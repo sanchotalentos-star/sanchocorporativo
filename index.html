@@ -807,6 +807,79 @@ body {
 /* error msg */
 .form-error { color: #E53E3E; font-size: 12px; margin-top: -10px; margin-bottom: 8px; display: none; }
 .form-error.show { display: block; }
+
+/* ===================== RESPONSIVE — TABLET ===================== */
+@media (max-width: 1024px) {
+  .slide {
+    padding: clamp(28px, 5vw, 60px) clamp(32px, 6vw, 80px);
+  }
+  .qr-layout {
+    gap: clamp(20px, 3vw, 40px);
+  }
+}
+
+/* ===================== RESPONSIVE — MOBILE ===================== */
+@media (max-width: 640px) {
+  body { overflow-x: hidden; }
+
+  .slide {
+    padding: 48px 24px 80px;
+    justify-content: flex-start;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* capa centralizada no mobile */
+  #slide-1 { justify-content: center; padding-top: 32px; }
+  #slide-1 .display { font-size: clamp(36px, 10vw, 56px); }
+
+  /* speakers: uma coluna */
+  .speakers-grid { grid-template-columns: 1fr; }
+
+  /* QR: empilha verticalmente, QR acima */
+  #slide-3 { align-items: center; }
+  .qr-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    text-align: center;
+  }
+  .qr-box { max-width: 180px; margin: 0 auto; }
+  #qrcode canvas, #qrcode img { width: 180px !important; height: 180px !important; }
+  .qr-right { align-items: center; }
+  .live-counter { justify-content: center; }
+  .presenter-btns { justify-content: center; }
+
+  /* comparação: uma coluna */
+  .compare-grid { grid-template-columns: 1fr; }
+
+  /* ações: label acima do texto */
+  .action-item {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  /* níveis: mais compactos */
+  .levels-list { gap: 6px; }
+
+  /* sorteio */
+  #slide-14 { justify-content: flex-start; padding-top: 40px; }
+  .raffle-num { font-size: clamp(52px, 14vw, 80px); }
+  .raffle-btns { flex-direction: column; align-items: center; }
+  .raffle-btn { width: 100%; max-width: 280px; }
+
+  /* logos de marca */
+  .brand-logos { flex-wrap: wrap; justify-content: center; gap: 16px; }
+
+  /* quote slide 4 */
+  #slide-4 { text-align: center; padding-top: 40px; }
+
+  /* word cloud */
+  #wordCloud { gap: 8px; }
+
+  /* counters e footer em mobile ficam menores */
+  #slide-counter { font-size: 11px; bottom: 12px; right: 16px; }
+  #footer-brand { font-size: 9px; bottom: 12px; left: 16px; }
+}
 </style>
 </head>
 <body>
@@ -1569,6 +1642,22 @@ function startLiveTracker() {
     lastCount = newCount;
   }, 1000);
 }
+
+// ===================== TOUCH SWIPE (celular/tablet) =====================
+let touchStartX = 0, touchStartY = 0;
+document.getElementById('deck').addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+document.getElementById('deck').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  // só reconhece swipe horizontal com pelo menos 45px e mais horizontal que vertical
+  if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    if (dx < 0) next();   // swipe ← = próximo
+    else prev();          // swipe → = anterior
+  }
+}, { passive: true });
 
 // ===================== BOOT =====================
 window.addEventListener('hashchange', route);
