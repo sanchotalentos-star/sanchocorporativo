@@ -11,7 +11,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/htm/dist/htm.umd.js"></script>
 <script>
 tailwind.config = {
   theme: {
@@ -21,10 +21,7 @@ tailwind.config = {
         sans: ['Inter','system-ui','sans-serif'],
       },
       colors: {
-        azul: '#1B4FE4',
-        'azul-dark': '#0D2B8A',
-        laranja: '#F4610E',
-        'laranja-light': '#F7893A',
+        azul:'#1B4FE4','azul-dark':'#0D2B8A',laranja:'#F4610E','laranja-light':'#F7893A',
       }
     }
   }
@@ -43,19 +40,19 @@ body{font-family:'Inter',sans-serif;overflow:hidden;background:#050F2C}
 .winner-glow{animation:pulseGlow 1s ease infinite alternate}
 @keyframes popScale{0%{transform:scale(0)}100%{transform:scale(1)}}
 .check-pop{animation:popScale .5s cubic-bezier(.175,.885,.32,1.275)}
-.pill{transition:transform .3s ease}
-.pill:hover{transform:scale(1.05)}
-.slide-enter{opacity:0;transform:translateX(24px)}
+.pill{transition:transform .3s ease}.pill:hover{transform:scale(1.05)}
 .slide-active{opacity:1;transform:translateX(0);transition:opacity .45s ease,transform .45s ease}
-input:focus{outline:none;border-color:#1B4FE4!important;box-shadow:0 0 0 3px rgba(27,79,228,.12)!important}
+input{outline:none}input:focus{border-color:#1B4FE4!important;box-shadow:0 0 0 3px rgba(27,79,228,.12)!important}
 </style>
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel">
+<script>
+/* ── htm + React setup (sem Babel) ── */
+const html = htm.bind(React.createElement);
 const {useState,useEffect,useRef,useCallback,useMemo} = React;
 
-/* ─── CONFIG ─── */
+/* ── Config ── */
 const firebaseConfig = {
   apiKey:            "COLE_AQUI",
   authDomain:        "COLE_AQUI",
@@ -84,390 +81,313 @@ const DEMO = [
 
 const POP_COLORS = ['#1B4FE4','#F4610E','#0D2B8A','#F7893A'];
 const TOTAL = 14;
-// fragments per slide (index = slide-1)
 const FRAGS = [0,0,0,1,4,2,5,5,1,5,5,4,1,0];
 
-/* ─── HELPERS ─── */
-const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+const cap  = s => s.charAt(0).toUpperCase()+s.slice(1);
 const first = s => (s||'').split(' ')[0];
 
-/* ─── FIREBASE HOOK ─── */
+/* ── Firebase hook ── */
 function useDB() {
-  const [parts, setParts] = useState([]);
-  const [rehearsal, setRehearsal] = useState(false);
+  const [parts,setParts] = useState([]);
+  const [rehearsal,setRehearsal] = useState(false);
   const dbRef = useRef(null);
 
-  useEffect(() => {
-    if (firebaseConfig.databaseURL === 'COLE_AQUI') { setRehearsal(true); return; }
-    try {
-      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  useEffect(()=>{
+    if(firebaseConfig.databaseURL==='COLE_AQUI'){setRehearsal(true);return;}
+    try{
+      if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       const ref = firebase.database().ref('participants');
       dbRef.current = ref;
-      ref.on('value', snap => {
-        const arr = [];
-        snap.forEach(c => arr.push(c.val()));
+      ref.on('value', snap=>{
+        const arr=[];
+        snap.forEach(c=>arr.push(c.val()));
         setParts(arr);
       });
-      return () => ref.off();
-    } catch(e) { setRehearsal(true); }
-  }, []);
+      return ()=>ref.off();
+    }catch(e){setRehearsal(true);}
+  },[]);
 
-  const inject = useCallback(() => setParts([...DEMO]), []);
-  const deleteAll = useCallback(() => {
-    if (dbRef.current) dbRef.current.remove();
-    else setParts([]);
-  }, []);
-  const add = useCallback(data => {
-    if (dbRef.current) return dbRef.current.push({...data, ts: Date.now()});
+  const inject   = useCallback(()=>setParts([...DEMO]),[]);
+  const deleteAll= useCallback(()=>{
+    if(dbRef.current) dbRef.current.remove(); else setParts([]);
+  },[]);
+  const add = useCallback(data=>{
+    if(dbRef.current) return dbRef.current.push({...data,ts:Date.now()});
     return Promise.resolve();
-  }, []);
+  },[]);
 
-  return {parts, rehearsal, inject, deleteAll, add};
+  return {parts,rehearsal,inject,deleteAll,add};
 }
 
-/* ─── ATOMS ─── */
-function Kicker({children}) {
-  return <p className="font-bold uppercase text-laranja tracking-[.22em] mb-5"
-             style={{fontSize:'clamp(11px,1vw,14px)'}}>{children}</p>;
+/* ── Atoms ── */
+function Kicker({children}){
+  return html`<p className="font-bold uppercase text-laranja tracking-[.22em] mb-5" style=${{fontSize:'clamp(11px,1vw,14px)'}}>${children}</p>`;
 }
-function Title({children, size='lg', className=''}) {
+
+function Title({children,size='lg',className=''}){
   const fs = size==='xl'?'clamp(52px,7.5vw,108px)'
             :size==='lg'?'clamp(36px,5.5vw,82px)'
             :size==='md'?'clamp(28px,4vw,58px)'
             :'clamp(22px,3.2vw,48px)';
-  return <div className={`font-serif font-black text-white leading-[1.05] mb-5 ${className}`}
-              style={{fontSize:fs}}>{children}</div>;
-}
-function Lead({children}) {
-  return <p className="text-white/70 leading-relaxed mb-7 max-w-2xl"
-             style={{fontSize:'clamp(14px,1.4vw,21px)'}}>{children}</p>;
-}
-function Hl({children}) { return <span style={{color:'#F4610E'}}>{children}</span>; }
-function Arrow({children}) {
-  return (
-    <li className="flex gap-3 items-start text-white/85" style={{fontSize:'clamp(13px,1.2vw,19px)'}}>
-      <span className="text-laranja font-bold flex-shrink-0 mt-px">→</span>
-      <span>{children}</span>
-    </li>
-  );
-}
-function Frag({i, rev, children, className=''}) {
-  return <div className={`${rev>=i?'frag-show':'frag-hide'} ${className}`}>{children}</div>;
-}
-function Brands({className=''}) {
-  return (
-    <div className={`flex items-center gap-8 ${className}`}>
-      <div className="flex flex-col items-center">
-        <span className="font-black tracking-[.15em] uppercase"
-              style={{color:'#1B4FE4',fontSize:'clamp(15px,1.9vw,28px)',textShadow:'0 0 28px rgba(27,79,228,.6)'}}>SANCHO</span>
-        <span className="text-white/35 tracking-[.2em] uppercase" style={{fontSize:'clamp(7px,.65vw,10px)'}}>Gestão de Carreira</span>
-      </div>
-      <span className="text-white/20" style={{fontSize:'clamp(18px,2.2vw,32px)'}}>×</span>
-      <div className="flex flex-col items-center">
-        <span className="font-black tracking-[.15em] uppercase"
-              style={{color:'#F4610E',fontSize:'clamp(15px,1.9vw,28px)',textShadow:'0 0 28px rgba(244,97,14,.5)'}}>ESCANDI</span>
-        <span className="text-white/35 tracking-[.2em] uppercase" style={{fontSize:'clamp(7px,.65vw,10px)'}}>Inteligência em Marcas</span>
-      </div>
-    </div>
-  );
-}
-function Wrap({center=false,children,className=''}) {
-  return (
-    <div className={`w-full h-full flex flex-col ${center?'items-center justify-center text-center':'justify-center items-start'} ${className}`}
-         style={{padding:'clamp(36px,6vw,96px) clamp(44px,8vw,136px)'}}>
-      {children}
-    </div>
-  );
+  return html`<div className=${'font-serif font-black text-white leading-[1.05] mb-5 '+className} style=${{fontSize:fs}}>${children}</div>`;
 }
 
-/* ─── QR CODE ─── */
-function QR({url}) {
-  const el = useRef(null);
-  const done = useRef(false);
-  useEffect(() => {
-    if (!el.current||done.current||!url) return;
-    done.current = true;
-    try {
-      new QRCode(el.current,{text:url,width:220,height:220,colorDark:'#050F2C',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
-    } catch(e) {
-      if(el.current) el.current.innerHTML='<div style="width:220px;height:220px;background:#eee;display:flex;align-items:center;justify-content:center;color:#555;font-size:12px;text-align:center;padding:16px;border-radius:8px;">QR disponível após deploy</div>';
-    }
+function Lead({children}){
+  return html`<p className="text-white/70 leading-relaxed mb-7 max-w-2xl" style=${{fontSize:'clamp(14px,1.4vw,21px)'}}>${children}</p>`;
+}
+
+function Hl({children}){return html`<span style=${{color:'#F4610E'}}>${children}</span>`;}
+
+function Arrow({children}){
+  return html`<li className="flex gap-3 items-start text-white/85" style=${{fontSize:'clamp(13px,1.2vw,19px)'}}>
+    <span className="text-laranja font-bold flex-shrink-0 mt-px">→</span>
+    <span>${children}</span>
+  </li>`;
+}
+
+function Frag({i,rev,children,className=''}){
+  return html`<div className=${(rev>=i?'frag-show':'frag-hide')+' '+className}>${children}</div>`;
+}
+
+function Brands({className=''}){
+  return html`<div className=${'flex items-center gap-8 '+className}>
+    <div className="flex flex-col items-center">
+      <span className="font-black tracking-[.15em] uppercase" style=${{color:'#1B4FE4',fontSize:'clamp(15px,1.9vw,28px)',textShadow:'0 0 28px rgba(27,79,228,.6)'}}>SANCHO</span>
+      <span className="text-white/35 tracking-[.2em] uppercase" style=${{fontSize:'clamp(7px,.65vw,10px)'}}>Gestão de Carreira</span>
+    </div>
+    <span className="text-white/20" style=${{fontSize:'clamp(18px,2.2vw,32px)'}}>×</span>
+    <div className="flex flex-col items-center">
+      <span className="font-black tracking-[.15em] uppercase" style=${{color:'#F4610E',fontSize:'clamp(15px,1.9vw,28px)',textShadow:'0 0 28px rgba(244,97,14,.5)'}}>ESCANDI</span>
+      <span className="text-white/35 tracking-[.2em] uppercase" style=${{fontSize:'clamp(7px,.65vw,10px)'}}>Inteligência em Marcas</span>
+    </div>
+  </div>`;
+}
+
+function Wrap({center=false,children,className=''}){
+  return html`<div className=${'w-full h-full flex flex-col '+(center?'items-center justify-center text-center':'justify-center items-start')+' '+className}
+                   style=${{padding:'clamp(36px,6vw,96px) clamp(44px,8vw,136px)'}}>
+    ${children}
+  </div>`;
+}
+
+/* ── QR Code ── */
+function QR({url}){
+  const el=useRef(null); const done=useRef(false);
+  useEffect(()=>{
+    if(!el.current||done.current||!url) return;
+    done.current=true;
+    try{new QRCode(el.current,{text:url,width:220,height:220,colorDark:'#050F2C',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});}
+    catch(e){if(el.current)el.current.innerHTML='<div style="width:220px;height:220px;background:#eee;display:flex;align-items:center;justify-content:center;color:#555;font-size:12px;text-align:center;padding:16px;border-radius:8px;">QR disponível após configurar a URL</div>';}
   },[url]);
-  return <div ref={el}/>;
+  return html`<div ref=${el}></div>`;
 }
 
-/* ─── WORD CLOUD ─── */
-function WordCloud({parts}) {
-  const groups = useMemo(() => {
+/* ── Word Cloud ── */
+function WordCloud({parts}){
+  const groups = useMemo(()=>{
     const g={};
-    parts.forEach(p => {
+    parts.forEach(p=>{
       const k=(p.palavra||'').trim().toLowerCase();
       if(!k) return;
       (g[k]=g[k]||[]).push(p.nome);
     });
     return g;
   },[parts]);
-  const max = useMemo(() => Math.max(1,...Object.values(groups).map(a=>a.length)),[groups]);
+  const max = useMemo(()=>Math.max(1,...Object.values(groups).map(a=>a.length)),[groups]);
 
   if(!Object.keys(groups).length)
-    return <p className="text-white/25 text-lg py-8">Aguardando participantes escanearem o QR...</p>;
+    return html`<p className="text-white/25 text-lg py-8">Aguardando participantes escanearem o QR...</p>`;
 
-  return (
-    <div className="flex flex-wrap gap-3 items-center justify-center py-4 max-w-5xl">
-      {Object.entries(groups).map(([w,names],i) => {
-        const f=names.length/max;
-        return (
-          <div key={w} className="pill flex flex-col items-center rounded-full px-4 py-1.5"
-               style={{
-                 fontSize:`clamp(16px,${1.2+f*2.8}vw,54px)`,
-                 opacity:0.65+f*0.35,
-                 background:'rgba(255,255,255,.08)',
-                 border:`1px solid ${i%2===0?'rgba(244,97,14,.4)':'rgba(255,255,255,.15)'}`,
-               }}>
-            <span className="text-white font-bold leading-tight">{cap(w)}</span>
-            <span className="text-white/45" style={{fontSize:'.52em',marginTop:'.1em'}}>
-              {names.slice(0,3).map(n=>first(n)).join(', ')}{names.length>3?'…':''}
-            </span>
-          </div>
-        );
-      })}
-    </div>
-  );
+  return html`<div className="flex flex-wrap gap-3 items-center justify-center py-4 max-w-5xl">
+    ${Object.entries(groups).map(([w,names],i)=>{
+      const f=names.length/max;
+      return html`<div key=${w} className="pill flex flex-col items-center rounded-full px-4 py-1.5"
+          style=${{fontSize:`clamp(16px,${1.2+f*2.8}vw,54px)`,opacity:0.65+f*0.35,
+            background:'rgba(255,255,255,.08)',border:`1px solid ${i%2===0?'rgba(244,97,14,.4)':'rgba(255,255,255,.15)'}`}}>
+        <span className="text-white font-bold leading-tight">${cap(w)}</span>
+        <span className="text-white/45" style=${{fontSize:'.52em',marginTop:'.1em'}}>
+          ${names.slice(0,3).map(n=>first(n)).join(', ')}${names.length>3?'…':''}
+        </span>
+      </div>`;
+    })}
+  </div>`;
 }
 
-/* ─── NAME POPPERS ─── */
-function Poppers({queue}) {
-  const [list, setList] = useState([]);
-  const idRef = useRef(0);
-  useEffect(() => {
+/* ── Name Poppers ── */
+function Poppers({queue}){
+  const [list,setList]=useState([]);
+  const idRef=useRef(0);
+  useEffect(()=>{
     if(!queue||!queue.length) return;
-    queue.forEach((name,i) => setTimeout(()=>{
-      const id = ++idRef.current;
-      const s = Math.random();
-      let style = {};
+    queue.forEach((name,i)=>setTimeout(()=>{
+      const id=++idRef.current;
+      const s=Math.random();
+      let style={};
       if(s<.25)      style={left:(5+Math.random()*18)+'vw',top:(15+Math.random()*70)+'vh'};
       else if(s<.5)  style={right:(5+Math.random()*18)+'vw',top:(15+Math.random()*70)+'vh'};
       else if(s<.75) style={top:(5+Math.random()*12)+'vh',left:(15+Math.random()*55)+'vw'};
       else           style={bottom:(5+Math.random()*12)+'vh',left:(15+Math.random()*55)+'vw'};
-      const color = POP_COLORS[Math.floor(Math.random()*POP_COLORS.length)];
+      const color=POP_COLORS[Math.floor(Math.random()*POP_COLORS.length)];
       setList(l=>[...l,{id,name,style,color}]);
       setTimeout(()=>setList(l=>l.filter(x=>x.id!==id)),3600);
     },i*280));
   },[queue]);
-  return <>
-    {list.map(p=>(
-      <div key={p.id} className="name-pop fixed z-50 font-bold text-white px-4 py-2 rounded-full pointer-events-none"
-           style={{...p.style,background:p.color,fontSize:'clamp(13px,1.3vw,18px)'}}>
-        {p.name}
-      </div>
-    ))}
-  </>;
+  return html`<div>
+    ${list.map(p=>html`<div key=${p.id} className="name-pop fixed z-50 font-bold text-white px-4 py-2 rounded-full pointer-events-none"
+        style=${{...p.style,background:p.color,fontSize:'clamp(13px,1.3vw,18px)'}}>
+      ${p.name}
+    </div>`)}
+  </div>`;
 }
 
-/* ─── WINNER OVERLAY ─── */
-function Winner({w, onClose}) {
+/* ── Winner Overlay ── */
+function Winner({w,onClose}){
   if(!w) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 text-center p-10"
-         style={{background:'rgba(5,15,44,.95)'}}>
-      <div style={{fontSize:'clamp(52px,7vw,96px)'}}>🎯</div>
-      <div className="winner-glow font-serif font-black" style={{color:'#F4610E',fontSize:'clamp(36px,5vw,72px)'}}>
-        {w.nome}
-      </div>
-      <div className="text-white/65" style={{fontSize:'clamp(15px,1.4vw,21px)'}}>
-        {w.segmento} · "{w.palavra}"
-      </div>
-      <button onClick={onClose}
-              className="mt-4 px-8 py-3 rounded-xl border border-white/25 text-white text-sm font-semibold hover:bg-white/10 transition-colors">
-        Fechar
-      </button>
-    </div>
-  );
+  return html`<div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 text-center p-10"
+       style=${{background:'rgba(5,15,44,.95)'}}>
+    <div style=${{fontSize:'clamp(52px,7vw,96px)'}}>🎯</div>
+    <div className="winner-glow font-serif font-black" style=${{color:'#F4610E',fontSize:'clamp(36px,5vw,72px)'}}>${w.nome}</div>
+    <div className="text-white/65" style=${{fontSize:'clamp(15px,1.4vw,21px)'}}>${w.segmento} · "${w.palavra}"</div>
+    <button onClick=${onClose} className="mt-4 px-8 py-3 rounded-xl border border-white/25 text-white text-sm font-semibold hover:bg-white/10 transition-colors">Fechar</button>
+  </div>`;
 }
 
-/* ═══════════════════ SLIDES ═══════════════════ */
+/* ══════════════════ SLIDES ══════════════════ */
 
-function S1() {
-  return (
-    <Wrap center>
-      <Kicker>Workshop · 23 de Junho · Fortaleza</Kicker>
-      <Title size="xl">Marca que Vende<br/><Hl>SEM Cerimônias</Hl></Title>
-      <Lead>Posicione sua marca e transforme ela no seu melhor vendedor.</Lead>
-      <p className="text-white/50 mb-8" style={{fontSize:'clamp(12px,.95vw,15px)'}}>
-        Wladson Sidney · Sancho &nbsp;|&nbsp; Diego Mourão · Escandi
-      </p>
-      <Brands/>
-    </Wrap>
-  );
+function S1(){
+  return html`<${Wrap} center=${true}>
+    <${Kicker}>Workshop · 23 de Junho · Fortaleza<//>
+    <${Title} size="xl">Marca que Vende<br/><${Hl}>SEM Cerimônias<//><//>
+    <${Lead}>Posicione sua marca e transforme ela no seu melhor vendedor.<//>
+    <p className="text-white/50 mb-8" style=${{fontSize:'clamp(12px,.95vw,15px)'}}>Wladson Sidney · Sancho | Diego Mourão · Escandi</p>
+    <${Brands}/>
+  <//>`;
 }
 
-function S2() {
-  const speakers = [
-    {ini:'WS',nome:'Wladson Sidney',cargo:'Gestor de Carreiras · Sancho',
-     bio:'Criador do método Se Amostramento Profissional. MC e gestor de talentos. Presidente da ADVB Ceará.',cor:'#1B4FE4'},
-    {ini:'DM',nome:'Diego Mourão',cargo:'Estrategista de Marca · Escandi',
-     bio:'Especialista em branding e inteligência de marca. Founder da Escandi Branding.',cor:'#F4610E'},
+function S2(){
+  const speakers=[
+    {ini:'WS',nome:'Wladson Sidney',cargo:'Gestor de Carreiras · Sancho',bio:'Criador do método Se Amostramento Profissional. MC e gestor de talentos. Presidente da ADVB Ceará.',cor:'#1B4FE4'},
+    {ini:'DM',nome:'Diego Mourão',cargo:'Estrategista de Marca · Escandi',bio:'Especialista em branding e inteligência de marca. Founder da Escandi Branding.',cor:'#F4610E'},
   ];
-  return (
-    <Wrap>
-      <Kicker>Quem vai falar com você</Kicker>
-      <Title size="md">Os Palestrantes</Title>
-      <div className="grid grid-cols-2 gap-5 w-full max-w-3xl">
-        {speakers.map(s=>(
-          <div key={s.ini} className="rounded-2xl p-7 flex flex-col gap-3"
-               style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)'}}>
-            <div className="w-14 h-14 rounded-full flex items-center justify-center font-black text-white text-lg"
-                 style={{background:s.cor}}>{s.ini}</div>
-            <div className="font-bold text-white" style={{fontSize:'clamp(14px,1.4vw,20px)'}}>{s.nome}</div>
-            <div className="font-bold uppercase tracking-widest" style={{color:'#F4610E',fontSize:'clamp(9px,.8vw,11px)'}}>{s.cargo}</div>
-            <div className="text-white/55 leading-relaxed" style={{fontSize:'clamp(11px,.9vw,14px)'}}>{s.bio}</div>
-          </div>
-        ))}
-      </div>
-    </Wrap>
-  );
+  return html`<${Wrap}>
+    <${Kicker}>Quem vai falar com você<//>
+    <${Title} size="md">Os Palestrantes<//>
+    <div className="grid grid-cols-2 gap-5 w-full max-w-3xl">
+      ${speakers.map(s=>html`<div key=${s.ini} className="rounded-2xl p-7 flex flex-col gap-3" style=${{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)'}}>
+        <div className="w-14 h-14 rounded-full flex items-center justify-center font-black text-white text-lg" style=${{background:s.cor}}>${s.ini}</div>
+        <div className="font-bold text-white" style=${{fontSize:'clamp(14px,1.4vw,20px)'}}>${s.nome}</div>
+        <div className="font-bold uppercase tracking-widest" style=${{color:'#F4610E',fontSize:'clamp(9px,.8vw,11px)'}}>${s.cargo}</div>
+        <div className="text-white/55 leading-relaxed" style=${{fontSize:'clamp(11px,.9vw,14px)'}}>${s.bio}</div>
+      </div>`)}
+    </div>
+  <//>`;
 }
 
-function S3({parts, onDraw, onCopy, onCSV}) {
+function S3({parts,onDraw,onCopy,onCSV}){
   const url = window.location.href.split('#')[0]+'#/form';
-  return (
-    <Wrap>
-      <Kicker>Antes de começar — Sorteio especial</Kicker>
-      <div className="grid grid-cols-2 gap-14 w-full max-w-4xl items-start">
-        {/* QR */}
-        <div className="rounded-2xl p-6 flex flex-col items-center gap-4 bg-white"
-             style={{boxShadow:'0 20px 60px rgba(0,0,0,.4)'}}>
-          <QR url={url}/>
-          <span className="text-gray-500 text-center break-all"
-                style={{fontFamily:'monospace',fontSize:'clamp(9px,.75vw,12px)'}}>{url}</span>
+  return html`<${Wrap}>
+    <${Kicker}>Antes de começar — Sorteio especial<//>
+    <div className="grid grid-cols-2 gap-14 w-full max-w-4xl items-start">
+      <div className="rounded-2xl p-6 flex flex-col items-center gap-4 bg-white" style=${{boxShadow:'0 20px 60px rgba(0,0,0,.4)'}}>
+        <${QR} url=${url}/>
+        <span className="text-gray-500 text-center break-all" style=${{fontFamily:'monospace',fontSize:'clamp(9px,.75vw,12px)'}}>${url}</span>
+      </div>
+      <div className="flex flex-col gap-4">
+        <div style=${{fontSize:'clamp(26px,3.2vw,42px)'}}>🎁</div>
+        <${Title} size="md">Concorra ao <${Hl}>sorteio<//><//>
+        <${Lead}>Escaneie o QR, responda 3 perguntas e participe do sorteio de encerramento.<//>
+        <div className="flex items-baseline gap-3">
+          <span className="font-serif font-black" style=${{fontSize:'clamp(52px,6vw,86px)',color:'#1B4FE4',lineHeight:1}}>${parts.length}</span>
+          <span className="text-white/55" style=${{fontSize:'clamp(13px,1.1vw,16px)'}}>já participaram</span>
         </div>
-        {/* Info */}
-        <div className="flex flex-col gap-4">
-          <div style={{fontSize:'clamp(26px,3.2vw,42px)'}}>🎁</div>
-          <Title size="md">Concorra ao <Hl>sorteio</Hl></Title>
-          <Lead>Escaneie o QR, responda 3 perguntas e participe do sorteio de encerramento.</Lead>
-          {/* Live counter */}
-          <div className="flex items-baseline gap-3">
-            <span className="font-serif font-black" style={{fontSize:'clamp(52px,6vw,86px)',color:'#1B4FE4',lineHeight:1}}>
-              {parts.length}
-            </span>
-            <span className="text-white/55" style={{fontSize:'clamp(13px,1.1vw,16px)'}}>já participaram</span>
-          </div>
-          {/* Participant names ticker */}
-          {parts.length>0 && (
-            <div className="flex flex-wrap gap-2 max-h-20 overflow-hidden">
-              {parts.slice(-8).map((p,i)=>(
-                <span key={i} className="text-white/70 text-xs px-3 py-1 rounded-full font-semibold"
-                      style={{background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.12)'}}>
-                  {first(p.nome)}
-                </span>
-              ))}
-              {parts.length>8 && <span className="text-white/40 text-xs py-1">+{parts.length-8} mais</span>}
-            </div>
-          )}
-          <div className="flex flex-wrap gap-2 mt-1">
-            {[['🎯 Sortear',onDraw],['📋 Copiar',onCopy],['⬇ CSV',onCSV]].map(([l,fn])=>(
-              <button key={l} onClick={e=>{e.stopPropagation();fn();}}
-                      className="text-xs px-3 py-2 rounded-lg text-white/65 font-semibold hover:bg-white/15 transition-colors"
-                      style={{background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.14)'}}>
-                {l}
-              </button>
-            ))}
-          </div>
+        ${parts.length>0 && html`<div className="flex flex-wrap gap-2 max-h-20 overflow-hidden">
+          ${parts.slice(-8).map((p,i)=>html`<span key=${i} className="text-white/70 text-xs px-3 py-1 rounded-full font-semibold" style=${{background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.12)'}}>
+            ${first(p.nome)}
+          </span>`)}
+          ${parts.length>8 && html`<span className="text-white/40 text-xs py-1">+${parts.length-8} mais</span>`}
+        </div>`}
+        <div className="flex flex-wrap gap-2 mt-1">
+          ${[['🎯 Sortear',onDraw],['📋 Copiar',onCopy],['⬇ CSV',onCSV]].map(([l,fn])=>html`
+            <button key=${l} onClick=${e=>{e.stopPropagation();fn();}}
+                className="text-xs px-3 py-2 rounded-lg text-white/65 font-semibold hover:bg-white/15 transition-colors"
+                style=${{background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.14)'}}>
+              ${l}
+            </button>`)}
         </div>
       </div>
-    </Wrap>
-  );
+    </div>
+  <//>`;
 }
 
-function S4({rev}) {
-  return (
-    <Wrap center>
-      <div className="font-serif font-bold text-white leading-snug max-w-4xl mb-10"
-           style={{fontSize:'clamp(23px,3.6vw,56px)'}}>
-        "Quantas oportunidades você já perdeu porque as pessoas não sabem o que você faz?"
+function S4({rev}){
+  return html`<${Wrap} center=${true}>
+    <div className="font-serif font-bold text-white leading-snug max-w-4xl mb-10" style=${{fontSize:'clamp(23px,3.6vw,56px)'}}>
+      "Quantas oportunidades você já perdeu porque as pessoas não sabem o que você faz?"
+    </div>
+    <${Frag} i=${0} rev=${rev}>
+      <p className="text-white/75 leading-relaxed max-w-2xl" style=${{fontSize:'clamp(15px,1.4vw,22px)'}}>
+        O mercado não premia apenas competência.<br/>
+        O mercado premia <strong style=${{color:'#F4610E'}}>competência conhecida</strong>.
+      </p>
+    <//>
+  <//>`;
+}
+
+function S5({rev}){
+  return html`<${Wrap}>
+    <${Kicker}>O maior erro dos talentos escondidos<//>
+    <${Title} size="md">"Não fale de si."<br/>"Espere que reconheçam<br/>seu valor."<//>
+    <ul className="flex flex-col gap-3 mb-4">
+      ${['Muita gente talentosa vive escondida.',
+         'Muita gente mediana vive cheia de oportunidades.',
+         'Qual a diferença? Uma decidiu aparecer.'
+        ].map((t,i)=>html`<${Frag} key=${i} i=${i} rev=${rev}><${Arrow}>${t}<//>  <//>`)}
+    </ul>
+    <${Frag} i=${3} rev=${rev}>
+      <p className="font-bold leading-snug mt-3" style=${{color:'#F4610E',fontSize:'clamp(15px,1.6vw,24px)'}}>
+        Invisibilidade não é humildade.<br/>Muitas vezes é apenas medo disfarçado.
+      </p>
+    <//>
+  <//>`;
+}
+
+function S6({rev}){
+  return html`<${Wrap}>
+    <${Kicker}>A diferença que muda tudo<//>
+    <${Title} size="lg">Arrogância <${Hl}>≠<//>Autoridade<//>
+    <${Frag} i=${0} rev=${rev}>
+      <div className="grid grid-cols-2 gap-5 w-full max-w-3xl mb-5">
+        ${[{title:'Arrogância',cor:'#E53E3E',tc:'#FC8181',items:['Precisa parecer melhor que os outros','Fala mais do que faz','Busca aplauso']},
+           {title:'Autoridade',cor:'#F4610E',tc:'#F4610E',items:['Compartilha experiências','Entrega valor antes de pedir qualquer coisa','Faz para servir']},
+          ].map(c=>html`<div key=${c.title} className="rounded-2xl p-6" style=${{background:'rgba(255,255,255,.07)',borderTop:`3px solid ${c.cor}`}}>
+          <p className="font-black uppercase tracking-widest mb-4" style=${{color:c.tc,fontSize:'clamp(9px,.85vw,12px)'}}>${c.title}</p>
+          <ul className="flex flex-col gap-2">
+            ${c.items.map(t=>html`<li key=${t} className="flex gap-2 items-start text-white/70" style=${{fontSize:'clamp(11px,.95vw,14px)'}}>
+              <span style=${{color:c.cor}} className="flex-shrink-0">·</span>${t}
+            </li>`)}
+          </ul>
+        </div>`)}
       </div>
-      <Frag i={0} rev={rev}>
-        <p className="text-white/75 leading-relaxed max-w-2xl" style={{fontSize:'clamp(15px,1.4vw,22px)'}}>
-          O mercado não premia apenas competência.<br/>
-          O mercado premia <strong style={{color:'#F4610E'}}>competência conhecida</strong>.
-        </p>
-      </Frag>
-    </Wrap>
-  );
+    <//>
+    <${Frag} i=${1} rev=${rev}>
+      <p className="font-bold" style=${{color:'#F4610E',fontSize:'clamp(14px,1.4vw,21px)'}}>Arrogância é sobre ego. Autoridade é sobre contribuição.</p>
+    <//>
+  <//>`;
 }
 
-function S5({rev}) {
-  return (
-    <Wrap>
-      <Kicker>O maior erro dos talentos escondidos</Kicker>
-      <Title size="md">"Não fale de si."<br/>"Espere que reconheçam<br/>seu valor."</Title>
-      <ul className="flex flex-col gap-3 mb-4">
-        {['Muita gente talentosa vive escondida.',
-          'Muita gente mediana vive cheia de oportunidades.',
-          <>Qual a diferença? <strong>Uma decidiu aparecer.</strong></>
-        ].map((t,i)=><Frag key={i} i={i} rev={rev}><Arrow>{t}</Arrow></Frag>)}
-      </ul>
-      <Frag i={3} rev={rev}>
-        <p className="font-bold leading-snug mt-3" style={{color:'#F4610E',fontSize:'clamp(15px,1.6vw,24px)'}}>
-          Invisibilidade não é humildade.<br/>Muitas vezes é apenas medo disfarçado.
-        </p>
-      </Frag>
-    </Wrap>
-  );
+function S7({rev}){
+  return html`<${Wrap}>
+    <${Kicker}>O método<//>
+    <${Title} size="md">Se Amostramento<br/><${Hl}>Profissional<//><//>
+    <${Lead}>O ato consciente de tornar visível o valor que você gera.<//>
+    <ul className="flex flex-col gap-3">
+      ${['Sem fingimento ou personagem inventado','Deixar rastros do seu trabalho','Documentar sua jornada','Compartilhar aprendizados reais','Ocupar espaços com intenção']
+        .map((t,i)=>html`<${Frag} key=${i} i=${i} rev=${rev}><${Arrow}>${t}<//>  <//>`)}
+    </ul>
+  <//>`;
 }
 
-function S6({rev}) {
-  return (
-    <Wrap>
-      <Kicker>A diferença que muda tudo</Kicker>
-      <Title size="lg">Arrogância <Hl>≠</Hl> Autoridade</Title>
-      <Frag i={0} rev={rev}>
-        <div className="grid grid-cols-2 gap-5 w-full max-w-3xl mb-5">
-          {[{title:'Arrogância',cor:'#E53E3E',tc:'#FC8181',items:['Precisa parecer melhor que os outros','Fala mais do que faz','Busca aplauso']},
-            {title:'Autoridade',cor:'#F4610E',tc:'#F4610E',items:['Compartilha experiências','Entrega valor antes de pedir qualquer coisa','Faz para servir']},
-          ].map(c=>(
-            <div key={c.title} className="rounded-2xl p-6" style={{background:'rgba(255,255,255,.07)',borderTop:`3px solid ${c.cor}`}}>
-              <p className="font-black uppercase tracking-widest mb-4" style={{color:c.tc,fontSize:'clamp(9px,.85vw,12px)'}}>{c.title}</p>
-              <ul className="flex flex-col gap-2">
-                {c.items.map(t=>(
-                  <li key={t} className="flex gap-2 items-start text-white/70" style={{fontSize:'clamp(11px,.95vw,14px)'}}>
-                    <span style={{color:c.cor}} className="flex-shrink-0">·</span>{t}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </Frag>
-      <Frag i={1} rev={rev}>
-        <p className="font-bold" style={{color:'#F4610E',fontSize:'clamp(14px,1.4vw,21px)'}}>
-          Arrogância é sobre ego. Autoridade é sobre contribuição.
-        </p>
-      </Frag>
-    </Wrap>
-  );
-}
-
-function S7({rev}) {
-  return (
-    <Wrap>
-      <Kicker>O método</Kicker>
-      <Title size="md">Se Amostramento<br/><Hl>Profissional</Hl></Title>
-      <Lead>O ato consciente de tornar visível o valor que você gera.</Lead>
-      <ul className="flex flex-col gap-3">
-        {['Sem fingimento ou personagem inventado',
-          'Deixar rastros do seu trabalho',
-          'Documentar sua jornada',
-          'Compartilhar aprendizados reais',
-          'Ocupar espaços com intenção',
-        ].map((t,i)=><Frag key={i} i={i} rev={rev}><Arrow>{t}</Arrow></Frag>)}
-      </ul>
-    </Wrap>
-  );
-}
-
-function S8({rev}) {
+function S8({rev}){
   const levels=[
     {n:'Nível 1',name:'EXISTIR',desc:'Você faz. Mas ninguém sabe.',hl:false},
     {n:'Nível 2',name:'APARECER',desc:'Você começa a mostrar. Ainda com vergonha.',hl:false},
@@ -475,76 +395,64 @@ function S8({rev}) {
     {n:'Nível 4',name:'INFLUENCIAR',desc:'As pessoas procuram sua opinião.',hl:false},
     {n:'Nível 5',name:'REFERÊNCIA',desc:'Quando falam do assunto, falam de você.',hl:true},
   ];
-  return (
-    <Wrap>
-      <Kicker>Onde você está agora?</Kicker>
-      <Title size="md">Os <Hl>5 Níveis</Hl></Title>
-      <ul className="flex flex-col gap-2 w-full max-w-2xl">
-        {levels.map((l,i)=>(
-          <Frag key={i} i={i} rev={rev}>
-            <li className="grid items-center rounded-xl px-5 py-3"
-                style={{gridTemplateColumns:'auto 1fr',gap:'16px',
-                  background:l.hl?'rgba(244,97,14,.12)':'rgba(255,255,255,.05)',
-                  borderLeft:`3px solid ${l.hl?'#F4610E':'rgba(255,255,255,.15)'}`}}>
-              <span className="text-white/30 font-bold tracking-wider" style={{fontSize:'clamp(9px,.8vw,12px)'}}>{l.n}</span>
-              <div>
-                <div className="font-bold" style={{color:l.hl?'#F4610E':'white',fontSize:'clamp(12px,1.1vw,16px)'}}>{l.name}</div>
-                <div className="text-white/50" style={{fontSize:'clamp(10px,.85vw,13px)'}}>{l.desc}</div>
-              </div>
-            </li>
-          </Frag>
-        ))}
-      </ul>
-    </Wrap>
-  );
+  return html`<${Wrap}>
+    <${Kicker}>Onde você está agora?<//>
+    <${Title} size="md">Os <${Hl}>5 Níveis<//><//>
+    <ul className="flex flex-col gap-2 w-full max-w-2xl">
+      ${levels.map((l,i)=>html`<${Frag} key=${i} i=${i} rev=${rev}>
+        <li className="grid items-center rounded-xl px-5 py-3"
+            style=${{gridTemplateColumns:'auto 1fr',gap:'16px',background:l.hl?'rgba(244,97,14,.12)':'rgba(255,255,255,.05)',borderLeft:`3px solid ${l.hl?'#F4610E':'rgba(255,255,255,.15)'}`}}>
+          <span className="text-white/30 font-bold tracking-wider" style=${{fontSize:'clamp(9px,.8vw,12px)'}}>${l.n}</span>
+          <div>
+            <div className="font-bold" style=${{color:l.hl?'#F4610E':'white',fontSize:'clamp(12px,1.1vw,16px)'}}>${l.name}</div>
+            <div className="text-white/50" style=${{fontSize:'clamp(10px,.85vw,13px)'}}>${l.desc}</div>
+          </div>
+        </li>
+      <//>`)}
+    </ul>
+  <//>`;
 }
 
-function S9({parts, rev}) {
-  return (
-    <Wrap center>
-      <Kicker>O que a sala disse sobre si mesma</Kicker>
-      <Title size="md">A palavra que <Hl>te define</Hl></Title>
-      <WordCloud parts={parts}/>
-      <div className="flex items-baseline gap-3 mt-2">
-        <span className="font-serif font-black" style={{fontSize:'clamp(38px,5vw,70px)',color:'#1B4FE4',lineHeight:1}}>
-          {parts.length}
-        </span>
-        <span className="text-white/50" style={{fontSize:'clamp(13px,1.1vw,17px)'}}>palavras registradas</span>
-      </div>
-      <Frag i={0} rev={rev} className="mt-5 max-w-2xl">
-        <p className="font-serif italic text-white/70 leading-snug" style={{fontSize:'clamp(14px,1.4vw,21px)'}}>
-          "Sua palavra é o início da sua marca. Agora o desafio é torná-la visível."
+function S9({parts,rev}){
+  return html`<${Wrap} center=${true}>
+    <${Kicker}>O que a sala disse sobre si mesma<//>
+    <${Title} size="md">A palavra que <${Hl}>te define<//><//>
+    <${WordCloud} parts=${parts}/>
+    <div className="flex items-baseline gap-3 mt-2">
+      <span className="font-serif font-black" style=${{fontSize:'clamp(38px,5vw,70px)',color:'#1B4FE4',lineHeight:1}}>${parts.length}</span>
+      <span className="text-white/50" style=${{fontSize:'clamp(13px,1.1vw,17px)'}}>palavras registradas</span>
+    </div>
+    <${Frag} i=${0} rev=${rev} className="mt-5 max-w-2xl">
+      <p className="font-serif italic text-white/70 leading-snug" style=${{fontSize:'clamp(14px,1.4vw,21px)'}}>
+        "Sua palavra é o início da sua marca. Agora o desafio é torná-la visível."
+      </p>
+    <//>
+  <//>`;
+}
+
+function S10({rev}){
+  return html`<${Wrap}>
+    <${Kicker}>O ponto mais importante<//>
+    <${Title} size="md">Você não precisa<br/>virar outra pessoa.<//>
+    <p className="text-white/60 mb-3" style=${{fontSize:'clamp(13px,1.1vw,17px)'}}>Você não precisa ser:</p>
+    <ul className="flex flex-col gap-3 mb-4">
+      ${['Mais extrovertido','Mais engraçado','Mais polêmico','Mais barulhento']
+        .map((t,i)=>html`<${Frag} key=${i} i=${i} rev=${rev}><${Arrow}>${t}<//>  <//>`)}
+    </ul>
+    <${Frag} i=${4} rev=${rev}>
+      <div className="mt-2">
+        <p className="font-bold leading-snug mb-3" style=${{color:'#F4610E',fontSize:'clamp(15px,1.6vw,24px)'}}>
+          Você precisa ser mais visível.<br/>Mais autêntico. Mais você.
         </p>
-      </Frag>
-    </Wrap>
-  );
+        <p className="font-serif italic text-white/55" style=${{fontSize:'clamp(12px,1.1vw,17px)'}}>
+          "O sucesso sustentável acontece quando a visibilidade encontra a autenticidade."
+        </p>
+      </div>
+    <//>
+  <//>`;
 }
 
-function S10({rev}) {
-  return (
-    <Wrap>
-      <Kicker>O ponto mais importante</Kicker>
-      <Title size="md">Você não precisa<br/>virar outra pessoa.</Title>
-      <p className="text-white/60 mb-3" style={{fontSize:'clamp(13px,1.1vw,17px)'}}>Você não precisa ser:</p>
-      <ul className="flex flex-col gap-3 mb-4">
-        {['Mais extrovertido','Mais engraçado','Mais polêmico','Mais barulhento']
-          .map((t,i)=><Frag key={i} i={i} rev={rev}><Arrow>{t}</Arrow></Frag>)}
-      </ul>
-      <Frag i={4} rev={rev}>
-        <div className="mt-2">
-          <p className="font-bold leading-snug mb-3" style={{color:'#F4610E',fontSize:'clamp(15px,1.6vw,24px)'}}>
-            Você precisa ser mais visível.<br/>Mais autêntico. Mais você.
-          </p>
-          <p className="font-serif italic text-white/55" style={{fontSize:'clamp(12px,1.1vw,17px)'}}>
-            "O sucesso sustentável acontece quando a visibilidade encontra a autenticidade."
-          </p>
-        </div>
-      </Frag>
-    </Wrap>
-  );
-}
-
-function S11({rev}) {
+function S11({rev}){
   const acts=[
     {k:'MOSTRAR',v:'Conte o que faz. Sem esperar ser perguntado.',hl:false},
     {k:'COMPARTILHAR',v:'Ensine o que aprende. Generosidade gera autoridade.',hl:false},
@@ -552,158 +460,128 @@ function S11({rev}) {
     {k:'CONECTAR',v:'Construa relacionamentos antes de precisar deles.',hl:false},
     {k:'REPETIR',v:null,hl:true},
   ];
-  return (
-    <Wrap>
-      <Kicker>Ação imediata</Kicker>
-      <Title size="md">Do conhecimento<br/>para o <Hl>movimento</Hl></Title>
-      <ul className="flex flex-col gap-2 w-full max-w-2xl">
-        {acts.map((a,i)=>(
-          <Frag key={i} i={i} rev={rev}>
-            <li className="grid items-center rounded-xl px-5 py-3"
-                style={{gridTemplateColumns:'120px 1fr',gap:'16px',
-                  background:a.hl?'rgba(244,97,14,.1)':'rgba(255,255,255,.05)',
-                  borderLeft:a.hl?'3px solid #F4610E':'3px solid transparent'}}>
-              <span className="font-black uppercase tracking-wider" style={{color:'#F4610E',fontSize:'clamp(9px,.85vw,12px)'}}>{a.k}</span>
-              {a.hl
-                ? <span className="text-white/80" style={{fontSize:'clamp(11px,.95vw,15px)'}}>
-                    Autoridade não nasce da intensidade. Nasce da <strong style={{color:'#F4610E'}}>consistência</strong>.
-                  </span>
-                : <span className="text-white/75" style={{fontSize:'clamp(11px,.95vw,15px)'}}>{a.v}</span>
-              }
-            </li>
-          </Frag>
-        ))}
-      </ul>
-    </Wrap>
-  );
+  return html`<${Wrap}>
+    <${Kicker}>Ação imediata<//>
+    <${Title} size="md">Do conhecimento<br/>para o <${Hl}>movimento<//><//>
+    <ul className="flex flex-col gap-2 w-full max-w-2xl">
+      ${acts.map((a,i)=>html`<${Frag} key=${i} i=${i} rev=${rev}>
+        <li className="grid items-center rounded-xl px-5 py-3"
+            style=${{gridTemplateColumns:'120px 1fr',gap:'16px',background:a.hl?'rgba(244,97,14,.1)':'rgba(255,255,255,.05)',borderLeft:a.hl?'3px solid #F4610E':'3px solid transparent'}}>
+          <span className="font-black uppercase tracking-wider" style=${{color:'#F4610E',fontSize:'clamp(9px,.85vw,12px)'}}>${a.k}</span>
+          ${a.hl
+            ? html`<span className="text-white/80" style=${{fontSize:'clamp(11px,.95vw,15px)'}}>Autoridade não nasce da intensidade. Nasce da <strong style=${{color:'#F4610E'}}>consistência</strong>.</span>`
+            : html`<span className="text-white/75" style=${{fontSize:'clamp(11px,.95vw,15px)'}}>${a.v}</span>`
+          }
+        </li>
+      <//>`)}
+    </ul>
+  <//>`;
 }
 
-function S12({rev}) {
-  return (
-    <Wrap>
-      <Kicker>Trajetória</Kicker>
-      <Title size="sm">Durante muito tempo eu acreditava que<br/>bastava fazer um <Hl>bom trabalho</Hl>.</Title>
-      <ul className="flex flex-col gap-4">
-        {['Depois percebi: fazer bem era apenas metade do caminho.',
-          'A outra metade era permitir que as pessoas soubessem do trabalho que estava sendo feito.',
-          'Não para alimentar o ego.',
-          'Para ampliar o impacto de forma intencional.',
-        ].map((t,i)=><Frag key={i} i={i} rev={rev}><Arrow>{t}</Arrow></Frag>)}
-      </ul>
-      <p className="mt-8 text-white/25 tracking-wide" style={{fontSize:'clamp(8px,.75vw,11px)'}}>
-        Wladson Sidney · MC · Gestor de Carreiras · Fundador da Sancho · Presidente ADVB Ceará
+function S12({rev}){
+  return html`<${Wrap}>
+    <${Kicker}>Trajetória<//>
+    <${Title} size="sm">Durante muito tempo eu acreditava que<br/>bastava fazer um <${Hl}>bom trabalho<//>.
+    <//>
+    <ul className="flex flex-col gap-4">
+      ${['Depois percebi: fazer bem era apenas metade do caminho.',
+         'A outra metade era permitir que as pessoas soubessem do trabalho que estava sendo feito.',
+         'Não para alimentar o ego.',
+         'Para ampliar o impacto de forma intencional.',
+        ].map((t,i)=>html`<${Frag} key=${i} i=${i} rev=${rev}><${Arrow}>${t}<//>  <//>`)}
+    </ul>
+    <p className="mt-8 text-white/25 tracking-wide" style=${{fontSize:'clamp(8px,.75vw,11px)'}}>
+      Wladson Sidney · MC · Gestor de Carreiras · Fundador da Sancho · Presidente ADVB Ceará
+    </p>
+  <//>`;
+}
+
+function S13({rev}){
+  return html`<${Wrap} center=${true}>
+    <div className="font-serif font-bold text-white leading-relaxed max-w-4xl" style=${{fontSize:'clamp(21px,3.4vw,52px)'}}>
+      "Se amostre para ser encontrado.<br/>
+      Se amostre para gerar oportunidades.<br/>
+      Se amostre para ampliar seu impacto."
+    </div>
+    <${Frag} i=${0} rev=${rev} className="mt-10">
+      <p className="font-bold leading-snug" style=${{color:'#F4610E',fontSize:'clamp(16px,1.7vw,25px)'}}>
+        O seu talento pode transformar vidas.<br/>
+        Mas primeiro as pessoas precisam saber que ele existe.
       </p>
-    </Wrap>
-  );
+    <//>
+  <//>`;
 }
 
-function S13({rev}) {
-  return (
-    <Wrap center>
-      <div className="font-serif font-bold text-white leading-relaxed max-w-4xl"
-           style={{fontSize:'clamp(21px,3.4vw,52px)'}}>
-        "Se amostre para ser encontrado.<br/>
-        Se amostre para gerar oportunidades.<br/>
-        Se amostre para ampliar seu impacto."
-      </div>
-      <Frag i={0} rev={rev} className="mt-10">
-        <p className="font-bold leading-snug" style={{color:'#F4610E',fontSize:'clamp(16px,1.7vw,25px)'}}>
-          O seu talento pode transformar vidas.<br/>
-          Mas primeiro as pessoas precisam saber que ele existe.
-        </p>
-      </Frag>
-    </Wrap>
-  );
+function S14({parts,onDraw,onCopy,onCSV,onDelete,deleteLabel}){
+  return html`<${Wrap} center=${true}>
+    <${Kicker}>Hora do sorteio!<//>
+    <${Title} size="md">Quem vai ser o <${Hl}>ganhador?<//><//>
+    <div className="flex items-baseline gap-3 my-3">
+      <span className="font-serif font-black" style=${{fontSize:'clamp(60px,8vw,108px)',color:'#1B4FE4',lineHeight:1}}>${parts.length}</span>
+      <span className="text-white/55" style=${{fontSize:'clamp(14px,1.3vw,20px)'}}>participantes no sorteio</span>
+    </div>
+    ${parts.length>0 && html`<div className="flex flex-wrap gap-2 justify-center mb-4 max-w-2xl max-h-24 overflow-hidden">
+      ${parts.map((p,i)=>html`<span key=${i} className="text-white/60 text-xs px-3 py-1 rounded-full"
+          style=${{background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.12)'}}>
+        ${first(p.nome)}
+      </span>`)}
+    </div>`}
+    <div className="flex flex-wrap gap-3 justify-center mb-7">
+      ${[['🎯 Sortear ganhador',onDraw,true],['📋 Copiar nomes',onCopy,false],['⬇ Baixar CSV',onCSV,false]].map(([l,fn,primary])=>html`
+        <button key=${l} onClick=${e=>{e.stopPropagation();fn();}}
+            className="font-bold text-white rounded-xl transition-all hover:scale-105"
+            style=${{fontSize:'clamp(12px,1.1vw,15px)',padding:'clamp(11px,1.4vh,17px) clamp(18px,1.8vw,28px)',
+              background:primary?'#F4610E':'rgba(255,255,255,.1)',
+              border:primary?'none':'1px solid rgba(255,255,255,.2)',
+              boxShadow:primary?'0 8px 24px rgba(244,97,14,.4)':'none'}}>
+          ${l}
+        </button>`)}
+    </div>
+    <div className="flex flex-col items-center gap-3 pt-5 w-full max-w-md" style=${{borderTop:'1px solid rgba(255,255,255,.1)'}}>
+      <button onClick=${e=>{e.stopPropagation();onDelete();}}
+          className="font-semibold rounded-xl transition-colors hover:bg-red-500/20"
+          style=${{fontSize:'clamp(11px,.95vw,14px)',padding:'10px 24px',background:'rgba(255,100,100,.1)',border:'1px solid rgba(255,100,100,.35)',color:'rgba(255,150,150,.9)'}}>
+        ${deleteLabel}
+      </button>
+      <p className="text-white/28 leading-relaxed text-center" style=${{fontSize:'clamp(9px,.8vw,12px)'}}>
+        Os dados serão apagados na frente de todos. Assim como sua marca, sua palavra fica — mas os dados, não.
+      </p>
+    </div>
+    <${Brands} className="mt-6"/>
+  <//>`;
 }
 
-function S14({parts, onDraw, onCopy, onCSV, onDelete, deleteLabel}) {
-  return (
-    <Wrap center>
-      <Kicker>Hora do sorteio!</Kicker>
-      <Title size="md">Quem vai ser o <Hl>ganhador?</Hl></Title>
-      <div className="flex items-baseline gap-3 my-3">
-        <span className="font-serif font-black" style={{fontSize:'clamp(60px,8vw,108px)',color:'#1B4FE4',lineHeight:1}}>
-          {parts.length}
-        </span>
-        <span className="text-white/55" style={{fontSize:'clamp(14px,1.3vw,20px)'}}>participantes no sorteio</span>
-      </div>
-      {/* Nomes dos participantes */}
-      {parts.length>0 && (
-        <div className="flex flex-wrap gap-2 justify-center mb-5 max-w-2xl max-h-24 overflow-hidden">
-          {parts.map((p,i)=>(
-            <span key={i} className="text-white/60 text-xs px-3 py-1 rounded-full"
-                  style={{background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.12)'}}>
-              {first(p.nome)}
-            </span>
-          ))}
-        </div>
-      )}
-      <div className="flex flex-wrap gap-3 justify-center mb-7">
-        {[['🎯 Sortear ganhador',onDraw,'#F4610E','rgba(244,97,14,.4)'],
-          ['📋 Copiar nomes',onCopy,'rgba(255,255,255,.1)','transparent'],
-          ['⬇ Baixar CSV',onCSV,'rgba(255,255,255,.1)','transparent'],
-        ].map(([l,fn,bg,sh])=>(
-          <button key={l} onClick={e=>{e.stopPropagation();fn();}}
-                  className="font-bold text-white rounded-xl transition-all hover:scale-105"
-                  style={{fontSize:'clamp(12px,1.1vw,15px)',padding:'clamp(11px,1.4vh,17px) clamp(18px,1.8vw,28px)',background:bg,
-                    border:bg.includes('rgba(255')?'1px solid rgba(255,255,255,.2)':'none',
-                    boxShadow:sh!=='transparent'?`0 8px 24px ${sh}`:'none'}}>
-            {l}
-          </button>
-        ))}
-      </div>
-      <div className="flex flex-col items-center gap-3 pt-5 w-full max-w-md"
-           style={{borderTop:'1px solid rgba(255,255,255,.1)'}}>
-        <button onClick={e=>{e.stopPropagation();onDelete();}}
-                className="font-semibold rounded-xl transition-colors hover:bg-red-500/20"
-                style={{fontSize:'clamp(11px,.95vw,14px)',padding:'10px 24px',
-                  background:'rgba(255,100,100,.1)',border:'1px solid rgba(255,100,100,.35)',color:'rgba(255,150,150,.9)'}}>
-          {deleteLabel}
-        </button>
-        <p className="text-white/28 leading-relaxed text-center" style={{fontSize:'clamp(9px,.8vw,12px)'}}>
-          Os dados serão apagados na frente de todos. Assim como sua marca, sua palavra fica — mas os dados, não.
-        </p>
-      </div>
-      <Brands className="mt-6"/>
-    </Wrap>
-  );
-}
+/* ══════════════════ FORM ══════════════════ */
+function FormView({add}){
+  const [f,setF]=useState({nome:'',segmento:'',palavra:''});
+  const [errs,setErrs]=useState({});
+  const [loading,setLoading]=useState(false);
+  const [done,setDone]=useState(false);
 
-/* ═══════════════════ FORM VIEW ═══════════════════ */
-function FormView({add}) {
-  const [f, setF] = useState({nome:'',segmento:'',palavra:''});
-  const [errs, setErrs] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
+  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
+  const clrErr=k=>setErrs(p=>({...p,[k]:null}));
 
-  const set = k => e => setF(p=>({...p,[k]:e.target.value}));
-  const clrErr = k => setErrs(p=>({...p,[k]:null}));
-
-  const submit = async () => {
+  const submit=async()=>{
     const e={};
     if(!f.nome.trim()) e.nome='Informe seu nome.';
     if(!f.segmento.trim()) e.segmento='Informe seu segmento.';
     if(!f.palavra.trim()) e.palavra='Informe sua palavra.';
     if(Object.keys(e).length){setErrs(e);return;}
     setLoading(true);
-    try {
+    try{
       await add({nome:f.nome.trim(),segmento:f.segmento.trim(),palavra:f.palavra.trim()});
       setDone(true);
-    } catch { setLoading(false); alert('Erro ao enviar. Tente novamente.'); }
+    }catch{setLoading(false);alert('Erro ao enviar. Tente novamente.');}
   };
 
-  if(done) return (
-    <div className="min-h-screen form-bg flex items-center justify-center p-6">
-      <div className="bg-white rounded-3xl p-10 w-full max-w-md shadow-2xl flex flex-col items-center gap-5 text-center"
-           style={{boxShadow:'0 32px 80px rgba(0,0,0,.5)'}}>
-        <div className="check-pop w-20 h-20 rounded-full bg-green-500 flex items-center justify-center text-white font-bold"
-             style={{fontSize:'40px'}}>✓</div>
-        <div className="font-serif font-black text-3xl" style={{color:'#0D2B8A'}}>Você está dentro!</div>
-        <p className="text-gray-500 leading-relaxed text-sm">Sua palavra foi registrada. Acompanhe na tela principal.</p>
-        <p className="text-gray-400 text-xs leading-relaxed">Apenas nome e segmento serão exibidos. Seus dados serão apagados ao vivo ao final.</p>
-      </div>
+  if(done) return html`<div className="min-h-screen form-bg flex items-center justify-center p-6">
+    <div className="bg-white rounded-3xl p-10 w-full max-w-md flex flex-col items-center gap-5 text-center" style=${{boxShadow:'0 32px 80px rgba(0,0,0,.5)'}}>
+      <div className="check-pop w-20 h-20 rounded-full bg-green-500 flex items-center justify-center text-white font-bold" style=${{fontSize:'40px'}}>✓</div>
+      <div className="font-serif font-black text-3xl" style=${{color:'#0D2B8A'}}>Você está dentro!</div>
+      <p className="text-gray-500 leading-relaxed text-sm">Sua palavra foi registrada. Acompanhe na tela principal.</p>
+      <p className="text-gray-400 text-xs leading-relaxed">Apenas nome e segmento serão exibidos. Seus dados serão apagados ao vivo ao final.</p>
     </div>
-  );
+  </div>`;
 
   const fields=[
     {k:'nome',label:'Primeiro nome',ph:'Seu primeiro nome',tip:null},
@@ -711,71 +589,55 @@ function FormView({add}) {
     {k:'palavra',label:'Uma palavra que te define',ph:'Ex: criativo, estratégico, transformador...',tip:'Essa palavra vai aparecer na apresentação!'},
   ];
 
-  return (
-    <div className="min-h-screen form-bg flex items-center justify-center p-6" style={{overflowY:'auto'}}>
-      <div className="bg-white rounded-3xl w-full max-w-md" style={{padding:'clamp(26px,5vw,46px)',boxShadow:'0 32px 80px rgba(0,0,0,.5)'}}>
-        <span className="inline-block text-white font-black uppercase rounded-full px-4 py-1 mb-5 text-xs tracking-[.2em]"
-              style={{background:'#F4610E'}}>WORKSHOP</span>
-        <div className="font-serif font-black mb-2 leading-tight" style={{color:'#0D2B8A',fontSize:'clamp(20px,4.5vw,28px)'}}>
-          Marca que Vende SEM Cerimônias
-        </div>
-        <p className="text-gray-500 mb-7 text-sm leading-relaxed">Participe e concorra ao sorteio especial</p>
-
-        {fields.map(fd=>(
-          <div key={fd.k} className="mb-5">
-            <label className="flex items-center gap-2 mb-2">
-              <span className="text-gray-900 font-bold text-sm">{fd.label}</span>
-              {fd.tip && (
-                <span className="text-xs rounded-md px-2 py-0.5" style={{color:'#F4610E',background:'rgba(244,97,14,.08)',border:'1px solid rgba(244,97,14,.2)'}}>
-                  {fd.tip}
-                </span>
-              )}
-            </label>
-            <input type="text" value={f[fd.k]} placeholder={fd.ph}
-                   onChange={e=>{set(fd.k)(e);clrErr(fd.k);}}
-                   onKeyDown={e=>e.key==='Enter'&&submit()}
-                   className="w-full rounded-xl text-gray-900 text-sm"
-                   style={{padding:'12px 16px',border:`1.5px solid ${errs[fd.k]?'#E53E3E':'#E2E8F0'}`,
-                     fontFamily:'Inter,sans-serif'}}/>
-            {errs[fd.k] && <p className="text-red-500 text-xs mt-1">{errs[fd.k]}</p>}
-          </div>
-        ))}
-
-        <button onClick={submit} disabled={loading}
-                className="w-full font-bold text-white rounded-xl mt-1"
-                style={{background:'#F4610E',fontSize:'16px',padding:'14px',opacity:loading?.7:1,
-                  boxShadow:'0 8px 24px rgba(244,97,14,.35)',fontFamily:'Inter,sans-serif'}}>
-          {loading?'Enviando...':'Participar do sorteio →'}
-        </button>
-      </div>
+  return html`<div className="min-h-screen form-bg flex items-center justify-center p-6" style=${{overflowY:'auto'}}>
+    <div className="bg-white rounded-3xl w-full max-w-md" style=${{padding:'clamp(26px,5vw,46px)',boxShadow:'0 32px 80px rgba(0,0,0,.5)'}}>
+      <span className="inline-block text-white font-black uppercase rounded-full px-4 py-1 mb-5 text-xs tracking-[.2em]" style=${{background:'#F4610E'}}>WORKSHOP</span>
+      <div className="font-serif font-black mb-2 leading-tight" style=${{color:'#0D2B8A',fontSize:'clamp(20px,4.5vw,28px)'}}>Marca que Vende SEM Cerimônias</div>
+      <p className="text-gray-500 mb-7 text-sm leading-relaxed">Participe e concorra ao sorteio especial</p>
+      ${fields.map(fd=>html`<div key=${fd.k} className="mb-5">
+        <label className="flex items-center gap-2 mb-2">
+          <span className="text-gray-900 font-bold text-sm">${fd.label}</span>
+          ${fd.tip && html`<span className="text-xs rounded-md px-2 py-0.5" style=${{color:'#F4610E',background:'rgba(244,97,14,.08)',border:'1px solid rgba(244,97,14,.2)'}}>${fd.tip}</span>`}
+        </label>
+        <input type="text" value=${f[fd.k]} placeholder=${fd.ph}
+               onChange=${e=>{set(fd.k)(e);clrErr(fd.k);}}
+               onKeyDown=${e=>e.key==='Enter'&&submit()}
+               className="w-full rounded-xl text-gray-900 text-sm"
+               style=${{padding:'12px 16px',border:`1.5px solid ${errs[fd.k]?'#E53E3E':'#E2E8F0'}`,fontFamily:'Inter,sans-serif',display:'block'}}/>
+        ${errs[fd.k] && html`<p className="text-red-500 text-xs mt-1">${errs[fd.k]}</p>`}
+      </div>`)}
+      <button onClick=${submit} disabled=${loading}
+              className="w-full font-bold text-white rounded-xl mt-1"
+              style=${{background:'#F4610E',fontSize:'16px',padding:'14px',opacity:loading?.7:1,boxShadow:'0 8px 24px rgba(244,97,14,.35)',fontFamily:'Inter,sans-serif',border:'none',cursor:'pointer'}}>
+        ${loading?'Enviando...':'Participar do sorteio →'}
+      </button>
     </div>
-  );
+  </div>`;
 }
 
-/* ═══════════════════ PRESENTATION ═══════════════════ */
-function Presentation({parts, rehearsal, inject, deleteAll}) {
-  const [slide, setSlide] = useState(1);
-  const [rev, setRev] = useState(-1);
-  const [winner, setWinner] = useState(null);
-  const [delLabel, setDelLabel] = useState('🗑 Apagar todos os dados ao vivo');
-  const [popQueue, setPopQueue] = useState(null);
-  const prevLen = useRef(0);
+/* ══════════════════ PRESENTATION ══════════════════ */
+function Presentation({parts,rehearsal,inject,deleteAll}){
+  const [slide,setSlide]=useState(1);
+  const [rev,setRev]=useState(-1);
+  const [winner,setWinner]=useState(null);
+  const [delLabel,setDelLabel]=useState('🗑 Apagar todos os dados ao vivo');
+  const [popQueue,setPopQueue]=useState(null);
+  const prevLen=useRef(0);
 
-  const totalFrags = FRAGS[slide-1];
+  const totalFrags=FRAGS[slide-1];
 
-  const next = useCallback(()=>{
-    if(rev < totalFrags-1) setRev(r=>r+1);
-    else if(slide<TOTAL){ setSlide(s=>s+1); setRev(-1); }
+  const next=useCallback(()=>{
+    if(rev<totalFrags-1) setRev(r=>r+1);
+    else if(slide<TOTAL){setSlide(s=>s+1);setRev(-1);}
   },[rev,totalFrags,slide]);
 
-  const prev = useCallback(()=>{
-    if(slide>1){ const ps=slide-1; setSlide(ps); setRev(FRAGS[ps-1]-1); }
+  const prev=useCallback(()=>{
+    if(slide>1){const ps=slide-1;setSlide(ps);setRev(FRAGS[ps-1]-1);}
   },[slide]);
 
-  // New participant → pop on slide 3
   useEffect(()=>{
     const cur=parts.length;
-    if(cur>prevLen.current && slide===3){
+    if(cur>prevLen.current&&slide===3){
       const added=parts.slice(prevLen.current).map(p=>first(p.nome));
       setPopQueue(added);
       setTimeout(()=>setPopQueue(null),100);
@@ -783,7 +645,6 @@ function Presentation({parts, rehearsal, inject, deleteAll}) {
     prevLen.current=cur;
   },[parts,slide]);
 
-  // Keys
   useEffect(()=>{
     const h=e=>{
       if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
@@ -816,9 +677,8 @@ function Presentation({parts, rehearsal, inject, deleteAll}) {
   };
   const handleDelete=()=>{
     if(!confirm('Apagar todos os dados ao vivo?')) return;
-    deleteAll(); setDelLabel('✓ Dados apagados');
+    deleteAll();setDelLabel('✓ Dados apagados');
   };
-
   const handleClick=e=>{
     if(winner) return;
     if(e.target.closest('button')) return;
@@ -828,65 +688,39 @@ function Presentation({parts, rehearsal, inject, deleteAll}) {
   const progress=((slide-1)/(TOTAL-1))*100;
   const hideChrome=slide===1||slide===14;
   const sp={parts,rev,onDraw:drawWinner,onCopy:copyNames,onCSV:downloadCSV,onDelete:handleDelete,deleteLabel:delLabel};
+  const SLIDES={1:S1,2:S2,3:S3,4:S4,5:S5,6:S6,7:S7,8:S8,9:S9,10:S10,11:S11,12:S12,13:S13,14:S14};
+  const CurrentSlide=SLIDES[slide];
 
-  const SLIDES={1:<S1/>,2:<S2/>,3:<S3 {...sp}/>,4:<S4 {...sp}/>,5:<S5 {...sp}/>,
-    6:<S6 {...sp}/>,7:<S7 {...sp}/>,8:<S8 {...sp}/>,9:<S9 {...sp}/>,10:<S10 {...sp}/>,
-    11:<S11 {...sp}/>,12:<S12 {...sp}/>,13:<S13 {...sp}/>,14:<S14 {...sp}/>};
-
-  return (
-    <div className="relative w-screen h-screen slide-bg overflow-hidden" onClick={handleClick}>
-      {/* Progress */}
-      <div className="fixed top-0 left-0 h-[3px] z-30 transition-all duration-500"
-           style={{width:progress+'%',background:'#F4610E'}}/>
-      {/* Rehearsal banner */}
-      {rehearsal&&(
-        <div className="fixed top-0 left-0 right-0 z-40 text-center py-1.5 px-4 text-xs text-white/65"
-             style={{background:'rgba(244,97,14,.15)',borderBottom:'1px solid rgba(244,97,14,.3)'}}>
-          Modo ensaio (sem Firebase). Pressione <strong>D</strong> para injetar participantes de teste.
-        </div>
-      )}
-      {/* Current slide */}
-      <div key={slide} className="slide-active w-full h-full">
-        {SLIDES[slide]}
-      </div>
-      {/* Counter */}
-      {!hideChrome&&(
-        <div className="fixed bottom-5 right-6 z-20 text-white/30 tracking-[.1em]"
-             style={{fontFamily:'monospace',fontSize:'13px'}}>
-          {String(slide).padStart(2,'0')} / {String(TOTAL).padStart(2,'0')}
-        </div>
-      )}
-      {/* Footer brand */}
-      {!hideChrome&&(
-        <div className="fixed bottom-5 left-6 z-20 font-black uppercase tracking-[.18em] text-white/35"
-             style={{fontSize:'11px'}}>
-          SANCHO × ESCANDI
-        </div>
-      )}
-      {/* Poppers */}
-      <Poppers queue={popQueue}/>
-      {/* Winner */}
-      {winner&&<Winner w={winner} onClose={()=>setWinner(null)}/>}
-    </div>
-  );
+  return html`<div className="relative w-screen h-screen slide-bg overflow-hidden" onClick=${handleClick}>
+    <div className="fixed top-0 left-0 h-[3px] z-30 transition-all duration-500" style=${{width:progress+'%',background:'#F4610E'}}></div>
+    ${rehearsal && html`<div className="fixed top-0 left-0 right-0 z-40 text-center py-1.5 px-4 text-xs text-white/65"
+         style=${{background:'rgba(244,97,14,.15)',borderBottom:'1px solid rgba(244,97,14,.3)'}}>
+      Modo ensaio (sem Firebase). Pressione <strong>D</strong> para injetar participantes de teste.
+    </div>`}
+    <div key=${slide} className="slide-active w-full h-full"><${CurrentSlide} ...${{...sp}}/></div>
+    ${!hideChrome && html`<div className="fixed bottom-5 right-6 z-20 text-white/30 tracking-[.1em]" style=${{fontFamily:'monospace',fontSize:'13px'}}>
+      ${String(slide).padStart(2,'0')} / ${String(TOTAL).padStart(2,'0')}
+    </div>`}
+    ${!hideChrome && html`<div className="fixed bottom-5 left-6 z-20 font-black uppercase tracking-[.18em] text-white/35" style=${{fontSize:'11px'}}>SANCHO × ESCANDI</div>`}
+    <${Poppers} queue=${popQueue}/>
+    ${winner && html`<${Winner} w=${winner} onClose=${()=>setWinner(null)}/>`}
+  </div>`;
 }
 
-/* ═══════════════════ ROOT ═══════════════════ */
-function App() {
-  const [hash, setHash] = useState(window.location.hash);
-  const {parts, rehearsal, inject, deleteAll, add} = useDB();
-
+/* ══════════════════ ROOT ══════════════════ */
+function App(){
+  const [hash,setHash]=useState(window.location.hash);
+  const {parts,rehearsal,inject,deleteAll,add}=useDB();
   useEffect(()=>{
     const h=()=>setHash(window.location.hash);
     window.addEventListener('hashchange',h);
     return ()=>window.removeEventListener('hashchange',h);
   },[]);
-
-  if(hash==='#/form') return <FormView add={add}/>;
-  return <Presentation parts={parts} rehearsal={rehearsal} inject={inject} deleteAll={deleteAll}/>;
+  if(hash==='#/form') return html`<${FormView} add=${add}/>`;
+  return html`<${Presentation} parts=${parts} rehearsal=${rehearsal} inject=${inject} deleteAll=${deleteAll}/>`;
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+ReactDOM.createRoot(document.getElementById('root')).render(html`<${App}/>`);
 </script>
 </body>
 </html>
