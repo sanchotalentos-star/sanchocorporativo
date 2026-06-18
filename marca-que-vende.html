@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marca que Vende SEM Cerimônias · Workshop</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<!--
+  PERSONALIZAÇÃO ANTES DO EVENTO:
+  1. Preencha o bloco firebaseConfig abaixo (substitua todos os COLE_AQUI)
+  2. Substitua [URL_DO_APP] pelo endereço onde o arquivo estará publicado
+  3. Se quiser foto dos palestrantes, adicione wladson.png e diego.png
+     e referencie com <img src="wladson.png" onerror="this.remove()">
+  4. Teste: abra no notebook → avance até o slide do QR → escaneie com o celular
+     → preencha → verifique se o contador sobe.
+  PLANO B (sem internet): pressione D para entrar em modo ensaio.
+-->
+
+<style>
+:root {
+  --azul-principal: #1B4FE4;
+  --azul-escuro: #0D2B8A;
+  --laranja: #F4610E;
+  --laranja-claro: #F7893A;
+  --branco: #FFFFFF;
+  --off-white: #F5F7FA;
+  --cinza-texto: #4A5568;
+  --fundo-grad: radial-gradient(120% 120% at 50% -10%, #1B4FE4 0%, #0D2B8A 45%, #050F2C 100%);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--fundo-grad);
+  color: var(--branco);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* ===================== REHEARSAL BANNER ===================== */
+#rehearsal-banner {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 9999;
+  background: rgba(244,97,14,0.15);
+  border-bottom: 1px solid rgba(244,97,14,0.4);
+  color: rgba(255,255,255,0.8);
+  font-size: 12px;
+  text-align: center;
+  padding: 6px 16px;
+  letter-spacing: 0.03em;
+}
+#rehearsal-banner.show { display: block; }
+
+/* ===================== PROGRESS BAR ===================== */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: var(--laranja);
+  transition: width 0.4s ease;
+  z-index: 100;
+}
+
+/* ===================== SLIDE COUNTER ===================== */
+#slide-counter {
+  position: fixed;
+  bottom: 20px; right: 24px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  z-index: 100;
+  letter-spacing: 0.1em;
+}
+
+/* ===================== FOOTER BRAND ===================== */
+#footer-brand {
+  position: fixed;
+  bottom: 20px; left: 24px;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 100;
+}
+
+/* ===================== DECK CONTAINER ===================== */
+#deck {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(40px, 6vw, 100px) clamp(48px, 8vw, 140px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.slide.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ===================== TYPOGRAPHY ===================== */
+.kicker {
+  font-size: clamp(11px, 1vw, 14px);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--laranja);
+  margin-bottom: clamp(12px, 2vh, 24px);
+}
+
+.display {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(42px, 6.5vw, 96px);
+  font-weight: 900;
+  line-height: 1.05;
+  color: var(--branco);
+  margin-bottom: clamp(16px, 2.5vh, 32px);
+}
+
+.display .hl { color: var(--laranja); }
+
+.lead {
+  font-size: clamp(16px, 1.6vw, 24px);
+  font-weight: 400;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
+  max-width: 720px;
+  margin-bottom: clamp(20px, 3vh, 40px);
+}
+
+.byline {
+  font-size: clamp(13px, 1.1vw, 16px);
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.05em;
+}
+
+/* ===================== FRAGMENTS ===================== */
+.fragment {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.fragment.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===================== BRAND LOGOS (text) ===================== */
+.brand-logos {
+  display: flex;
+  gap: clamp(24px, 4vw, 60px);
+  align-items: center;
+  margin-top: clamp(24px, 4vh, 48px);
+}
+.brand-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.brand-logo .logo-name {
+  font-size: clamp(18px, 2.2vw, 32px);
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.brand-logo .logo-tag {
+  font-size: clamp(9px, 0.8vw, 12px);
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.brand-logo.sancho .logo-name { color: var(--azul-principal); text-shadow: 0 0 30px rgba(27,79,228,0.6); }
+.brand-logo.escandi .logo-name { color: var(--laranja); text-shadow: 0 0 30px rgba(244,97,14,0.5); }
+
+/* separator */
+.brand-sep {
+  font-size: clamp(20px, 2.5vw, 36px);
+  color: rgba(255,255,255,0.2);
+}
+
+/* ===================== SLIDE 1 — CAPA ===================== */
+#slide-1 {
+  align-items: center;
+  text-align: center;
+}
+#slide-1 .display { font-size: clamp(52px, 7.5vw, 112px); }
+
+/* ===================== SLIDE 2 — SPEAKERS ===================== */
+.speakers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(20px, 3vw, 48px);
+  width: 100%;
+  max-width: 900px;
+  margin-top: clamp(16px, 2.5vh, 32px);
+}
+.speaker-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: clamp(20px, 2.5vw, 36px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.speaker-avatar {
+  width: clamp(52px, 5.5vw, 80px);
+  height: clamp(52px, 5.5vw, 80px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(18px, 2vw, 28px);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+.avatar-azul { background: var(--azul-principal); color: white; }
+.avatar-laranja { background: var(--laranja); color: white; }
+.speaker-name {
+  font-size: clamp(16px, 1.6vw, 22px);
+  font-weight: 700;
+  color: var(--branco);
+}
+.speaker-title {
+  font-size: clamp(11px, 0.9vw, 13px);
+  color: var(--laranja);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+.speaker-bio {
+  font-size: clamp(12px, 1vw, 15px);
+  color: rgba(255,255,255,0.65);
+  line-height: 1.6;
+}
+
+/* ===================== SLIDE 3 — QR CODE ===================== */
+#slide-3 { align-items: center; }
+.qr-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, 4vw, 72px);
+  width: 100%;
+  max-width: 960px;
+  align-items: start;
+  margin-top: clamp(12px, 2vh, 24px);
+}
+.qr-box {
+  background: white;
+  border-radius: 20px;
+  padding: clamp(16px, 2vw, 28px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+#qrcode canvas, #qrcode img { display: block; }
+.qr-url {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(10px, 0.9vw, 13px);
+  color: var(--cinza-texto);
+  word-break: break-all;
+  text-align: center;
+}
+.qr-right {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vh, 20px);
+}
+.qr-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 2.8vw, 40px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+.qr-sub {
+  font-size: clamp(13px, 1.1vw, 16px);
+  color: rgba(255,255,255,0.65);
+  line-height: 1.6;
+}
+.live-counter {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.live-count-num {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(52px, 6vw, 88px);
+  font-weight: 900;
+  color: var(--azul-principal);
+  line-height: 1;
+}
+.live-count-label {
+  font-size: clamp(13px, 1.1vw, 16px);
+  color: rgba(255,255,255,0.6);
+}
+.presenter-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.presenter-btns button {
+  font-size: 12px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.75);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.2s;
+}
+.presenter-btns button:hover { background: rgba(255,255,255,0.15); }
+
+/* name poppers */
+.name-popper {
+  position: fixed;
+  font-size: clamp(14px, 1.4vw, 20px);
+  font-weight: 700;
+  pointer-events: none;
+  border-radius: 999px;
+  padding: 6px 16px;
+  color: white;
+  z-index: 200;
+  animation: popIn 3.5s ease forwards;
+}
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.5) translateY(0); }
+  20%  { opacity: 1; transform: scale(1) translateY(-8px); }
+  80%  { opacity: 1; transform: scale(1) translateY(-8px); }
+  100% { opacity: 0; transform: scale(0.8) translateY(-20px); }
+}
+
+/* ===================== SLIDE 4 — PROVOCAÇÃO ===================== */
+#slide-4 {
+  align-items: center;
+  text-align: center;
+}
+.quote-big {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 4vw, 60px);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--branco);
+  max-width: 900px;
+  margin-bottom: clamp(24px, 4vh, 48px);
+}
+.quote-big::before { content: '\201C'; }
+.quote-big::after  { content: '\201D'; }
+
+/* ===================== SLIDE 5 ===================== */
+.arrow-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.5vh, 18px);
+  margin-top: clamp(12px, 2vh, 20px);
+}
+.arrow-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: clamp(15px, 1.4vw, 20px);
+  color: rgba(255,255,255,0.85);
+}
+.arrow-item::before {
+  content: '→';
+  color: var(--laranja);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.impact-line {
+  font-size: clamp(17px, 1.8vw, 26px);
+  font-weight: 700;
+  color: var(--laranja);
+  margin-top: clamp(16px, 2.5vh, 28px);
+  line-height: 1.4;
+}
+
+/* ===================== SLIDE 6 — COMPARISON ===================== */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 2vw, 32px);
+  width: 100%;
+  max-width: 860px;
+  margin-top: clamp(16px, 2.5vh, 28px);
+}
+.compare-card {
+  background: rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: clamp(18px, 2vw, 28px);
+}
+.compare-card.bad  { border-top: 3px solid #E53E3E; }
+.compare-card.good { border-top: 3px solid var(--laranja); }
+.compare-card-title {
+  font-size: clamp(11px, 1vw, 14px);
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.compare-card.bad  .compare-card-title { color: #FC8181; }
+.compare-card.good .compare-card-title { color: var(--laranja); }
+.compare-card ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.compare-card ul li {
+  font-size: clamp(13px, 1.1vw, 16px);
+  color: rgba(255,255,255,0.75);
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.compare-card ul li::before {
+  content: '·';
+  color: rgba(255,255,255,0.4);
+  flex-shrink: 0;
+}
+
+/* ===================== SLIDE 8 — LEVELS ===================== */
+.levels-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.2vh, 14px);
+  margin-top: clamp(12px, 2vh, 20px);
+  width: 100%;
+  max-width: 780px;
+}
+.level-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: clamp(10px, 1.5vh, 16px) clamp(14px, 1.5vw, 20px);
+  border-left: 3px solid rgba(255,255,255,0.15);
+}
+.level-item:last-child { border-left-color: var(--laranja); background: rgba(244,97,14,0.1); }
+.level-num {
+  font-size: clamp(11px, 0.9vw, 13px);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.4);
+}
+.level-content { display: flex; flex-direction: column; gap: 2px; }
+.level-name {
+  font-size: clamp(13px, 1.2vw, 17px);
+  font-weight: 700;
+  color: var(--branco);
+}
+.level-desc {
+  font-size: clamp(11px, 0.9vw, 14px);
+  color: rgba(255,255,255,0.55);
+}
+.level-item:last-child .level-name { color: var(--laranja); }
+
+/* ===================== SLIDE 9 — WORD CLOUD ===================== */
+#slide-9 { align-items: center; }
+#wordCloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(10px, 1.5vw, 24px);
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 3vh, 40px) 0;
+  max-width: 1100px;
+  width: 100%;
+}
+.word-pill {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 999px;
+  padding: .35em 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform .3s ease;
+}
+.word-pill:hover { transform: scale(1.05); }
+.word-pill:nth-child(odd) { border-color: rgba(244,97,14,0.4); }
+.word-text { color: #fff; font-weight: 700; line-height: 1.1; }
+.word-names { color: rgba(255,255,255,0.5); font-size: .55em; margin-top: .1em; }
+.word-count-display {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 900;
+  color: var(--azul-principal);
+  line-height: 1;
+}
+
+/* ===================== SLIDE 11 — PRACTICE ===================== */
+.action-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.2vh, 14px);
+  width: 100%;
+  max-width: 780px;
+  margin-top: clamp(12px, 2vh, 20px);
+}
+.action-item {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 16px;
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: clamp(12px, 1.5vh, 18px) clamp(14px, 1.5vw, 20px);
+}
+.action-item:last-child { background: rgba(244,97,14,0.1); border-left: 3px solid var(--laranja); }
+.action-key {
+  font-size: clamp(11px, 0.9vw, 13px);
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--laranja);
+  text-transform: uppercase;
+}
+.action-item:last-child .action-key { color: var(--laranja-claro); }
+.action-val {
+  font-size: clamp(13px, 1.1vw, 16px);
+  color: rgba(255,255,255,0.8);
+}
+
+/* ===================== SLIDE 14 — RAFFLE ===================== */
+#slide-14 { align-items: center; text-align: center; }
+.raffle-count-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: clamp(12px, 2vh, 20px) 0;
+}
+.raffle-num {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(64px, 8vw, 110px);
+  font-weight: 900;
+  color: var(--azul-principal);
+  line-height: 1;
+}
+.raffle-label { font-size: clamp(16px, 1.5vw, 22px); color: rgba(255,255,255,0.6); }
+.raffle-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: clamp(20px, 3vh, 36px);
+}
+.raffle-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(13px, 1.1vw, 16px);
+  font-weight: 700;
+  padding: clamp(12px, 1.5vh, 18px) clamp(20px, 2vw, 32px);
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.raffle-btn:active { transform: scale(0.97); }
+.btn-draw {
+  background: var(--laranja);
+  color: white;
+  box-shadow: 0 8px 24px rgba(244,97,14,0.4);
+}
+.btn-draw:hover { box-shadow: 0 12px 32px rgba(244,97,14,0.55); }
+.btn-copy, .btn-csv {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.btn-copy:hover, .btn-csv:hover { background: rgba(255,255,255,0.18); }
+.delete-zone {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: clamp(16px, 2.5vh, 28px);
+  margin-top: clamp(12px, 2vh, 20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.btn-delete {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(12px, 1vw, 15px);
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,100,100,0.4);
+  background: rgba(255,100,100,0.1);
+  color: rgba(255,150,150,0.9);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-delete:hover { background: rgba(255,100,100,0.2); }
+.delete-note {
+  font-size: clamp(10px, 0.85vw, 13px);
+  color: rgba(255,255,255,0.35);
+  max-width: 440px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* winner overlay */
+#winner-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5,15,44,0.92);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 24px;
+  text-align: center;
+  padding: 40px;
+}
+#winner-overlay.show { display: flex; }
+.winner-badge {
+  font-size: clamp(52px, 7vw, 96px);
+}
+.winner-name {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 900;
+  color: var(--laranja);
+  animation: pulse 1s ease infinite alternate;
+}
+.winner-info {
+  font-size: clamp(16px, 1.5vw, 22px);
+  color: rgba(255,255,255,0.7);
+}
+.winner-close {
+  margin-top: 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  padding: 10px 28px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: transparent;
+  color: white;
+  cursor: pointer;
+}
+@keyframes pulse {
+  from { text-shadow: 0 0 20px rgba(244,97,14,0.4); }
+  to   { text-shadow: 0 0 50px rgba(244,97,14,0.9); }
+}
+
+/* ===================== FORM VIEW ===================== */
+#form-view {
+  display: none;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #0D2B8A 0%, #050F2C 100%);
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+#form-view.active { display: flex; }
+
+.form-card {
+  background: white;
+  border-radius: 24px;
+  padding: clamp(28px, 5vw, 48px);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+}
+.form-badge {
+  display: inline-block;
+  background: var(--laranja);
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+.form-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 900;
+  color: #0D2B8A;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+.form-subtitle {
+  font-size: 14px;
+  color: var(--cinza-texto);
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.form-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a202c;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.form-tooltip {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--laranja);
+  background: rgba(244,97,14,0.08);
+  border: 1px solid rgba(244,97,14,0.2);
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+.form-input {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1.5px solid #E2E8F0;
+  outline: none;
+  color: #1a202c;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+.form-input:focus {
+  border-color: var(--azul-principal);
+  box-shadow: 0 0 0 3px rgba(27,79,228,0.12);
+}
+.form-input::placeholder { color: #a0aec0; }
+.submit-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--laranja);
+  color: white;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 8px 24px rgba(244,97,14,0.35);
+}
+.submit-btn:hover { background: #d94f08; box-shadow: 0 12px 32px rgba(244,97,14,0.45); }
+.submit-btn:active { transform: scale(0.98); }
+
+/* success screen */
+#success-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+#success-screen.show { display: flex; }
+.check-anim {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: #48BB78;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  animation: popScale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes popScale {
+  0%   { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+.success-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: #0D2B8A;
+}
+.success-msg { font-size: 15px; color: var(--cinza-texto); line-height: 1.6; }
+.success-note { font-size: 12px; color: #a0aec0; line-height: 1.5; margin-top: 8px; }
+
+/* error msg */
+.form-error { color: #E53E3E; font-size: 12px; margin-top: -10px; margin-bottom: 8px; display: none; }
+.form-error.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Rehearsal Banner -->
+<div id="rehearsal-banner">
+  Modo ensaio (sem Firebase). Pressione <strong>D</strong> para injetar participantes de teste.
+</div>
+
+<!-- Progress Bar -->
+<div id="progress-bar"></div>
+
+<!-- Slide Counter -->
+<div id="slide-counter">01 / 14</div>
+
+<!-- Footer Brand -->
+<div id="footer-brand">SANCHO × ESCANDI</div>
+
+<!-- Winner Overlay -->
+<div id="winner-overlay">
+  <div class="winner-badge">🎯</div>
+  <div class="winner-name" id="winner-name-text"></div>
+  <div class="winner-info" id="winner-info-text"></div>
+  <button class="winner-close" onclick="document.getElementById('winner-overlay').classList.remove('show')">Fechar</button>
+</div>
+
+<!-- ===================== DECK ===================== -->
+<div id="deck">
+
+  <!-- SLIDE 1 — CAPA -->
+  <div class="slide active" id="slide-1" data-frags="0">
+    <div class="kicker">Workshop · 23 de Junho · Fortaleza</div>
+    <div class="display">Marca que Vende<br><span class="hl">SEM Cerimônias</span></div>
+    <div class="lead">Posicione sua marca e transforme ela no seu melhor vendedor.</div>
+    <div class="byline">Wladson Sidney · Sancho &nbsp;|&nbsp; Diego Mourão · Escandi</div>
+    <div class="brand-logos">
+      <div class="brand-logo sancho">
+        <div class="logo-name">SANCHO</div>
+        <div class="logo-tag">Gestão de Carreira</div>
+      </div>
+      <div class="brand-sep">×</div>
+      <div class="brand-logo escandi">
+        <div class="logo-name">ESCANDI</div>
+        <div class="logo-tag">Inteligência em Marcas</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 — SPEAKERS -->
+  <div class="slide" id="slide-2" data-frags="0">
+    <div class="kicker">Quem vai falar com você</div>
+    <div class="display" style="font-size:clamp(32px,4.5vw,64px);">Os Palestrantes</div>
+    <div class="speakers-grid">
+      <div class="speaker-card">
+        <div class="speaker-avatar avatar-azul">WS</div>
+        <div class="speaker-name">Wladson Sidney</div>
+        <div class="speaker-title">Gestor de Carreiras · Sancho</div>
+        <div class="speaker-bio">Criador do método Se Amostramento Profissional. MC e gestor de talentos. Presidente da ADVB Ceará.</div>
+      </div>
+      <div class="speaker-card">
+        <div class="speaker-avatar avatar-laranja">DM</div>
+        <div class="speaker-name">Diego Mourão</div>
+        <div class="speaker-title">Estrategista de Marca · Escandi</div>
+        <div class="speaker-bio">Especialista em branding e inteligência de marca. Founder da Escandi Branding.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 — QR CODE / SORTEIO -->
+  <div class="slide" id="slide-3" data-frags="0" data-qr-slide="true">
+    <div class="kicker">Antes de começar — Sorteio especial</div>
+    <div class="qr-layout">
+      <div class="qr-box">
+        <div id="qrcode"></div>
+        <div class="qr-url" id="form-url-display">[URL_DO_APP]/#/form</div>
+      </div>
+      <div class="qr-right">
+        <div style="font-size:clamp(28px,3.5vw,40px)">🎁</div>
+        <div class="qr-title">Concorra ao <span class="hl">sorteio</span></div>
+        <div class="qr-sub">Escaneie o QR code, responda 3 perguntas e participe do sorteio de encerramento.</div>
+        <div class="live-counter">
+          <span class="live-count-num" id="live-count-3">0</span>
+          <span class="live-count-label">já participaram</span>
+        </div>
+        <div class="presenter-btns">
+          <button onclick="drawWinner()">🎯 Sortear</button>
+          <button onclick="copyNames()">📋 Copiar nomes</button>
+          <button onclick="downloadCSV()">⬇ CSV</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 — PROVOCAÇÃO -->
+  <div class="slide" id="slide-4" data-frags="1">
+    <div class="quote-big" style="font-size:clamp(24px,3.8vw,56px);text-align:center;max-width:900px;">
+      Quantas oportunidades você já perdeu porque as pessoas não sabem o que você faz?
+    </div>
+    <div class="fragment" style="text-align:center;max-width:700px;">
+      <div style="font-size:clamp(16px,1.5vw,22px);color:rgba(255,255,255,0.75);line-height:1.7;">
+        O mercado não premia apenas competência.<br>
+        O mercado premia <strong style="color:var(--laranja);">competência conhecida</strong>.
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 — MITO DA HUMILDADE -->
+  <div class="slide" id="slide-5" data-frags="4">
+    <div class="kicker">O maior erro dos talentos escondidos</div>
+    <div class="display" style="font-size:clamp(28px,4vw,58px);">"Não fale de si."<br>"Espere que reconheçam<br>seu valor."</div>
+    <ul class="arrow-list">
+      <li class="arrow-item fragment">Muita gente talentosa vive escondida.</li>
+      <li class="arrow-item fragment">Muita gente mediana vive cheia de oportunidades.</li>
+      <li class="arrow-item fragment">Qual a diferença? <strong>Uma decidiu aparecer.</strong></li>
+    </ul>
+    <div class="impact-line fragment">
+      Invisibilidade não é humildade.<br>
+      Muitas vezes é apenas medo disfarçado.
+    </div>
+  </div>
+
+  <!-- SLIDE 6 — ARROGÂNCIA VS AUTORIDADE -->
+  <div class="slide" id="slide-6" data-frags="1">
+    <div class="kicker">A diferença que muda tudo</div>
+    <div class="display" style="font-size:clamp(32px,4.8vw,72px);">Arrogância <span class="hl">≠</span> Autoridade</div>
+    <div class="compare-grid fragment">
+      <div class="compare-card bad">
+        <div class="compare-card-title">Arrogância</div>
+        <ul>
+          <li>Precisa parecer melhor que os outros</li>
+          <li>Fala mais do que faz</li>
+          <li>Busca aplauso</li>
+        </ul>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-card-title">Autoridade</div>
+        <ul>
+          <li>Compartilha experiências</li>
+          <li>Entrega valor antes de pedir qualquer coisa</li>
+          <li>Faz para servir</li>
+        </ul>
+      </div>
+    </div>
+    <!-- fragment 2 handled by data-frags=1 (grid is frag 0, this is after) -->
+  </div>
+
+  <!-- SLIDE 7 — SE AMOSTRAMENTO -->
+  <div class="slide" id="slide-7" data-frags="5">
+    <div class="kicker">O método</div>
+    <div class="display" style="font-size:clamp(32px,4.5vw,66px);">Se Amostramento<br><span class="hl">Profissional</span></div>
+    <div class="lead">O ato consciente de tornar visível o valor que você gera.</div>
+    <ul class="arrow-list">
+      <li class="arrow-item fragment">Sem fingimento ou personagem inventado</li>
+      <li class="arrow-item fragment">Deixar rastros do seu trabalho</li>
+      <li class="arrow-item fragment">Documentar sua jornada</li>
+      <li class="arrow-item fragment">Compartilhar aprendizados reais</li>
+      <li class="arrow-item fragment">Ocupar espaços com intenção</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 8 — OS 5 NÍVEIS -->
+  <div class="slide" id="slide-8" data-frags="5">
+    <div class="kicker">Onde você está agora?</div>
+    <div class="display" style="font-size:clamp(32px,4.5vw,66px);">Os <span class="hl">5 Níveis</span></div>
+    <ul class="levels-list">
+      <li class="level-item fragment">
+        <div class="level-num">Nível 1</div>
+        <div class="level-content">
+          <div class="level-name">EXISTIR</div>
+          <div class="level-desc">Você faz. Mas ninguém sabe.</div>
+        </div>
+      </li>
+      <li class="level-item fragment">
+        <div class="level-num">Nível 2</div>
+        <div class="level-content">
+          <div class="level-name">APARECER</div>
+          <div class="level-desc">Você começa a mostrar. Ainda com vergonha.</div>
+        </div>
+      </li>
+      <li class="level-item fragment">
+        <div class="level-num">Nível 3</div>
+        <div class="level-content">
+          <div class="level-name">COMPARTILHAR</div>
+          <div class="level-desc">Você divide conhecimento. As pessoas te associam a um tema.</div>
+        </div>
+      </li>
+      <li class="level-item fragment">
+        <div class="level-num">Nível 4</div>
+        <div class="level-content">
+          <div class="level-name">INFLUENCIAR</div>
+          <div class="level-desc">As pessoas procuram sua opinião.</div>
+        </div>
+      </li>
+      <li class="level-item fragment">
+        <div class="level-num">Nível 5</div>
+        <div class="level-content">
+          <div class="level-name">REFERÊNCIA</div>
+          <div class="level-desc">Quando falam do assunto, falam de você.</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 9 — WORD CLOUD -->
+  <div class="slide" id="slide-9" data-frags="1" style="align-items:center;text-align:center;">
+    <div class="kicker">O que a sala disse sobre si mesma</div>
+    <div class="display" style="font-size:clamp(28px,4vw,56px);">A palavra que <span class="hl">te define</span></div>
+    <div id="wordCloud"></div>
+    <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;">
+      <span class="word-count-display" id="word-count">0</span>
+      <span style="font-size:clamp(14px,1.2vw,18px);color:rgba(255,255,255,0.6);">palavras registradas</span>
+    </div>
+    <div class="fragment" style="margin-top:clamp(12px,2vh,20px);font-family:'Playfair Display',serif;font-size:clamp(16px,1.6vw,24px);color:rgba(255,255,255,0.8);font-style:italic;max-width:700px;text-align:center;">
+      "Sua palavra é o início da sua marca. Agora o desafio é torná-la visível."
+    </div>
+  </div>
+
+  <!-- SLIDE 10 — ESSÊNCIA -->
+  <div class="slide" id="slide-10" data-frags="5">
+    <div class="kicker">O ponto mais importante</div>
+    <div class="display" style="font-size:clamp(28px,4vw,58px);">Você não precisa<br>virar outra pessoa.</div>
+    <div style="font-size:clamp(15px,1.3vw,19px);color:rgba(255,255,255,0.7);margin-bottom:8px;">Você não precisa ser:</div>
+    <ul class="arrow-list">
+      <li class="arrow-item fragment">Mais extrovertido</li>
+      <li class="arrow-item fragment">Mais engraçado</li>
+      <li class="arrow-item fragment">Mais polêmico</li>
+      <li class="arrow-item fragment">Mais barulhento</li>
+    </ul>
+    <div class="impact-line fragment">
+      Você precisa ser mais <span style="color:var(--laranja);">visível</span>.<br>
+      Mais autêntico. Mais <span style="color:var(--laranja);">você</span>.<br>
+      <span style="font-size:0.8em;font-weight:400;color:rgba(255,255,255,0.6);">"O sucesso sustentável acontece quando a visibilidade encontra a autenticidade."</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 11 — PRÁTICA -->
+  <div class="slide" id="slide-11" data-frags="5">
+    <div class="kicker">Ação imediata</div>
+    <div class="display" style="font-size:clamp(28px,4vw,58px);">Do conhecimento<br>para o <span class="hl">movimento</span></div>
+    <ul class="action-list">
+      <li class="action-item fragment">
+        <div class="action-key">MOSTRAR</div>
+        <div class="action-val">Conte o que faz. Sem esperar ser perguntado.</div>
+      </li>
+      <li class="action-item fragment">
+        <div class="action-key">COMPARTILHAR</div>
+        <div class="action-val">Ensine o que aprende. Generosidade gera autoridade.</div>
+      </li>
+      <li class="action-item fragment">
+        <div class="action-key">PARTICIPAR</div>
+        <div class="action-val">Esteja onde as conversas acontecem.</div>
+      </li>
+      <li class="action-item fragment">
+        <div class="action-key">CONECTAR</div>
+        <div class="action-val">Construa relacionamentos antes de precisar deles.</div>
+      </li>
+      <li class="action-item fragment">
+        <div class="action-key">REPETIR</div>
+        <div class="action-val">Autoridade não nasce da intensidade. Nasce da <span style="color:var(--laranja);font-weight:700;">consistência</span>.</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 12 — HISTÓRIA PESSOAL -->
+  <div class="slide" id="slide-12" data-frags="4">
+    <div class="kicker">Trajetória</div>
+    <div class="display" style="font-size:clamp(24px,3.5vw,52px);">Durante muito tempo<br>eu acreditava que<br>bastava fazer um <span class="hl">bom trabalho</span>.</div>
+    <ul class="arrow-list" style="margin-top:clamp(10px,1.5vh,16px);">
+      <li class="arrow-item fragment">Depois percebi: fazer bem era apenas metade do caminho.</li>
+      <li class="arrow-item fragment">A outra metade era permitir que as pessoas soubessem do trabalho que estava sendo feito.</li>
+      <li class="arrow-item fragment">Não para alimentar o ego.</li>
+      <li class="arrow-item fragment">Para ampliar o impacto de forma intencional.</li>
+    </ul>
+    <div style="margin-top:clamp(16px,2.5vh,28px);font-size:clamp(10px,0.85vw,13px);color:rgba(255,255,255,0.35);letter-spacing:0.05em;">
+      Wladson Sidney · MC · Gestor de Carreiras · Fundador da Sancho · Presidente ADVB Ceará
+    </div>
+  </div>
+
+  <!-- SLIDE 13 — ENCERRAMENTO -->
+  <div class="slide" id="slide-13" data-frags="1" style="align-items:center;text-align:center;">
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(24px,3.8vw,58px);font-weight:700;line-height:1.3;max-width:900px;">
+      "Se amostre para ser encontrado.<br>
+      Se amostre para gerar oportunidades.<br>
+      Se amostre para ampliar seu impacto."
+    </div>
+    <div class="fragment impact-line" style="margin-top:clamp(24px,4vh,48px);font-size:clamp(17px,1.8vw,26px);">
+      O seu talento pode transformar vidas.<br>
+      Mas primeiro as pessoas precisam saber que ele existe.
+    </div>
+  </div>
+
+  <!-- SLIDE 14 — SORTEIO FINAL -->
+  <div class="slide" id="slide-14" data-frags="0" style="align-items:center;text-align:center;">
+    <div class="kicker">Hora do sorteio!</div>
+    <div class="display" style="font-size:clamp(28px,4vw,58px);">Quem vai ser o <span class="hl">ganhador?</span></div>
+    <div class="raffle-count-wrap">
+      <span class="raffle-num" id="raffle-count">0</span>
+      <span class="raffle-label">participantes no sorteio</span>
+    </div>
+    <div class="raffle-btns">
+      <button class="raffle-btn btn-draw" onclick="drawWinner()">🎯 Sortear ganhador</button>
+      <button class="raffle-btn btn-copy" onclick="copyNames()">📋 Copiar nomes</button>
+      <button class="raffle-btn btn-csv" onclick="downloadCSV()">⬇ Baixar CSV</button>
+    </div>
+    <div class="delete-zone">
+      <button class="btn-delete" id="btn-delete" onclick="deleteAllData()">🗑 Apagar todos os dados ao vivo</button>
+      <div class="delete-note">Os dados serão apagados na frente de todos. Assim como sua marca, sua palavra fica — mas os dados, não.</div>
+    </div>
+    <div class="brand-logos" style="margin-top:clamp(16px,2.5vh,28px);">
+      <div class="brand-logo sancho">
+        <div class="logo-name">SANCHO</div>
+        <div class="logo-tag">Gestão de Carreira</div>
+      </div>
+      <div class="brand-sep">×</div>
+      <div class="brand-logo escandi">
+        <div class="logo-name">ESCANDI</div>
+        <div class="logo-tag">Inteligência em Marcas</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ===================== FORM VIEW ===================== -->
+<div id="form-view">
+  <div class="form-card">
+    <div id="form-content">
+      <span class="form-badge">WORKSHOP</span>
+      <div class="form-title">Marca que Vende SEM Cerimônias</div>
+      <div class="form-subtitle">Participe e concorra ao sorteio especial</div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-nome">Primeiro nome</label>
+        <input class="form-input" id="f-nome" type="text" placeholder="Seu primeiro nome" autocomplete="given-name">
+      </div>
+      <div class="form-error" id="err-nome">Por favor, informe seu nome.</div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-seg">Seu segmento de atuação</label>
+        <input class="form-input" id="f-seg" type="text" placeholder="Ex: advocacia, marketing, saúde...">
+      </div>
+      <div class="form-error" id="err-seg">Por favor, informe seu segmento.</div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-word">
+          Uma palavra que te define
+          <span class="form-tooltip">Essa palavra vai aparecer na apresentação!</span>
+        </label>
+        <input class="form-input" id="f-word" type="text" placeholder="Ex: criativo, estratégico, transformador...">
+      </div>
+      <div class="form-error" id="err-word">Por favor, informe sua palavra.</div>
+
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()">Participar do sorteio →</button>
+    </div>
+
+    <div id="success-screen">
+      <div class="check-anim">✓</div>
+      <div class="success-title">Você está dentro!</div>
+      <div class="success-msg">Sua palavra foi registrada. Acompanhe na tela principal.</div>
+      <div class="success-note">Apenas nome e segmento serão exibidos. Seus dados serão apagados ao vivo ao final.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== CONFIG =====================
+const firebaseConfig = {
+  apiKey:            "COLE_AQUI",
+  authDomain:        "COLE_AQUI",
+  databaseURL:       "COLE_AQUI",
+  projectId:         "COLE_AQUI",
+  storageBucket:     "COLE_AQUI",
+  messagingSenderId: "COLE_AQUI",
+  appId:             "COLE_AQUI"
+};
+
+const FORM_URL = window.location.href.split('#')[0] + '#/form';
+
+const DEMO_PARTICIPANTS = [
+  { nome: 'Ana',      segmento: 'Advocacia',        palavra: 'Estratégica'   },
+  { nome: 'Bruno',    segmento: 'Arquitetura',       palavra: 'Criativo'      },
+  { nome: 'Carla',    segmento: 'Marketing Digital', palavra: 'Autêntica'     },
+  { nome: 'Diego',    segmento: 'Consultoria',       palavra: 'Transformador' },
+  { nome: 'Eduarda',  segmento: 'Moda',              palavra: 'Ousada'        },
+  { nome: 'Felipe',   segmento: 'Tecnologia',        palavra: 'Inovador'      },
+  { nome: 'Gabriela', segmento: 'Saúde',             palavra: 'Humana'        },
+  { nome: 'Hugo',     segmento: 'Educação',          palavra: 'Inspirador'    },
+  { nome: 'Isabela',  segmento: 'Gastronomia',       palavra: 'Apaixonada'    },
+  { nome: 'João',     segmento: 'Finanças',          palavra: 'Confiável'     },
+  { nome: 'Karen',    segmento: 'RH',                palavra: 'Conectora'     },
+  { nome: 'Lucas',    segmento: 'Design',            palavra: 'Visual'        },
+  { nome: 'Marina',   segmento: 'Varejo',            palavra: 'Persistente'   }
+];
+
+const POP_COLORS = ['#1B4FE4', '#F4610E', '#0D2B8A', '#F7893A', '#FFFFFF'];
+
+// ===================== STATE =====================
+let participants = [];
+let rehearsalMode = false;
+let dbRef = null;
+let currentSlide = 1;
+let currentFrag = -1;
+const TOTAL_SLIDES = 14;
+
+// ===================== HELPERS =====================
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function capitalize(s) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+function firstName(s) {
+  return (s || '').split(' ')[0];
+}
+
+// ===================== FIREBASE INIT =====================
+function initFirebase() {
+  if (firebaseConfig.databaseURL === 'COLE_AQUI') {
+    rehearsalMode = true;
+    document.getElementById('rehearsal-banner').classList.add('show');
+    return;
+  }
+  try {
+    firebase.initializeApp(firebaseConfig);
+    dbRef = firebase.database().ref('participants');
+    dbRef.on('value', snap => {
+      participants = [];
+      snap.forEach(child => participants.push(child.val()));
+      updateUI();
+    });
+  } catch(e) {
+    rehearsalMode = true;
+    document.getElementById('rehearsal-banner').classList.add('show');
+    console.warn('Firebase init failed, rehearsal mode:', e);
+  }
+}
+
+// ===================== UI UPDATES =====================
+function updateUI() {
+  const n = participants.length;
+  document.getElementById('live-count-3').textContent = n;
+  document.getElementById('word-count').textContent = n;
+  document.getElementById('raffle-count').textContent = n;
+  buildWordCloud();
+}
+
+function buildWordCloud() {
+  const host = document.getElementById('wordCloud');
+  if (!host) return;
+  host.innerHTML = '';
+  const src = participants.length > 0 ? participants : (rehearsalMode ? [] : []);
+  if (src.length === 0) return;
+
+  const groups = {};
+  src.forEach(p => {
+    const key = (p.palavra || '').trim().toLowerCase();
+    if (!key) return;
+    (groups[key] = groups[key] || []).push(p.nome);
+  });
+
+  const vals = Object.values(groups).map(a => a.length);
+  const maxCount = vals.length > 0 ? Math.max(...vals) : 1;
+
+  Object.entries(groups).forEach(([palavra, nomes]) => {
+    const pill = document.createElement('div');
+    pill.className = 'word-pill';
+    const freq = nomes.length / maxCount;
+    pill.style.fontSize = `clamp(18px, ${1.2 + freq * 2.8}vw, 56px)`;
+    pill.style.opacity = String(0.65 + freq * 0.35);
+    pill.innerHTML = `<span class="word-text">${esc(capitalize(palavra))}</span>
+                      <span class="word-names">${nomes.slice(0,3).map(n=>esc(firstName(n))).join(', ')}${nomes.length > 3 ? '...' : ''}</span>`;
+    host.appendChild(pill);
+  });
+}
+
+// ===================== NAME POPPER (Slide 3) =====================
+let knownCount = 0;
+function maybePopName(p) {
+  if (currentSlide !== 3) return;
+  const name = firstName(p.nome);
+  const el = document.createElement('div');
+  el.className = 'name-popper';
+  el.textContent = name;
+  el.style.background = POP_COLORS[Math.floor(Math.random() * POP_COLORS.length)];
+
+  // Random edge position (avoid center)
+  const side = Math.random();
+  if (side < 0.25) {
+    el.style.left = (5 + Math.random() * 20) + 'vw';
+    el.style.top = (10 + Math.random() * 80) + 'vh';
+  } else if (side < 0.5) {
+    el.style.right = (5 + Math.random() * 20) + 'vw';
+    el.style.top = (10 + Math.random() * 80) + 'vh';
+  } else if (side < 0.75) {
+    el.style.top = (5 + Math.random() * 15) + 'vh';
+    el.style.left = (10 + Math.random() * 60) + 'vw';
+  } else {
+    el.style.bottom = (5 + Math.random() * 15) + 'vh';
+    el.style.left = (10 + Math.random() * 60) + 'vw';
+  }
+
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3600);
+}
+
+// ===================== SLIDE NAVIGATION =====================
+function getTotalFrags(slideIdx) {
+  const s = document.getElementById('slide-' + slideIdx);
+  if (!s) return 0;
+  return parseInt(s.dataset.frags || '0');
+}
+
+function showSlide(idx) {
+  document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+  const s = document.getElementById('slide-' + idx);
+  if (s) s.classList.add('active');
+  currentSlide = idx;
+  currentFrag = -1;
+
+  // reset fragments
+  if (s) s.querySelectorAll('.fragment').forEach(f => f.classList.remove('visible'));
+
+  // QR code
+  if (idx === 3) renderQR();
+  // word cloud
+  if (idx === 9) buildWordCloud();
+
+  updateProgress();
+  updateCounter();
+  updateFooter();
+}
+
+function next() {
+  const totalFrags = getTotalFrags(currentSlide);
+  if (currentFrag < totalFrags - 1) {
+    currentFrag++;
+    revealFrag(currentSlide, currentFrag);
+  } else if (currentSlide < TOTAL_SLIDES) {
+    showSlide(currentSlide + 1);
+  }
+}
+
+function prev() {
+  if (currentSlide > 1) {
+    showSlide(currentSlide - 1);
+    // show all frags of previous slide
+    const prev = currentSlide; // already decremented in showSlide, need to get current
+    const s = document.getElementById('slide-' + currentSlide);
+    if (s) {
+      const frags = s.querySelectorAll('.fragment');
+      frags.forEach(f => f.classList.add('visible'));
+      currentFrag = frags.length - 1;
+    }
+  }
+}
+
+function revealFrag(slideIdx, fragIdx) {
+  const s = document.getElementById('slide-' + slideIdx);
+  if (!s) return;
+  const frags = s.querySelectorAll('.fragment');
+  if (frags[fragIdx]) frags[fragIdx].classList.add('visible');
+}
+
+function updateProgress() {
+  const pct = ((currentSlide - 1) / (TOTAL_SLIDES - 1)) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function updateCounter() {
+  const idx = String(currentSlide).padStart(2, '0');
+  const total = String(TOTAL_SLIDES).padStart(2, '0');
+  document.getElementById('slide-counter').textContent = idx + ' / ' + total;
+}
+
+function updateFooter() {
+  const hide = (currentSlide === 1 || currentSlide === 14);
+  document.getElementById('footer-brand').style.opacity = hide ? '0' : '1';
+  document.getElementById('slide-counter').style.opacity = hide ? '0' : '1';
+}
+
+// ===================== QR CODE =====================
+function renderQR() {
+  const host = document.getElementById('qrcode');
+  if (!host || host.children.length > 0) return;
+  const url = FORM_URL;
+  document.getElementById('form-url-display').textContent = url;
+  try {
+    new QRCode(host, {
+      text: url,
+      width: 220,
+      height: 220,
+      colorDark: '#050F2C',
+      colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch(e) {
+    host.innerHTML = '<div style="width:220px;height:220px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#333;font-size:12px;text-align:center;padding:12px;border-radius:8px;">QR: carregue online para gerar</div>';
+  }
+}
+
+// ===================== EXPORT FUNCTIONS =====================
+function drawWinner() {
+  if (participants.length === 0) {
+    alert('Nenhum participante ainda!');
+    return;
+  }
+  const winner = participants[Math.floor(Math.random() * participants.length)];
+  document.getElementById('winner-name-text').textContent = winner.nome;
+  document.getElementById('winner-info-text').textContent = winner.segmento + ' · "' + winner.palavra + '"';
+  document.getElementById('winner-overlay').classList.add('show');
+}
+
+function copyNames() {
+  if (participants.length === 0) { alert('Nenhum participante ainda!'); return; }
+  const text = participants.map(p => `${p.nome} — ${p.segmento} — ${p.palavra}`).join('\n');
+  navigator.clipboard.writeText(text).then(() => alert('Copiado!'));
+}
+
+function downloadCSV() {
+  if (participants.length === 0) { alert('Nenhum participante ainda!'); return; }
+  const header = 'nome,segmento,palavra\n';
+  const rows = participants.map(p => `"${p.nome}","${p.segmento}","${p.palavra}"`).join('\n');
+  const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'sorteio-marca-vende.csv';
+  link.click();
+}
+
+function deleteAllData() {
+  if (!confirm('Apagar TODOS os dados ao vivo? Essa ação não pode ser desfeita.')) return;
+  if (dbRef) {
+    dbRef.remove().then(() => {
+      document.getElementById('btn-delete').textContent = '✓ Dados apagados';
+    });
+  } else {
+    participants = [];
+    updateUI();
+    document.getElementById('btn-delete').textContent = '✓ Dados apagados';
+  }
+}
+
+// ===================== FORM SUBMISSION =====================
+function submitForm() {
+  const nome    = document.getElementById('f-nome').value.trim();
+  const seg     = document.getElementById('f-seg').value.trim();
+  const palavra = document.getElementById('f-word').value.trim();
+
+  let ok = true;
+  function err(id, show) {
+    document.getElementById(id).classList.toggle('show', show);
+    if (show) ok = false;
+  }
+  err('err-nome', !nome);
+  err('err-seg', !seg);
+  err('err-word', !palavra);
+  if (!ok) return;
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  const record = { nome, segmento: seg, palavra, ts: Date.now() };
+
+  if (dbRef) {
+    dbRef.push(record).then(showSuccess).catch(e => {
+      btn.disabled = false;
+      btn.textContent = 'Participar do sorteio →';
+      alert('Erro ao enviar. Tente novamente.');
+    });
+  } else {
+    // rehearsal: just show success
+    setTimeout(showSuccess, 600);
+  }
+}
+
+function showSuccess() {
+  document.getElementById('form-content').style.display = 'none';
+  document.getElementById('success-screen').classList.add('show');
+}
+
+// ===================== KEYBOARD CONTROLS =====================
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  const key = e.key;
+  if (key === 'ArrowRight' || key === ' ') { e.preventDefault(); next(); }
+  if (key === 'ArrowLeft')  { e.preventDefault(); prev(); }
+  if (key === 'f' || key === 'F') toggleFullscreen();
+  if (key === 'd' || key === 'D') injectDemo();
+});
+
+// ===================== CLICK NAVIGATION =====================
+document.getElementById('deck').addEventListener('click', e => {
+  const x = e.clientX;
+  const w = window.innerWidth;
+  if (x < w * 0.33) prev();
+  else next();
+});
+
+// ===================== FULLSCREEN =====================
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+// ===================== DEMO MODE =====================
+function injectDemo() {
+  if (!rehearsalMode) return;
+  participants = [...DEMO_PARTICIPANTS];
+  // simulate pop one by one
+  let i = 0;
+  const tick = setInterval(() => {
+    if (i >= participants.length) { clearInterval(tick); return; }
+    maybePopName(participants[i]);
+    i++;
+  }, 200);
+  updateUI();
+}
+
+// ===================== ROUTER =====================
+function route() {
+  const hash = window.location.hash;
+  const deck = document.getElementById('deck');
+  const form = document.getElementById('form-view');
+  const counter = document.getElementById('slide-counter');
+  const footer = document.getElementById('footer-brand');
+  const progress = document.getElementById('progress-bar');
+  const banner = document.getElementById('rehearsal-banner');
+
+  if (hash === '#/form') {
+    deck.style.display = 'none';
+    form.classList.add('active');
+    counter.style.display = 'none';
+    footer.style.display = 'none';
+    progress.style.display = 'none';
+    banner.style.display = 'none';
+  } else {
+    deck.style.display = 'block';
+    form.classList.remove('active');
+    counter.style.display = 'block';
+    footer.style.display = 'block';
+    progress.style.display = 'block';
+    if (rehearsalMode) banner.classList.add('show');
+  }
+}
+
+// ===================== LIVE TRACKER (for poppers) =====================
+function startLiveTracker() {
+  let lastCount = participants.length;
+  setInterval(() => {
+    const newCount = participants.length;
+    if (newCount > lastCount) {
+      for (let i = lastCount; i < newCount; i++) {
+        maybePopName(participants[i]);
+      }
+    }
+    lastCount = newCount;
+  }, 1000);
+}
+
+// ===================== BOOT =====================
+window.addEventListener('hashchange', route);
+initFirebase();
+route();
+showSlide(1);
+startLiveTracker();
+</script>
+</body>
+</html>
