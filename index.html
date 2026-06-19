@@ -687,15 +687,19 @@ body {
 }
 
 /* ===================== SPEAKER CARD ===================== */
-.speaker-card {
-  display: flex; align-items: center; gap: clamp(16px, 2.5vw, 32px);
-  margin-top: clamp(16px, 3vh, 36px);
-  max-width: 700px;
+.speaker-layout {
+  display: grid;
+  grid-template-columns: clamp(80px, 10vw, 140px) 1fr;
+  gap: clamp(20px, 3vw, 42px);
+  align-items: start;
+  margin-top: clamp(14px, 2.5vh, 28px);
+  width: 100%;
+  max-width: 860px;
 }
 .speaker-avatar-wrap {
   flex-shrink: 0;
-  width: clamp(64px, 7vw, 104px);
-  height: clamp(64px, 7vw, 104px);
+  width: clamp(80px, 10vw, 140px);
+  height: clamp(80px, 10vw, 140px);
   border-radius: 50%; overflow: hidden;
   border: 3px solid var(--pink);
   position: relative;
@@ -707,23 +711,39 @@ body {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(18px, 2.2vw, 32px); font-weight: 800;
+  font-size: clamp(22px, 2.6vw, 40px); font-weight: 800;
   background: var(--pink); color: white;
   letter-spacing: 0.04em;
 }
-.speaker-info { display: flex; flex-direction: column; gap: 5px; }
+.speaker-content { display: flex; flex-direction: column; gap: clamp(6px, 1vh, 12px); }
 .speaker-name {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(20px, 2.2vw, 32px); font-weight: 800;
-  color: var(--text-dark);
+  font-size: clamp(26px, 3.2vw, 48px); font-weight: 800;
+  color: var(--text-dark); line-height: 1.05;
+  letter-spacing: -0.02em;
 }
 .speaker-role {
-  font-size: clamp(10px, 0.88vw, 13px); font-weight: 700;
+  font-size: clamp(10px, 0.9vw, 13px); font-weight: 700;
   color: var(--pink); text-transform: uppercase; letter-spacing: 0.12em;
 }
-.speaker-bio {
-  font-size: clamp(12px, 1vw, 15px); color: var(--text-muted); line-height: 1.6;
-  max-width: 500px;
+.speaker-tagline {
+  font-size: clamp(14px, 1.3vw, 20px);
+  color: var(--text-mid); line-height: 1.5;
+  margin-top: clamp(2px, 0.5vh, 6px);
+}
+.speaker-bio-long {
+  font-size: clamp(12px, 1vw, 15px); color: var(--text-muted); line-height: 1.75;
+  border-left: 2px solid rgba(232,24,109,0.25);
+  padding-left: 12px;
+}
+.speaker-book {
+  font-size: clamp(12px, 1vw, 15px); font-weight: 600;
+  color: var(--pink); font-style: italic;
+}
+.speaker-traits {
+  font-size: clamp(11px, 0.85vw, 13px); color: var(--text-muted);
+  letter-spacing: 0.02em; line-height: 1.7;
+  margin-top: clamp(2px, 0.4vh, 6px);
 }
 
 /* ===================== CAPA ===================== */
@@ -866,7 +886,8 @@ body {
   .compare-grid { grid-template-columns: 1fr; }
   .action-item { grid-template-columns: 1fr; gap: 4px; }
   .levels-list { gap: 6px; }
-  .speaker-card { flex-direction: column; align-items: flex-start; }
+  .speaker-layout { grid-template-columns: 1fr; gap: 16px; }
+  .speaker-avatar-wrap { width: 72px; height: 72px; }
   .area-slide-layout { grid-template-columns: 1fr; }
   #slide-counter { font-size: 10px; bottom: 12px; right: 14px; }
   #footer-brand { font-size: 9px; bottom: 12px; left: 14px; }
@@ -884,7 +905,7 @@ body {
 <div id="progress-bar"></div>
 
 <!-- Slide Counter -->
-<div id="slide-counter">01 / 17</div>
+<div id="slide-counter">01 / 16</div>
 
 <!-- Footer Brand -->
 <div id="footer-brand">SANCHO</div>
@@ -911,18 +932,22 @@ body {
   <!-- SLIDE 2 — SPEAKER (light) -->
   <div class="slide light" id="slide-speaker" data-frags="0">
     <div class="kicker"><span class="accent">Quem vai falar com voc&ecirc;</span></div>
-    <div class="display" style="font-size:clamp(30px,4.2vw,60px);">O Palestrante</div>
-    <div class="speaker-card">
+    <div class="speaker-layout">
       <div class="speaker-avatar-wrap">
         <div class="speaker-avatar-fallback" id="ws-fallback">WS</div>
         <img src="wladson.jpg" alt="Wladson Sidney"
           onload="document.getElementById('ws-fallback').style.display='none'"
           onerror="this.style.display='none'">
       </div>
-      <div class="speaker-info">
+      <div class="speaker-content">
         <div class="speaker-name">Wladson Sidney</div>
-        <div class="speaker-role">MC &middot; Gestor de Carreiras &middot; Fundador da Sancho</div>
-        <div class="speaker-bio">MC &middot; Gestor de Carreiras &middot; Fundador da Sancho &middot; Presidente ADVB Cear&aacute; &middot; Especialista em Se Amostramento Profissional</div>
+        <div class="speaker-role">Presidente ADVB-CE &amp; CEO Sancho Gest&atilde;o de Carreiras</div>
+        <div class="speaker-tagline">Empres&aacute;rio, apresentador e mestre na <strong style="color:var(--pink)">ARTE do Se Amostramento Profissional</strong>.</div>
+        <div class="speaker-bio-long">
+          Formado nas ruas do Conjunto Cear&aacute;. Presidente da Associa&ccedil;&atilde;o de Dirigentes de Vendas do Brasil &mdash; ADVB-CE, fundador da Sancho Gest&atilde;o de Carreiras &mdash; uma das maiores ag&ecirc;ncias de talentos e personalidades do Nordeste. Graduado em Gest&atilde;o Estrat&eacute;gica de Marketing, MBA em Administra&ccedil;&atilde;o e Neg&oacute;cios. Estudioso do comportamento humano.
+        </div>
+        <div class="speaker-book">Autor: &ldquo;Quais os benef&iacute;cios de acordar cedo? N&Atilde;O TEM.&rdquo;</div>
+        <div class="speaker-traits">Pai afetuoso &middot; Crist&atilde;o avesso &agrave; religiosidade &middot; Motociclista &middot; Faixa preta de jiu-jitsu &middot; Empres&aacute;rio de corpo e artista de alma</div>
       </div>
     </div>
   </div>
@@ -1175,18 +1200,7 @@ body {
     </div>
   </div>
 
-  <!-- SLIDE 16 — DELETE (dark) -->
-  <div class="slide dark" id="slide-delete" data-frags="0" style="align-items:center;text-align:center;">
-    <div class="kicker"><span class="accent">O momento da verdade</span></div>
-    <div class="display" style="font-size:clamp(28px,4vw,58px);">E agora, eu <span class="hl">apago tudo</span></div>
-    <div class="delete-count-text">
-      <span id="delete-count">0</span> registros ser&atilde;o apagados na frente de todos.<br>
-      Assim como sua marca, sua palavra fica &mdash; mas os dados, n&atilde;o.
-    </div>
-    <button class="btn-delete-big" id="btn-delete" onclick="deleteAllData()">&#128465; Apagar todos os dados ao vivo</button>
-  </div>
-
-  <!-- SLIDE 17 — OBRIGADO (light) -->
+  <!-- SLIDE 16 — OBRIGADO (light) -->
   <div class="slide light" id="slide-obrigado" data-frags="0" style="align-items:center;text-align:center;">
     <div class="obrigado-text"><em>Obrigado!</em></div>
     <div class="obrigado-byline">Wladson Sidney &middot; Sancho</div>
