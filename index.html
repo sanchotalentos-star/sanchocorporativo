@@ -3,57 +3,1238 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marca que Vende SEM Cerimônias</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Marca que Vende SEM Cerimônias · Workshop · Sancho</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/htm/dist/htm.umd.js"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      fontFamily: {
-        serif: ['Playfair Display','Georgia','serif'],
-        sans: ['Inter','system-ui','sans-serif'],
-      },
-      colors: {
-        azul:'#1B4FE4','azul-dark':'#0D2B8A',laranja:'#F4610E','laranja-light':'#F7893A',
-      }
-    }
-  }
-}
-</script>
+
+<!--
+  PERSONALIZAÇÃO ANTES DO EVENTO:
+  1. Preencha o bloco firebaseConfig abaixo (substitua todos os COLE_AQUI)
+  2. Se quiser foto do palestrante, adicione wladson.jpg na mesma pasta
+  3. Teste: abra no notebook → avance até o slide do QR → escaneie com o celular
+     → preencha → verifique se o contador sobe.
+  PLANO B (sem internet): pressione D para entrar em modo ensaio.
+-->
+
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;overflow:hidden;background:#050F2C}
-.slide-bg{background:radial-gradient(120% 120% at 50% -10%,#1B4FE4 0%,#0D2B8A 45%,#050F2C 100%)}
-.form-bg{background:linear-gradient(160deg,#0D2B8A 0%,#050F2C 100%)}
-.frag-hide{opacity:0;transform:translateY(14px);transition:opacity .4s ease,transform .4s ease}
-.frag-show{opacity:1;transform:translateY(0)}
-@keyframes popIn{0%{opacity:0;transform:scale(.5) translateY(0)}20%{opacity:1;transform:scale(1) translateY(-8px)}80%{opacity:1;transform:scale(1) translateY(-8px)}100%{opacity:0;transform:scale(.8) translateY(-20px)}}
-.name-pop{animation:popIn 3.5s ease forwards}
-@keyframes pulseGlow{from{text-shadow:0 0 20px rgba(244,97,14,.4)}to{text-shadow:0 0 50px rgba(244,97,14,.9)}}
-.winner-glow{animation:pulseGlow 1s ease infinite alternate}
-@keyframes popScale{0%{transform:scale(0)}100%{transform:scale(1)}}
-.check-pop{animation:popScale .5s cubic-bezier(.175,.885,.32,1.275)}
-.pill{transition:transform .3s ease}.pill:hover{transform:scale(1.05)}
-.slide-active{opacity:1;transform:translateX(0);transition:opacity .45s ease,transform .45s ease}
-input{outline:none}input:focus{border-color:#1B4FE4!important;box-shadow:0 0 0 3px rgba(27,79,228,.12)!important}
+/* ===================== DESIGN TOKENS ===================== */
+:root {
+  --azul: #1B4FE4;
+  --azul-dark: #0D2B8A;
+  --laranja: #F4610E;
+  --laranja-light: #F7893A;
+  --navy: #050F2C;
+  --white: #FFFFFF;
+  --off-white: #F8FAFD;
+  --text-dark: #1a2744;
+  --text-mid: #3a4a6b;
+  --text-muted: #6b7a99;
+
+  --bg-light: linear-gradient(135deg, #e8eef9 0%, #f0f4fb 40%, #f8fafd 100%);
+  --bg-dark: #050F2C;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--navy);
+  color: var(--white);
+}
+
+/* ===================== REHEARSAL BANNER ===================== */
+#rehearsal-banner {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 9999;
+  background: rgba(244,97,14,0.18);
+  border-bottom: 1px solid rgba(244,97,14,0.35);
+  color: rgba(255,255,255,0.85);
+  font-size: 12px;
+  text-align: center;
+  padding: 6px 16px;
+  letter-spacing: 0.03em;
+}
+#rehearsal-banner.show { display: block; }
+
+/* ===================== PROGRESS BAR ===================== */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: var(--laranja);
+  transition: width 0.4s ease;
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* ===================== SLIDE COUNTER ===================== */
+#slide-counter {
+  position: fixed;
+  bottom: 20px; right: 24px;
+  font-family: 'Inter', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.35);
+  z-index: 100;
+  letter-spacing: 0.12em;
+  transition: color 0.4s;
+  pointer-events: none;
+}
+#slide-counter.dark-text { color: rgba(26,39,68,0.4); }
+
+/* ===================== FOOTER BRAND ===================== */
+#footer-brand {
+  position: fixed;
+  bottom: 20px; left: 24px;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 100;
+  transition: color 0.4s;
+  pointer-events: none;
+}
+#footer-brand.dark-text { color: rgba(26,39,68,0.4); }
+
+/* ===================== DECK CONTAINER ===================== */
+#deck {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===================== SLIDES ===================== */
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(40px, 6vw, 96px) clamp(52px, 8vw, 140px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+.slide.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Light slide */
+.slide.light {
+  background: var(--bg-light);
+  color: var(--text-dark);
+}
+
+/* Dark slide */
+.slide.dark {
+  background: var(--bg-dark);
+  color: var(--white);
+}
+
+/* ===================== KICKER ===================== */
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(10px, 0.9vw, 13px);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: clamp(12px, 2vh, 24px);
+}
+.kicker::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--laranja);
+  flex-shrink: 0;
+}
+.slide.light .kicker { color: var(--text-mid); }
+.slide.dark  .kicker { color: rgba(255,255,255,0.55); }
+.kicker .accent { color: var(--azul); }
+.slide.dark .kicker .accent { color: var(--laranja); }
+
+/* ===================== DISPLAY HEADLINE ===================== */
+.display {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(38px, 5.5vw, 86px);
+  font-weight: 800;
+  line-height: 1.06;
+  margin-bottom: clamp(16px, 2.5vh, 32px);
+  letter-spacing: -0.02em;
+}
+.slide.light .display { color: var(--text-dark); }
+.slide.dark  .display { color: var(--white); }
+.display .hl { color: var(--azul); }
+.slide.dark .display .hl { color: var(--laranja); }
+
+/* ===================== LEAD TEXT ===================== */
+.lead {
+  font-size: clamp(15px, 1.5vw, 22px);
+  font-weight: 400;
+  line-height: 1.65;
+  max-width: 680px;
+  margin-bottom: clamp(20px, 3vh, 40px);
+}
+.slide.light .lead { color: var(--text-mid); }
+.slide.dark  .lead { color: rgba(255,255,255,0.7); }
+
+/* ===================== BYLINE ===================== */
+.byline {
+  font-size: clamp(12px, 1vw, 15px);
+  letter-spacing: 0.04em;
+}
+.slide.light .byline { color: var(--text-muted); }
+.slide.dark  .byline { color: rgba(255,255,255,0.5); }
+
+/* ===================== FRAGMENTS ===================== */
+.fragment {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.fragment.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===================== ARROW LIST ===================== */
+.arrow-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(9px, 1.3vh, 16px);
+  margin-top: clamp(10px, 1.5vh, 18px);
+}
+.arrow-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: clamp(14px, 1.3vw, 19px);
+  line-height: 1.5;
+}
+.arrow-item::before {
+  content: '\2192';
+  color: var(--laranja);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.slide.light .arrow-item { color: var(--text-mid); }
+.slide.dark  .arrow-item { color: rgba(255,255,255,0.82); }
+
+/* ===================== IMPACT LINE ===================== */
+.impact-line {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(16px, 1.7vw, 24px);
+  font-weight: 700;
+  color: var(--azul);
+  margin-top: clamp(16px, 2.5vh, 28px);
+  line-height: 1.4;
+}
+.slide.dark .impact-line { color: var(--laranja); }
+
+/* ===================== COMPARE GRID ===================== */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(14px, 2vw, 28px);
+  width: 100%;
+  max-width: 820px;
+  margin-top: clamp(14px, 2vh, 24px);
+}
+.compare-card {
+  border-radius: 14px;
+  padding: clamp(16px, 2vw, 26px);
+}
+.slide.light .compare-card { background: rgba(26,39,68,0.06); border: 1px solid rgba(26,39,68,0.1); }
+.slide.dark  .compare-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); }
+.compare-card.bad  { border-top: 3px solid #E53E3E !important; }
+.compare-card.good { border-top: 3px solid var(--laranja) !important; }
+.compare-card-title {
+  font-size: clamp(10px, 0.85vw, 13px);
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.compare-card.bad  .compare-card-title { color: #FC8181; }
+.compare-card.good .compare-card-title { color: var(--laranja); }
+.compare-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.compare-card ul li {
+  font-size: clamp(12px, 1vw, 15px);
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.slide.light .compare-card ul li { color: var(--text-mid); }
+.slide.dark  .compare-card ul li { color: rgba(255,255,255,0.72); }
+.compare-card ul li::before { content: '\00B7'; color: rgba(128,128,128,0.6); flex-shrink: 0; }
+
+/* ===================== LEVELS LIST ===================== */
+.levels-list {
+  list-style: none;
+  display: flex; flex-direction: column;
+  gap: clamp(7px, 1vh, 12px);
+  margin-top: clamp(10px, 1.5vh, 18px);
+  width: 100%; max-width: 760px;
+}
+.level-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px; align-items: center;
+  border-radius: 10px;
+  padding: clamp(9px, 1.2vh, 14px) clamp(14px, 1.5vw, 20px);
+  border-left: 3px solid transparent;
+}
+.slide.light .level-item { background: rgba(26,39,68,0.05); border-left-color: rgba(26,39,68,0.12); }
+.slide.dark  .level-item { background: rgba(255,255,255,0.05); border-left-color: rgba(255,255,255,0.12); }
+.level-item:last-child { border-left-color: var(--laranja) !important; }
+.slide.light .level-item:last-child { background: rgba(244,97,14,0.07); }
+.slide.dark  .level-item:last-child { background: rgba(244,97,14,0.1); }
+.level-num {
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 700; letter-spacing: 0.1em;
+}
+.slide.light .level-num { color: var(--text-muted); }
+.slide.dark  .level-num { color: rgba(255,255,255,0.38); }
+.level-content { display: flex; flex-direction: column; gap: 2px; }
+.level-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(12px, 1.1vw, 16px); font-weight: 700;
+}
+.slide.light .level-name { color: var(--text-dark); }
+.slide.dark  .level-name { color: var(--white); }
+.level-item:last-child .level-name { color: var(--laranja) !important; }
+.level-desc { font-size: clamp(11px, 0.88vw, 13px); }
+.slide.light .level-desc { color: var(--text-muted); }
+.slide.dark  .level-desc { color: rgba(255,255,255,0.52); }
+
+/* ===================== ACTION LIST ===================== */
+.action-list {
+  list-style: none;
+  display: flex; flex-direction: column;
+  gap: clamp(7px, 1vh, 12px);
+  width: 100%; max-width: 760px;
+  margin-top: clamp(10px, 1.5vh, 18px);
+}
+.action-item {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 14px; align-items: center;
+  border-radius: 10px;
+  padding: clamp(11px, 1.4vh, 17px) clamp(14px, 1.5vw, 20px);
+}
+.slide.light .action-item { background: rgba(26,39,68,0.05); border: 1px solid rgba(26,39,68,0.08); }
+.slide.dark  .action-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+.action-item:last-child { border-left: 3px solid var(--laranja) !important; }
+.slide.light .action-item:last-child { background: rgba(244,97,14,0.06); }
+.slide.dark  .action-item:last-child { background: rgba(244,97,14,0.1); }
+.action-key {
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--laranja);
+}
+.action-val { font-size: clamp(12px, 1vw, 15px); }
+.slide.light .action-val { color: var(--text-mid); }
+.slide.dark  .action-val { color: rgba(255,255,255,0.78); }
+
+/* ===================== QR SLIDE ===================== */
+#slide-qr { align-items: center; }
+.qr-layout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(28px, 4vw, 68px);
+  width: 100%; max-width: 920px; align-items: start;
+  margin-top: clamp(10px, 1.5vh, 20px);
+}
+.qr-box {
+  background: white;
+  border-radius: 20px;
+  padding: clamp(14px, 1.8vw, 24px);
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  box-shadow: 0 20px 60px rgba(26,39,68,0.15);
+  border: 1px solid rgba(26,39,68,0.08);
+}
+#qrcode canvas, #qrcode img { display: block; }
+.qr-url {
+  font-family: 'Inter', monospace;
+  font-size: clamp(10px, 0.85vw, 12px);
+  color: #6b7a99;
+  word-break: break-all; text-align: center;
+}
+.qr-right {
+  display: flex; flex-direction: column;
+  gap: clamp(10px, 1.5vh, 18px);
+}
+.qr-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(244,97,14,0.1);
+  border: 1px solid rgba(244,97,14,0.3);
+  color: var(--laranja);
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 5px 12px; border-radius: 999px;
+  width: -moz-fit-content; width: fit-content;
+}
+.qr-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(22px, 2.6vw, 38px);
+  font-weight: 800; line-height: 1.2;
+  color: var(--text-dark);
+}
+.qr-sub {
+  font-size: clamp(13px, 1.05vw, 16px);
+  color: var(--text-muted); line-height: 1.6;
+  max-width: 400px;
+}
+.live-counter {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-top: 4px;
+}
+.live-count-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(50px, 5.5vw, 82px);
+  font-weight: 800;
+  color: var(--azul); line-height: 1;
+}
+.live-count-label {
+  font-size: clamp(12px, 1vw, 15px);
+  color: var(--text-muted);
+}
+.countdown-timer {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(16px, 1.6vw, 22px);
+  font-weight: 700;
+  color: var(--text-mid);
+  letter-spacing: 0.05em;
+}
+.countdown-timer.urgent { color: var(--laranja); }
+.presenter-btns {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 6px;
+}
+.presenter-btns button {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px; font-weight: 600;
+  padding: 7px 14px; border-radius: 8px;
+  border: 1.5px solid rgba(26,39,68,0.18);
+  background: rgba(26,39,68,0.06);
+  color: var(--text-mid);
+  cursor: pointer; transition: background 0.2s, border-color 0.2s;
+}
+.presenter-btns button:hover { background: rgba(26,39,68,0.12); border-color: rgba(26,39,68,0.3); }
+
+/* +1 pop */
+.plus-one-pop {
+  position: fixed;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(16px, 1.5vw, 22px);
+  font-weight: 800;
+  color: var(--azul);
+  background: white;
+  border: 2px solid var(--azul);
+  border-radius: 999px;
+  padding: 6px 16px;
+  pointer-events: none;
+  z-index: 300;
+  animation: plusOnePop 2s ease forwards;
+}
+@keyframes plusOnePop {
+  0%   { opacity: 0; transform: translateY(0) scale(0.6); }
+  20%  { opacity: 1; transform: translateY(-12px) scale(1); }
+  75%  { opacity: 1; transform: translateY(-28px) scale(1); }
+  100% { opacity: 0; transform: translateY(-44px) scale(0.9); }
+}
+
+/* name popper */
+.name-popper {
+  position: fixed;
+  font-size: clamp(14px, 1.3vw, 19px);
+  font-weight: 700;
+  pointer-events: none;
+  border-radius: 999px;
+  padding: 6px 16px;
+  color: white;
+  z-index: 200;
+  animation: popIn 3.5s ease forwards;
+}
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.5) translateY(0); }
+  20%  { opacity: 1; transform: scale(1) translateY(-8px); }
+  80%  { opacity: 1; transform: scale(1) translateY(-8px); }
+  100% { opacity: 0; transform: scale(0.8) translateY(-20px); }
+}
+
+/* ===================== WORD CLOUD ===================== */
+#slide-wordcloud { align-items: center; text-align: center; }
+#wordCloud {
+  display: flex; flex-wrap: wrap; gap: clamp(10px, 1.4vw, 22px);
+  align-items: center; justify-content: center;
+  padding: clamp(14px, 2.5vh, 36px) 0;
+  max-width: 1100px; width: 100%;
+}
+.word-pill {
+  border-radius: 999px;
+  padding: .32em .95em;
+  display: flex; flex-direction: column; align-items: center;
+  transition: transform .3s ease;
+  cursor: default;
+}
+.slide.light .word-pill { background: rgba(26,39,68,0.07); border: 1px solid rgba(26,39,68,0.15); }
+.slide.dark  .word-pill { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); }
+.slide.light .word-pill:nth-child(odd) { border-color: rgba(244,97,14,0.3); }
+.slide.dark  .word-pill:nth-child(odd) { border-color: rgba(244,97,14,0.4); }
+.word-pill:hover { transform: scale(1.06); }
+.slide.light .word-text { color: var(--text-dark); font-weight: 700; line-height: 1.1; }
+.slide.dark  .word-text { color: #fff; font-weight: 700; line-height: 1.1; }
+.slide.light .word-names { color: var(--text-muted); font-size: .55em; margin-top: .1em; }
+.slide.dark  .word-names { color: rgba(255,255,255,0.5); font-size: .55em; margin-top: .1em; }
+.word-count-display {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(38px, 4.5vw, 68px);
+  font-weight: 800; color: var(--azul); line-height: 1;
+}
+
+/* ===================== IMPACT SLIDE ===================== */
+#slide-impact { align-items: center; text-align: center; }
+.impact-big-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(80px, 12vw, 180px);
+  font-weight: 800; line-height: 1; color: var(--white);
+}
+.impact-big-sub {
+  font-size: clamp(18px, 2vw, 28px); color: rgba(255,255,255,0.6);
+  margin-top: 8px; letter-spacing: 0.02em;
+}
+
+/* ===================== AREA SLIDES ===================== */
+.area-slide-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(20px, 3vw, 48px);
+  width: 100%; max-width: 1060px;
+  margin-top: clamp(10px, 1.5vh, 18px);
+  align-items: start;
+}
+.area-count-text {
+  font-size: clamp(12px, 1.1vw, 16px);
+  color: rgba(255,255,255,0.6);
+  margin-bottom: clamp(10px, 1.5vh, 16px);
+}
+.area-pills {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.area-name-pill {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 7px 12px;
+  display: flex; flex-direction: column; gap: 1px;
+}
+.area-pill-name {
+  font-size: clamp(11px, 0.95vw, 14px);
+  font-weight: 700; color: var(--white);
+}
+.area-pill-palavra {
+  font-size: clamp(9px, 0.78vw, 11px);
+  color: var(--laranja); letter-spacing: 0.05em;
+}
+.email-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.email-titlebar {
+  background: #f0f0f0;
+  padding: 10px 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.email-dots { display: flex; gap: 5px; }
+.email-dot { width: 11px; height: 11px; border-radius: 50%; }
+.email-dot.red    { background: #FF5F57; }
+.email-dot.yellow { background: #FEBC2E; }
+.email-dot.green  { background: #28C840; }
+.email-body {
+  padding: clamp(14px, 1.8vw, 22px);
+  color: #1a2744;
+}
+.email-from { font-size: clamp(9px, 0.78vw, 11px); color: #6b7a99; margin-bottom: 2px; }
+.email-to   { font-size: clamp(9px, 0.78vw, 11px); color: #6b7a99; margin-bottom: 2px; }
+.email-subject {
+  font-size: clamp(10px, 0.9vw, 13px);
+  font-weight: 700; color: #1a2744;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(26,39,68,0.1);
+}
+.email-text {
+  font-size: clamp(9px, 0.82vw, 12px);
+  color: #3a4a6b; line-height: 1.6;
+  white-space: pre-line;
+}
+.email-suggestions {
+  list-style: none; margin: 8px 0; display: flex; flex-direction: column; gap: 4px;
+}
+.email-suggestions li {
+  font-size: clamp(9px, 0.78vw, 11px);
+  color: #3a4a6b;
+  display: flex; gap: 6px; align-items: flex-start;
+}
+.email-suggestions li::before { content: '\2192'; color: var(--azul); flex-shrink: 0; }
+.email-btn {
+  display: inline-block;
+  margin-top: 10px;
+  background: var(--azul);
+  color: white;
+  font-size: clamp(9px, 0.78vw, 11px);
+  font-weight: 700; letter-spacing: 0.05em;
+  padding: 7px 14px; border-radius: 7px;
+}
+.email-sig {
+  margin-top: 10px;
+  font-size: clamp(8px, 0.72vw, 10px);
+  color: #6b7a99; line-height: 1.5;
+  border-top: 1px solid rgba(26,39,68,0.08);
+  padding-top: 8px;
+}
+
+/* ===================== RAFFLE SLIDE ===================== */
+#slide-raffle { align-items: center; text-align: center; }
+.raffle-count-wrap { display: flex; align-items: baseline; gap: 12px; margin: clamp(10px, 1.5vh, 18px) 0; }
+.raffle-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(60px, 8vw, 110px);
+  font-weight: 800; color: var(--white); line-height: 1;
+}
+.raffle-label { font-size: clamp(14px, 1.3vw, 20px); color: rgba(255,255,255,0.5); }
+.raffle-btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: clamp(10px, 2vh, 24px) 0; }
+.raffle-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(13px, 1.05vw, 16px); font-weight: 700;
+  padding: clamp(11px, 1.4vh, 17px) clamp(18px, 2vw, 30px);
+  border-radius: 12px; border: none; cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.raffle-btn:active { transform: scale(0.97); }
+.btn-draw { background: var(--laranja); color: white; box-shadow: 0 8px 24px rgba(244,97,14,0.4); }
+.btn-draw:hover { box-shadow: 0 12px 32px rgba(244,97,14,0.55); }
+.btn-copy, .btn-csv {
+  background: rgba(255,255,255,0.1); color: white;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+}
+.btn-copy:hover, .btn-csv:hover { background: rgba(255,255,255,0.18); }
+
+/* ===================== DELETE SLIDE ===================== */
+#slide-delete { align-items: center; text-align: center; }
+.delete-count-text { font-size: clamp(14px, 1.3vw, 20px); color: rgba(255,255,255,0.55); margin: 10px 0 24px; }
+.btn-delete-big {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(13px, 1.1vw, 17px); font-weight: 700;
+  padding: clamp(12px, 1.5vh, 18px) clamp(24px, 3vw, 40px);
+  border-radius: 14px;
+  border: 2px solid rgba(255,100,100,0.5);
+  background: rgba(255,80,80,0.12);
+  color: rgba(255,160,160,0.95);
+  cursor: pointer; transition: background 0.2s, border-color 0.2s;
+}
+.btn-delete-big:hover { background: rgba(255,80,80,0.22); border-color: rgba(255,100,100,0.7); }
+
+/* ===================== WINNER OVERLAY ===================== */
+#winner-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(5,15,44,0.93);
+  z-index: 500;
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 20px;
+  text-align: center; padding: 40px;
+}
+#winner-overlay.show { display: flex; }
+.winner-badge { font-size: clamp(44px, 6vw, 80px); }
+.winner-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(34px, 5vw, 70px); font-weight: 800;
+  color: var(--laranja);
+  animation: pulse 1s ease infinite alternate;
+}
+.winner-info { font-size: clamp(15px, 1.4vw, 21px); color: rgba(255,255,255,0.65); }
+.winner-close {
+  margin-top: 16px; font-family: 'Inter', sans-serif; font-size: 14px;
+  padding: 10px 28px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.3); background: transparent; color: white; cursor: pointer;
+}
+@keyframes pulse {
+  from { text-shadow: 0 0 20px rgba(244,97,14,0.4); }
+  to   { text-shadow: 0 0 50px rgba(244,97,14,0.9); }
+}
+
+/* ===================== SPEAKER CARD ===================== */
+.speaker-card {
+  display: flex; align-items: center; gap: clamp(16px, 2.5vw, 32px);
+  margin-top: clamp(16px, 3vh, 36px);
+  max-width: 700px;
+}
+.speaker-avatar-wrap {
+  flex-shrink: 0;
+  width: clamp(64px, 7vw, 104px);
+  height: clamp(64px, 7vw, 104px);
+  border-radius: 50%; overflow: hidden;
+  border: 3px solid var(--azul);
+  position: relative;
+}
+.speaker-avatar-wrap img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.speaker-avatar-fallback {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(18px, 2.2vw, 32px); font-weight: 800;
+  background: var(--azul); color: white;
+  letter-spacing: 0.04em;
+}
+.speaker-info { display: flex; flex-direction: column; gap: 5px; }
+.speaker-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(20px, 2.2vw, 32px); font-weight: 800;
+  color: var(--text-dark);
+}
+.speaker-role {
+  font-size: clamp(10px, 0.88vw, 13px); font-weight: 700;
+  color: var(--azul); text-transform: uppercase; letter-spacing: 0.12em;
+}
+.speaker-bio {
+  font-size: clamp(12px, 1vw, 15px); color: var(--text-muted); line-height: 1.6;
+  max-width: 500px;
+}
+
+/* ===================== CAPA ===================== */
+#slide-capa { align-items: flex-start; }
+.capa-logos {
+  display: flex; align-items: center; gap: clamp(14px, 2vw, 28px);
+  margin-top: clamp(20px, 3.5vh, 44px);
+}
+.logo-sancho {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(14px, 1.6vw, 22px); font-weight: 800;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--azul);
+}
+
+/* ===================== QUOTE BLOCK ===================== */
+.quote-block {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(24px, 3.4vw, 52px);
+  font-weight: 800; line-height: 1.18;
+  max-width: 900px;
+  margin-bottom: clamp(20px, 3vh, 40px);
+}
+.slide.light .quote-block { color: var(--text-dark); }
+.slide.dark  .quote-block { color: var(--white); }
+
+/* ===================== CLOSING QUOTE ===================== */
+#slide-encerramento { align-items: center; text-align: center; }
+.closing-quote {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(22px, 3vw, 46px);
+  font-weight: 800; line-height: 1.3;
+  color: var(--text-dark); max-width: 820px;
+  margin-bottom: clamp(20px, 3.5vh, 44px);
+}
+.closing-quote em { color: var(--azul); font-style: normal; }
+
+/* ===================== OBRIGADO ===================== */
+#slide-obrigado { align-items: center; text-align: center; }
+.obrigado-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(48px, 8vw, 120px);
+  font-weight: 800; color: var(--text-dark); line-height: 1;
+  margin-bottom: clamp(16px, 3vh, 36px);
+}
+.obrigado-text em { color: var(--azul); font-style: normal; }
+.obrigado-byline { font-size: clamp(14px, 1.3vw, 20px); color: var(--text-muted); letter-spacing: 0.04em; }
+
+/* ===================== FORM VIEW ===================== */
+#form-view {
+  display: none;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #0D2B8A 0%, #050F2C 100%);
+  align-items: center; justify-content: center;
+  padding: 24px 16px;
+}
+#form-view.active { display: flex; }
+.form-card {
+  background: white; border-radius: 24px;
+  padding: clamp(28px, 5vw, 48px);
+  width: 100%; max-width: 480px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+}
+.form-badge {
+  display: inline-block; background: var(--laranja); color: white;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 999px; margin-bottom: 16px;
+}
+.form-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(22px, 5vw, 30px); font-weight: 800;
+  color: #0D2B8A; line-height: 1.15; margin-bottom: 8px;
+}
+.form-subtitle { font-size: 14px; color: #6b7a99; margin-bottom: 28px; line-height: 1.5; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+.form-label {
+  font-size: 13px; font-weight: 700; color: #1a202c;
+  display: flex; align-items: center; gap: 6px;
+}
+.form-tooltip {
+  font-size: 11px; font-weight: 400; color: var(--laranja);
+  background: rgba(244,97,14,0.08); border: 1px solid rgba(244,97,14,0.2);
+  border-radius: 6px; padding: 2px 7px;
+}
+.form-input {
+  font-family: 'Inter', sans-serif; font-size: 15px;
+  padding: 12px 16px; border-radius: 10px;
+  border: 1.5px solid #E2E8F0; outline: none; color: #1a202c;
+  transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
+}
+.form-input:focus {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(27,79,228,0.12);
+}
+.form-input::placeholder { color: #a0aec0; }
+.submit-btn {
+  width: 100%; padding: 15px; background: var(--laranja); color: white;
+  font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700;
+  border: none; border-radius: 12px; cursor: pointer; margin-top: 8px;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 8px 24px rgba(244,97,14,0.35);
+}
+.submit-btn:hover { background: #d94f08; box-shadow: 0 12px 32px rgba(244,97,14,0.45); }
+.submit-btn:active { transform: scale(0.98); }
+#success-screen { display: none; flex-direction: column; align-items: center; text-align: center; gap: 16px; }
+#success-screen.show { display: flex; }
+.check-anim {
+  width: 72px; height: 72px; border-radius: 50%; background: #48BB78;
+  display: flex; align-items: center; justify-content: center; font-size: 36px;
+  animation: popScale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes popScale {
+  0%   { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+.success-title { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 800; color: #0D2B8A; }
+.success-msg { font-size: 15px; color: #6b7a99; line-height: 1.6; }
+.success-note { font-size: 12px; color: #a0aec0; line-height: 1.5; margin-top: 8px; }
+.form-error { color: #E53E3E; font-size: 12px; margin-top: -10px; margin-bottom: 8px; display: none; }
+.form-error.show { display: block; }
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 1024px) {
+  .slide { padding: clamp(28px, 5vw, 60px) clamp(32px, 6vw, 80px); }
+  .qr-layout { gap: clamp(18px, 2.5vw, 36px); }
+  .area-slide-layout { gap: clamp(14px, 2vw, 28px); }
+}
+@media (max-width: 640px) {
+  body { overflow-x: hidden; }
+  .slide {
+    padding: 48px 24px 80px;
+    justify-content: flex-start;
+    overflow-y: auto; overflow-x: hidden;
+  }
+  #slide-capa { justify-content: center; padding-top: 32px; }
+  #slide-capa .display { font-size: clamp(34px, 10vw, 52px); }
+  .qr-layout { grid-template-columns: 1fr; gap: 18px; text-align: center; }
+  .qr-box { max-width: 180px; margin: 0 auto; }
+  #qrcode canvas, #qrcode img { width: 180px !important; height: 180px !important; }
+  .qr-right { align-items: center; }
+  .live-counter { justify-content: center; }
+  .presenter-btns { justify-content: center; }
+  .compare-grid { grid-template-columns: 1fr; }
+  .action-item { grid-template-columns: 1fr; gap: 4px; }
+  .levels-list { gap: 6px; }
+  .speaker-card { flex-direction: column; align-items: flex-start; }
+  .area-slide-layout { grid-template-columns: 1fr; }
+  #slide-counter { font-size: 10px; bottom: 12px; right: 14px; }
+  #footer-brand { font-size: 9px; bottom: 12px; left: 14px; }
+}
 </style>
 </head>
 <body>
-<div id="root"></div>
-<script>
-/* ── htm + React setup (sem Babel) ── */
-const html = htm.bind(React.createElement);
-const {useState,useEffect,useRef,useCallback,useMemo} = React;
 
-/* ── Config ── */
-const firebaseConfig = {
+<!-- Rehearsal Banner -->
+<div id="rehearsal-banner">
+  Modo ensaio (sem Firebase). Pressione <strong>D</strong> para injetar 13 participantes de teste.
+</div>
+
+<!-- Progress Bar -->
+<div id="progress-bar"></div>
+
+<!-- Slide Counter -->
+<div id="slide-counter">01 / 17</div>
+
+<!-- Footer Brand -->
+<div id="footer-brand">SANCHO</div>
+
+<!-- Winner Overlay -->
+<div id="winner-overlay">
+  <div class="winner-badge">&#127919;</div>
+  <div class="winner-name" id="winner-name-text"></div>
+  <div class="winner-info" id="winner-info-text"></div>
+  <button class="winner-close" onclick="document.getElementById('winner-overlay').classList.remove('show')">Fechar</button>
+</div>
+
+<!-- ===================== DECK ===================== -->
+<div id="deck">
+
+  <!-- SLIDE 1 — CAPA (light) -->
+  <div class="slide light active" id="slide-capa" data-frags="0">
+    <div class="kicker"><span class="accent">Workshop &middot; Sancho</span></div>
+    <div class="display" style="font-size:clamp(40px,6vw,92px);">Marca que Vende<br><span class="hl">SEM Cerim&ocirc;nias</span></div>
+    <div class="lead">Posicione sua marca e transforme ela no seu melhor vendedor.</div>
+    <div class="byline">Wladson Sidney &middot; Sancho</div>
+    <div class="capa-logos">
+      <span class="logo-sancho">SANCHO</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 — SPEAKER (light) -->
+  <div class="slide light" id="slide-speaker" data-frags="0">
+    <div class="kicker"><span class="accent">Quem vai falar com voc&ecirc;</span></div>
+    <div class="display" style="font-size:clamp(30px,4.2vw,60px);">O Palestrante</div>
+    <div class="speaker-card">
+      <div class="speaker-avatar-wrap">
+        <div class="speaker-avatar-fallback" id="ws-fallback">WS</div>
+        <img src="wladson.jpg" alt="Wladson Sidney"
+          onload="document.getElementById('ws-fallback').style.display='none'"
+          onerror="this.style.display='none'">
+      </div>
+      <div class="speaker-info">
+        <div class="speaker-name">Wladson Sidney</div>
+        <div class="speaker-role">MC &middot; Gestor de Carreiras &middot; Fundador da Sancho</div>
+        <div class="speaker-bio">MC &middot; Gestor de Carreiras &middot; Fundador da Sancho &middot; Presidente ADVB Cear&aacute; &middot; Especialista em Se Amostramento Profissional</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 — QR CODE (light) -->
+  <div class="slide light" id="slide-qr" data-frags="0" data-qr-slide="true">
+    <div class="kicker"><span class="accent">Antes de come&ccedil;ar &mdash; Sorteio especial</span></div>
+    <div class="qr-layout">
+      <div class="qr-box">
+        <div id="qrcode"></div>
+        <div class="qr-url" id="form-url-display">...</div>
+      </div>
+      <div class="qr-right">
+        <div class="qr-badge">&#127873; PR&Ecirc;MIO ESPECIAL</div>
+        <div class="qr-title">Concorra ao <span style="color:var(--azul)">sorteio</span></div>
+        <div class="qr-sub">Escaneie o QR, responda 3 perguntas e participe do sorteio de encerramento.</div>
+        <div class="live-counter">
+          <span class="live-count-num" id="live-count-qr">0</span>
+          <span class="live-count-label">j&aacute; participaram</span>
+        </div>
+        <div class="countdown-timer" id="countdown-display">01:00</div>
+        <div class="presenter-btns">
+          <button onclick="drawWinner()">&#127919; Sortear</button>
+          <button onclick="copyNames()">&#128203; Copiar nomes</button>
+          <button onclick="downloadCSV()">&#8595; CSV</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 — PROVOCACAO (light) -->
+  <div class="slide light" id="slide-provocacao" data-frags="1" style="align-items:center;text-align:center;">
+    <div class="quote-block">
+      Quantas oportunidades voc&ecirc; j&aacute; perdeu porque as pessoas n&atilde;o sabem o que voc&ecirc; faz?
+    </div>
+    <div class="fragment" style="max-width:680px;">
+      <div style="font-size:clamp(15px,1.4vw,21px);color:var(--text-mid);line-height:1.7;">
+        O mercado n&atilde;o premia apenas compet&ecirc;ncia.<br>
+        O mercado premia <strong style="color:var(--azul);">compet&ecirc;ncia conhecida</strong>.
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 — MITO (light) -->
+  <div class="slide light" id="slide-mito" data-frags="4">
+    <div class="kicker"><span class="accent">O maior erro dos talentos escondidos</span></div>
+    <div class="display" style="font-size:clamp(26px,3.8vw,56px);">&ldquo;N&atilde;o fale de si.&rdquo;<br>&ldquo;Espere que reconhe&ccedil;am<br>seu valor.&rdquo;</div>
+    <ul class="arrow-list">
+      <li class="arrow-item fragment">Muita gente talentosa vive escondida.</li>
+      <li class="arrow-item fragment">Muita gente mediana vive cheia de oportunidades.</li>
+      <li class="arrow-item fragment">Qual a diferen&ccedil;a? <strong style="color:var(--azul);">Uma decidiu aparecer.</strong></li>
+    </ul>
+    <div class="impact-line fragment">
+      Invisibilidade n&atilde;o &eacute; humildade.<br>
+      Muitas vezes &eacute; apenas medo disfarçado.
+    </div>
+  </div>
+
+  <!-- SLIDE 6 — AUTORIDADE (light) -->
+  <div class="slide light" id="slide-autoridade" data-frags="1">
+    <div class="kicker"><span class="accent">A diferen&ccedil;a que muda tudo</span></div>
+    <div class="display" style="font-size:clamp(30px,4.5vw,68px);">Arrog&acirc;ncia <span class="hl">&ne;</span> Autoridade</div>
+    <div class="compare-grid fragment">
+      <div class="compare-card bad">
+        <div class="compare-card-title">Arrog&acirc;ncia</div>
+        <ul>
+          <li>Precisa parecer melhor que os outros</li>
+          <li>Fala mais do que faz</li>
+          <li>Busca aplauso</li>
+        </ul>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-card-title">Autoridade</div>
+        <ul>
+          <li>Compartilha experi&ecirc;ncias</li>
+          <li>Entrega valor antes de pedir qualquer coisa</li>
+          <li>Faz para servir</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7 — METODO (light) -->
+  <div class="slide light" id="slide-metodo" data-frags="5">
+    <div class="kicker"><span class="accent">O m&eacute;todo</span></div>
+    <div class="display" style="font-size:clamp(30px,4.2vw,62px);">Se Amostramento<br><span class="hl">Profissional</span></div>
+    <div class="lead">O ato consciente de tornar vis&iacute;vel o valor que voc&ecirc; gera.</div>
+    <ul class="arrow-list">
+      <li class="arrow-item fragment">Sem fingimento ou personagem inventado</li>
+      <li class="arrow-item fragment">Deixar rastros do seu trabalho</li>
+      <li class="arrow-item fragment">Documentar sua jornada</li>
+      <li class="arrow-item fragment">Compartilhar aprendizados reais</li>
+      <li class="arrow-item fragment">Ocupar espa&ccedil;os com inten&ccedil;&atilde;o</li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 8 — OS 5 NIVEIS (light) -->
+  <div class="slide light" id="slide-niveis" data-frags="5">
+    <div class="kicker"><span class="accent">Onde voc&ecirc; est&aacute; agora?</span></div>
+    <div class="display" style="font-size:clamp(30px,4.2vw,62px);">Os <span class="hl">5 N&iacute;veis</span></div>
+    <ul class="levels-list">
+      <li class="level-item fragment">
+        <div class="level-num">N&iacute;vel 1</div>
+        <div class="level-content">
+          <div class="level-name">EXISTIR</div>
+          <div class="level-desc">Voc&ecirc; faz. Mas ningu&eacute;m sabe.</div>
+        </div>
+      </li>
+      <li class="level-item fragment">
+        <div class="level-num">N&iacute;vel 2</div>
+        <div class="level-content">
+          <div class="level-name">APARECER</div>
+          <div class="level-desc">Voc&ecirc; come&ccedil;a a mostrar. Ainda com vergonha.</div>
+        </div>
+      </li>
+      <li class="level-item fragment">
+        <div class="level-num">N&iacute;vel 3</div>
+        <div class="level-content">
+          <div class="level-name">COMPARTILHAR</div>
+          <div class="level-desc">Voc&ecirc; divide conhecimento. As pessoas te associam a um tema.</div>
+        </div>
+      </li>
+      <li class="level-item fragment">
+        <div class="level-num">N&iacute;vel 4</div>
+        <div class="level-content">
+          <div class="level-name">INFLUENCIAR</div>
+          <div class="level-desc">As pessoas procuram sua opini&atilde;o.</div>
+        </div>
+      </li>
+      <li class="level-item fragment">
+        <div class="level-num">N&iacute;vel 5</div>
+        <div class="level-content">
+          <div class="level-name">REFER&Ecirc;NCIA</div>
+          <div class="level-desc">Quando falam do assunto, falam de voc&ecirc;.</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 9 — WORD CLOUD (light) -->
+  <div class="slide light" id="slide-wordcloud" data-frags="0" style="align-items:center;text-align:center;">
+    <div class="kicker"><span class="accent">O que a sala disse sobre si mesma</span></div>
+    <div class="display" style="font-size:clamp(26px,3.6vw,52px);">A palavra que <span class="hl">te define</span></div>
+    <div id="wordCloud"></div>
+    <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;">
+      <span class="word-count-display" id="word-count">0</span>
+      <span style="font-size:clamp(13px,1.1vw,17px);color:var(--text-muted);">palavras registradas</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 10 — IMPACT (dark) -->
+  <div class="slide dark" id="slide-impact" data-frags="0" style="align-items:center;text-align:center;">
+    <div class="kicker"><span class="accent">Voc&ecirc;s chegaram</span></div>
+    <div class="impact-big-num" id="impact-count">0</div>
+    <div class="impact-big-sub">participaram em poucos minutos.</div>
+  </div>
+
+  <!-- AREA SLIDES inserted by JS before slide-essencia -->
+
+  <!-- SLIDE 11 — ESSENCIA (light) -->
+  <div class="slide light" id="slide-essencia" data-frags="5">
+    <div class="kicker"><span class="accent">O ponto mais importante</span></div>
+    <div class="display" style="font-size:clamp(26px,3.8vw,56px);">Voc&ecirc; n&atilde;o precisa<br>virar outra pessoa.</div>
+    <div style="font-size:clamp(14px,1.2vw,18px);color:var(--text-muted);margin-bottom:6px;">Voc&ecirc; n&atilde;o precisa ser:</div>
+    <ul class="arrow-list">
+      <li class="arrow-item fragment">Mais extrovertido</li>
+      <li class="arrow-item fragment">Mais engra&ccedil;ado</li>
+      <li class="arrow-item fragment">Mais pol&ecirc;mico</li>
+      <li class="arrow-item fragment">Mais barulhento</li>
+    </ul>
+    <div class="impact-line fragment">
+      Voc&ecirc; precisa ser mais <span style="color:var(--laranja);">vis&iacute;vel</span>.<br>
+      Mais aut&ecirc;ntico. Mais <span style="color:var(--laranja);">voc&ecirc;</span>.
+    </div>
+  </div>
+
+  <!-- SLIDE 12 — PRATICA (light) -->
+  <div class="slide light" id="slide-pratica" data-frags="5">
+    <div class="kicker"><span class="accent">A&ccedil;&atilde;o imediata</span></div>
+    <div class="display" style="font-size:clamp(26px,3.8vw,56px);">Do conhecimento<br>para o <span class="hl">movimento</span></div>
+    <ul class="action-list">
+      <li class="action-item fragment">
+        <div class="action-key">MOSTRAR</div>
+        <div class="action-val">Conte o que faz. Sem esperar ser perguntado.</div>
+      </li>
+      <li class="action-item fragment">
+        <div class="action-key">COMPARTILHAR</div>
+        <div class="action-val">Ensine o que aprende. Generosidade gera autoridade.</div>
+      </li>
+      <li class="action-item fragment">
+        <div class="action-key">PARTICIPAR</div>
+        <div class="action-val">Esteja onde as conversas acontecem.</div>
+      </li>
+      <li class="action-item fragment">
+        <div class="action-key">CONECTAR</div>
+        <div class="action-val">Construa relacionamentos antes de precisar deles.</div>
+      </li>
+      <li class="action-item fragment">
+        <div class="action-key">REPETIR</div>
+        <div class="action-val">Autoridade n&atilde;o nasce da intensidade. Nasce da <span style="color:var(--laranja);font-weight:700;">consist&ecirc;ncia</span>.</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 13 — HISTORIA (light) -->
+  <div class="slide light" id="slide-historia" data-frags="4">
+    <div class="kicker"><span class="accent">Trajet&oacute;ria</span></div>
+    <div class="display" style="font-size:clamp(22px,3.2vw,48px);">Durante muito tempo<br>eu acreditava que<br>bastava fazer um <span class="hl">bom trabalho</span>.</div>
+    <ul class="arrow-list" style="margin-top:clamp(8px,1.2vh,14px);">
+      <li class="arrow-item fragment">Depois percebi: fazer bem era apenas metade do caminho.</li>
+      <li class="arrow-item fragment">A outra metade era permitir que as pessoas soubessem do trabalho que estava sendo feito.</li>
+      <li class="arrow-item fragment">N&atilde;o para alimentar o ego.</li>
+      <li class="arrow-item fragment">Para ampliar o impacto de forma intencional.</li>
+    </ul>
+    <div style="margin-top:clamp(14px,2vh,24px);font-size:clamp(10px,0.82vw,12px);color:var(--text-muted);letter-spacing:0.05em;">
+      Wladson Sidney &middot; MC &middot; Gestor de Carreiras &middot; Fundador da Sancho &middot; Presidente ADVB Cear&aacute;
+    </div>
+  </div>
+
+  <!-- SLIDE 14 — ENCERRAMENTO (light) -->
+  <div class="slide light" id="slide-encerramento" data-frags="1" style="align-items:center;text-align:center;">
+    <div class="closing-quote">
+      &ldquo;Se amostre para ser encontrado.<br>
+      Se amostre para gerar oportunidades.<br>
+      Se amostre para ampliar seu impacto.&rdquo;
+    </div>
+    <div class="fragment impact-line" style="margin-top:clamp(20px,3vh,40px);">
+      O seu talento pode transformar vidas.<br>
+      Mas primeiro as pessoas precisam saber que ele existe.
+    </div>
+  </div>
+
+  <!-- SLIDE 15 — RAFFLE (dark) -->
+  <div class="slide dark" id="slide-raffle" data-frags="0" style="align-items:center;text-align:center;">
+    <div class="kicker"><span class="accent">Hora do sorteio!</span></div>
+    <div class="display" style="font-size:clamp(26px,3.8vw,56px);">Quem vai ser o <span class="hl">ganhador?</span></div>
+    <div class="raffle-count-wrap">
+      <span class="raffle-num" id="raffle-count">0</span>
+      <span class="raffle-label">participantes no sorteio</span>
+    </div>
+    <div class="raffle-btns">
+      <button class="raffle-btn btn-draw" onclick="drawWinner()">&#127919; Sortear ganhador</button>
+      <button class="raffle-btn btn-copy" onclick="copyNames()">&#128203; Copiar nomes</button>
+      <button class="raffle-btn btn-csv" onclick="downloadCSV()">&#8595; Baixar CSV</button>
+    </div>
+  </div>
+
+  <!-- SLIDE 16 — DELETE (dark) -->
+  <div class="slide dark" id="slide-delete" data-frags="0" style="align-items:center;text-align:center;">
+    <div class="kicker"><span class="accent">O momento da verdade</span></div>
+    <div class="display" style="font-size:clamp(28px,4vw,58px);">E agora, eu <span class="hl">apago tudo</span></div>
+    <div class="delete-count-text">
+      <span id="delete-count">0</span> registros ser&atilde;o apagados na frente de todos.<br>
+      Assim como sua marca, sua palavra fica &mdash; mas os dados, n&atilde;o.
+    </div>
+    <button class="btn-delete-big" id="btn-delete" onclick="deleteAllData()">&#128465; Apagar todos os dados ao vivo</button>
+  </div>
+
+  <!-- SLIDE 17 — OBRIGADO (light) -->
+  <div class="slide light" id="slide-obrigado" data-frags="0" style="align-items:center;text-align:center;">
+    <div class="obrigado-text"><em>Obrigado!</em></div>
+    <div class="obrigado-byline">Wladson Sidney &middot; Sancho</div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ===================== FORM VIEW ===================== -->
+<div id="form-view">
+  <div class="form-card">
+    <div id="form-content">
+      <span class="form-badge">WORKSHOP &middot; SANCHO</span>
+      <div class="form-title">Marca que Vende SEM Cerim&ocirc;nias</div>
+      <div class="form-subtitle">Participe e concorra ao sorteio especial</div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-nome">Primeiro nome</label>
+        <input class="form-input" id="f-nome" type="text" placeholder="Seu primeiro nome" autocomplete="given-name">
+      </div>
+      <div class="form-error" id="err-nome">Por favor, informe seu nome.</div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-seg">Seu segmento de atua&ccedil;&atilde;o</label>
+        <input class="form-input" id="f-seg" type="text" placeholder="Ex: advocacia, marketing, sa&uacute;de...">
+      </div>
+      <div class="form-error" id="err-seg">Por favor, informe seu segmento.</div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-word">
+          Uma palavra que te define
+          <span class="form-tooltip">Essa palavra vai aparecer na apresenta&ccedil;&atilde;o!</span>
+        </label>
+        <input class="form-input" id="f-word" type="text" placeholder="Ex: criativo, estrat&eacute;gico, transformador...">
+      </div>
+      <div class="form-error" id="err-word">Por favor, informe sua palavra.</div>
+
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()">Participar do sorteio &rarr;</button>
+    </div>
+
+    <div id="success-screen">
+      <div class="check-anim">&#10003;</div>
+      <div class="success-title">Voc&ecirc; est&aacute; dentro!</div>
+      <div class="success-msg">Sua palavra foi registrada. Acompanhe na tela principal.</div>
+      <div class="success-note">Apenas nome e segmento ser&atilde;o exibidos. Seus dados ser&atilde;o apagados ao vivo ao final.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== CONFIG =====================
+var firebaseConfig = {
   apiKey:            "COLE_AQUI",
   authDomain:        "COLE_AQUI",
   databaseURL:       "COLE_AQUI",
@@ -63,664 +1244,602 @@ const firebaseConfig = {
   appId:             "COLE_AQUI"
 };
 
-const DEMO = [
-  {nome:'Ana',     segmento:'Advocacia',        palavra:'Estratégica'},
-  {nome:'Bruno',   segmento:'Arquitetura',       palavra:'Criativo'},
-  {nome:'Carla',   segmento:'Marketing Digital', palavra:'Autêntica'},
-  {nome:'Diego',   segmento:'Consultoria',       palavra:'Transformador'},
-  {nome:'Eduarda', segmento:'Moda',              palavra:'Ousada'},
-  {nome:'Felipe',  segmento:'Tecnologia',        palavra:'Inovador'},
-  {nome:'Gabriela',segmento:'Saúde',             palavra:'Humana'},
-  {nome:'Hugo',    segmento:'Educação',          palavra:'Inspirador'},
-  {nome:'Isabela', segmento:'Gastronomia',       palavra:'Apaixonada'},
-  {nome:'João',    segmento:'Finanças',          palavra:'Confiável'},
-  {nome:'Karen',   segmento:'RH',                palavra:'Conectora'},
-  {nome:'Lucas',   segmento:'Design',            palavra:'Visual'},
-  {nome:'Marina',  segmento:'Varejo',            palavra:'Persistente'},
+var FORM_URL = window.location.href.split('#')[0] + '#/form';
+
+// ===================== DEMO PARTICIPANTS =====================
+var DEMO_PARTICIPANTS = [
+  { nome: 'Ana',      segmento: 'Advocacia',           palavra: 'Estratégica'   },
+  { nome: 'Bruno',    segmento: 'Arquitetura e Design', palavra: 'Criativo'           },
+  { nome: 'Carla',    segmento: 'Marketing Digital',   palavra: 'Autêntica'      },
+  { nome: 'Diego',    segmento: 'Consultoria',         palavra: 'Transformador'       },
+  { nome: 'Eduarda',  segmento: 'Varejo',              palavra: 'Ousada'              },
+  { nome: 'Felipe',   segmento: 'Tecnologia',          palavra: 'Inovador'            },
+  { nome: 'Gabriela', segmento: 'Saúde',          palavra: 'Humana'              },
+  { nome: 'Hugo',     segmento: 'Educação', palavra: 'Inspirador'           },
+  { nome: 'Isabela',  segmento: 'Gastronomia',         palavra: 'Apaixonada'          },
+  { nome: 'João', segmento: 'Finanças',     palavra: 'Confiável'      },
+  { nome: 'Karen',    segmento: 'RH',                  palavra: 'Conectora'           },
+  { nome: 'Lucas',    segmento: 'Engenharia',          palavra: 'Preciso'             },
+  { nome: 'Marina',   segmento: 'Consultoria',         palavra: 'Persistente'         }
 ];
 
-const POP_COLORS = ['#1B4FE4','#F4610E','#0D2B8A','#F7893A'];
-const TOTAL = 14;
-const FRAGS = [0,0,0,1,4,2,5,5,1,5,5,4,1,0];
+// ===================== AREA MAP =====================
+var AREAS = [
+  { match: /advoca|direito|juridic|notár/i, titulo: 'Advocacia', sugestoes: ['Publique análises jurídicas sobre temas do cotidiano de forma acessível', 'Compartilhe bastidores de como você constrói uma estratégia para seu cliente', 'Grave vídeos curtos explicando direitos que as pessoas deveriam conhecer', 'Escreva sobre mudanças na legislação com sua visão prática e estratégica'] },
+  { match: /marketing|publicidade|social media|mídia|comunicação|branding/i, titulo: 'Marketing', sugestoes: ['Documente campanhas reais com resultados, erros e aprendizados', 'Compartilhe estratégias que funcionaram com dados e contexto real', 'Mostre seu processo criativo do briefing ao resultado final', 'Escreva análises de tendências com seu ponto de vista único'] },
+  { match: /saúde|medicina|médic|psicolog|nutricion|farmac|enferm|fisio|odontolog|dentist/i, titulo: 'Saúde', sugestoes: ['Compartilhe conhecimento preventivo de forma acessível para o público leigo', 'Mostre sua rotina profissional e bastidores do seu trabalho', 'Publique reflexões sobre casos respeitando ética e privacidade', 'Eduque sobre mitos e verdades da sua área de especialidade'] },
+  { match: /educação|professor|docente|pedagog|ensino|escola|academia|treinamento/i, titulo: 'Educação', sugestoes: ['Compartilhe metodologias de ensino que transformam o aprendizado', 'Mostre os bastidores de como você prepara e conduz suas aulas', 'Publique reflexões sobre aprendizado e desenvolvimento humano', 'Crie conteúdo educativo que demonstre seu domínio do tema'] },
+  { match: /tecnologia|ti |developer|programad|software|sistemas|dados|data science|ux|ui |produto digital/i, titulo: 'Tecnologia', sugestoes: ['Documente projetos reais: o problema, sua abordagem e os resultados', 'Compartilhe soluções para problemas técnicos comuns de forma didática', 'Mostre seu processo de raciocínio e como você resolve desafios complexos', 'Crie tutoriais e análises sobre ferramentas e tecnologias que você domina'] },
+  { match: /rh|recursos humanos|gestão de pessoas|talentos|people/i, titulo: 'RH e Gestão de Pessoas', sugestoes: ['Compartilhe insights sobre comportamento humano e cultura organizacional', 'Publique reflexões sobre tendências no mundo do trabalho', 'Mostre como você identifica potencial e desenvolve pessoas', 'Escreva sobre desafios reais da gestão com soluções práticas'] },
+  { match: /consult|coaching|mentor|estratégia empresarial/i, titulo: 'Consultoria', sugestoes: ['Documente estudos de caso sem nomear clientes, com aprendizados reais', 'Compartilhe frameworks e metodologias que você usa no trabalho', 'Mostre seu processo de diagnóstico: como você chega ao problema real', 'Publique reflexões sobre os desafios comuns das empresas que atende'] },
+  { match: /arquitetura|design gráfico|ux|creative|criativo|visual|arte/i, titulo: 'Arquitetura e Design', sugestoes: ['Mostre seu processo criativo: do conceito ao resultado final', 'Documente projetos com bastidores e decisões criativas', 'Compartilhe sua filosofia e os princípios que guiam seu trabalho', 'Crie conteúdo sobre tendências e referências que inspiram sua visão'] },
+  { match: /finanç|contab|econom|invest|banking|banc|financeiro/i, titulo: 'Finanças', sugestoes: ['Compartilhe educação financeira prática de forma acessível e sem jargão', 'Publique análises de mercado com sua leitura única e contextualizada', 'Mostre dicas práticas de gestão financeira para diferentes perfis', 'Escreva sobre estratégia e planejamento com exemplos reais'] },
+  { match: /gastronom|culinária|restaurante|chef|alimentação|food/i, titulo: 'Gastronomia', sugestoes: ['Mostre o processo criativo de criação de pratos do conceito à execução', 'Compartilhe técnicas e dicas de cozinha que fazem a diferença', 'Documente experiências gastronômicas com suas análises e percepções', 'Crie conteúdo sobre ingredientes, combinações e história dos pratos'] },
+  { match: /imóv|imobiliário|corretor|real estate/i, titulo: 'Mercado Imobiliário', sugestoes: ['Compartilhe análises de mercado com sua leitura regional e prática', 'Mostre bastidores de negociações sem identificar clientes ou valores', 'Publique guias práticos para quem está comprando ou vendendo imóvel', 'Documente o processo de avaliação e visitação de propriedades'] },
+  { match: /varejo|comércio|vendas|comercial|loja|empreendedor/i, titulo: 'Vendas e Varejo', sugestoes: ['Compartilhe técnicas de vendas que funcionam na prática com contexto real', 'Mostre bastidores do seu processo comercial e como você fecha negócios', 'Publique reflexões sobre comportamento do consumidor e suas implicações', 'Documente lançamentos, estratégias e os resultados que geraram'] },
+  { match: /engenhar|engenheiro/i, titulo: 'Engenharia', sugestoes: ['Documente projetos técnicos com foco nas decisões e desafios superados', 'Compartilhe soluções de engenharia de forma acessível e visual', 'Mostre a aplicação prática do seu conhecimento técnico no cotidiano', 'Publique reflexões sobre inovação e tendências da sua especialidade'] }
+];
 
-const cap  = s => s.charAt(0).toUpperCase()+s.slice(1);
-const first = s => (s||'').split(' ')[0];
+var POP_COLORS = ['#1B4FE4', '#F4610E', '#0D2B8A', '#F7893A', '#050F2C'];
 
-/* ── Firebase hook ── */
-function useDB() {
-  const [parts,setParts] = useState([]);
-  const [rehearsal,setRehearsal] = useState(false);
-  const dbRef = useRef(null);
+// ===================== STATE =====================
+var participants = [];
+var rehearsalMode = false;
+var dbRef = null;
+var currentSlideIdx = 0;
+var currentFrag = -1;
 
-  useEffect(()=>{
-    if(firebaseConfig.databaseURL==='COLE_AQUI'){setRehearsal(true);return;}
-    try{
-      if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-      const ref = firebase.database().ref('participants');
-      dbRef.current = ref;
-      ref.on('value', snap=>{
-        const arr=[];
-        snap.forEach(c=>arr.push(c.val()));
-        setParts(arr);
-      });
-      return ()=>ref.off();
-    }catch(e){setRehearsal(true);}
-  },[]);
+// ===================== SLIDE HELPERS =====================
+function getAllSlides() {
+  return Array.from(document.querySelectorAll('#deck > .slide'));
+}
+function getSlideEl(idx) { return getAllSlides()[idx] || null; }
+function getTotalSlides() { return getAllSlides().length; }
 
-  const inject   = useCallback(()=>setParts([...DEMO]),[]);
-  const deleteAll= useCallback(()=>{
-    if(dbRef.current) dbRef.current.remove(); else setParts([]);
-  },[]);
-  const add = useCallback(data=>{
-    if(dbRef.current) return dbRef.current.push({...data,ts:Date.now()});
-    return Promise.resolve();
-  },[]);
-
-  return {parts,rehearsal,inject,deleteAll,add};
+// ===================== HELPERS =====================
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+function capitalize(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+}
+function firstName(s) {
+  return (s || '').split(' ')[0];
+}
+function matchArea(segmento) {
+  for (var i = 0; i < AREAS.length; i++) {
+    if (AREAS[i].match.test(segmento)) return AREAS[i];
+  }
+  return null;
 }
 
-/* ── Atoms ── */
-function Kicker({children}){
-  return html`<p className="font-bold uppercase text-laranja tracking-[.22em] mb-5" style=${{fontSize:'clamp(11px,1vw,14px)'}}>${children}</p>`;
-}
-
-function Title({children,size='lg',className=''}){
-  const fs = size==='xl'?'clamp(52px,7.5vw,108px)'
-            :size==='lg'?'clamp(36px,5.5vw,82px)'
-            :size==='md'?'clamp(28px,4vw,58px)'
-            :'clamp(22px,3.2vw,48px)';
-  return html`<div className=${'font-serif font-black text-white leading-[1.05] mb-5 '+className} style=${{fontSize:fs}}>${children}</div>`;
-}
-
-function Lead({children}){
-  return html`<p className="text-white/70 leading-relaxed mb-7 max-w-2xl" style=${{fontSize:'clamp(14px,1.4vw,21px)'}}>${children}</p>`;
-}
-
-function Hl({children}){return html`<span style=${{color:'#F4610E'}}>${children}</span>`;}
-
-function Arrow({children}){
-  return html`<li className="flex gap-3 items-start text-white/85" style=${{fontSize:'clamp(13px,1.2vw,19px)'}}>
-    <span className="text-laranja font-bold flex-shrink-0 mt-px">→</span>
-    <span>${children}</span>
-  </li>`;
-}
-
-function Frag({i,rev,children,className=''}){
-  return html`<div className=${(rev>=i?'frag-show':'frag-hide')+' '+className}>${children}</div>`;
-}
-
-function Brands({className=''}){
-  return html`<div className=${'flex items-center gap-8 '+className}>
-    <div className="flex flex-col items-center">
-      <span className="font-black tracking-[.15em] uppercase" style=${{color:'#1B4FE4',fontSize:'clamp(15px,1.9vw,28px)',textShadow:'0 0 28px rgba(27,79,228,.6)'}}>SANCHO</span>
-      <span className="text-white/35 tracking-[.2em] uppercase" style=${{fontSize:'clamp(7px,.65vw,10px)'}}>Gestão de Carreira</span>
-    </div>
-    <span className="text-white/20" style=${{fontSize:'clamp(18px,2.2vw,32px)'}}>×</span>
-    <div className="flex flex-col items-center">
-      <span className="font-black tracking-[.15em] uppercase" style=${{color:'#F4610E',fontSize:'clamp(15px,1.9vw,28px)',textShadow:'0 0 28px rgba(244,97,14,.5)'}}>ESCANDI</span>
-      <span className="text-white/35 tracking-[.2em] uppercase" style=${{fontSize:'clamp(7px,.65vw,10px)'}}>Inteligência em Marcas</span>
-    </div>
-  </div>`;
-}
-
-function Wrap({center=false,children,className=''}){
-  return html`<div className=${'w-full h-full flex flex-col '+(center?'items-center justify-center text-center':'justify-center items-start')+' '+className}
-                   style=${{padding:'clamp(36px,6vw,96px) clamp(44px,8vw,136px)'}}>
-    ${children}
-  </div>`;
-}
-
-/* ── QR Code ── */
-function QR({url}){
-  const el=useRef(null); const done=useRef(false);
-  useEffect(()=>{
-    if(!el.current||done.current||!url) return;
-    done.current=true;
-    try{new QRCode(el.current,{text:url,width:220,height:220,colorDark:'#050F2C',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});}
-    catch(e){if(el.current)el.current.innerHTML='<div style="width:220px;height:220px;background:#eee;display:flex;align-items:center;justify-content:center;color:#555;font-size:12px;text-align:center;padding:16px;border-radius:8px;">QR disponível após configurar a URL</div>';}
-  },[url]);
-  return html`<div ref=${el}></div>`;
-}
-
-/* ── Word Cloud ── */
-function WordCloud({parts}){
-  const groups = useMemo(()=>{
-    const g={};
-    parts.forEach(p=>{
-      const k=(p.palavra||'').trim().toLowerCase();
-      if(!k) return;
-      (g[k]=g[k]||[]).push(p.nome);
-    });
-    return g;
-  },[parts]);
-  const max = useMemo(()=>Math.max(1,...Object.values(groups).map(a=>a.length)),[groups]);
-
-  if(!Object.keys(groups).length)
-    return html`<p className="text-white/25 text-lg py-8">Aguardando participantes escanearem o QR...</p>`;
-
-  return html`<div className="flex flex-wrap gap-3 items-center justify-center py-4 max-w-5xl">
-    ${Object.entries(groups).map(([w,names],i)=>{
-      const f=names.length/max;
-      return html`<div key=${w} className="pill flex flex-col items-center rounded-full px-4 py-1.5"
-          style=${{fontSize:`clamp(16px,${1.2+f*2.8}vw,54px)`,opacity:0.65+f*0.35,
-            background:'rgba(255,255,255,.08)',border:`1px solid ${i%2===0?'rgba(244,97,14,.4)':'rgba(255,255,255,.15)'}`}}>
-        <span className="text-white font-bold leading-tight">${cap(w)}</span>
-        <span className="text-white/45" style=${{fontSize:'.52em',marginTop:'.1em'}}>
-          ${names.slice(0,3).map(n=>first(n)).join(', ')}${names.length>3?'…':''}
-        </span>
-      </div>`;
-    })}
-  </div>`;
-}
-
-/* ── Name Poppers ── */
-function Poppers({queue}){
-  const [list,setList]=useState([]);
-  const idRef=useRef(0);
-  useEffect(()=>{
-    if(!queue||!queue.length) return;
-    queue.forEach((name,i)=>setTimeout(()=>{
-      const id=++idRef.current;
-      const s=Math.random();
-      let style={};
-      if(s<.25)      style={left:(5+Math.random()*18)+'vw',top:(15+Math.random()*70)+'vh'};
-      else if(s<.5)  style={right:(5+Math.random()*18)+'vw',top:(15+Math.random()*70)+'vh'};
-      else if(s<.75) style={top:(5+Math.random()*12)+'vh',left:(15+Math.random()*55)+'vw'};
-      else           style={bottom:(5+Math.random()*12)+'vh',left:(15+Math.random()*55)+'vw'};
-      const color=POP_COLORS[Math.floor(Math.random()*POP_COLORS.length)];
-      setList(l=>[...l,{id,name,style,color}]);
-      setTimeout(()=>setList(l=>l.filter(x=>x.id!==id)),3600);
-    },i*280));
-  },[queue]);
-  return html`<div>
-    ${list.map(p=>html`<div key=${p.id} className="name-pop fixed z-50 font-bold text-white px-4 py-2 rounded-full pointer-events-none"
-        style=${{...p.style,background:p.color,fontSize:'clamp(13px,1.3vw,18px)'}}>
-      ${p.name}
-    </div>`)}
-  </div>`;
-}
-
-/* ── Winner Overlay ── */
-function Winner({w,onClose}){
-  if(!w) return null;
-  return html`<div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 text-center p-10"
-       style=${{background:'rgba(5,15,44,.95)'}}>
-    <div style=${{fontSize:'clamp(52px,7vw,96px)'}}>🎯</div>
-    <div className="winner-glow font-serif font-black" style=${{color:'#F4610E',fontSize:'clamp(36px,5vw,72px)'}}>${w.nome}</div>
-    <div className="text-white/65" style=${{fontSize:'clamp(15px,1.4vw,21px)'}}>${w.segmento} · "${w.palavra}"</div>
-    <button onClick=${onClose} className="mt-4 px-8 py-3 rounded-xl border border-white/25 text-white text-sm font-semibold hover:bg-white/10 transition-colors">Fechar</button>
-  </div>`;
-}
-
-/* ══════════════════ SLIDES ══════════════════ */
-
-function S1(){
-  return html`<${Wrap} center=${true}>
-    <${Kicker}>Workshop · 23 de Junho · Fortaleza<//>
-    <${Title} size="xl">Marca que Vende<br/><${Hl}>SEM Cerimônias<//><//>
-    <${Lead}>Posicione sua marca e transforme ela no seu melhor vendedor.<//>
-    <p className="text-white/50 mb-8" style=${{fontSize:'clamp(12px,.95vw,15px)'}}>Wladson Sidney · Sancho | Diego Mourão · Escandi</p>
-    <${Brands}/>
-  <//>`;
-}
-
-function S2(){
-  const speakers=[
-    {ini:'WS',nome:'Wladson Sidney',cargo:'Gestor de Carreiras · Sancho',bio:'Criador do método Se Amostramento Profissional. MC e gestor de talentos. Presidente da ADVB Ceará.',cor:'#1B4FE4'},
-    {ini:'DM',nome:'Diego Mourão',cargo:'Estrategista de Marca · Escandi',bio:'Especialista em branding e inteligência de marca. Founder da Escandi Branding.',cor:'#F4610E'},
-  ];
-  return html`<${Wrap}>
-    <${Kicker}>Quem vai falar com você<//>
-    <${Title} size="md">Os Palestrantes<//>
-    <div className="grid grid-cols-2 gap-5 w-full max-w-3xl">
-      ${speakers.map(s=>html`<div key=${s.ini} className="rounded-2xl p-7 flex flex-col gap-3" style=${{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)'}}>
-        <div className="w-14 h-14 rounded-full flex items-center justify-center font-black text-white text-lg" style=${{background:s.cor}}>${s.ini}</div>
-        <div className="font-bold text-white" style=${{fontSize:'clamp(14px,1.4vw,20px)'}}>${s.nome}</div>
-        <div className="font-bold uppercase tracking-widest" style=${{color:'#F4610E',fontSize:'clamp(9px,.8vw,11px)'}}>${s.cargo}</div>
-        <div className="text-white/55 leading-relaxed" style=${{fontSize:'clamp(11px,.9vw,14px)'}}>${s.bio}</div>
-      </div>`)}
-    </div>
-  <//>`;
-}
-
-function S3({parts,onDraw,onCopy,onCSV}){
-  const url = window.location.href.split('#')[0]+'#/form';
-  return html`<${Wrap}>
-    <${Kicker}>Antes de começar — Sorteio especial<//>
-    <div className="grid grid-cols-2 gap-14 w-full max-w-4xl items-start">
-      <div className="rounded-2xl p-6 flex flex-col items-center gap-4 bg-white" style=${{boxShadow:'0 20px 60px rgba(0,0,0,.4)'}}>
-        <${QR} url=${url}/>
-        <span className="text-gray-500 text-center break-all" style=${{fontFamily:'monospace',fontSize:'clamp(9px,.75vw,12px)'}}>${url}</span>
-      </div>
-      <div className="flex flex-col gap-4">
-        <div style=${{fontSize:'clamp(26px,3.2vw,42px)'}}>🎁</div>
-        <${Title} size="md">Concorra ao <${Hl}>sorteio<//><//>
-        <${Lead}>Escaneie o QR, responda 3 perguntas e participe do sorteio de encerramento.<//>
-        <div className="flex items-baseline gap-3">
-          <span className="font-serif font-black" style=${{fontSize:'clamp(52px,6vw,86px)',color:'#1B4FE4',lineHeight:1}}>${parts.length}</span>
-          <span className="text-white/55" style=${{fontSize:'clamp(13px,1.1vw,16px)'}}>já participaram</span>
-        </div>
-        ${parts.length>0 && html`<div className="flex flex-wrap gap-2 max-h-20 overflow-hidden">
-          ${parts.slice(-8).map((p,i)=>html`<span key=${i} className="text-white/70 text-xs px-3 py-1 rounded-full font-semibold" style=${{background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.12)'}}>
-            ${first(p.nome)}
-          </span>`)}
-          ${parts.length>8 && html`<span className="text-white/40 text-xs py-1">+${parts.length-8} mais</span>`}
-        </div>`}
-        <div className="flex flex-wrap gap-2 mt-1">
-          ${[['🎯 Sortear',onDraw],['📋 Copiar',onCopy],['⬇ CSV',onCSV]].map(([l,fn])=>html`
-            <button key=${l} onClick=${e=>{e.stopPropagation();fn();}}
-                className="text-xs px-3 py-2 rounded-lg text-white/65 font-semibold hover:bg-white/15 transition-colors"
-                style=${{background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.14)'}}>
-              ${l}
-            </button>`)}
-        </div>
-      </div>
-    </div>
-  <//>`;
-}
-
-function S4({rev}){
-  return html`<${Wrap} center=${true}>
-    <div className="font-serif font-bold text-white leading-snug max-w-4xl mb-10" style=${{fontSize:'clamp(23px,3.6vw,56px)'}}>
-      "Quantas oportunidades você já perdeu porque as pessoas não sabem o que você faz?"
-    </div>
-    <${Frag} i=${0} rev=${rev}>
-      <p className="text-white/75 leading-relaxed max-w-2xl" style=${{fontSize:'clamp(15px,1.4vw,22px)'}}>
-        O mercado não premia apenas competência.<br/>
-        O mercado premia <strong style=${{color:'#F4610E'}}>competência conhecida</strong>.
-      </p>
-    <//>
-  <//>`;
-}
-
-function S5({rev}){
-  return html`<${Wrap}>
-    <${Kicker}>O maior erro dos talentos escondidos<//>
-    <${Title} size="md">"Não fale de si."<br/>"Espere que reconheçam<br/>seu valor."<//>
-    <ul className="flex flex-col gap-3 mb-4">
-      ${['Muita gente talentosa vive escondida.',
-         'Muita gente mediana vive cheia de oportunidades.',
-         'Qual a diferença? Uma decidiu aparecer.'
-        ].map((t,i)=>html`<${Frag} key=${i} i=${i} rev=${rev}><${Arrow}>${t}<//>  <//>`)}
-    </ul>
-    <${Frag} i=${3} rev=${rev}>
-      <p className="font-bold leading-snug mt-3" style=${{color:'#F4610E',fontSize:'clamp(15px,1.6vw,24px)'}}>
-        Invisibilidade não é humildade.<br/>Muitas vezes é apenas medo disfarçado.
-      </p>
-    <//>
-  <//>`;
-}
-
-function S6({rev}){
-  return html`<${Wrap}>
-    <${Kicker}>A diferença que muda tudo<//>
-    <${Title} size="lg">Arrogância <${Hl}>≠<//>Autoridade<//>
-    <${Frag} i=${0} rev=${rev}>
-      <div className="grid grid-cols-2 gap-5 w-full max-w-3xl mb-5">
-        ${[{title:'Arrogância',cor:'#E53E3E',tc:'#FC8181',items:['Precisa parecer melhor que os outros','Fala mais do que faz','Busca aplauso']},
-           {title:'Autoridade',cor:'#F4610E',tc:'#F4610E',items:['Compartilha experiências','Entrega valor antes de pedir qualquer coisa','Faz para servir']},
-          ].map(c=>html`<div key=${c.title} className="rounded-2xl p-6" style=${{background:'rgba(255,255,255,.07)',borderTop:`3px solid ${c.cor}`}}>
-          <p className="font-black uppercase tracking-widest mb-4" style=${{color:c.tc,fontSize:'clamp(9px,.85vw,12px)'}}>${c.title}</p>
-          <ul className="flex flex-col gap-2">
-            ${c.items.map(t=>html`<li key=${t} className="flex gap-2 items-start text-white/70" style=${{fontSize:'clamp(11px,.95vw,14px)'}}>
-              <span style=${{color:c.cor}} className="flex-shrink-0">·</span>${t}
-            </li>`)}
-          </ul>
-        </div>`)}
-      </div>
-    <//>
-    <${Frag} i=${1} rev=${rev}>
-      <p className="font-bold" style=${{color:'#F4610E',fontSize:'clamp(14px,1.4vw,21px)'}}>Arrogância é sobre ego. Autoridade é sobre contribuição.</p>
-    <//>
-  <//>`;
-}
-
-function S7({rev}){
-  return html`<${Wrap}>
-    <${Kicker}>O método<//>
-    <${Title} size="md">Se Amostramento<br/><${Hl}>Profissional<//><//>
-    <${Lead}>O ato consciente de tornar visível o valor que você gera.<//>
-    <ul className="flex flex-col gap-3">
-      ${['Sem fingimento ou personagem inventado','Deixar rastros do seu trabalho','Documentar sua jornada','Compartilhar aprendizados reais','Ocupar espaços com intenção']
-        .map((t,i)=>html`<${Frag} key=${i} i=${i} rev=${rev}><${Arrow}>${t}<//>  <//>`)}
-    </ul>
-  <//>`;
-}
-
-function S8({rev}){
-  const levels=[
-    {n:'Nível 1',name:'EXISTIR',desc:'Você faz. Mas ninguém sabe.',hl:false},
-    {n:'Nível 2',name:'APARECER',desc:'Você começa a mostrar. Ainda com vergonha.',hl:false},
-    {n:'Nível 3',name:'COMPARTILHAR',desc:'Você divide conhecimento. As pessoas te associam a um tema.',hl:false},
-    {n:'Nível 4',name:'INFLUENCIAR',desc:'As pessoas procuram sua opinião.',hl:false},
-    {n:'Nível 5',name:'REFERÊNCIA',desc:'Quando falam do assunto, falam de você.',hl:true},
-  ];
-  return html`<${Wrap}>
-    <${Kicker}>Onde você está agora?<//>
-    <${Title} size="md">Os <${Hl}>5 Níveis<//><//>
-    <ul className="flex flex-col gap-2 w-full max-w-2xl">
-      ${levels.map((l,i)=>html`<${Frag} key=${i} i=${i} rev=${rev}>
-        <li className="grid items-center rounded-xl px-5 py-3"
-            style=${{gridTemplateColumns:'auto 1fr',gap:'16px',background:l.hl?'rgba(244,97,14,.12)':'rgba(255,255,255,.05)',borderLeft:`3px solid ${l.hl?'#F4610E':'rgba(255,255,255,.15)'}`}}>
-          <span className="text-white/30 font-bold tracking-wider" style=${{fontSize:'clamp(9px,.8vw,12px)'}}>${l.n}</span>
-          <div>
-            <div className="font-bold" style=${{color:l.hl?'#F4610E':'white',fontSize:'clamp(12px,1.1vw,16px)'}}>${l.name}</div>
-            <div className="text-white/50" style=${{fontSize:'clamp(10px,.85vw,13px)'}}>${l.desc}</div>
-          </div>
-        </li>
-      <//>`)}
-    </ul>
-  <//>`;
-}
-
-function S9({parts,rev}){
-  return html`<${Wrap} center=${true}>
-    <${Kicker}>O que a sala disse sobre si mesma<//>
-    <${Title} size="md">A palavra que <${Hl}>te define<//><//>
-    <${WordCloud} parts=${parts}/>
-    <div className="flex items-baseline gap-3 mt-2">
-      <span className="font-serif font-black" style=${{fontSize:'clamp(38px,5vw,70px)',color:'#1B4FE4',lineHeight:1}}>${parts.length}</span>
-      <span className="text-white/50" style=${{fontSize:'clamp(13px,1.1vw,17px)'}}>palavras registradas</span>
-    </div>
-    <${Frag} i=${0} rev=${rev} className="mt-5 max-w-2xl">
-      <p className="font-serif italic text-white/70 leading-snug" style=${{fontSize:'clamp(14px,1.4vw,21px)'}}>
-        "Sua palavra é o início da sua marca. Agora o desafio é torná-la visível."
-      </p>
-    <//>
-  <//>`;
-}
-
-function S10({rev}){
-  return html`<${Wrap}>
-    <${Kicker}>O ponto mais importante<//>
-    <${Title} size="md">Você não precisa<br/>virar outra pessoa.<//>
-    <p className="text-white/60 mb-3" style=${{fontSize:'clamp(13px,1.1vw,17px)'}}>Você não precisa ser:</p>
-    <ul className="flex flex-col gap-3 mb-4">
-      ${['Mais extrovertido','Mais engraçado','Mais polêmico','Mais barulhento']
-        .map((t,i)=>html`<${Frag} key=${i} i=${i} rev=${rev}><${Arrow}>${t}<//>  <//>`)}
-    </ul>
-    <${Frag} i=${4} rev=${rev}>
-      <div className="mt-2">
-        <p className="font-bold leading-snug mb-3" style=${{color:'#F4610E',fontSize:'clamp(15px,1.6vw,24px)'}}>
-          Você precisa ser mais visível.<br/>Mais autêntico. Mais você.
-        </p>
-        <p className="font-serif italic text-white/55" style=${{fontSize:'clamp(12px,1.1vw,17px)'}}>
-          "O sucesso sustentável acontece quando a visibilidade encontra a autenticidade."
-        </p>
-      </div>
-    <//>
-  <//>`;
-}
-
-function S11({rev}){
-  const acts=[
-    {k:'MOSTRAR',v:'Conte o que faz. Sem esperar ser perguntado.',hl:false},
-    {k:'COMPARTILHAR',v:'Ensine o que aprende. Generosidade gera autoridade.',hl:false},
-    {k:'PARTICIPAR',v:'Esteja onde as conversas acontecem.',hl:false},
-    {k:'CONECTAR',v:'Construa relacionamentos antes de precisar deles.',hl:false},
-    {k:'REPETIR',v:null,hl:true},
-  ];
-  return html`<${Wrap}>
-    <${Kicker}>Ação imediata<//>
-    <${Title} size="md">Do conhecimento<br/>para o <${Hl}>movimento<//><//>
-    <ul className="flex flex-col gap-2 w-full max-w-2xl">
-      ${acts.map((a,i)=>html`<${Frag} key=${i} i=${i} rev=${rev}>
-        <li className="grid items-center rounded-xl px-5 py-3"
-            style=${{gridTemplateColumns:'120px 1fr',gap:'16px',background:a.hl?'rgba(244,97,14,.1)':'rgba(255,255,255,.05)',borderLeft:a.hl?'3px solid #F4610E':'3px solid transparent'}}>
-          <span className="font-black uppercase tracking-wider" style=${{color:'#F4610E',fontSize:'clamp(9px,.85vw,12px)'}}>${a.k}</span>
-          ${a.hl
-            ? html`<span className="text-white/80" style=${{fontSize:'clamp(11px,.95vw,15px)'}}>Autoridade não nasce da intensidade. Nasce da <strong style=${{color:'#F4610E'}}>consistência</strong>.</span>`
-            : html`<span className="text-white/75" style=${{fontSize:'clamp(11px,.95vw,15px)'}}>${a.v}</span>`
-          }
-        </li>
-      <//>`)}
-    </ul>
-  <//>`;
-}
-
-function S12({rev}){
-  return html`<${Wrap}>
-    <${Kicker}>Trajetória<//>
-    <${Title} size="sm">Durante muito tempo eu acreditava que<br/>bastava fazer um <${Hl}>bom trabalho<//>.
-    <//>
-    <ul className="flex flex-col gap-4">
-      ${['Depois percebi: fazer bem era apenas metade do caminho.',
-         'A outra metade era permitir que as pessoas soubessem do trabalho que estava sendo feito.',
-         'Não para alimentar o ego.',
-         'Para ampliar o impacto de forma intencional.',
-        ].map((t,i)=>html`<${Frag} key=${i} i=${i} rev=${rev}><${Arrow}>${t}<//>  <//>`)}
-    </ul>
-    <p className="mt-8 text-white/25 tracking-wide" style=${{fontSize:'clamp(8px,.75vw,11px)'}}>
-      Wladson Sidney · MC · Gestor de Carreiras · Fundador da Sancho · Presidente ADVB Ceará
-    </p>
-  <//>`;
-}
-
-function S13({rev}){
-  return html`<${Wrap} center=${true}>
-    <div className="font-serif font-bold text-white leading-relaxed max-w-4xl" style=${{fontSize:'clamp(21px,3.4vw,52px)'}}>
-      "Se amostre para ser encontrado.<br/>
-      Se amostre para gerar oportunidades.<br/>
-      Se amostre para ampliar seu impacto."
-    </div>
-    <${Frag} i=${0} rev=${rev} className="mt-10">
-      <p className="font-bold leading-snug" style=${{color:'#F4610E',fontSize:'clamp(16px,1.7vw,25px)'}}>
-        O seu talento pode transformar vidas.<br/>
-        Mas primeiro as pessoas precisam saber que ele existe.
-      </p>
-    <//>
-  <//>`;
-}
-
-function S14({parts,onDraw,onCopy,onCSV,onDelete,deleteLabel}){
-  return html`<${Wrap} center=${true}>
-    <${Kicker}>Hora do sorteio!<//>
-    <${Title} size="md">Quem vai ser o <${Hl}>ganhador?<//><//>
-    <div className="flex items-baseline gap-3 my-3">
-      <span className="font-serif font-black" style=${{fontSize:'clamp(60px,8vw,108px)',color:'#1B4FE4',lineHeight:1}}>${parts.length}</span>
-      <span className="text-white/55" style=${{fontSize:'clamp(14px,1.3vw,20px)'}}>participantes no sorteio</span>
-    </div>
-    ${parts.length>0 && html`<div className="flex flex-wrap gap-2 justify-center mb-4 max-w-2xl max-h-24 overflow-hidden">
-      ${parts.map((p,i)=>html`<span key=${i} className="text-white/60 text-xs px-3 py-1 rounded-full"
-          style=${{background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.12)'}}>
-        ${first(p.nome)}
-      </span>`)}
-    </div>`}
-    <div className="flex flex-wrap gap-3 justify-center mb-7">
-      ${[['🎯 Sortear ganhador',onDraw,true],['📋 Copiar nomes',onCopy,false],['⬇ Baixar CSV',onCSV,false]].map(([l,fn,primary])=>html`
-        <button key=${l} onClick=${e=>{e.stopPropagation();fn();}}
-            className="font-bold text-white rounded-xl transition-all hover:scale-105"
-            style=${{fontSize:'clamp(12px,1.1vw,15px)',padding:'clamp(11px,1.4vh,17px) clamp(18px,1.8vw,28px)',
-              background:primary?'#F4610E':'rgba(255,255,255,.1)',
-              border:primary?'none':'1px solid rgba(255,255,255,.2)',
-              boxShadow:primary?'0 8px 24px rgba(244,97,14,.4)':'none'}}>
-          ${l}
-        </button>`)}
-    </div>
-    <div className="flex flex-col items-center gap-3 pt-5 w-full max-w-md" style=${{borderTop:'1px solid rgba(255,255,255,.1)'}}>
-      <button onClick=${e=>{e.stopPropagation();onDelete();}}
-          className="font-semibold rounded-xl transition-colors hover:bg-red-500/20"
-          style=${{fontSize:'clamp(11px,.95vw,14px)',padding:'10px 24px',background:'rgba(255,100,100,.1)',border:'1px solid rgba(255,100,100,.35)',color:'rgba(255,150,150,.9)'}}>
-        ${deleteLabel}
-      </button>
-      <p className="text-white/28 leading-relaxed text-center" style=${{fontSize:'clamp(9px,.8vw,12px)'}}>
-        Os dados serão apagados na frente de todos. Assim como sua marca, sua palavra fica — mas os dados, não.
-      </p>
-    </div>
-    <${Brands} className="mt-6"/>
-  <//>`;
-}
-
-/* ══════════════════ FORM ══════════════════ */
-function FormView({add}){
-  const [f,setF]=useState({nome:'',segmento:'',palavra:''});
-  const [errs,setErrs]=useState({});
-  const [loading,setLoading]=useState(false);
-  const [done,setDone]=useState(false);
-
-  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  const clrErr=k=>setErrs(p=>({...p,[k]:null}));
-
-  const submit=async()=>{
-    const e={};
-    if(!f.nome.trim()) e.nome='Informe seu nome.';
-    if(!f.segmento.trim()) e.segmento='Informe seu segmento.';
-    if(!f.palavra.trim()) e.palavra='Informe sua palavra.';
-    if(Object.keys(e).length){setErrs(e);return;}
-    setLoading(true);
-    try{
-      await add({nome:f.nome.trim(),segmento:f.segmento.trim(),palavra:f.palavra.trim()});
-      setDone(true);
-    }catch{setLoading(false);alert('Erro ao enviar. Tente novamente.');}
-  };
-
-  if(done) return html`<div className="min-h-screen form-bg flex items-center justify-center p-6">
-    <div className="bg-white rounded-3xl p-10 w-full max-w-md flex flex-col items-center gap-5 text-center" style=${{boxShadow:'0 32px 80px rgba(0,0,0,.5)'}}>
-      <div className="check-pop w-20 h-20 rounded-full bg-green-500 flex items-center justify-center text-white font-bold" style=${{fontSize:'40px'}}>✓</div>
-      <div className="font-serif font-black text-3xl" style=${{color:'#0D2B8A'}}>Você está dentro!</div>
-      <p className="text-gray-500 leading-relaxed text-sm">Sua palavra foi registrada. Acompanhe na tela principal.</p>
-      <p className="text-gray-400 text-xs leading-relaxed">Apenas nome e segmento serão exibidos. Seus dados serão apagados ao vivo ao final.</p>
-    </div>
-  </div>`;
-
-  const fields=[
-    {k:'nome',label:'Primeiro nome',ph:'Seu primeiro nome',tip:null},
-    {k:'segmento',label:'Seu segmento de atuação',ph:'Ex: advocacia, marketing, saúde...',tip:null},
-    {k:'palavra',label:'Uma palavra que te define',ph:'Ex: criativo, estratégico, transformador...',tip:'Essa palavra vai aparecer na apresentação!'},
-  ];
-
-  return html`<div className="min-h-screen form-bg flex items-center justify-center p-6" style=${{overflowY:'auto'}}>
-    <div className="bg-white rounded-3xl w-full max-w-md" style=${{padding:'clamp(26px,5vw,46px)',boxShadow:'0 32px 80px rgba(0,0,0,.5)'}}>
-      <span className="inline-block text-white font-black uppercase rounded-full px-4 py-1 mb-5 text-xs tracking-[.2em]" style=${{background:'#F4610E'}}>WORKSHOP</span>
-      <div className="font-serif font-black mb-2 leading-tight" style=${{color:'#0D2B8A',fontSize:'clamp(20px,4.5vw,28px)'}}>Marca que Vende SEM Cerimônias</div>
-      <p className="text-gray-500 mb-7 text-sm leading-relaxed">Participe e concorra ao sorteio especial</p>
-      ${fields.map(fd=>html`<div key=${fd.k} className="mb-5">
-        <label className="flex items-center gap-2 mb-2">
-          <span className="text-gray-900 font-bold text-sm">${fd.label}</span>
-          ${fd.tip && html`<span className="text-xs rounded-md px-2 py-0.5" style=${{color:'#F4610E',background:'rgba(244,97,14,.08)',border:'1px solid rgba(244,97,14,.2)'}}>${fd.tip}</span>`}
-        </label>
-        <input type="text" value=${f[fd.k]} placeholder=${fd.ph}
-               onChange=${e=>{set(fd.k)(e);clrErr(fd.k);}}
-               onKeyDown=${e=>e.key==='Enter'&&submit()}
-               className="w-full rounded-xl text-gray-900 text-sm"
-               style=${{padding:'12px 16px',border:`1.5px solid ${errs[fd.k]?'#E53E3E':'#E2E8F0'}`,fontFamily:'Inter,sans-serif',display:'block'}}/>
-        ${errs[fd.k] && html`<p className="text-red-500 text-xs mt-1">${errs[fd.k]}</p>`}
-      </div>`)}
-      <button onClick=${submit} disabled=${loading}
-              className="w-full font-bold text-white rounded-xl mt-1"
-              style=${{background:'#F4610E',fontSize:'16px',padding:'14px',opacity:loading?.7:1,boxShadow:'0 8px 24px rgba(244,97,14,.35)',fontFamily:'Inter,sans-serif',border:'none',cursor:'pointer'}}>
-        ${loading?'Enviando...':'Participar do sorteio →'}
-      </button>
-    </div>
-  </div>`;
-}
-
-/* ══════════════════ PRESENTATION ══════════════════ */
-function Presentation({parts,rehearsal,inject,deleteAll}){
-  const [slide,setSlide]=useState(1);
-  const [rev,setRev]=useState(-1);
-  const [winner,setWinner]=useState(null);
-  const [delLabel,setDelLabel]=useState('🗑 Apagar todos os dados ao vivo');
-  const [popQueue,setPopQueue]=useState(null);
-  const prevLen=useRef(0);
-
-  const totalFrags=FRAGS[slide-1];
-
-  const next=useCallback(()=>{
-    if(rev<totalFrags-1) setRev(r=>r+1);
-    else if(slide<TOTAL){setSlide(s=>s+1);setRev(-1);}
-  },[rev,totalFrags,slide]);
-
-  const prev=useCallback(()=>{
-    if(slide>1){const ps=slide-1;setSlide(ps);setRev(FRAGS[ps-1]-1);}
-  },[slide]);
-
-  useEffect(()=>{
-    const cur=parts.length;
-    if(cur>prevLen.current&&slide===3){
-      const added=parts.slice(prevLen.current).map(p=>first(p.nome));
-      setPopQueue(added);
-      setTimeout(()=>setPopQueue(null),100);
-    }
-    prevLen.current=cur;
-  },[parts,slide]);
-
-  useEffect(()=>{
-    const h=e=>{
-      if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
-      if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}
-      if(e.key==='ArrowLeft'){e.preventDefault();prev();}
-      if(e.key==='f'||e.key==='F'){
-        if(!document.fullscreenElement) document.documentElement.requestFullscreen();
-        else document.exitFullscreen();
+// ===================== FIREBASE INIT =====================
+function initFirebase() {
+  if (firebaseConfig.databaseURL === 'COLE_AQUI') {
+    rehearsalMode = true;
+    document.getElementById('rehearsal-banner').classList.add('show');
+    return;
+  }
+  try {
+    firebase.initializeApp(firebaseConfig);
+    dbRef = firebase.database().ref('participants');
+    dbRef.on('value', function(snap) {
+      var prevCount = participants.length;
+      participants = [];
+      snap.forEach(function(child) { participants.push(child.val()); });
+      if (participants.length > prevCount) {
+        for (var i = prevCount; i < participants.length; i++) {
+          handleNewParticipant(participants[i]);
+        }
       }
-      if((e.key==='d'||e.key==='D')&&rehearsal) inject();
-    };
-    window.addEventListener('keydown',h);
-    return ()=>window.removeEventListener('keydown',h);
-  },[next,prev,rehearsal,inject]);
-
-  const drawWinner=()=>{
-    if(!parts.length){alert('Nenhum participante ainda!');return;}
-    setWinner(parts[Math.floor(Math.random()*parts.length)]);
-  };
-  const copyNames=()=>{
-    if(!parts.length){alert('Nenhum participante ainda!');return;}
-    navigator.clipboard.writeText(parts.map(p=>`${p.nome} — ${p.segmento} — ${p.palavra}`).join('\n')).then(()=>alert('Copiado!'));
-  };
-  const downloadCSV=()=>{
-    if(!parts.length){alert('Nenhum participante ainda!');return;}
-    const csv='nome,segmento,palavra\n'+parts.map(p=>`"${p.nome}","${p.segmento}","${p.palavra}"`).join('\n');
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-    a.download='sorteio-marca-vende.csv';a.click();
-  };
-  const handleDelete=()=>{
-    if(!confirm('Apagar todos os dados ao vivo?')) return;
-    deleteAll();setDelLabel('✓ Dados apagados');
-  };
-  const handleClick=e=>{
-    if(winner) return;
-    if(e.target.closest('button')) return;
-    if(e.clientX<window.innerWidth*.33) prev(); else next();
-  };
-
-  const progress=((slide-1)/(TOTAL-1))*100;
-  const hideChrome=slide===1||slide===14;
-  const sp={parts,rev,onDraw:drawWinner,onCopy:copyNames,onCSV:downloadCSV,onDelete:handleDelete,deleteLabel:delLabel};
-  const SLIDES={1:S1,2:S2,3:S3,4:S4,5:S5,6:S6,7:S7,8:S8,9:S9,10:S10,11:S11,12:S12,13:S13,14:S14};
-  const CurrentSlide=SLIDES[slide];
-
-  return html`<div className="relative w-screen h-screen slide-bg overflow-hidden" onClick=${handleClick}>
-    <div className="fixed top-0 left-0 h-[3px] z-30 transition-all duration-500" style=${{width:progress+'%',background:'#F4610E'}}></div>
-    ${rehearsal && html`<div className="fixed top-0 left-0 right-0 z-40 text-center py-1.5 px-4 text-xs text-white/65"
-         style=${{background:'rgba(244,97,14,.15)',borderBottom:'1px solid rgba(244,97,14,.3)'}}>
-      Modo ensaio (sem Firebase). Pressione <strong>D</strong> para injetar participantes de teste.
-    </div>`}
-    <div key=${slide} className="slide-active w-full h-full"><${CurrentSlide} ...${{...sp}}/></div>
-    ${!hideChrome && html`<div className="fixed bottom-5 right-6 z-20 text-white/30 tracking-[.1em]" style=${{fontFamily:'monospace',fontSize:'13px'}}>
-      ${String(slide).padStart(2,'0')} / ${String(TOTAL).padStart(2,'0')}
-    </div>`}
-    ${!hideChrome && html`<div className="fixed bottom-5 left-6 z-20 font-black uppercase tracking-[.18em] text-white/35" style=${{fontSize:'11px'}}>SANCHO × ESCANDI</div>`}
-    <${Poppers} queue=${popQueue}/>
-    ${winner && html`<${Winner} w=${winner} onClose=${()=>setWinner(null)}/>`}
-  </div>`;
+      updateUI();
+    });
+  } catch(e) {
+    rehearsalMode = true;
+    document.getElementById('rehearsal-banner').classList.add('show');
+    console.warn('Firebase init failed, rehearsal mode:', e);
+  }
 }
 
-/* ══════════════════ ROOT ══════════════════ */
-function App(){
-  const [hash,setHash]=useState(window.location.hash);
-  const {parts,rehearsal,inject,deleteAll,add}=useDB();
-  useEffect(()=>{
-    const h=()=>setHash(window.location.hash);
-    window.addEventListener('hashchange',h);
-    return ()=>window.removeEventListener('hashchange',h);
-  },[]);
-  if(hash==='#/form') return html`<${FormView} add=${add}/>`;
-  return html`<${Presentation} parts=${parts} rehearsal=${rehearsal} inject=${inject} deleteAll=${deleteAll}/>`;
+// ===================== HANDLE NEW PARTICIPANT =====================
+function handleNewParticipant(p) {
+  var slides = getAllSlides();
+  var activeSlide = slides[currentSlideIdx];
+  if (activeSlide && activeSlide.id === 'slide-qr') {
+    showPlusOnePop();
+    showNamePopper(p);
+  }
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(html`<${App}/>`);
+function showPlusOnePop() {
+  var el = document.createElement('div');
+  el.className = 'plus-one-pop';
+  el.textContent = '+1';
+  el.style.left = (30 + Math.random() * 40) + 'vw';
+  el.style.bottom = (30 + Math.random() * 30) + 'vh';
+  document.body.appendChild(el);
+  setTimeout(function() { el.remove(); }, 2100);
+}
+
+function showNamePopper(p) {
+  var name = firstName(p.nome);
+  var el = document.createElement('div');
+  el.className = 'name-popper';
+  el.textContent = name;
+  el.style.background = POP_COLORS[Math.floor(Math.random() * POP_COLORS.length)];
+  var side = Math.random();
+  if (side < 0.25) {
+    el.style.left = (5 + Math.random() * 20) + 'vw';
+    el.style.top = (10 + Math.random() * 80) + 'vh';
+  } else if (side < 0.5) {
+    el.style.right = (5 + Math.random() * 20) + 'vw';
+    el.style.top = (10 + Math.random() * 80) + 'vh';
+  } else if (side < 0.75) {
+    el.style.top = (5 + Math.random() * 15) + 'vh';
+    el.style.left = (10 + Math.random() * 60) + 'vw';
+  } else {
+    el.style.bottom = (5 + Math.random() * 15) + 'vh';
+    el.style.left = (10 + Math.random() * 60) + 'vw';
+  }
+  document.body.appendChild(el);
+  setTimeout(function() { el.remove(); }, 3600);
+}
+
+// ===================== UI UPDATES =====================
+function updateUI() {
+  var n = participants.length;
+  document.getElementById('live-count-qr').textContent = n;
+  document.getElementById('word-count').textContent = n;
+  document.getElementById('raffle-count').textContent = n;
+  document.getElementById('impact-count').textContent = n;
+  var delEl = document.getElementById('delete-count');
+  if (delEl) delEl.textContent = n;
+  buildWordCloud();
+  syncAreaSlides();
+  updateCounter();
+}
+
+// ===================== WORD CLOUD =====================
+function buildWordCloud() {
+  var host = document.getElementById('wordCloud');
+  if (!host) return;
+  host.innerHTML = '';
+  if (participants.length === 0) return;
+  var groups = {};
+  participants.forEach(function(p) {
+    var key = (p.palavra || '').trim().toLowerCase();
+    if (!key) return;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(p.nome);
+  });
+  var vals = Object.values(groups).map(function(a) { return a.length; });
+  var maxCount = vals.length > 0 ? Math.max.apply(null, vals) : 1;
+  Object.keys(groups).forEach(function(palavra) {
+    var nomes = groups[palavra];
+    var pill = document.createElement('div');
+    pill.className = 'word-pill';
+    var freq = nomes.length / maxCount;
+    pill.style.fontSize = 'clamp(16px, ' + (1.1 + freq * 2.6) + 'vw, 52px)';
+    pill.style.opacity = String(0.65 + freq * 0.35);
+    var nameStr = nomes.slice(0,3).map(function(n) { return esc(firstName(n)); }).join(', ');
+    if (nomes.length > 3) nameStr += '…';
+    pill.innerHTML = '<span class="word-text">' + esc(capitalize(palavra)) + '</span>' +
+                     '<span class="word-names">' + nameStr + '</span>';
+    host.appendChild(pill);
+  });
+}
+
+// ===================== AREA SLIDES =====================
+var areaSlideMap = {};
+
+function syncAreaSlides() {
+  var areaGroups = {};
+  participants.forEach(function(p) {
+    var seg = p.segmento || '';
+    var areaObj = matchArea(seg);
+    var key = areaObj ? areaObj.titulo : ('outro:' + seg.toLowerCase().trim().slice(0,20));
+    if (!areaGroups[key]) {
+      areaGroups[key] = { areaObj: areaObj, titulo: areaObj ? areaObj.titulo : (seg || 'Outros'), participants: [] };
+    }
+    areaGroups[key].participants.push(p);
+  });
+
+  Object.keys(areaSlideMap).forEach(function(key) {
+    if (!areaGroups[key]) {
+      var el = areaSlideMap[key];
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+      delete areaSlideMap[key];
+    }
+  });
+
+  var anchor = document.getElementById('slide-essencia');
+  Object.keys(areaGroups).forEach(function(key) {
+    var group = areaGroups[key];
+    if (!areaSlideMap[key]) {
+      var el = buildAreaSlide(key, group);
+      areaSlideMap[key] = el;
+      anchor.parentNode.insertBefore(el, anchor);
+    } else {
+      updateAreaSlide(areaSlideMap[key], group);
+    }
+  });
+}
+
+function buildAreaSlide(key, group) {
+  var el = document.createElement('div');
+  el.className = 'slide dark';
+  el.dataset.frags = '0';
+  el.dataset.areaKey = key;
+  el.style.cssText = 'opacity:0;pointer-events:none;';
+  updateAreaSlide(el, group);
+  return el;
+}
+
+function updateAreaSlide(el, group) {
+  var titulo = group.titulo;
+  var areaObj = group.areaObj;
+  var ps = group.participants;
+  var sugestoes = areaObj ? areaObj.sugestoes : [
+    'Compartilhe sua experiência profissional',
+    'Documente projetos e resultados',
+    'Mostre seu processo de trabalho',
+    'Publique conteúdo sobre sua área'
+  ];
+  var first = ps[0] || {};
+  var fName = firstName(first.nome || 'você');
+  var area = titulo;
+  var palavra = first.palavra || 'profissional';
+
+  var pillsHtml = ps.map(function(p) {
+    return '<div class="area-name-pill">' +
+           '<div class="area-pill-name">' + esc(firstName(p.nome)) + '</div>' +
+           '<div class="area-pill-palavra">' + esc(p.palavra || '') + '</div>' +
+           '</div>';
+  }).join('');
+
+  var sugHtml = sugestoes.map(function(s) {
+    return '<li>' + esc(s) + '</li>';
+  }).join('');
+
+  el.innerHTML =
+    '<div class="kicker"><span class="accent">SE AMOSTRAMENTO · ÁREA</span></div>' +
+    '<div class="display" style="font-size:clamp(26px,3.6vw,52px);">Área: ' + esc(titulo) + '</div>' +
+    '<div class="area-slide-layout">' +
+      '<div class="area-left">' +
+        '<div class="area-count-text">' + ps.length + ' participante' + (ps.length !== 1 ? 's' : '') + ' nessa área</div>' +
+        '<div class="area-pills">' + pillsHtml + '</div>' +
+      '</div>' +
+      '<div class="area-right">' +
+        '<div class="email-card">' +
+          '<div class="email-titlebar">' +
+            '<div class="email-dots">' +
+              '<div class="email-dot red"></div>' +
+              '<div class="email-dot yellow"></div>' +
+              '<div class="email-dot green"></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="email-body">' +
+            '<div class="email-from">De: Wladson Sidney &lt;wladson@sancho.com.br&gt;</div>' +
+            '<div class="email-to">Para: ' + esc(fName) + '</div>' +
+            '<div class="email-subject">' + esc(fName) + ', seu Se Amostramento começa por aqui</div>' +
+            '<div class="email-text">Olá ' + esc(fName) + ',\n\nVocê atua em ' + esc(area) + ' e se define como <strong>' + esc(palavra) + '</strong>. Esse é o ponto de partida da sua marca.\n\nComo profissional ' + esc(palavra) + ' na área de ' + esc(area) + ', você pode:</div>' +
+            '<ul class="email-suggestions">' + sugHtml + '</ul>' +
+            '<div class="email-btn">Iniciar meu Se Amostramento →</div>' +
+            '<div class="email-sig">— Wladson Sidney<br>MC · Gestor de Carreiras · Sancho</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+// ===================== SLIDE NAVIGATION =====================
+function getFragCount(slideEl) {
+  if (!slideEl) return 0;
+  return parseInt(slideEl.dataset.frags || '0');
+}
+
+function showSlide(idx) {
+  var slides = getAllSlides();
+  slides.forEach(function(s) {
+    s.classList.remove('active');
+    s.style.opacity = '0';
+    s.style.pointerEvents = 'none';
+  });
+  var s = slides[idx];
+  if (!s) return;
+  s.classList.add('active');
+  s.style.opacity = '1';
+  s.style.pointerEvents = 'all';
+  currentSlideIdx = idx;
+  currentFrag = -1;
+
+  s.querySelectorAll('.fragment').forEach(function(f) { f.classList.remove('visible'); });
+
+  if (s.id === 'slide-qr') {
+    renderQR();
+    startCountdown();
+  }
+  if (s.id === 'slide-wordcloud') buildWordCloud();
+
+  updateProgress();
+  updateCounter();
+  updateFooterTheme(s);
+}
+
+function next() {
+  var slides = getAllSlides();
+  var s = slides[currentSlideIdx];
+  var totalFrags = getFragCount(s);
+  if (currentFrag < totalFrags - 1) {
+    currentFrag++;
+    var frags = s ? s.querySelectorAll('.fragment') : [];
+    if (frags[currentFrag]) frags[currentFrag].classList.add('visible');
+  } else if (currentSlideIdx < slides.length - 1) {
+    showSlide(currentSlideIdx + 1);
+  }
+}
+
+function prev() {
+  if (currentSlideIdx > 0) {
+    showSlide(currentSlideIdx - 1);
+    var slides = getAllSlides();
+    var s = slides[currentSlideIdx];
+    if (s) {
+      var frags = s.querySelectorAll('.fragment');
+      frags.forEach(function(f) { f.classList.add('visible'); });
+      currentFrag = frags.length - 1;
+    }
+  }
+}
+
+function updateProgress() {
+  var total = getTotalSlides();
+  var pct = total > 1 ? (currentSlideIdx / (total - 1)) * 100 : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function updateCounter() {
+  var total = getTotalSlides();
+  var idx = String(currentSlideIdx + 1).padStart(2, '0');
+  var tot = String(total).padStart(2, '0');
+  document.getElementById('slide-counter').textContent = idx + ' / ' + tot;
+}
+
+function updateFooterTheme(slideEl) {
+  var isDark = slideEl && slideEl.classList.contains('dark');
+  var counter = document.getElementById('slide-counter');
+  var footer = document.getElementById('footer-brand');
+  if (isDark) {
+    counter.classList.remove('dark-text');
+    footer.classList.remove('dark-text');
+  } else {
+    counter.classList.add('dark-text');
+    footer.classList.add('dark-text');
+  }
+}
+
+// ===================== QR CODE =====================
+function renderQR() {
+  var host = document.getElementById('qrcode');
+  if (!host || host.children.length > 0) return;
+  var url = FORM_URL;
+  document.getElementById('form-url-display').textContent = url;
+  try {
+    new QRCode(host, {
+      text: url,
+      width: 210,
+      height: 210,
+      colorDark: '#050F2C',
+      colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch(e) {
+    host.innerHTML = '<div style="width:210px;height:210px;background:#f0f4fb;display:flex;align-items:center;justify-content:center;color:#6b7a99;font-size:12px;text-align:center;padding:12px;border-radius:8px;">QR: carregue online para gerar</div>';
+  }
+}
+
+// ===================== COUNTDOWN TIMER =====================
+var countdownInterval = null;
+var countdownRemaining = 60;
+
+function startCountdown() {
+  if (countdownInterval) clearInterval(countdownInterval);
+  countdownRemaining = 60;
+  renderCountdown();
+  countdownInterval = setInterval(function() {
+    countdownRemaining--;
+    renderCountdown();
+    if (countdownRemaining <= 0) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+  }, 1000);
+}
+
+function renderCountdown() {
+  var el = document.getElementById('countdown-display');
+  if (!el) return;
+  var secs = Math.max(0, countdownRemaining);
+  var m = String(Math.floor(secs / 60)).padStart(2, '0');
+  var s = String(secs % 60).padStart(2, '0');
+  el.textContent = m + ':' + s;
+  if (secs <= 10 && secs > 0) el.classList.add('urgent');
+  else el.classList.remove('urgent');
+}
+
+// ===================== EXPORT FUNCTIONS =====================
+function drawWinner() {
+  if (participants.length === 0) { alert('Nenhum participante ainda!'); return; }
+  var winner = participants[Math.floor(Math.random() * participants.length)];
+  document.getElementById('winner-name-text').textContent = winner.nome;
+  document.getElementById('winner-info-text').textContent = winner.segmento + ' · “' + winner.palavra + '”';
+  document.getElementById('winner-overlay').classList.add('show');
+}
+
+function copyNames() {
+  if (participants.length === 0) { alert('Nenhum participante ainda!'); return; }
+  var text = participants.map(function(p) { return p.nome + ' — ' + p.segmento + ' — ' + p.palavra; }).join('\n');
+  navigator.clipboard.writeText(text).then(function() { alert('Copiado!'); });
+}
+
+function downloadCSV() {
+  if (participants.length === 0) { alert('Nenhum participante ainda!'); return; }
+  var header = 'nome,segmento,palavra\n';
+  var rows = participants.map(function(p) {
+    return '"' + (p.nome||'').replace(/"/g,'""') + '","' + (p.segmento||'').replace(/"/g,'""') + '","' + (p.palavra||'').replace(/"/g,'""') + '"';
+  }).join('\n');
+  var blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+  var link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'sorteio-marca-vende.csv';
+  link.click();
+}
+
+function deleteAllData() {
+  if (!confirm('Apagar TODOS os dados ao vivo? Essa ação não pode ser desfeita.')) return;
+  if (dbRef) {
+    dbRef.remove().then(function() {
+      var btn = document.getElementById('btn-delete');
+      if (btn) btn.textContent = '✓ Dados apagados';
+    });
+  } else {
+    participants = [];
+    updateUI();
+    var btn = document.getElementById('btn-delete');
+    if (btn) btn.textContent = '✓ Dados apagados';
+  }
+}
+
+// ===================== FORM SUBMISSION =====================
+function submitForm() {
+  var nome    = document.getElementById('f-nome').value.trim();
+  var seg     = document.getElementById('f-seg').value.trim();
+  var palavra = document.getElementById('f-word').value.trim();
+
+  var ok = true;
+  function err(id, show) {
+    document.getElementById(id).classList.toggle('show', show);
+    if (show) ok = false;
+  }
+  err('err-nome', !nome);
+  err('err-seg', !seg);
+  err('err-word', !palavra);
+  if (!ok) return;
+
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  var record = { nome: nome, segmento: seg, palavra: palavra, ts: Date.now() };
+
+  if (dbRef) {
+    dbRef.push(record).then(showSuccess).catch(function() {
+      btn.disabled = false;
+      btn.textContent = 'Participar do sorteio →';
+      alert('Erro ao enviar. Tente novamente.');
+    });
+  } else {
+    setTimeout(showSuccess, 600);
+  }
+}
+
+function showSuccess() {
+  document.getElementById('form-content').style.display = 'none';
+  document.getElementById('success-screen').classList.add('show');
+}
+
+// ===================== KEYBOARD CONTROLS =====================
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  var key = e.key;
+  if (key === 'ArrowRight' || key === ' ') { e.preventDefault(); next(); }
+  if (key === 'ArrowLeft')  { e.preventDefault(); prev(); }
+  if (key === 'f' || key === 'F') toggleFullscreen();
+  if (key === 'd' || key === 'D') injectDemo();
+});
+
+// ===================== CLICK NAVIGATION =====================
+document.getElementById('deck').addEventListener('click', function(e) {
+  if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+  var x = e.clientX;
+  var w = window.innerWidth;
+  if (x < w * 0.33) prev();
+  else next();
+});
+
+// ===================== FULLSCREEN =====================
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(function() {});
+  } else {
+    document.exitFullscreen().catch(function() {});
+  }
+}
+
+// ===================== DEMO MODE =====================
+function injectDemo() {
+  if (!rehearsalMode) return;
+  participants = DEMO_PARTICIPANTS.slice();
+  var i = 0;
+  var tick = setInterval(function() {
+    if (i >= participants.length) { clearInterval(tick); return; }
+    handleNewParticipant(participants[i]);
+    i++;
+  }, 200);
+  updateUI();
+}
+
+// ===================== TOUCH SWIPE =====================
+var touchStartX = 0, touchStartY = 0;
+document.getElementById('deck').addEventListener('touchstart', function(e) {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+document.getElementById('deck').addEventListener('touchend', function(e) {
+  var dx = e.changedTouches[0].clientX - touchStartX;
+  var dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    if (dx < 0) next();
+    else prev();
+  }
+}, { passive: true });
+
+// ===================== ROUTER =====================
+function route() {
+  var hash = window.location.hash;
+  var deck = document.getElementById('deck');
+  var form = document.getElementById('form-view');
+  var counter = document.getElementById('slide-counter');
+  var footer = document.getElementById('footer-brand');
+  var progress = document.getElementById('progress-bar');
+  var banner = document.getElementById('rehearsal-banner');
+
+  if (hash === '#/form') {
+    deck.style.display = 'none';
+    form.classList.add('active');
+    counter.style.display = 'none';
+    footer.style.display = 'none';
+    progress.style.display = 'none';
+    banner.style.display = 'none';
+  } else {
+    deck.style.display = 'block';
+    form.classList.remove('active');
+    counter.style.display = 'block';
+    footer.style.display = 'block';
+    progress.style.display = 'block';
+    if (rehearsalMode) banner.classList.add('show');
+  }
+}
+
+// ===================== BOOT =====================
+window.addEventListener('hashchange', route);
+initFirebase();
+route();
+showSlide(0);
 </script>
 </body>
 </html>
