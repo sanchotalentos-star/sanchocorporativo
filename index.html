@@ -1249,6 +1249,118 @@ body {
   </div>
 </div>
 
+<!-- ===================== EDITOR VIEW ===================== -->
+<div id="editor-view" style="display:none;position:fixed;inset:0;z-index:8000;font-family:system-ui,sans-serif;">
+<style>
+#editor-view *{box-sizing:border-box;}
+#ev-cv .ev-el{position:absolute;cursor:move;user-select:none;min-width:40px;min-height:20px;}
+#ev-cv .ev-el.ev-sel{outline:2px dashed #818cf8;outline-offset:3px;z-index:50;}
+#ev-cv .ev-el.ev-edit{cursor:text;user-select:text;}
+.ev-del{display:none;position:absolute;top:-11px;right:-11px;width:22px;height:22px;background:#ef4444;color:#fff;border-radius:50%;align-items:center;justify-content:center;font-size:15px;font-weight:700;cursor:pointer;border:none;z-index:300;}
+.ev-el.ev-sel .ev-del{display:flex;}
+.ev-rsz{display:none;position:absolute;bottom:-6px;right:-6px;width:13px;height:13px;background:#818cf8;border-radius:3px;cursor:se-resize;z-index:300;}
+.ev-el.ev-sel .ev-rsz{display:block;}
+#ev-strip .ev-th{flex-shrink:0;position:relative;width:160px;height:90px;border:2px solid #374151;border-radius:5px;overflow:hidden;cursor:pointer;background:#fff;transition:border-color .15s;}
+#ev-strip .ev-th:hover{border-color:#6366f1;}
+#ev-strip .ev-th.ev-active{border-color:#6366f1;box-shadow:0 0 0 2px #6366f1;}
+.ev-th-inner{width:960px;height:540px;transform-origin:top left;transform:scale(0.1667);pointer-events:none;position:absolute;top:0;left:0;}
+.ev-th-num{position:absolute;bottom:3px;left:5px;font-size:9px;color:#9ca3af;z-index:10;pointer-events:none;}
+.ev-th-btns{position:absolute;top:3px;right:3px;display:none;gap:2px;}
+.ev-th:hover .ev-th-btns{display:flex;}
+.ev-sb{width:100%;display:flex;align-items:center;gap:8px;padding:6px 8px;font-size:12px;color:#d1d5db;background:transparent;border:none;border-radius:6px;cursor:pointer;text-align:left;transition:background .12s,color .12s;}
+.ev-sb:hover{background:#374151;color:#fff;}
+#ev-propbar{display:none;position:absolute;z-index:400;background:#1f2937;border:1px solid #374151;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.5);padding:6px 12px;align-items:center;flex-wrap:wrap;gap:6px;font-size:11px;color:#d1d5db;}
+#ev-propbar input[type=color]{width:24px;height:24px;border:none;border-radius:4px;cursor:pointer;background:transparent;padding:0;}
+#ev-propbar select,#ev-propbar button{background:#374151;color:#fff;border:1px solid #4b5563;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:11px;}
+#ev-propbar button:hover{background:#4b5563;}
+#ev-propbar input[type=range]{width:60px;}
+.ev-sep{width:1px;height:16px;background:#4b5563;}
+#ev-present-ov{display:none;position:fixed;inset:0;background:#000;z-index:9999;align-items:center;justify-content:center;}
+#ev-present-ov.ev-on{display:flex;}
+</style>
+<!-- Top bar -->
+<div style="height:48px;background:#1f2937;border-bottom:1px solid #374151;display:flex;align-items:center;gap:12px;padding:0 16px;flex-shrink:0;">
+  <span style="font-weight:900;color:#fff;letter-spacing:-0.02em;">✦ Editor de Slides</span>
+  <div style="width:1px;height:20px;background:#374151;"></div>
+  <button onclick="evAddSlide()" style="background:#6366f1;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;">+ Slide</button>
+  <div style="flex:1;"></div>
+  <div style="display:flex;border-radius:6px;overflow:hidden;border:1px solid #374151;">
+    <button id="ev-btn-edit" onclick="evSetMode('edit')" style="padding:6px 12px;background:#6366f1;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;">✏ Editar</button>
+    <button id="ev-btn-present" onclick="evSetMode('present')" style="padding:6px 12px;background:transparent;color:#9ca3af;border:none;font-size:12px;font-weight:700;cursor:pointer;">▶ Apresentar</button>
+  </div>
+  <button onclick="evDownload()" style="background:#059669;color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer;">⬇ Baixar Editável</button>
+  <div style="width:1px;height:20px;background:#374151;"></div>
+  <a href="#/" style="color:#9ca3af;font-size:12px;text-decoration:none;" title="Voltar à apresentação">✕ Sair</a>
+</div>
+<!-- Body -->
+<div style="display:flex;flex:1;overflow:hidden;height:calc(100% - 48px - 112px);">
+  <!-- Sidebar -->
+  <div style="width:176px;background:#1f2937;border-right:1px solid #374151;padding:12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;flex-shrink:0;">
+    <p style="color:#6b7280;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px;">Texto</p>
+    <button class="ev-sb" onclick="evAddText('title')"><b style="font-size:15px;">T</b> Título</button>
+    <button class="ev-sb" onclick="evAddText('body')"><span style="font-size:12px;">T</span> Parágrafo</button>
+    <div style="height:1px;background:#374151;margin:6px 0;"></div>
+    <p style="color:#6b7280;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px;">Formas</p>
+    <button class="ev-sb" onclick="evAddShape('rect')"><span>▬</span> Retângulo</button>
+    <button class="ev-sb" onclick="evAddShape('circle')"><span>●</span> Círculo</button>
+    <div style="height:1px;background:#374151;margin:6px 0;"></div>
+    <p style="color:#6b7280;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px;">Imagem</p>
+    <input id="ev-img-url" type="text" placeholder="Cole a URL..." style="width:100%;font-size:11px;background:#374151;border:1px solid #4b5563;border-radius:6px;padding:5px 8px;color:#fff;outline:none;margin-bottom:4px;">
+    <button class="ev-sb" onclick="evAddImgURL()"><span>🔗</span> Inserir URL</button>
+    <label class="ev-sb" style="cursor:pointer;"><span>📁</span> Upload Local<input type="file" accept="image/*" onchange="evAddImgFile(this)" style="display:none;"></label>
+    <div style="height:1px;background:#374151;margin:6px 0;"></div>
+    <p style="color:#6b7280;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px;">Slide</p>
+    <label style="color:#9ca3af;font-size:11px;">Fundo</label>
+    <input type="color" id="ev-bg-pick" value="#ffffff" oninput="evChangeBg(this.value)" style="width:100%;height:32px;border-radius:6px;cursor:pointer;border:1px solid #4b5563;background:#374151;padding:2px;">
+  </div>
+  <!-- Canvas area -->
+  <div style="flex:1;overflow:auto;background:#4b5563;display:flex;align-items:flex-start;justify-content:center;padding:40px;">
+    <div style="position:relative;" id="ev-cv-wrap">
+      <!-- Property bar -->
+      <div id="ev-propbar">
+        <span style="color:#9ca3af;">Texto</span>
+        <input type="color" id="ev-pb-col" value="#000000" oninput="evApply('color',this.value)">
+        <span style="color:#9ca3af;">Fundo</span>
+        <input type="color" id="ev-pb-bg" value="#ffffff" oninput="evApply('backgroundColor',this.value)">
+        <button onclick="evApply('backgroundColor','transparent')">∅</button>
+        <div class="ev-sep"></div>
+        <span style="color:#9ca3af;">Tam.</span>
+        <select id="ev-pb-sz" onchange="evApply('fontSize',this.value+'px')">
+          <option>12</option><option>16</option><option>20</option><option>24</option>
+          <option>28</option><option>32</option><option>40</option><option>48</option>
+          <option>56</option><option>64</option><option>72</option><option>96</option>
+        </select>
+        <button onclick="evToggleBold()"><b>N</b></button>
+        <button onclick="evToggleItalic()" style="font-style:italic;">I</button>
+        <div class="ev-sep"></div>
+        <span style="color:#9ca3af;">Opac.</span>
+        <input type="range" id="ev-pb-op" min="10" max="100" value="100" oninput="evApply('opacity',this.value/100)">
+        <div class="ev-sep"></div>
+        <button onclick="evChangeZ(1)" title="Frente">↑</button>
+        <button onclick="evChangeZ(-1)" title="Atrás">↓</button>
+        <button onclick="evDupEl()" title="Duplicar">⎘</button>
+      </div>
+      <!-- Canvas 960×540 -->
+      <div id="ev-cv" onclick="evCvClick(event)"
+        style="width:960px;height:540px;background:#ffffff;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5);">
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Thumbnail strip -->
+<div id="ev-strip" style="height:112px;background:#1f2937;border-top:1px solid #374151;display:flex;align-items:center;gap:12px;padding:0 16px;overflow-x:auto;flex-shrink:0;"></div>
+<!-- Present overlay -->
+<div id="ev-present-ov">
+  <div style="position:absolute;top:16px;display:flex;gap:12px;align-items:center;z-index:10;">
+    <button onclick="evPNav(-1)" style="background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:999px;padding:6px 16px;cursor:pointer;font-size:14px;">← Anterior</button>
+    <span id="ev-p-count" style="color:rgba(255,255,255,.4);font-size:14px;">1 / 1</span>
+    <button onclick="evPNav(1)" style="background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:999px;padding:6px 16px;cursor:pointer;font-size:14px;">Próximo →</button>
+    <button onclick="evSetMode('edit')" style="background:rgba(220,38,38,.7);color:#fff;border:none;border-radius:999px;padding:6px 16px;cursor:pointer;font-size:14px;margin-left:16px;">✕ Sair</button>
+  </div>
+  <div id="ev-pcv" style="width:960px;height:540px;position:relative;overflow:hidden;pointer-events:none;"></div>
+</div>
+</div>
+
 <script>
 // ===================== CONFIG =====================
 var firebaseConfig = {
@@ -1830,6 +1942,7 @@ function route() {
   var hash = window.location.hash;
   var deck = document.getElementById('deck');
   var form = document.getElementById('form-view');
+  var editor = document.getElementById('editor-view');
   var counter = document.getElementById('slide-counter');
   var footer = document.getElementById('footer-brand');
   var progress = document.getElementById('progress-bar');
@@ -1838,18 +1951,359 @@ function route() {
   if (hash === '#/form') {
     deck.style.display = 'none';
     form.classList.add('active');
+    editor.style.display = 'none';
     counter.style.display = 'none';
     footer.style.display = 'none';
     progress.style.display = 'none';
     banner.style.display = 'none';
+  } else if (hash === '#/editor') {
+    deck.style.display = 'none';
+    form.classList.remove('active');
+    editor.style.display = 'flex';
+    editor.style.flexDirection = 'column';
+    counter.style.display = 'none';
+    footer.style.display = 'none';
+    progress.style.display = 'none';
+    banner.style.display = 'none';
+    evInit();
   } else {
     deck.style.display = 'block';
     form.classList.remove('active');
+    editor.style.display = 'none';
     counter.style.display = 'block';
     footer.style.display = 'block';
     progress.style.display = 'block';
     if (rehearsalMode) banner.classList.add('show');
   }
+}
+
+// ===================== SLIDE EDITOR =====================
+var evSlides = [], evCurIdx = 0, evSelEl = null, evEditEl = null;
+var evElN = 1, evSlideN = 1, evPIdx = 0, evInited = false;
+var EV_CV, EV_STRIP, EV_PROPBAR;
+
+function evInit() {
+  if (evInited) return;
+  evInited = true;
+  EV_CV      = document.getElementById('ev-cv');
+  EV_STRIP   = document.getElementById('ev-strip');
+  EV_PROPBAR = document.getElementById('ev-propbar');
+  var saved = document.getElementById('ev-state');
+  if (saved && saved.textContent.trim()) {
+    try {
+      var s = JSON.parse(saved.textContent);
+      evSlides = s.slides || []; evElN = s.elN||100; evSlideN = s.slideN||2;
+    } catch(_) {}
+  }
+  if (!evSlides.length) evSlides = [evMkSlide()];
+  evRenderStrip();
+  evShowSlide(0, true);
+
+  // Keyboard shortcuts for editor
+  document.addEventListener('keydown', function(e) {
+    if (window.location.hash !== '#/editor') return;
+    var inPresent = document.getElementById('ev-present-ov').classList.contains('ev-on');
+    if (inPresent) {
+      if (e.key==='ArrowRight'||e.key===' '){e.preventDefault();evPNav(1);}
+      if (e.key==='ArrowLeft') evPNav(-1);
+      if (e.key==='Escape') evSetMode('edit');
+      return;
+    }
+    if (e.key==='Escape'){if(evEditEl)evExitEdit();else evDeselect();}
+    if ((e.key==='Delete'||e.key==='Backspace')&&evSelEl&&!evEditEl) {
+      if (['INPUT','SELECT','TEXTAREA'].indexOf(document.activeElement.tagName)>=0) return;
+      evRemoveEl(evSelEl);
+    }
+  });
+  document.addEventListener('mousedown', function(e) {
+    if (evEditEl && !evEditEl.contains(e.target)) evExitEdit();
+  });
+}
+
+function evMkSlide() { return {id:evSlideN++,bg:'#ffffff',html:''}; }
+
+function evSaveCur() {
+  if (!evSlides[evCurIdx]) return;
+  evSlides[evCurIdx].html = EV_CV.innerHTML;
+  evSlides[evCurIdx].bg   = EV_CV.style.background||'#ffffff';
+}
+
+function evShowSlide(idx, skipSave) {
+  if (!skipSave) evSaveCur();
+  evCurIdx = Math.max(0, Math.min(idx, evSlides.length-1));
+  var s = evSlides[evCurIdx];
+  EV_CV.innerHTML = s.html||'';
+  EV_CV.style.background = s.bg||'#ffffff';
+  document.getElementById('ev-bg-pick').value = evToHex(s.bg||'#ffffff');
+  EV_CV.querySelectorAll('.ev-el').forEach(function(el){
+    el.classList.remove('ev-sel');
+    evInitInteract(el);
+    evBindEl(el);
+  });
+  evDeselect();
+  evRenderStrip();
+}
+
+function evAddSlide() { evSaveCur(); evSlides.push(evMkSlide()); evShowSlide(evSlides.length-1); }
+
+function evDupSlide(i, e) {
+  e.stopPropagation(); evSaveCur();
+  var src=evSlides[i];
+  evSlides.splice(i+1,0,{id:evSlideN++,bg:src.bg,html:i===evCurIdx?EV_CV.innerHTML:src.html});
+  evCurIdx=-1; evShowSlide(i+1);
+}
+
+function evDelSlide(i, e) {
+  e.stopPropagation();
+  if (evSlides.length<=1) return;
+  evSaveCur(); evSlides.splice(i,1); evCurIdx=-1;
+  evShowSlide(Math.min(i,evSlides.length-1));
+}
+
+function evAddText(type) {
+  var el=evMkEl(); el.dataset.t=type;
+  el.style.left=type==='title'?'60px':'80px';
+  el.style.top=type==='title'?'60px':'220px';
+  el.style.width=type==='title'?'840px':'620px';
+  el.style.minHeight='60px'; el.style.padding='6px 10px';
+  el.style.fontFamily='sans-serif';
+  el.style.fontSize=type==='title'?'56px':'28px';
+  el.style.fontWeight=type==='title'?'800':'400';
+  el.style.color='#111'; el.style.lineHeight='1.25';
+  el.innerHTML=type==='title'?'Título do Slide':'Clique duplo para editar...';
+  evFinish(el);
+}
+
+function evAddShape(type) {
+  var el=evMkEl(); el.dataset.t=type;
+  el.style.left='220px'; el.style.top='160px';
+  el.style.width='200px'; el.style.height='130px';
+  el.style.background='#6366f1';
+  el.style.borderRadius=type==='circle'?'50%':'10px';
+  evFinish(el);
+}
+
+function evAddImgURL() {
+  var url=document.getElementById('ev-img-url').value.trim();
+  if(!url)return; evMkImgEl(url);
+  document.getElementById('ev-img-url').value='';
+}
+
+function evAddImgFile(input) {
+  var file=input.files[0]; if(!file)return;
+  var fr=new FileReader();
+  fr.onload=function(e){evMkImgEl(e.target.result);};
+  fr.readAsDataURL(file); input.value='';
+}
+
+function evMkImgEl(src) {
+  var el=evMkEl(); el.dataset.t='image';
+  el.style.left='80px'; el.style.top='80px';
+  el.style.width='320px'; el.style.height='220px';
+  var img=document.createElement('img');
+  img.src=src; img.style.cssText='width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;';
+  el.appendChild(img); evFinish(el);
+}
+
+function evMkEl() {
+  var el=document.createElement('div');
+  el.id='eev-'+(evElN++); el.className='ev-el'; return el;
+}
+
+function evFinish(el) {
+  var d=document.createElement('button'); d.className='ev-del'; d.innerHTML='&times;';
+  d.onmousedown=function(e){e.stopPropagation();evRemoveEl(el);}; el.appendChild(d);
+  var r=document.createElement('div'); r.className='ev-rsz'; el.appendChild(r);
+  EV_CV.appendChild(el); evInitInteract(el); evBindEl(el); evSelectEl(el);
+}
+
+function evRemoveEl(el) {
+  if(evSelEl===el){evSelEl=null;EV_PROPBAR.style.display='none';}
+  if(evEditEl===el)evEditEl=null; el.remove();
+}
+
+function evInitInteract(el) {
+  try{interact(el).unset();}catch(_){}
+  interact(el)
+    .draggable({ignoreFrom:'.ev-del,.ev-rsz',listeners:{
+      start:function(){evSelectEl(el);},
+      move:function(ev){
+        el.style.left=((parseFloat(el.style.left)||0)+ev.dx)+'px';
+        el.style.top=((parseFloat(el.style.top)||0)+ev.dy)+'px';
+        evPosBar();
+      }
+    }})
+    .resizable({edges:{right:true,bottom:true,bottomRight:'.ev-rsz'},listeners:{
+      start:function(){evSelectEl(el);},
+      move:function(ev){
+        el.style.width=Math.max(40,ev.rect.width)+'px';
+        el.style.height=Math.max(20,ev.rect.height)+'px';
+        evPosBar();
+      }
+    }});
+}
+
+function evBindEl(el) {
+  el.addEventListener('mousedown',function(e){
+    if(e.target.classList.contains('ev-del')||e.target.classList.contains('ev-rsz'))return;
+    e.stopPropagation(); if(el!==evSelEl)evSelectEl(el);
+  });
+  el.addEventListener('dblclick',function(e){
+    var t=el.dataset.t;
+    if(t==='title'||t==='body'||t==='text'){e.stopPropagation();evEnterEdit(el);}
+  });
+}
+
+function evSelectEl(el) {
+  if(evSelEl&&evSelEl!==el)evSelEl.classList.remove('ev-sel');
+  if(evEditEl&&evEditEl!==el)evExitEdit();
+  evSelEl=el; el.classList.add('ev-sel'); evShowBar(el);
+}
+
+function evDeselect() {
+  evExitEdit();
+  if(evSelEl)evSelEl.classList.remove('ev-sel');
+  evSelEl=null; if(EV_PROPBAR)EV_PROPBAR.style.display='none';
+}
+
+function evCvClick(e){if(e.target===EV_CV)evDeselect();}
+
+function evEnterEdit(el) {
+  evExitEdit(); evEditEl=el;
+  el.contentEditable='true'; el.classList.add('ev-edit');
+  try{interact(el).draggable({enabled:false});}catch(_){}
+  el.focus();
+  var r=document.createRange(); r.selectNodeContents(el); r.collapse(false);
+  var s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+
+function evExitEdit() {
+  if(!evEditEl)return;
+  evEditEl.contentEditable='false'; evEditEl.classList.remove('ev-edit');
+  try{interact(evEditEl).draggable({enabled:true});}catch(_){}
+  evEditEl=null;
+}
+
+function evShowBar(el) {
+  EV_PROPBAR.style.display='flex'; evPosBar();
+  var cs=getComputedStyle(el);
+  document.getElementById('ev-pb-col').value=evToHex(cs.color);
+  document.getElementById('ev-pb-bg').value=evToHex(cs.backgroundColor);
+  document.getElementById('ev-pb-op').value=Math.round((parseFloat(cs.opacity)||1)*100);
+  var fs=parseInt(cs.fontSize)||28, sel=document.getElementById('ev-pb-sz');
+  for(var i=0;i<sel.options.length;i++)if(+sel.options[i].value===fs){sel.value=sel.options[i].value;break;}
+}
+
+function evPosBar() {
+  if(!evSelEl)return;
+  var top=parseFloat(evSelEl.style.top)||0, left=parseFloat(evSelEl.style.left)||0;
+  EV_PROPBAR.style.top=Math.max(0,top-48)+'px';
+  EV_PROPBAR.style.left=Math.max(0,left)+'px';
+}
+
+function evApply(prop,val){if(evSelEl)evSelEl.style[prop]=val;}
+
+function evToggleBold() {
+  if(!evSelEl)return;
+  evSelEl.style.fontWeight=parseInt(getComputedStyle(evSelEl).fontWeight)>=700?'400':'800';
+}
+
+function evToggleItalic() {
+  if(!evSelEl)return;
+  evSelEl.style.fontStyle=getComputedStyle(evSelEl).fontStyle==='italic'?'normal':'italic';
+}
+
+function evChangeZ(d) {
+  if(!evSelEl)return;
+  evSelEl.style.zIndex=Math.max(0,(parseInt(evSelEl.style.zIndex)||0)+d);
+}
+
+function evDupEl() {
+  if(!evSelEl)return;
+  var clone=evSelEl.cloneNode(true); clone.id='eev-'+(evElN++);
+  clone.style.left=(parseFloat(evSelEl.style.left)+20)+'px';
+  clone.style.top=(parseFloat(evSelEl.style.top)+20)+'px';
+  var d=clone.querySelector('.ev-del');
+  if(d)d.onmousedown=function(e){e.stopPropagation();evRemoveEl(clone);};
+  EV_CV.appendChild(clone); evInitInteract(clone); evBindEl(clone); evSelectEl(clone);
+}
+
+function evChangeBg(c) {
+  EV_CV.style.background=c;
+  if(evSlides[evCurIdx])evSlides[evCurIdx].bg=c;
+}
+
+function evRenderStrip() {
+  if(!EV_STRIP)return;
+  EV_STRIP.innerHTML='';
+  evSlides.forEach(function(slide,i){
+    var wrap=document.createElement('div'); wrap.className='ev-th'+(i===evCurIdx?' ev-active':'');
+    wrap.onclick=function(){evShowSlide(i);}; wrap.title='Slide '+(i+1);
+    var inner=document.createElement('div'); inner.className='ev-th-inner';
+    inner.style.background=(i===evCurIdx?EV_CV.style.background:slide.bg)||'#fff';
+    inner.innerHTML=(i===evCurIdx?EV_CV.innerHTML:slide.html)||'';
+    inner.querySelectorAll('.ev-el').forEach(function(el){el.classList.remove('ev-sel');});
+    inner.querySelectorAll('.ev-del,.ev-rsz').forEach(function(el){el.style.display='none';});
+    var num=document.createElement('div'); num.className='ev-th-num'; num.textContent=i+1;
+    var btns=document.createElement('div'); btns.className='ev-th-btns';
+    var dup=document.createElement('button');
+    dup.style.cssText='width:18px;height:18px;border:none;border-radius:3px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;background:rgba(99,102,241,.85);';
+    dup.innerHTML='⎘'; dup.title='Duplicar'; dup.onclick=function(e){evDupSlide(i,e);}; btns.appendChild(dup);
+    if(evSlides.length>1){
+      var del=document.createElement('button');
+      del.style.cssText='width:18px;height:18px;border:none;border-radius:3px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;background:rgba(239,68,68,.85);';
+      del.innerHTML='×'; del.title='Excluir'; del.onclick=function(e){evDelSlide(i,e);}; btns.appendChild(del);
+    }
+    wrap.appendChild(inner); wrap.appendChild(num); wrap.appendChild(btns); EV_STRIP.appendChild(wrap);
+  });
+}
+
+function evSetMode(mode) {
+  if(mode==='present'){
+    evSaveCur(); evPIdx=evCurIdx; evRenderPresent();
+    document.getElementById('ev-present-ov').classList.add('ev-on');
+    document.getElementById('ev-btn-edit').style.background='transparent';
+    document.getElementById('ev-btn-edit').style.color='#9ca3af';
+    document.getElementById('ev-btn-present').style.background='#6366f1';
+    document.getElementById('ev-btn-present').style.color='#fff';
+  } else {
+    document.getElementById('ev-present-ov').classList.remove('ev-on');
+    document.getElementById('ev-btn-edit').style.background='#6366f1';
+    document.getElementById('ev-btn-edit').style.color='#fff';
+    document.getElementById('ev-btn-present').style.background='transparent';
+    document.getElementById('ev-btn-present').style.color='#9ca3af';
+  }
+}
+
+function evRenderPresent() {
+  var pc=document.getElementById('ev-pcv'), s=evSlides[evPIdx];
+  pc.innerHTML=s.html||''; pc.style.background=s.bg||'#fff';
+  pc.querySelectorAll('.ev-del,.ev-rsz').forEach(function(el){el.style.display='none';});
+  pc.querySelectorAll('.ev-el').forEach(function(el){el.classList.remove('ev-sel');el.style.cursor='default';});
+  document.getElementById('ev-p-count').textContent=(evPIdx+1)+' / '+evSlides.length;
+}
+
+function evPNav(d){var n=evPIdx+d;if(n>=0&&n<evSlides.length){evPIdx=n;evRenderPresent();}}
+
+function evDownload() {
+  evDeselect(); evSaveCur();
+  var state={slides:evSlides,elN:evElN,slideN:evSlideN};
+  var tag=document.getElementById('ev-state');
+  if(!tag){tag=document.createElement('script');tag.id='ev-state';tag.type='application/json';document.body.appendChild(tag);}
+  tag.textContent=JSON.stringify(state);
+  var html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+  tag.textContent='';
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='meu-slide-editavel.html'; document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(a.href);
+}
+
+function evToHex(c) {
+  if(!c||c==='transparent'||c==='rgba(0, 0, 0, 0)')return '#ffffff';
+  if(c.startsWith('#'))return c.length===4?'#'+[...c.slice(1)].map(function(x){return x+x;}).join(''):c;
+  var m=c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  return m?'#'+[m[1],m[2],m[3]].map(function(n){return(+n).toString(16).padStart(2,'0');}).join(''):'#ffffff';
 }
 
 // ===================== BOOT =====================
