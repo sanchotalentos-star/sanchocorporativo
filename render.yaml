@@ -10,5 +10,8 @@ services:
         value: no-cache, no-store, must-revalidate
     routes:
       - type: rewrite
+        source: /slide-editor.html
+        destination: /slide-editor.html
+      - type: rewrite
         source: /*
         destination: /index.html
