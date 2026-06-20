@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Slides</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.27/dist/interact.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    /* === ELEMENTS ON CANVAS === */
+    .slide-el {
+      position: absolute;
+      cursor: move;
+      user-select: none;
+      min-width: 40px;
+      min-height: 20px;
+    }
+    .slide-el.selected {
+      outline: 2px dashed #818cf8;
+      outline-offset: 3px;
+      z-index: 50;
+    }
+    .slide-el.editing {
+      cursor: text;
+      user-select: text;
+    }
+    /* Delete button (shown when selected) */
+    .el-del {
+      display: none;
+      position: absolute;
+      top: -11px; right: -11px;
+      width: 22px; height: 22px;
+      background: #ef4444;
+      color: #fff;
+      border-radius: 50%;
+      align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer; border: none;
+      z-index: 300; line-height: 1;
+    }
+    .slide-el.selected .el-del { display: flex; }
+    /* Resize handle */
+    .el-rsz {
+      display: none;
+      position: absolute;
+      bottom: -6px; right: -6px;
+      width: 13px; height: 13px;
+      background: #818cf8;
+      border-radius: 3px;
+      cursor: se-resize;
+      z-index: 300;
+    }
+    .slide-el.selected .el-rsz { display: block; }
+
+    /* === THUMBNAILS === */
+    .thumb {
+      flex-shrink: 0;
+      position: relative;
+      width: 160px; height: 90px;
+      border: 2px solid #374151;
+      border-radius: 5px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #fff;
+      transition: border-color .15s;
+    }
+    .thumb:hover { border-color: #6366f1; }
+    .thumb.active { border-color: #6366f1; box-shadow: 0 0 0 2px #6366f1; }
+    .thumb-inner {
+      width: 960px; height: 540px;
+      transform-origin: top left;
+      transform: scale(0.1667);
+      pointer-events: none;
+      position: absolute; top: 0; left: 0;
+    }
+    .thumb-num {
+      position: absolute; bottom: 3px; left: 5px;
+      font-size: 9px; color: #9ca3af;
+      z-index: 10; pointer-events: none;
+      font-family: system-ui;
+    }
+    .thumb-btns {
+      position: absolute; top: 3px; right: 3px;
+      display: none; gap: 2px;
+    }
+    .thumb:hover .thumb-btns { display: flex; }
+    .thumb-btn {
+      width: 18px; height: 18px; border: none;
+      border-radius: 3px; cursor: pointer; font-size: 11px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700;
+    }
+
+    /* === PRESENT OVERLAY === */
+    #present-ov {
+      display: none;
+      position: fixed; inset: 0;
+      background: #000; z-index: 9999;
+      align-items: center; justify-content: center;
+      flex-direction: column;
+    }
+    #present-ov.on { display: flex; }
+    #present-cv {
+      position: relative; overflow: hidden;
+      pointer-events: none;
+      width: 960px; height: 540px;
+    }
+
+    /* Sidebar button */
+    .sb { width:100%; display:flex; align-items:center; gap:8px;
+      padding:6px 8px; font-size:12px; color:#d1d5db;
+      background:transparent; border:none; border-radius:6px;
+      cursor:pointer; text-align:left; transition:background .12s, color .12s; }
+    .sb:hover { background:#374151; color:#fff; }
+
+    /* Property bar */
+    #prop-bar {
+      display: none;
+      position: absolute;
+      z-index: 400;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+      padding: 6px 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 11px;
+      color: #d1d5db;
+    }
+    #prop-bar input[type=color] {
+      width: 24px; height: 24px; border: none; border-radius: 4px;
+      cursor: pointer; background: transparent; padding: 0;
+    }
+    #prop-bar select, #prop-bar button {
+      background: #374151; color: #fff; border: 1px solid #4b5563;
+      border-radius: 4px; padding: 2px 6px; cursor: pointer; font-size: 11px;
+    }
+    #prop-bar button:hover { background: #4b5563; }
+    #prop-bar input[type=range] { width: 60px; }
+    .sep { width:1px; height:16px; background:#4b5563; }
+  </style>
+</head>
+
+<body class="bg-gray-900 flex flex-col h-screen overflow-hidden text-gray-100" style="font-family:system-ui,sans-serif;">
+
+<!-- ═══════════════ TOP BAR ═══════════════ -->
+<header class="h-12 bg-gray-800 border-b border-gray-700 flex items-center gap-3 px-4 flex-shrink-0">
+  <span class="font-black text-white tracking-tight">✦ Editor de Slides</span>
+  <div class="w-px h-5 bg-gray-600"></div>
+  <button onclick="addSlide()"
+    class="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded transition-colors">
+    + Novo Slide
+  </button>
+  <div class="flex-1"></div>
+  <div class="flex rounded overflow-hidden text-xs border border-gray-600">
+    <button id="btn-edit" onclick="setMode('edit')"
+      class="px-3 py-1.5 bg-indigo-600 text-white font-semibold">✏ Editar</button>
+    <button id="btn-present" onclick="setMode('present')"
+      class="px-3 py-1.5 text-gray-300 hover:text-white font-semibold">▶ Apresentar</button>
+  </div>
+  <button onclick="doDownload()"
+    class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-1.5 rounded transition-colors">
+    ⬇ Baixar Editável
+  </button>
+</header>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div class="flex flex-1 overflow-hidden">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="w-44 bg-gray-800 border-r border-gray-700 flex flex-col p-3 gap-1 overflow-y-auto flex-shrink-0">
+    <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Texto</p>
+    <button class="sb" onclick="addText('title')"><b style="font-size:15px">T</b> Título</button>
+    <button class="sb" onclick="addText('body')"><span style="font-size:12px">T</span> Parágrafo</button>
+
+    <div class="my-2 h-px bg-gray-700"></div>
+    <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Formas</p>
+    <button class="sb" onclick="addShape('rect')"><span>▬</span> Retângulo</button>
+    <button class="sb" onclick="addShape('circle')"><span>●</span> Círculo</button>
+
+    <div class="my-2 h-px bg-gray-700"></div>
+    <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Imagem</p>
+    <input id="img-url" type="text" placeholder="Cole a URL..."
+      class="w-full text-xs bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-400 mb-1">
+    <button class="sb" onclick="addImgURL()"><span>🔗</span> Inserir URL</button>
+    <label class="sb cursor-pointer">
+      <span>📁</span> Upload Local
+      <input type="file" accept="image/*" onchange="addImgFile(this)" class="sr-only">
+    </label>
+
+    <div class="my-2 h-px bg-gray-700"></div>
+    <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Slide</p>
+    <label class="text-gray-400 text-xs">Cor de fundo</label>
+    <input type="color" id="bg-pick" value="#ffffff" oninput="changeBg(this.value)"
+      class="w-full h-8 rounded cursor-pointer bg-gray-700 border border-gray-600 p-0.5 mt-1">
+  </aside>
+
+  <!-- CANVAS AREA -->
+  <main class="flex-1 overflow-auto bg-gray-700 flex items-start justify-center p-10">
+    <div style="position:relative;" id="cv-wrap">
+
+      <!-- PROPERTY BAR (floats above selected element) -->
+      <div id="prop-bar">
+        <span class="text-gray-400">Cor texto</span>
+        <input type="color" id="pb-col" value="#000000" oninput="applyStyle('color',this.value)">
+        <span class="text-gray-400">Fundo</span>
+        <input type="color" id="pb-bg" value="#ffffff" oninput="applyStyle('backgroundColor',this.value)">
+        <button onclick="applyStyle('backgroundColor','transparent')" title="Fundo transparente">∅</button>
+        <div class="sep"></div>
+        <span class="text-gray-400">Tam.</span>
+        <select id="pb-sz" onchange="applyStyle('fontSize',this.value+'px')">
+          <option>12</option><option>16</option><option>20</option><option>24</option>
+          <option>28</option><option>32</option><option>40</option><option>48</option>
+          <option>56</option><option>64</option><option>72</option><option>96</option>
+        </select>
+        <button onclick="toggleBold()" title="Negrito"><b>N</b></button>
+        <button onclick="toggleItalic()" title="Itálico" style="font-style:italic">I</button>
+        <div class="sep"></div>
+        <span class="text-gray-400">Opac.</span>
+        <input type="range" id="pb-op" min="10" max="100" value="100" oninput="applyStyle('opacity',this.value/100)">
+        <div class="sep"></div>
+        <button onclick="changeZ(1)"  title="Trazer à frente">↑</button>
+        <button onclick="changeZ(-1)" title="Enviar atrás">↓</button>
+        <button onclick="dupEl()"     title="Duplicar">⎘</button>
+      </div>
+
+      <!-- CANVAS (960×540, 16:9) -->
+      <div id="cv"
+        style="width:960px;height:540px;background:#ffffff;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5);"
+        onclick="cvClick(event)">
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════ THUMBNAIL STRIP ═══════════════ -->
+<footer id="strip"
+  class="h-28 bg-gray-800 border-t border-gray-700 flex items-center gap-3 px-4 overflow-x-auto flex-shrink-0">
+</footer>
+
+<!-- ═══════════════ PRESENT OVERLAY ═══════════════ -->
+<div id="present-ov">
+  <div class="absolute top-4 flex gap-3 items-center z-10">
+    <button onclick="pNav(-1)"
+      class="bg-white/10 hover:bg-white/20 text-white text-sm px-4 py-1.5 rounded-full">← Anterior</button>
+    <span id="p-count" class="text-white/40 text-sm">1 / 1</span>
+    <button onclick="pNav(1)"
+      class="bg-white/10 hover:bg-white/20 text-white text-sm px-4 py-1.5 rounded-full">Próximo →</button>
+    <button onclick="setMode('edit')"
+      class="bg-red-500/70 hover:bg-red-500 text-white text-sm px-4 py-1.5 rounded-full ml-4">✕ Sair</button>
+  </div>
+  <div id="present-cv"></div>
+</div>
+
+<!-- SERIALIZED STATE (written on download, read on init) -->
+<script id="app-state" type="application/json"></script>
+
+<script>
+/* ================================================================
+   STATE
+   ================================================================ */
+const CV       = document.getElementById('cv');
+const STRIP    = document.getElementById('strip');
+const PROPBAR  = document.getElementById('prop-bar');
+
+let slides     = [];   // [{id, bg, html}]
+let curIdx     = 0;    // active slide
+let selEl      = null; // selected element
+let editEl     = null; // element in text-edit mode
+let elN        = 1;    // element id counter
+let slideN     = 1;    // slide id counter
+let pIdx       = 0;    // present index
+
+/* ================================================================
+   INIT
+   ================================================================ */
+function init() {
+  const saved = document.getElementById('app-state');
+  if (saved && saved.textContent.trim()) {
+    try {
+      const s = JSON.parse(saved.textContent);
+      slides = s.slides || [];
+      elN    = s.elN    || 100;
+      slideN = s.slideN || slides.length + 1;
+    } catch(_) {}
+  }
+  if (!slides.length) slides = [mkSlide()];
+  renderStrip();
+  showSlide(0, true);
+}
+
+function mkSlide() {
+  return { id: slideN++, bg: '#ffffff', html: '' };
+}
+
+/* ================================================================
+   SLIDE MANAGEMENT
+   ================================================================ */
+function saveCur() {
+  if (!slides[curIdx]) return;
+  slides[curIdx].html = CV.innerHTML;
+  slides[curIdx].bg   = CV.style.background || '#ffffff';
+}
+
+function showSlide(idx, skipSave) {
+  if (!skipSave) saveCur();
+  curIdx = Math.max(0, Math.min(idx, slides.length - 1));
+  const s = slides[curIdx];
+  CV.innerHTML = s.html || '';
+  CV.style.background = s.bg || '#ffffff';
+  document.getElementById('bg-pick').value = toHex(s.bg || '#ffffff');
+  CV.querySelectorAll('.slide-el').forEach(el => {
+    el.classList.remove('selected');
+    initInteract(el);
+    bindEl(el);
+  });
+  deselect();
+  renderStrip();
+}
+
+function addSlide() {
+  saveCur();
+  slides.push(mkSlide());
+  showSlide(slides.length - 1);
+}
+
+function dupSlide(i, e) {
+  e.stopPropagation();
+  saveCur();
+  const src = slides[i];
+  const copy = { id: slideN++, bg: src.bg, html: i === curIdx ? CV.innerHTML : src.html };
+  slides.splice(i + 1, 0, copy);
+  curIdx = -1;
+  showSlide(i + 1);
+}
+
+function delSlide(i, e) {
+  e.stopPropagation();
+  if (slides.length <= 1) return;
+  saveCur();
+  slides.splice(i, 1);
+  curIdx = -1;
+  showSlide(Math.min(i, slides.length - 1));
+}
+
+/* ================================================================
+   ADD ELEMENTS
+   ================================================================ */
+function addText(type) {
+  const el = mkEl();
+  el.dataset.t = type;
+  Object.assign(el.style, {
+    left:       type === 'title' ? '60px'  : '80px',
+    top:        type === 'title' ? '60px'  : '220px',
+    width:      type === 'title' ? '840px' : '620px',
+    minHeight:  '60px',
+    padding:    '6px 10px',
+    fontFamily: 'sans-serif',
+    fontSize:   type === 'title' ? '56px'   : '28px',
+    fontWeight: type === 'title' ? '800'    : '400',
+    color:      '#111111',
+    lineHeight: '1.25',
+  });
+  el.innerHTML = type === 'title' ? 'Título do Slide' : 'Clique duplo para editar este texto...';
+  finish(el);
+}
+
+function addShape(type) {
+  const el = mkEl();
+  el.dataset.t = type;
+  Object.assign(el.style, {
+    left: '220px', top: '160px',
+    width: '200px', height: '130px',
+    background: '#6366f1',
+    borderRadius: type === 'circle' ? '50%' : '10px',
+  });
+  finish(el);
+}
+
+function addImgURL() {
+  const url = document.getElementById('img-url').value.trim();
+  if (!url) return;
+  mkImgEl(url);
+  document.getElementById('img-url').value = '';
+}
+
+function addImgFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const fr = new FileReader();
+  fr.onload = e => mkImgEl(e.target.result);
+  fr.readAsDataURL(file);
+  input.value = '';
+}
+
+function mkImgEl(src) {
+  const el = mkEl();
+  el.dataset.t = 'image';
+  Object.assign(el.style, { left:'80px', top:'80px', width:'320px', height:'220px' });
+  const img = document.createElement('img');
+  img.src = src;
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;';
+  el.appendChild(img);
+  finish(el);
+}
+
+function mkEl() {
+  const el = document.createElement('div');
+  el.id = 'el-' + (elN++);
+  el.className = 'slide-el';
+  return el;
+}
+
+function finish(el) {
+  // Delete button
+  const del = document.createElement('button');
+  del.className = 'el-del';
+  del.innerHTML = '&times;';
+  del.title = 'Deletar';
+  del.onmousedown = e => { e.stopPropagation(); removeEl(el); };
+  el.appendChild(del);
+  // Resize handle
+  const rsz = document.createElement('div');
+  rsz.className = 'el-rsz';
+  el.appendChild(rsz);
+  CV.appendChild(el);
+  initInteract(el);
+  bindEl(el);
+  selectEl(el);
+}
+
+function removeEl(el) {
+  if (selEl === el) { selEl = null; PROPBAR.style.display = 'none'; }
+  if (editEl === el) editEl = null;
+  el.remove();
+}
+
+/* ================================================================
+   INTERACT.JS — DRAG + RESIZE
+   ================================================================ */
+function initInteract(el) {
+  try { interact(el).unset(); } catch(_) {}
+
+  interact(el)
+    .draggable({
+      ignoreFrom: '.el-del, .el-rsz',
+      listeners: {
+        start: () => selectEl(el),
+        move(ev) {
+          el.style.left = ((parseFloat(el.style.left) || 0) + ev.dx) + 'px';
+          el.style.top  = ((parseFloat(el.style.top)  || 0) + ev.dy) + 'px';
+          posBar();
+        }
+      }
+    })
+    .resizable({
+      edges: { right: true, bottom: true, bottomRight: '.el-rsz' },
+      listeners: {
+        start: () => selectEl(el),
+        move(ev) {
+          el.style.width  = Math.max(40, ev.rect.width)  + 'px';
+          el.style.height = Math.max(20, ev.rect.height) + 'px';
+          posBar();
+        }
+      }
+    });
+}
+
+function bindEl(el) {
+  el.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('el-del') ||
+        e.target.classList.contains('el-rsz')) return;
+    e.stopPropagation();
+    if (el !== selEl) selectEl(el);
+  });
+  el.addEventListener('dblclick', e => {
+    const t = el.dataset.t;
+    if (t === 'title' || t === 'body' || t === 'text') {
+      e.stopPropagation();
+      enterEdit(el);
+    }
+  });
+}
+
+/* ================================================================
+   SELECTION
+   ================================================================ */
+function selectEl(el) {
+  if (selEl && selEl !== el) selEl.classList.remove('selected');
+  if (editEl && editEl !== el) exitEdit();
+  selEl = el;
+  el.classList.add('selected');
+  showBar(el);
+}
+
+function deselect() {
+  exitEdit();
+  if (selEl) selEl.classList.remove('selected');
+  selEl = null;
+  PROPBAR.style.display = 'none';
+}
+
+function cvClick(e) {
+  if (e.target === CV) deselect();
+}
+
+/* ================================================================
+   TEXT EDITING
+   ================================================================ */
+function enterEdit(el) {
+  exitEdit();
+  editEl = el;
+  el.contentEditable = 'true';
+  el.classList.add('editing');
+  try { interact(el).draggable({ enabled: false }); } catch(_) {}
+  el.focus();
+  // Move cursor to end
+  const r = document.createRange();
+  r.selectNodeContents(el);
+  r.collapse(false);
+  const s = window.getSelection();
+  s.removeAllRanges();
+  s.addRange(r);
+}
+
+function exitEdit() {
+  if (!editEl) return;
+  editEl.contentEditable = 'false';
+  editEl.classList.remove('editing');
+  try { interact(editEl).draggable({ enabled: true }); } catch(_) {}
+  editEl = null;
+}
+
+document.addEventListener('mousedown', e => {
+  if (editEl && !editEl.contains(e.target)) exitEdit();
+});
+
+document.addEventListener('keydown', e => {
+  const inPresent = document.getElementById('present-ov').classList.contains('on');
+
+  if (inPresent) {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); pNav(1); }
+    if (e.key === 'ArrowLeft') pNav(-1);
+    if (e.key === 'Escape') setMode('edit');
+    return;
+  }
+
+  if (e.key === 'Escape') {
+    if (editEl) exitEdit();
+    else deselect();
+  }
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selEl && !editEl) {
+    if (['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+    removeEl(selEl);
+  }
+});
+
+/* ================================================================
+   PROPERTY BAR
+   ================================================================ */
+function showBar(el) {
+  PROPBAR.style.display = 'flex';
+  posBar();
+  const cs = getComputedStyle(el);
+  document.getElementById('pb-col').value = toHex(cs.color);
+  document.getElementById('pb-bg').value  = toHex(cs.backgroundColor);
+  document.getElementById('pb-op').value  = Math.round((parseFloat(cs.opacity)||1)*100);
+  const fs = parseInt(cs.fontSize) || 28;
+  const sel = document.getElementById('pb-sz');
+  for (const o of sel.options) if (+o.value === fs) { sel.value = o.value; break; }
+}
+
+function posBar() {
+  if (!selEl) return;
+  const top  = parseFloat(selEl.style.top)  || 0;
+  const left = parseFloat(selEl.style.left) || 0;
+  PROPBAR.style.top  = Math.max(0, top - 48) + 'px';
+  PROPBAR.style.left = Math.max(0, left) + 'px';
+}
+
+function applyStyle(prop, val) {
+  if (selEl) selEl.style[prop] = val;
+}
+
+function toggleBold() {
+  if (!selEl) return;
+  const w = parseInt(getComputedStyle(selEl).fontWeight) || 400;
+  selEl.style.fontWeight = w >= 700 ? '400' : '800';
+}
+
+function toggleItalic() {
+  if (!selEl) return;
+  const s = getComputedStyle(selEl).fontStyle;
+  selEl.style.fontStyle = s === 'italic' ? 'normal' : 'italic';
+}
+
+function changeZ(d) {
+  if (!selEl) return;
+  selEl.style.zIndex = Math.max(0, (parseInt(selEl.style.zIndex)||0) + d);
+}
+
+function dupEl() {
+  if (!selEl) return;
+  const clone = selEl.cloneNode(true);
+  clone.id = 'el-' + (elN++);
+  clone.style.left = (parseFloat(selEl.style.left) + 20) + 'px';
+  clone.style.top  = (parseFloat(selEl.style.top)  + 20) + 'px';
+  const d = clone.querySelector('.el-del');
+  if (d) d.onmousedown = e => { e.stopPropagation(); removeEl(clone); };
+  CV.appendChild(clone);
+  initInteract(clone);
+  bindEl(clone);
+  selectEl(clone);
+}
+
+/* ================================================================
+   BACKGROUND
+   ================================================================ */
+function changeBg(color) {
+  CV.style.background = color;
+  if (slides[curIdx]) slides[curIdx].bg = color;
+}
+
+/* ================================================================
+   THUMBNAILS
+   ================================================================ */
+function renderStrip() {
+  STRIP.innerHTML = '';
+  slides.forEach((slide, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'thumb' + (i === curIdx ? ' active' : '');
+    wrap.onclick = () => showSlide(i);
+    wrap.title = 'Slide ' + (i + 1);
+
+    // Scaled preview
+    const inner = document.createElement('div');
+    inner.className = 'thumb-inner';
+    inner.style.background = (i === curIdx ? CV.style.background : slide.bg) || '#fff';
+    inner.innerHTML = (i === curIdx ? CV.innerHTML : slide.html) || '';
+    inner.querySelectorAll('.slide-el').forEach(el => el.classList.remove('selected'));
+    inner.querySelectorAll('.el-del, .el-rsz').forEach(el => el.style.display = 'none');
+
+    // Number
+    const num = document.createElement('div');
+    num.className = 'thumb-num';
+    num.textContent = i + 1;
+
+    // Buttons
+    const btns = document.createElement('div');
+    btns.className = 'thumb-btns';
+
+    const dup = document.createElement('button');
+    dup.className = 'thumb-btn';
+    dup.style.background = 'rgba(99,102,241,.85)';
+    dup.title = 'Duplicar';
+    dup.innerHTML = '⎘';
+    dup.onclick = e => dupSlide(i, e);
+    btns.appendChild(dup);
+
+    if (slides.length > 1) {
+      const del = document.createElement('button');
+      del.className = 'thumb-btn';
+      del.style.background = 'rgba(239,68,68,.85)';
+      del.title = 'Excluir';
+      del.innerHTML = '×';
+      del.onclick = e => delSlide(i, e);
+      btns.appendChild(del);
+    }
+
+    wrap.appendChild(inner);
+    wrap.appendChild(num);
+    wrap.appendChild(btns);
+    STRIP.appendChild(wrap);
+  });
+}
+
+/* ================================================================
+   PRESENT MODE
+   ================================================================ */
+function setMode(mode) {
+  if (mode === 'present') {
+    saveCur();
+    pIdx = curIdx;
+    renderPresent();
+    document.getElementById('present-ov').classList.add('on');
+    document.getElementById('btn-edit').className    = 'px-3 py-1.5 text-gray-300 hover:text-white font-semibold';
+    document.getElementById('btn-present').className = 'px-3 py-1.5 bg-indigo-600 text-white font-semibold';
+  } else {
+    document.getElementById('present-ov').classList.remove('on');
+    document.getElementById('btn-edit').className    = 'px-3 py-1.5 bg-indigo-600 text-white font-semibold';
+    document.getElementById('btn-present').className = 'px-3 py-1.5 text-gray-300 hover:text-white font-semibold';
+  }
+}
+
+function renderPresent() {
+  const pc = document.getElementById('present-cv');
+  const s  = slides[pIdx];
+  pc.innerHTML = s.html || '';
+  pc.style.cssText = `width:960px;height:540px;position:relative;overflow:hidden;background:${s.bg||'#fff'}`;
+  pc.querySelectorAll('.el-del, .el-rsz').forEach(el => el.style.display = 'none');
+  pc.querySelectorAll('.slide-el').forEach(el => { el.classList.remove('selected'); el.style.cursor = 'default'; });
+  document.getElementById('p-count').textContent = `${pIdx + 1} / ${slides.length}`;
+}
+
+function pNav(d) {
+  const next = pIdx + d;
+  if (next >= 0 && next < slides.length) { pIdx = next; renderPresent(); }
+}
+
+/* ================================================================
+   DOWNLOAD
+   ================================================================ */
+function doDownload() {
+  deselect();
+  saveCur();
+  // Serialize state into the script tag
+  const state = { slides, elN, slideN };
+  document.getElementById('app-state').textContent = JSON.stringify(state);
+  // Capture full document
+  const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  // Clear the tag so the live session stays clean
+  document.getElementById('app-state').textContent = '';
+  // Trigger download
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'meu-slide-editavel.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+/* ================================================================
+   UTILS
+   ================================================================ */
+function toHex(c) {
+  if (!c || c === 'transparent' || c === 'rgba(0, 0, 0, 0)') return '#ffffff';
+  if (c.startsWith('#')) {
+    return c.length === 4 ? '#' + [...c.slice(1)].map(x => x+x).join('') : c;
+  }
+  const m = c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  return m ? '#' + [m[1],m[2],m[3]].map(n => (+n).toString(16).padStart(2,'0')).join('') : '#ffffff';
+}
+
+/* ================================================================
+   BOOT
+   ================================================================ */
+init();
+</script>
+</body>
+</html>
