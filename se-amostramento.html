@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Se Amostramento Profissional · Teste de Perfil</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Se Amostramento Profissional · Teste de Perfil · Sancho</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <!--
   PERSONALIZAÇÃO ANTES DE USAR:
@@ -18,15 +18,22 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <style>
+/* ===================== TOKENS ===================== */
 :root {
-  --azul: #1B4FE4;
-  --azul-escuro: #0D2B8A;
-  --laranja: #F4610E;
-  --branco: #FFFFFF;
-  --fundo: radial-gradient(135% 135% at 50% -10%, #1B4FE4 0%, #0D2B8A 42%, #050F2C 100%);
+  --pink:       #E8186D;
+  --pink-dark:  #B01254;
+  --yellow:     #F5E600;
+  --dark:       #0A0A0F;
+  --white:      #FFFFFF;
+  --text-dark:  #111111;
+  --text-mid:   #444444;
+  --text-muted: #888888;
+  --bg-light:   linear-gradient(135deg, #e6e8ec 0%, #f0f2f4 40%, #f8f9fa 100%);
+
+  /* perfis */
   --cor-I: #8B5CF6;
-  --cor-C: #F4610E;
-  --cor-O: #1B4FE4;
+  --cor-C: #E8186D;
+  --cor-O: #2563EB;
   --cor-A: #EF4444;
 }
 
@@ -35,264 +42,319 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Inter', sans-serif;
-  background: var(--fundo);
-  background-attachment: fixed;
-  color: var(--branco);
+  font-family: 'Barlow', sans-serif;
+  background: var(--dark);
+  color: var(--white);
   min-height: 100vh;
 }
 
-/* ===== PROGRESS BAR ===== */
+/* ===================== PROGRESS BAR ===================== */
 #progress-wrap {
   position: fixed;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.06);
   z-index: 200;
 }
 #progress-fill {
   height: 100%;
-  background: var(--laranja);
+  background: var(--pink);
   transition: width 0.5s cubic-bezier(.4,0,.2,1);
   width: 0%;
 }
 
-/* ===== SCREENS ===== */
+/* ===================== SCREENS ===================== */
 .screen {
   display: none;
   min-height: 100vh;
-  padding: 60px 24px 48px;
-  max-width: 540px;
+  padding: 56px 24px 48px;
+  max-width: 520px;
   margin: 0 auto;
   flex-direction: column;
   justify-content: center;
 }
 .screen.active { display: flex; }
 
-/* ===== TYPOGRAPHY ===== */
-.badge {
-  display: inline-block;
+/* ===================== KICKER ===================== */
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--laranja);
-  border: 1px solid rgba(244,97,14,0.35);
-  border-radius: 20px;
-  padding: 5px 14px;
-  margin-bottom: 28px;
-  width: fit-content;
+  color: var(--pink);
+  margin-bottom: 20px;
+}
+.kicker::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--pink);
+  flex-shrink: 0;
 }
 
+/* ===================== TYPOGRAPHY ===================== */
 .display {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(38px, 9vw, 58px);
-  font-weight: 900;
-  line-height: 1.08;
-  margin-bottom: 22px;
+  font-size: clamp(38px, 9vw, 60px);
+  font-weight: 800;
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+  color: var(--white);
+  margin-bottom: 18px;
 }
-.display .hl { color: var(--laranja); }
+.display .hl { color: var(--pink); }
 
 .lead {
-  font-size: 15px;
-  color: rgba(255,255,255,0.68);
-  line-height: 1.75;
-  margin-bottom: 36px;
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.7;
+  margin-bottom: 32px;
 }
 
 .section-heading {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-dark);
   margin-bottom: 6px;
 }
 .section-sub {
   font-size: 14px;
-  color: rgba(255,255,255,0.58);
-  line-height: 1.55;
-  margin-bottom: 28px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 24px;
 }
 
-/* ===== BUTTONS ===== */
+/* ===================== QUOTE CARD ===================== */
+.quote-card {
+  border-left: 3px solid rgba(232,24,109,0.3);
+  padding: 14px 16px;
+  margin-bottom: 28px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.65;
+  font-style: italic;
+}
+
+/* ===================== BUTTON ===================== */
 .btn-primary {
   width: 100%;
-  padding: 17px 24px;
-  background: var(--laranja);
+  padding: 16px 24px;
+  background: var(--pink);
   color: #fff;
   border: none;
-  border-radius: 12px;
-  font-family: 'Inter', sans-serif;
+  border-radius: 10px;
+  font-family: 'Barlow', sans-serif;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s, transform 0.12s, box-shadow 0.2s;
-  letter-spacing: 0.02em;
-  box-shadow: 0 8px 24px rgba(244,97,14,0.3);
+  letter-spacing: 0.01em;
+  box-shadow: 0 8px 24px rgba(232,24,109,0.35);
 }
-.btn-primary:hover { background: #d94f08; box-shadow: 0 12px 32px rgba(244,97,14,0.45); }
+.btn-primary:hover { background: var(--pink-dark); box-shadow: 0 12px 32px rgba(232,24,109,0.5); }
 .btn-primary:active { transform: scale(0.98); }
 .btn-primary:disabled {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
   box-shadow: none;
   cursor: not-allowed;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.25);
 }
 
-/* ===== FORM ===== */
+/* ===================== FORM CARD ===================== */
+.form-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: clamp(24px, 6vw, 40px);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+}
+
+.form-badge {
+  display: inline-block;
+  background: var(--pink);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+.form-card .section-heading {
+  font-size: clamp(20px, 5vw, 26px);
+  margin-bottom: 6px;
+}
+
 .form-group { margin-bottom: 14px; }
 
 .form-label {
   display: block;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
+  color: #1a202c;
   margin-bottom: 7px;
+}
+.form-label span {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 4px;
 }
 
 .form-input {
   width: 100%;
-  padding: 14px 16px;
-  background: rgba(255,255,255,0.07);
-  border: 1.5px solid rgba(255,255,255,0.12);
+  padding: 12px 16px;
+  background: #fff;
+  border: 1.5px solid #E2E8F0;
   border-radius: 10px;
-  color: #fff;
-  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  font-family: 'Barlow', sans-serif;
   font-size: 15px;
   outline: none;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   -webkit-appearance: none;
 }
 .form-input:focus {
-  border-color: rgba(244,97,14,0.7);
-  background: rgba(255,255,255,0.1);
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(232,24,109,0.1);
 }
-.form-input::placeholder { color: rgba(255,255,255,0.25); }
+.form-input::placeholder { color: #a0aec0; }
+
 .form-error {
   font-size: 12px;
-  color: #FC8181;
+  color: #E53E3E;
   margin-top: -8px;
   margin-bottom: 8px;
   display: none;
 }
 .form-error.show { display: block; }
 
-/* ===== QUESTION SCREEN ===== */
+.form-card .btn-primary { margin-top: 6px; }
+
+/* ===================== QUESTION SCREEN ===================== */
 .q-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 36px;
+  margin-bottom: 32px;
 }
 .q-back-btn {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.6);
-  width: 40px; height: 40px;
+  color: rgba(255,255,255,0.5);
+  width: 38px; height: 38px;
   border-radius: 50%;
-  font-size: 18px;
+  font-size: 17px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.2s;
   flex-shrink: 0;
+  font-family: 'Barlow', sans-serif;
 }
-.q-back-btn:hover { background: rgba(255,255,255,0.14); }
+.q-back-btn:hover { background: rgba(255,255,255,0.12); }
 
 .q-counter {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.3);
 }
 
 .q-text {
-  font-family: 'Playfair Display', serif;
   font-size: clamp(22px, 5.5vw, 32px);
-  font-weight: 700;
-  line-height: 1.28;
-  margin-bottom: 24px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 22px;
 }
 
 .options-grid {
   display: flex;
   flex-direction: column;
-  gap: 9px;
-  margin-bottom: 24px;
+  gap: 8px;
+  margin-bottom: 22px;
 }
 
 .opt-card {
-  padding: 16px 20px;
-  background: rgba(255,255,255,0.055);
-  border: 1.5px solid rgba(255,255,255,0.09);
-  border-radius: 12px;
-  font-family: 'Inter', sans-serif;
+  padding: 15px 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  font-family: 'Barlow', sans-serif;
   font-size: 15px;
+  font-weight: 500;
   line-height: 1.45;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
   text-align: left;
-  color: rgba(255,255,255,0.82);
+  color: rgba(255,255,255,0.75);
   width: 100%;
   -webkit-tap-highlight-color: transparent;
 }
 .opt-card:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
   border-color: rgba(255,255,255,0.18);
+  color: #fff;
 }
 .opt-card.selected {
-  background: rgba(244,97,14,0.15);
-  border-color: var(--laranja);
+  background: rgba(232,24,109,0.12);
+  border-color: var(--pink);
+  border-left: 3px solid var(--pink);
   color: #fff;
 }
 .opt-card:active { transform: scale(0.985); }
 
-/* ===== RESULT SCREEN ===== */
-.result-header {
-  margin-bottom: 28px;
-}
-
+/* ===================== RESULT SCREEN ===================== */
 .result-badge {
   display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   padding: 5px 14px;
-  border-radius: 20px;
-  margin-bottom: 16px;
+  border-radius: 999px;
+  margin-bottom: 14px;
 }
 
 .result-name {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(40px, 10vw, 58px);
+  font-size: clamp(42px, 10vw, 62px);
   font-weight: 900;
-  line-height: 1.05;
-  margin-bottom: 6px;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  margin-bottom: 4px;
 }
 
 .result-lema {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  opacity: 0.55;
-  margin-bottom: 20px;
+  opacity: 0.45;
+  margin-bottom: 18px;
 }
 
 .result-desc {
   font-size: 15px;
-  color: rgba(255,255,255,0.72);
+  font-weight: 400;
+  color: rgba(255,255,255,0.65);
   line-height: 1.72;
-  margin-bottom: 28px;
-  border-left: 3px solid var(--laranja);
-  padding-left: 16px;
+  margin-bottom: 24px;
+  border-left: 3px solid var(--pink);
+  padding-left: 14px;
 }
 
 .divider {
   height: 1px;
-  background: rgba(255,255,255,0.08);
-  margin: 24px 0;
+  background: rgba(255,255,255,0.07);
+  margin: 22px 0;
 }
 
 .label-small {
@@ -300,8 +362,8 @@ body {
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.35);
-  margin-bottom: 12px;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 10px;
 }
 
 /* Score cards */
@@ -312,32 +374,32 @@ body {
   margin-bottom: 4px;
 }
 .score-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.09);
-  border-radius: 12px;
-  padding: 14px 15px;
-  transition: border-color 0.3s;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 13px 14px;
 }
 .score-card.dominant {
-  border-color: rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.07);
 }
 .score-name {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 .score-num {
-  font-size: 26px;
-  font-weight: 800;
+  font-size: 28px;
+  font-weight: 900;
   line-height: 1;
+  letter-spacing: -0.02em;
   margin-bottom: 8px;
 }
 .score-bar-bg {
   height: 3px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -352,36 +414,55 @@ body {
 .tag-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
 .tag {
   padding: 5px 12px;
-  border-radius: 20px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.78);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.72);
 }
 .tag.highlight {
-  background: rgba(244,97,14,0.15);
-  color: var(--laranja);
+  background: rgba(232,24,109,0.12);
+  border-color: rgba(232,24,109,0.3);
+  color: var(--pink);
 }
 
-/* Secondary profile */
+/* Secondary profile card */
 .sec-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
   border-radius: 12px;
   padding: 16px 18px;
 }
-.sec-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
-.sec-lema { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.45; }
+.sec-name {
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  margin-bottom: 3px;
+}
+.sec-lema {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.4;
+  margin-bottom: 8px;
+}
+.sec-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.6;
+}
 
 /* Save note */
 .save-note {
-  margin-top: 24px;
-  padding: 14px 18px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  margin-top: 22px;
+  padding: 13px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
   border-radius: 10px;
   font-size: 12px;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.35);
   text-align: center;
   line-height: 1.5;
 }
@@ -389,27 +470,13 @@ body {
 /* Footer */
 .footer-brand {
   text-align: center;
-  margin-top: 36px;
+  margin-top: 32px;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.15);
   padding-bottom: 8px;
-}
-
-/* Intro ornament */
-.intro-quote {
-  margin-top: 24px;
-  padding: 16px 18px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  font-size: 13px;
-  color: rgba(255,255,255,0.5);
-  line-height: 1.6;
-  font-style: italic;
-  margin-bottom: 32px;
 }
 </style>
 </head>
@@ -417,67 +484,70 @@ body {
 
 <div id="progress-wrap"><div id="progress-fill"></div></div>
 
-<!-- ===== INTRO ===== -->
+<!-- ===================== INTRO ===================== -->
 <div class="screen active" id="s-intro">
-  <div class="badge">Se Amostramento Profissional</div>
-  <h1 class="display">Descubra seu<br><span class="hl">Perfil</span><br>Midiático</h1>
-  <p class="lead">Baseado na pesquisa do "pai da tecnologia de dominação cerebral", William Edward Herrmann, este teste revela suas disposições naturais e o que te move profissional e midiaticamente.</p>
-  <div class="intro-quote">
-    "Tipo é uma disposição geral que se observa nos indivíduos, caracterizando-os quanto a interesses, preferências e habilidades." — Jung
+  <div class="kicker">Sancho Gest&atilde;o de Carreiras</div>
+  <h1 class="display">Descubra seu<br>Perfil <span class="hl">Midi&aacute;tico</span></h1>
+  <p class="lead">Baseado na pesquisa de William Edward Herrmann sobre domin&acirc;ncia cerebral, este teste revela suas disposi&ccedil;&otilde;es naturais e o que te move profissional e midiaticamente.</p>
+  <div class="quote-card">
+    &ldquo;Tipo &eacute; uma disposi&ccedil;&atilde;o geral que se observa nos indiv&iacute;duos, caracterizando-os quanto a interesses, prefer&ecirc;ncias e habilidades.&rdquo; &mdash; Jung
   </div>
-  <p class="lead" style="margin-bottom:12px; font-size:13px">São <strong style="color:#fff">25 perguntas</strong>. Não existe resposta certa ou errada — existe a <em>sua</em>. Não antecipe as coisas.</p>
-  <button class="btn-primary" onclick="goTo('s-data')">Começar o teste →</button>
-  <div class="footer-brand">Sancho · Se Amostramento Profissional</div>
+  <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:24px;">S&atilde;o <strong style="color:rgba(255,255,255,0.7)">25 perguntas</strong>. N&atilde;o existe resposta certa ou errada &mdash; existe a <em>sua</em>.</p>
+  <button class="btn-primary" onclick="goTo('s-data')">Come&ccedil;ar o teste &rarr;</button>
+  <div class="footer-brand">SANCHO &middot; Se Amostramento Profissional</div>
 </div>
 
-<!-- ===== DADOS PESSOAIS ===== -->
+<!-- ===================== DADOS PESSOAIS ===================== -->
 <div class="screen" id="s-data">
-  <div class="section-heading">Antes de começar</div>
-  <div class="section-sub">Preencha seus dados para receber seu resultado e para que possamos entrar em contato com você.</div>
+  <div class="form-card">
+    <span class="form-badge">SANCHO &middot; Se Amostramento</span>
+    <div class="section-heading">Antes de come&ccedil;ar</div>
+    <div class="section-sub">Preencha seus dados para receber seu resultado e entrarmos em contato.</div>
 
-  <div class="form-group">
-    <label class="form-label" for="f-nome">Nome completo *</label>
-    <input class="form-input" id="f-nome" type="text" placeholder="Seu nome completo" autocomplete="name">
+    <div class="form-group">
+      <label class="form-label" for="f-nome">Nome completo <span>*</span></label>
+      <input class="form-input" id="f-nome" type="text" placeholder="Seu nome completo" autocomplete="name">
+    </div>
+    <div class="form-error" id="err-nome">Por favor, informe seu nome.</div>
+
+    <div class="form-group">
+      <label class="form-label" for="f-wpp">WhatsApp <span>*</span></label>
+      <input class="form-input" id="f-wpp" type="tel" placeholder="(00) 00000-0000" autocomplete="tel">
+    </div>
+    <div class="form-error" id="err-wpp">Por favor, informe seu WhatsApp.</div>
+
+    <div class="form-group">
+      <label class="form-label" for="f-email">E-mail <span>opcional</span></label>
+      <input class="form-input" id="f-email" type="email" placeholder="seu@email.com" autocomplete="email">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="f-area">&Aacute;rea de atua&ccedil;&atilde;o <span>*</span></label>
+      <input class="form-input" id="f-area" type="text" placeholder="Ex: marketing, advocacia, sa&uacute;de...">
+    </div>
+    <div class="form-error" id="err-area">Por favor, informe sua &aacute;rea de atua&ccedil;&atilde;o.</div>
+
+    <button class="btn-primary" onclick="startQuestions()">Iniciar o teste &rarr;</button>
   </div>
-  <div class="form-error" id="err-nome">Por favor, informe seu nome.</div>
-
-  <div class="form-group">
-    <label class="form-label" for="f-wpp">WhatsApp *</label>
-    <input class="form-input" id="f-wpp" type="tel" placeholder="(00) 00000-0000" autocomplete="tel">
-  </div>
-  <div class="form-error" id="err-wpp">Por favor, informe seu WhatsApp.</div>
-
-  <div class="form-group">
-    <label class="form-label" for="f-email">E-mail</label>
-    <input class="form-input" id="f-email" type="email" placeholder="seu@email.com" autocomplete="email">
-  </div>
-
-  <div class="form-group">
-    <label class="form-label" for="f-area">Área de atuação *</label>
-    <input class="form-input" id="f-area" type="text" placeholder="Ex: marketing, advocacia, saúde...">
-  </div>
-  <div class="form-error" id="err-area">Por favor, informe sua área de atuação.</div>
-
-  <button class="btn-primary" style="margin-top:10px" onclick="startQuestions()">Iniciar o teste →</button>
-  <div class="footer-brand">Sancho · Se Amostramento Profissional</div>
+  <div class="footer-brand" style="margin-top:20px">SANCHO &middot; Se Amostramento Profissional</div>
 </div>
 
-<!-- ===== PERGUNTA ===== -->
+<!-- ===================== PERGUNTA ===================== -->
 <div class="screen" id="s-question">
   <div class="q-header">
-    <button class="q-back-btn" onclick="prevQuestion()" title="Voltar">←</button>
+    <button class="q-back-btn" onclick="prevQuestion()">&#8592;</button>
     <span class="q-counter" id="q-counter">1 / 25</span>
-    <div style="width:40px"></div>
+    <div style="width:38px"></div>
   </div>
   <h2 class="q-text" id="q-text"></h2>
   <div class="options-grid" id="q-options"></div>
-  <button class="btn-primary" id="q-next" onclick="nextQuestion()" disabled>Próxima →</button>
+  <button class="btn-primary" id="q-next" onclick="nextQuestion()" disabled>Pr&oacute;xima &rarr;</button>
 </div>
 
-<!-- ===== RESULTADO ===== -->
+<!-- ===================== RESULTADO ===================== -->
 <div class="screen" id="s-result">
   <div id="result-content"></div>
-  <div class="footer-brand">Sancho · Se Amostramento Profissional</div>
+  <div class="footer-brand">SANCHO &middot; Se Amostramento Profissional</div>
 </div>
 
 <script>
@@ -656,13 +726,13 @@ const PERFIS = {
     descricao: "Você é movido pela criatividade e pela liberdade. Seu olhar está sempre no futuro, e você tem o dom de enxergar o que ainda não existe. Inovar não é uma escolha — é sua natureza.",
     comportamento: ["Criativo", "Intuitivo", "Foco no futuro", "Curioso", "Informal", "Flexível"],
     fortes: ["Pensamento macro", "Busca inovação", "Antecipa o futuro", "Provoca mudanças radicais", "Alta criatividade"],
-    melhoras: ["Atenção ao presente", "Impaciência e rebeldia", "Defender o novo pelo novo"],
-    motivadores: ["Liberdade de expressão", "Ambiente descentralizado", "Autonomia para delegar detalhes", "Liberdade para fazer exceções"],
+    melhoras: ["Atenção ao presente", "Impaciência", "Defender o novo pelo novo"],
+    motivadores: ["Liberdade de expressão", "Ambiente descentralizado", "Autonomia para delegar detalhes"],
   },
   C: {
     nome: "Comunicador",
     lema: "FAZER JUNTO",
-    cor: "#F4610E",
+    cor: "#E8186D",
     move: "Felicidade & Igualdade",
     descricao: "Você é movido pela conexão com as pessoas. Sua maior força é criar ambientes onde todos se sentem ouvidos e valorizados. Você não apenas comunica — você une.",
     comportamento: ["Sensível", "Colaborativo", "Empático", "Tradicional", "Harmônico", "Delega bem"],
@@ -673,7 +743,7 @@ const PERFIS = {
   O: {
     nome: "Organizador",
     lema: "FAZER CERTO",
-    cor: "#1B4FE4",
+    cor: "#2563EB",
     move: "Ordem & Controle",
     descricao: "Você é movido pela ordem e pela excelência. Onde outros veem caos, você enxerga um sistema esperando para ser organizado. Sua confiabilidade e consistência são diferenciais raros.",
     comportamento: ["Detalhista", "Organizado", "Estrategista", "Pontual", "Conservador", "Previsível"],
@@ -696,9 +766,9 @@ const PERFIS = {
 
 // ===================== STATE =====================
 let currentQ = 0;
-let answers = new Array(25).fill(null);
+let answers  = new Array(25).fill(null);
 let userData = {};
-let dbRef = null;
+let dbRef    = null;
 
 // ===================== FIREBASE =====================
 function initFirebase() {
@@ -717,8 +787,8 @@ function goTo(id) {
 }
 
 function updateProgress() {
-  const pct = (currentQ / QUESTIONS.length) * 100;
-  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-fill').style.width =
+    (currentQ / QUESTIONS.length * 100) + '%';
 }
 
 // ===================== DADOS =====================
@@ -729,8 +799,7 @@ function startQuestions() {
   const area  = document.getElementById('f-area').value.trim();
 
   let ok = true;
-  const show = (id, vis) => document.getElementById(id).classList.toggle('show', vis);
-
+  const show = (id, v) => document.getElementById(id).classList.toggle('show', v);
   show('err-nome', !nome);  if (!nome)  ok = false;
   show('err-wpp',  !wpp);   if (!wpp)   ok = false;
   show('err-area', !area);  if (!area)  ok = false;
@@ -747,7 +816,7 @@ function startQuestions() {
 function renderQuestion() {
   const q = QUESTIONS[currentQ];
   document.getElementById('q-counter').textContent = `${currentQ + 1} / ${QUESTIONS.length}`;
-  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('q-text').textContent    = q.q;
 
   const container = document.getElementById('q-options');
   container.innerHTML = '';
@@ -760,8 +829,10 @@ function renderQuestion() {
   });
 
   const nxt = document.getElementById('q-next');
-  nxt.disabled = answers[currentQ] === null;
-  nxt.textContent = currentQ === QUESTIONS.length - 1 ? 'Ver meu resultado →' : 'Próxima →';
+  nxt.disabled    = answers[currentQ] === null;
+  nxt.textContent = currentQ === QUESTIONS.length - 1
+    ? 'Ver meu resultado →'
+    : 'Próxima →';
   updateProgress();
 }
 
@@ -797,9 +868,7 @@ function prevQuestion() {
 // ===================== RESULTADO =====================
 function calcScores() {
   const s = { I: 0, O: 0, C: 0, A: 0 };
-  answers.forEach((ansIdx, qIdx) => {
-    if (ansIdx !== null) s[QUESTIONS[qIdx].opts[ansIdx].p]++;
-  });
+  answers.forEach((idx, qi) => { if (idx !== null) s[QUESTIONS[qi].opts[idx].p]++; });
   return s;
 }
 
@@ -810,18 +879,18 @@ function esc(s) {
 function showResult() {
   document.getElementById('progress-fill').style.width = '100%';
 
-  const scores  = calcScores();
-  const sorted  = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-  const [domKey, domScore] = sorted[0];
-  const [secKey]           = sorted[1];
-  const dom = PERFIS[domKey];
-  const sec = PERFIS[secKey];
+  const scores = calcScores();
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const [domKey] = sorted[0];
+  const [secKey] = sorted[1];
+  const dom   = PERFIS[domKey];
+  const sec   = PERFIS[secKey];
   const total = QUESTIONS.length;
 
   const scoresHTML = sorted.map(([k, v]) => `
     <div class="score-card ${k === domKey ? 'dominant' : ''}">
       <div class="score-name" style="color:${PERFIS[k].cor}">${esc(PERFIS[k].nome)}</div>
-      <div class="score-num"  style="color:${PERFIS[k].cor}">${v}<span style="font-size:14px;font-weight:500;opacity:.5"> pts</span></div>
+      <div class="score-num"  style="color:${PERFIS[k].cor}">${v}<span style="font-size:13px;font-weight:500;opacity:.4"> pts</span></div>
       <div class="score-bar-bg">
         <div class="score-bar-fill" data-pct="${(v/total*100).toFixed(0)}" style="background:${PERFIS[k].cor}"></div>
       </div>
@@ -829,52 +898,50 @@ function showResult() {
   `).join('');
 
   document.getElementById('result-content').innerHTML = `
-    <div class="result-header">
-      <div class="result-badge" style="background:${dom.cor}20;color:${dom.cor};border:1px solid ${dom.cor}44">
-        Seu perfil dominante
-      </div>
-      <div class="result-name">${esc(dom.nome)}</div>
-      <div class="result-lema">${esc(dom.lema)}</div>
-      <p class="result-desc">${esc(dom.descricao)}</p>
+    <div class="result-badge" style="background:${dom.cor}18;color:${dom.cor};border:1px solid ${dom.cor}40">
+      Seu perfil dominante
     </div>
+    <div class="result-name">${esc(dom.nome)}</div>
+    <div class="result-lema">${esc(dom.lema)}</div>
+    <p class="result-desc">${esc(dom.descricao)}</p>
 
-    <div class="label-small">Pontuação por perfil</div>
+    <div class="label-small">Pontua&ccedil;&atilde;o por perfil</div>
     <div class="scores-wrap">${scoresHTML}</div>
 
     <div class="divider"></div>
 
     <div class="label-small">O que te move</div>
-    <div class="tag-wrap" style="margin-bottom:20px">
+    <div class="tag-wrap" style="margin-bottom:18px">
       <span class="tag highlight">${esc(dom.move)}</span>
     </div>
 
     <div class="label-small">Pontos fortes</div>
-    <div class="tag-wrap" style="margin-bottom:20px">
+    <div class="tag-wrap" style="margin-bottom:18px">
       ${dom.fortes.map(f => `<span class="tag">${esc(f)}</span>`).join('')}
     </div>
 
     <div class="label-small">Comportamento</div>
-    <div class="tag-wrap" style="margin-bottom:20px">
+    <div class="tag-wrap" style="margin-bottom:18px">
       ${dom.comportamento.map(c => `<span class="tag">${esc(c)}</span>`).join('')}
     </div>
 
-    <div class="label-small">Áreas de desenvolvimento</div>
-    <div class="tag-wrap" style="margin-bottom:20px">
+    <div class="label-small">&Aacute;reas de desenvolvimento</div>
+    <div class="tag-wrap" style="margin-bottom:18px">
       ${dom.melhoras.map(m => `<span class="tag">${esc(m)}</span>`).join('')}
     </div>
 
     <div class="label-small">O que te motiva</div>
-    <div class="tag-wrap" style="margin-bottom:20px">
+    <div class="tag-wrap" style="margin-bottom:18px">
       ${dom.motivadores.map(m => `<span class="tag">${esc(m)}</span>`).join('')}
     </div>
 
     <div class="divider"></div>
 
-    <div class="label-small" style="margin-bottom:10px">Perfil secundário</div>
+    <div class="label-small" style="margin-bottom:10px">Perfil secund&aacute;rio</div>
     <div class="sec-card">
       <div class="sec-name" style="color:${sec.cor}">${esc(sec.nome)}</div>
       <div class="sec-lema">${esc(sec.lema)}</div>
-      <p style="font-size:13px;color:rgba(255,255,255,.55);margin-top:8px;line-height:1.6">${esc(sec.descricao)}</p>
+      <p class="sec-desc">${esc(sec.descricao)}</p>
     </div>
 
     <div class="save-note" id="save-note">Salvando seu resultado...</div>
@@ -882,7 +949,6 @@ function showResult() {
 
   goTo('s-result');
 
-  // Animate score bars after render
   requestAnimationFrame(() => {
     document.querySelectorAll('.score-bar-fill').forEach(bar => {
       bar.style.width = bar.dataset.pct + '%';
