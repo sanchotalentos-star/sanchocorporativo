@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Marca que Vende SEM Cerimônias · Workshop · Sancho</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.27/dist/interact.min.js"></script>
 
 <!--
   PERSONALIZAÇÃO ANTES DO EVENTO:
@@ -43,7 +44,7 @@ html, body {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Barlow', sans-serif;
   background: var(--dark);
   color: var(--white);
 }
@@ -79,7 +80,7 @@ body {
 #slide-counter {
   position: fixed;
   bottom: 20px; right: 24px;
-  font-family: 'Inter', monospace;
+  font-family: 'Barlow', monospace;
   font-size: 12px;
   font-weight: 500;
   color: rgba(255,255,255,0.35);
@@ -170,7 +171,7 @@ body {
 
 /* ===================== DISPLAY HEADLINE ===================== */
 .display {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(36px, 5.2vw, 82px);
   font-weight: 800;
   line-height: 1.06;
@@ -240,7 +241,7 @@ body {
 
 /* ===================== IMPACT LINE ===================== */
 .impact-line {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(20px, 2.2vw, 32px);
   font-weight: 700;
   color: var(--pink);
@@ -313,7 +314,7 @@ body {
 .slide.dark  .level-num { color: rgba(255,255,255,0.35); }
 .level-content { display: flex; flex-direction: column; gap: 2px; }
 .level-name {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(12px, 1.1vw, 16px); font-weight: 700;
 }
 .slide.light .level-name { color: var(--text-dark); }
@@ -373,7 +374,7 @@ body {
 }
 #qrcode canvas, #qrcode img { display: block; }
 .qr-url {
-  font-family: 'Inter', monospace;
+  font-family: 'Barlow', monospace;
   font-size: clamp(10px, 0.85vw, 12px);
   color: #888888;
   word-break: break-all; text-align: center;
@@ -393,7 +394,7 @@ body {
   width: -moz-fit-content; width: fit-content;
 }
 .qr-title {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(22px, 2.6vw, 38px);
   font-weight: 800; line-height: 1.2;
   color: var(--text-dark);
@@ -408,7 +409,7 @@ body {
   margin-top: 4px;
 }
 .live-count-num {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(50px, 5.5vw, 82px);
   font-weight: 800;
   color: var(--pink); line-height: 1;
@@ -418,7 +419,7 @@ body {
   color: var(--text-muted);
 }
 .countdown-timer {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(16px, 1.6vw, 22px);
   font-weight: 700;
   color: var(--text-mid);
@@ -430,7 +431,7 @@ body {
   margin-top: 6px;
 }
 .presenter-btns button {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: 12px; font-weight: 600;
   padding: 7px 14px; border-radius: 8px;
   border: 1.5px solid rgba(17,17,17,0.15);
@@ -440,10 +441,86 @@ body {
 }
 .presenter-btns button:hover { background: rgba(17,17,17,0.1); border-color: rgba(17,17,17,0.25); }
 
+/* ===================== WHATSAPP SE AMOSTRAMENTO SLIDE ===================== */
+#slide-wpp-se-amostramento { align-items: center; }
+.wpp-layout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(28px, 4vw, 68px);
+  width: 100%; max-width: 940px; align-items: center;
+  margin-top: clamp(10px, 1.5vh, 20px);
+}
+.wpp-qr-box {
+  background: white;
+  border-radius: 20px;
+  padding: clamp(14px, 1.8vw, 24px);
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+#qrcode-wpp canvas, #qrcode-wpp img { display: block; }
+.wpp-qr-label {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(9px, 0.75vw, 11px);
+  font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: #25D366; text-align: center;
+}
+.wpp-right {
+  display: flex; flex-direction: column;
+  gap: clamp(12px, 1.8vh, 22px);
+}
+.wpp-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(37,211,102,0.12);
+  border: 1px solid rgba(37,211,102,0.3);
+  color: #25D366;
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 999px;
+  width: fit-content;
+}
+.wpp-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(28px, 4vw, 62px);
+  font-weight: 800; line-height: 1.08;
+  color: var(--white);
+}
+.wpp-title .hl { color: var(--yellow); }
+.wpp-desc {
+  font-size: clamp(15px, 1.3vw, 20px);
+  color: rgba(255,255,255,0.60);
+  line-height: 1.6; max-width: 480px;
+}
+.wpp-cta-box {
+  display: flex; align-items: center; gap: 16px;
+  background: rgba(37,211,102,0.08);
+  border: 1.5px solid rgba(37,211,102,0.25);
+  border-radius: 16px;
+  padding: clamp(14px, 2vh, 20px) clamp(18px, 2vw, 26px);
+  margin-top: 4px;
+}
+.wpp-cta-icon { font-size: clamp(28px, 3vw, 40px); flex-shrink: 0; }
+.wpp-cta-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(14px, 1.25vw, 19px); font-weight: 700;
+  color: #25D366;
+}
+.wpp-cta-hint {
+  font-size: clamp(11px, 0.9vw, 14px);
+  color: rgba(255,255,255,0.45);
+  margin-top: 4px; line-height: 1.5;
+}
+@media (max-width: 768px) {
+  .wpp-layout { grid-template-columns: 1fr; gap: 20px; text-align: center; }
+  .wpp-qr-box { max-width: 180px; margin: 0 auto; }
+  #qrcode-wpp canvas, #qrcode-wpp img { width: 180px !important; height: 180px !important; }
+  .wpp-right { align-items: center; }
+  .wpp-desc { text-align: center; }
+}
+
 /* +1 pop */
 .plus-one-pop {
   position: fixed;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(16px, 1.5vw, 22px);
   font-weight: 800;
   color: var(--pink);
@@ -506,7 +583,7 @@ body {
 .slide.light .word-names { color: var(--text-muted); font-size: .55em; margin-top: .1em; }
 .slide.dark  .word-names { color: rgba(255,255,255,0.45); font-size: .55em; margin-top: .1em; }
 .word-count-display {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(38px, 4.5vw, 68px);
   font-weight: 800; color: var(--pink); line-height: 1;
 }
@@ -514,7 +591,7 @@ body {
 /* ===================== IMPACT SLIDE ===================== */
 #slide-impact { align-items: flex-start; }
 .impact-big-num {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(100px, 18vw, 260px);
   font-weight: 800; line-height: 0.9; color: var(--white);
   letter-spacing: -0.04em;
@@ -620,14 +697,14 @@ body {
 #slide-raffle { align-items: center; text-align: center; }
 .raffle-count-wrap { display: flex; align-items: baseline; gap: 12px; margin: clamp(10px, 1.5vh, 18px) 0; }
 .raffle-num {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(60px, 8vw, 110px);
   font-weight: 800; color: var(--white); line-height: 1;
 }
 .raffle-label { font-size: clamp(14px, 1.3vw, 20px); color: rgba(255,255,255,0.45); }
 .raffle-btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: clamp(10px, 2vh, 24px) 0; }
 .raffle-btn {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(13px, 1.05vw, 16px); font-weight: 700;
   padding: clamp(11px, 1.4vh, 17px) clamp(18px, 2vw, 30px);
   border-radius: 12px; border: none; cursor: pointer;
@@ -646,7 +723,7 @@ body {
 #slide-delete { align-items: center; text-align: center; }
 .delete-count-text { font-size: clamp(14px, 1.3vw, 20px); color: rgba(255,255,255,0.5); margin: 10px 0 24px; }
 .btn-delete-big {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(13px, 1.1vw, 17px); font-weight: 700;
   padding: clamp(12px, 1.5vh, 18px) clamp(24px, 3vw, 40px);
   border-radius: 14px;
@@ -670,14 +747,14 @@ body {
 #winner-overlay.show { display: flex; }
 .winner-badge { font-size: clamp(44px, 6vw, 80px); }
 .winner-name {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(34px, 5vw, 70px); font-weight: 800;
   color: var(--yellow);
   animation: pulse 1s ease infinite alternate;
 }
 .winner-info { font-size: clamp(15px, 1.4vw, 21px); color: rgba(255,255,255,0.6); }
 .winner-close {
-  margin-top: 16px; font-family: 'Inter', sans-serif; font-size: 14px;
+  margin-top: 16px; font-family: 'Barlow', sans-serif; font-size: 14px;
   padding: 10px 28px; border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.25); background: transparent; color: white; cursor: pointer;
 }
@@ -710,14 +787,14 @@ body {
 .speaker-avatar-fallback {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(22px, 2.6vw, 40px); font-weight: 800;
   background: var(--pink); color: white;
   letter-spacing: 0.04em;
 }
 .speaker-content { display: flex; flex-direction: column; gap: clamp(6px, 1vh, 12px); }
 .speaker-name {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(26px, 3.2vw, 48px); font-weight: 800;
   color: var(--text-dark); line-height: 1.05;
   letter-spacing: -0.02em;
@@ -749,7 +826,7 @@ body {
 /* ===================== CAPA ===================== */
 #slide-capa { align-items: flex-start; justify-content: center; }
 .logo-sancho {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(14px, 1.6vw, 22px); font-weight: 800;
   letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--pink);
@@ -757,7 +834,7 @@ body {
 
 /* ===================== QUOTE BLOCK ===================== */
 .quote-block {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(38px, 5.4vw, 86px);
   font-weight: 800; line-height: 1.08;
   margin-bottom: clamp(24px, 4vh, 52px);
@@ -769,7 +846,7 @@ body {
 /* ===================== CLOSING QUOTE ===================== */
 #slide-encerramento { align-items: flex-start; }
 .closing-quote {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(42px, 6vw, 96px);
   font-weight: 800; line-height: 1.06;
   letter-spacing: -0.025em;
@@ -781,7 +858,7 @@ body {
 /* ===================== OBRIGADO ===================== */
 #slide-obrigado { align-items: flex-start; text-align: left; }
 .obrigado-text {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(48px, 8vw, 120px);
   font-weight: 800; color: var(--text-dark); line-height: 1;
   margin-bottom: clamp(16px, 3vh, 36px);
@@ -810,7 +887,7 @@ body {
   padding: 5px 14px; border-radius: 999px; margin-bottom: 16px;
 }
 .form-title {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: clamp(22px, 5vw, 30px); font-weight: 800;
   color: #111111; line-height: 1.15; margin-bottom: 8px;
 }
@@ -826,7 +903,7 @@ body {
   border-radius: 6px; padding: 2px 7px;
 }
 .form-input {
-  font-family: 'Inter', sans-serif; font-size: 15px;
+  font-family: 'Barlow', sans-serif; font-size: 15px;
   padding: 12px 16px; border-radius: 10px;
   border: 1.5px solid #E2E8F0; outline: none; color: #1a202c;
   transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
@@ -838,7 +915,7 @@ body {
 .form-input::placeholder { color: #a0aec0; }
 .submit-btn {
   width: 100%; padding: 15px; background: var(--pink); color: white;
-  font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700;
+  font-family: 'Barlow', sans-serif; font-size: 16px; font-weight: 700;
   border: none; border-radius: 12px; cursor: pointer; margin-top: 8px;
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
   box-shadow: 0 8px 24px rgba(232,24,109,0.35);
@@ -856,7 +933,7 @@ body {
   0%   { transform: scale(0); }
   100% { transform: scale(1); }
 }
-.success-title { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 800; color: #111111; }
+.success-title { font-family: 'Barlow', sans-serif; font-size: 28px; font-weight: 800; color: #111111; }
 .success-msg { font-size: 15px; color: #888888; line-height: 1.6; }
 .success-note { font-size: 12px; color: #a0aec0; line-height: 1.5; margin-top: 8px; }
 .form-error { color: #E53E3E; font-size: 12px; margin-top: -10px; margin-bottom: 8px; display: none; }
@@ -905,7 +982,7 @@ body {
 <div id="progress-bar"></div>
 
 <!-- Slide Counter -->
-<div id="slide-counter">01 / 16</div>
+<div id="slide-counter">01 / 18</div>
 
 <!-- Footer Brand -->
 <div id="footer-brand">SANCHO</div>
@@ -987,28 +1064,46 @@ body {
     </div>
     <div class="fragment">
       <div style="font-size:clamp(15px,1.4vw,22px);color:var(--text-mid);line-height:1.7;max-width:660px;">
-        O mercado n&atilde;o premia apenas compet&ecirc;ncia.<br>
         O mercado premia <strong style="color:var(--pink);">compet&ecirc;ncia conhecida</strong>.
       </div>
     </div>
   </div>
 
   <!-- SLIDE 5 — MITO (light) -->
-  <div class="slide light" id="slide-mito" data-frags="4">
-    <div class="kicker"><span class="accent">O maior erro dos talentos escondidos</span></div>
-    <div class="display" style="font-size:clamp(40px,5.8vw,90px);">&ldquo;N&atilde;o fale de si.&rdquo;<br>&ldquo;Espere que reconhe&ccedil;am<br>seu valor.&rdquo;</div>
+  <div class="slide light" id="slide-mito" data-frags="3">
+    <div class="kicker"><span class="accent">Divis&atilde;o Simplista da Humanidade</span></div>
+    <div class="display" style="font-size:clamp(40px,5.8vw,90px);">&ldquo;S&oacute; existem dois tipos de pessoas<br>na face da terra&rdquo;</div>
     <ul class="arrow-list">
-      <li class="arrow-item fragment">Muita gente talentosa vive escondida.</li>
-      <li class="arrow-item fragment">Muita gente mediana vive cheia de oportunidades.</li>
-      <li class="arrow-item fragment">Qual a diferen&ccedil;a? <strong style="color:var(--pink);">Uma decidiu aparecer.</strong></li>
+      <li class="arrow-item fragment">Pessoas que se amostram</li>
+      <li class="arrow-item fragment">Pessoas que <strong style="color:var(--pink);">N&Atilde;O</strong> se amostram</li>
     </ul>
     <div class="impact-line fragment">
-      Invisibilidade n&atilde;o &eacute; humildade.<br>
-      Muitas vezes &eacute; apenas medo disfarçado.
+      Quais as caracter&iacute;sticas desses Seres Humanos?
     </div>
   </div>
 
-  <!-- SLIDE 6 — AUTORIDADE (light) -->
+  <!-- SLIDE 6 — NÃO SE AMOSTRAM (light) -->
+  <div class="slide light" id="slide-nao-amostram" data-frags="2">
+    <div class="kicker"><span class="accent">Divis&atilde;o Simplista da Humanidade</span></div>
+    <div class="display" style="font-size:clamp(40px,5.8vw,90px);">&ldquo;Pessoas que <span class="hl">N&Atilde;O</span> se amostram&rdquo;</div>
+    <div class="fragment">
+      <div style="font-size:clamp(10px,0.85vw,13px);font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:var(--pink);margin-bottom:clamp(8px,1.2vh,14px);">Atributos</div>
+      <ul class="arrow-list">
+        <li class="arrow-item">Escolha, Timidez, se sente melhor, quest&otilde;es de sa&uacute;de, medo, considerar que n&atilde;o precisa, prefer&ecirc;ncia&hellip;</li>
+      </ul>
+    </div>
+    <div class="impact-line fragment">
+      A invisibilidade s&oacute; &eacute; super poder quando voc&ecirc; n&atilde;o precisar de outros.
+    </div>
+  </div>
+
+  <!-- SLIDE 7 — GENTE BOA OU CARNIÇA (light) -->
+  <div class="slide light" id="slide-gente-boa" data-frags="0" style="justify-content:center;">
+    <div class="kicker"><span class="accent">Divis&atilde;o Simplista da Humanidade</span></div>
+    <div class="display" style="font-size:clamp(44px,6.5vw,96px);">Os Gente Boa <span class="hl">ou</span> Os Carni&ccedil;a</div>
+  </div>
+
+  <!-- SLIDE 8 — AUTORIDADE (light) -->
   <div class="slide light" id="slide-autoridade" data-frags="1" style="justify-content:center;">
     <div class="kicker"><span class="accent">A diferen&ccedil;a que muda tudo</span></div>
     <div class="display" style="font-size:clamp(44px,6.5vw,96px);">Arrog&acirc;ncia <span class="hl">&ne;</span> Autoridade</div>
@@ -1093,10 +1188,20 @@ body {
   <div class="slide light" id="slide-wordcloud" data-frags="0" style="align-items:center;text-align:center;">
     <div class="kicker"><span class="accent">O que a sala disse sobre si mesma</span></div>
     <div class="display" style="font-size:clamp(26px,3.6vw,52px);">A palavra que <span class="hl">te define</span></div>
-    <div id="wordCloud"></div>
-    <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;">
-      <span class="word-count-display" id="word-count">0</span>
-      <span style="font-size:clamp(13px,1.1vw,17px);color:var(--text-muted);">palavras registradas</span>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:clamp(6px,1.2vw,18px);padding:clamp(10px,2vh,24px) 0;max-width:900px;">
+      <span style="font-size:clamp(28px,4.2vw,62px);font-weight:900;color:var(--text-dark);">Criativo</span>
+      <span style="font-size:clamp(16px,2vw,30px);font-weight:700;color:var(--pink);">Impressão</span>
+      <span style="font-size:clamp(22px,3.2vw,48px);font-weight:800;color:var(--pink);">Marketing</span>
+      <span style="font-size:clamp(13px,1.3vw,20px);font-weight:500;color:var(--text-muted);">Sucesso</span>
+      <span style="font-size:clamp(18px,2.4vw,36px);font-weight:700;color:var(--text-dark);">Arte</span>
+      <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Desenho</span>
+      <span style="font-size:clamp(20px,2.8vw,42px);font-weight:800;color:var(--text-dark);">Perspectiva</span>
+      <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Promoção</span>
+      <span style="font-size:clamp(18px,2.2vw,34px);font-weight:700;color:var(--pink);">Ideia</span>
+      <span style="font-size:clamp(20px,2.6vw,40px);font-weight:800;color:var(--text-dark);">Estilo</span>
+      <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Comercial</span>
+      <span style="font-size:clamp(16px,1.8vw,28px);font-weight:700;color:var(--pink);">Cor</span>
+      <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Esboço</span>
     </div>
   </div>
 
@@ -1107,7 +1212,30 @@ body {
     <div class="impact-big-sub">participaram em<br>poucos minutos.</div>
   </div>
 
-  <!-- AREA SLIDES inserted by JS before slide-essencia -->
+  <!-- AREA SLIDES inserted by JS before slide-wpp-se-amostramento -->
+
+  <!-- SLIDE CTA — WHATSAPP SE AMOSTRAMENTO ASTRAL (dark) -->
+  <div class="slide dark" id="slide-wpp-se-amostramento" data-frags="0" style="align-items:center;">
+    <div class="kicker"><span class="accent">Pr&oacute;ximo passo</span></div>
+    <div class="wpp-layout">
+      <div class="wpp-qr-box">
+        <div id="qrcode-wpp"></div>
+        <div class="wpp-qr-label">&#128262; WhatsApp</div>
+      </div>
+      <div class="wpp-right">
+        <div class="wpp-badge">&#9889; Se Amostramento Astral</div>
+        <div class="wpp-title">Isso aqui<br>qualquer um<br>pode fazer.</div>
+        <div class="wpp-desc">Para voc&ecirc; avan&ccedil;ar para o pr&oacute;ximo passo e receber o <strong style="color:var(--yellow)">MAPA do seu Se Amostramento Astral</strong>...</div>
+        <div class="wpp-cta-box">
+          <div class="wpp-cta-icon">&#128247;</div>
+          <div>
+            <div class="wpp-cta-label">Escaneie e envie uma mensagem</div>
+            <div class="wpp-cta-hint">Voc&ecirc; receber&aacute; seu Mapa do Se Amostramento Astral personalizado</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- SLIDE 11 — ESSENCIA (light) -->
   <div class="slide light" id="slide-essencia" data-frags="5">
@@ -1128,46 +1256,32 @@ body {
 
   <!-- SLIDE 12 — PRATICA (light) -->
   <div class="slide light" id="slide-pratica" data-frags="5">
-    <div class="kicker"><span class="accent">A&ccedil;&atilde;o imediata</span></div>
-    <div class="display" style="font-size:clamp(26px,3.8vw,56px);">Do conhecimento<br>para o <span class="hl">movimento</span></div>
+    <div class="kicker"><span class="accent">A&ccedil;&atilde;o Imediata</span></div>
+    <div class="display" style="font-size:clamp(26px,3.8vw,56px);">CORTA do conhecimento<br>para o <span class="hl">movimento!</span></div>
     <ul class="action-list">
-      <li class="action-item fragment">
-        <div class="action-key">MOSTRAR</div>
-        <div class="action-val">Conte o que faz. Sem esperar ser perguntado.</div>
-      </li>
-      <li class="action-item fragment">
-        <div class="action-key">COMPARTILHAR</div>
-        <div class="action-val">Ensine o que aprende. Generosidade gera autoridade.</div>
-      </li>
-      <li class="action-item fragment">
-        <div class="action-key">PARTICIPAR</div>
-        <div class="action-val">Esteja onde as conversas acontecem.</div>
-      </li>
       <li class="action-item fragment">
         <div class="action-key">CONECTAR</div>
         <div class="action-val">Construa relacionamentos antes de precisar deles.</div>
       </li>
       <li class="action-item fragment">
+        <div class="action-key">ORIENTAR</div>
+        <div class="action-val">Ensinar &eacute; um ato de extrema generosidade e gera autoridade.</div>
+      </li>
+      <li class="action-item fragment">
         <div class="action-key">REPETIR</div>
         <div class="action-val">Autoridade n&atilde;o nasce da intensidade. Nasce da <span style="color:var(--pink);font-weight:700;">consist&ecirc;ncia</span>.</div>
+      </li>
+      <li class="action-item fragment">
+        <div class="action-key">TRANSMITIR</div>
+        <div class="action-val">A narrativa &eacute; indispens&aacute;vel, mas fazer &eacute; muito mais forte que falar.</div>
+      </li>
+      <li class="action-item fragment">
+        <div class="action-key">APRESENTAR</div>
+        <div class="action-val">Esteja onde as conversas acontecem, para ganhar o direito de ser quem voc&ecirc; &eacute;.</div>
       </li>
     </ul>
   </div>
 
-  <!-- SLIDE 13 — HISTORIA (light) -->
-  <div class="slide light" id="slide-historia" data-frags="4">
-    <div class="kicker"><span class="accent">Trajet&oacute;ria</span></div>
-    <div class="display" style="font-size:clamp(22px,3.2vw,48px);">Durante muito tempo<br>eu acreditava que<br>bastava fazer um <span class="hl">bom trabalho</span>.</div>
-    <ul class="arrow-list" style="margin-top:clamp(8px,1.2vh,14px);">
-      <li class="arrow-item fragment">Depois percebi: fazer bem era apenas metade do caminho.</li>
-      <li class="arrow-item fragment">A outra metade era permitir que as pessoas soubessem do trabalho que estava sendo feito.</li>
-      <li class="arrow-item fragment">N&atilde;o para alimentar o ego.</li>
-      <li class="arrow-item fragment">Para ampliar o impacto de forma intencional.</li>
-    </ul>
-    <div style="margin-top:clamp(14px,2vh,24px);font-size:clamp(10px,0.82vw,12px);color:var(--text-muted);letter-spacing:0.05em;">
-      Wladson Sidney &middot; MC &middot; Gestor de Carreiras &middot; Fundador da Sancho &middot; Presidente ADVB Cear&aacute;
-    </div>
-  </div>
 
   <!-- SLIDE 14 — ENCERRAMENTO (light) -->
   <div class="slide light" id="slide-encerramento" data-frags="1">
@@ -1177,10 +1291,10 @@ body {
     </div>
     <div class="fragment" style="max-width:680px;">
       <div style="font-size:clamp(15px,1.4vw,22px);color:var(--text-mid);line-height:1.7;">
-        Se amostre para gerar oportunidades.<br>
-        Se amostre para ampliar seu impacto.<br><br>
+        &hellip;Para gerar oportunidades.<br>
+        &hellip;Para ampliar seu impacto.<br><br>
         O seu talento pode transformar vidas.<br>
-        Mas primeiro as pessoas precisam saber que ele existe.
+        As pessoas precisam saber que ele existe.
       </div>
     </div>
   </div>
@@ -1247,6 +1361,118 @@ body {
       <div class="success-note">Apenas nome e segmento ser&atilde;o exibidos. Seus dados ser&atilde;o apagados ao vivo ao final.</div>
     </div>
   </div>
+</div>
+
+<!-- ===================== EDITOR VIEW ===================== -->
+<div id="editor-view" style="display:none;position:fixed;inset:0;z-index:8000;font-family:system-ui,sans-serif;">
+<style>
+#editor-view *{box-sizing:border-box;}
+#ev-cv .ev-el{position:absolute;cursor:move;user-select:none;min-width:40px;min-height:20px;}
+#ev-cv .ev-el.ev-sel{outline:2px dashed #818cf8;outline-offset:3px;z-index:50;}
+#ev-cv .ev-el.ev-edit{cursor:text;user-select:text;}
+.ev-del{display:none;position:absolute;top:-11px;right:-11px;width:22px;height:22px;background:#ef4444;color:#fff;border-radius:50%;align-items:center;justify-content:center;font-size:15px;font-weight:700;cursor:pointer;border:none;z-index:300;}
+.ev-el.ev-sel .ev-del{display:flex;}
+.ev-rsz{display:none;position:absolute;bottom:-6px;right:-6px;width:13px;height:13px;background:#818cf8;border-radius:3px;cursor:se-resize;z-index:300;}
+.ev-el.ev-sel .ev-rsz{display:block;}
+#ev-strip .ev-th{flex-shrink:0;position:relative;width:160px;height:90px;border:2px solid #374151;border-radius:5px;overflow:hidden;cursor:pointer;background:#fff;transition:border-color .15s;}
+#ev-strip .ev-th:hover{border-color:#6366f1;}
+#ev-strip .ev-th.ev-active{border-color:#6366f1;box-shadow:0 0 0 2px #6366f1;}
+.ev-th-inner{width:960px;height:540px;transform-origin:top left;transform:scale(0.1667);pointer-events:none;position:absolute;top:0;left:0;}
+.ev-th-num{position:absolute;bottom:3px;left:5px;font-size:9px;color:#9ca3af;z-index:10;pointer-events:none;}
+.ev-th-btns{position:absolute;top:3px;right:3px;display:none;gap:2px;}
+.ev-th:hover .ev-th-btns{display:flex;}
+.ev-sb{width:100%;display:flex;align-items:center;gap:8px;padding:6px 8px;font-size:12px;color:#d1d5db;background:transparent;border:none;border-radius:6px;cursor:pointer;text-align:left;transition:background .12s,color .12s;}
+.ev-sb:hover{background:#374151;color:#fff;}
+#ev-propbar{display:none;position:absolute;z-index:400;background:#1f2937;border:1px solid #374151;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.5);padding:6px 12px;align-items:center;flex-wrap:wrap;gap:6px;font-size:11px;color:#d1d5db;}
+#ev-propbar input[type=color]{width:24px;height:24px;border:none;border-radius:4px;cursor:pointer;background:transparent;padding:0;}
+#ev-propbar select,#ev-propbar button{background:#374151;color:#fff;border:1px solid #4b5563;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:11px;}
+#ev-propbar button:hover{background:#4b5563;}
+#ev-propbar input[type=range]{width:60px;}
+.ev-sep{width:1px;height:16px;background:#4b5563;}
+#ev-present-ov{display:none;position:fixed;inset:0;background:#000;z-index:9999;align-items:center;justify-content:center;}
+#ev-present-ov.ev-on{display:flex;}
+</style>
+<!-- Top bar -->
+<div style="height:48px;background:#1f2937;border-bottom:1px solid #374151;display:flex;align-items:center;gap:12px;padding:0 16px;flex-shrink:0;">
+  <span style="font-weight:900;color:#fff;letter-spacing:-0.02em;">✦ Editor de Slides</span>
+  <div style="width:1px;height:20px;background:#374151;"></div>
+  <button onclick="evAddSlide()" style="background:#6366f1;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;">+ Slide</button>
+  <div style="flex:1;"></div>
+  <div style="display:flex;border-radius:6px;overflow:hidden;border:1px solid #374151;">
+    <button id="ev-btn-edit" onclick="evSetMode('edit')" style="padding:6px 12px;background:#6366f1;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;">✏ Editar</button>
+    <button id="ev-btn-present" onclick="evSetMode('present')" style="padding:6px 12px;background:transparent;color:#9ca3af;border:none;font-size:12px;font-weight:700;cursor:pointer;">▶ Apresentar</button>
+  </div>
+  <button onclick="evDownload()" style="background:#059669;color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer;">⬇ Baixar Editável</button>
+  <div style="width:1px;height:20px;background:#374151;"></div>
+  <a href="#/" style="color:#9ca3af;font-size:12px;text-decoration:none;" title="Voltar à apresentação">✕ Sair</a>
+</div>
+<!-- Body -->
+<div style="display:flex;flex:1;overflow:hidden;height:calc(100% - 48px - 112px);">
+  <!-- Sidebar -->
+  <div style="width:176px;background:#1f2937;border-right:1px solid #374151;padding:12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;flex-shrink:0;">
+    <p style="color:#6b7280;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px;">Texto</p>
+    <button class="ev-sb" onclick="evAddText('title')"><b style="font-size:15px;">T</b> Título</button>
+    <button class="ev-sb" onclick="evAddText('body')"><span style="font-size:12px;">T</span> Parágrafo</button>
+    <div style="height:1px;background:#374151;margin:6px 0;"></div>
+    <p style="color:#6b7280;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px;">Formas</p>
+    <button class="ev-sb" onclick="evAddShape('rect')"><span>▬</span> Retângulo</button>
+    <button class="ev-sb" onclick="evAddShape('circle')"><span>●</span> Círculo</button>
+    <div style="height:1px;background:#374151;margin:6px 0;"></div>
+    <p style="color:#6b7280;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px;">Imagem</p>
+    <input id="ev-img-url" type="text" placeholder="Cole a URL..." style="width:100%;font-size:11px;background:#374151;border:1px solid #4b5563;border-radius:6px;padding:5px 8px;color:#fff;outline:none;margin-bottom:4px;">
+    <button class="ev-sb" onclick="evAddImgURL()"><span>🔗</span> Inserir URL</button>
+    <label class="ev-sb" style="cursor:pointer;"><span>📁</span> Upload Local<input type="file" accept="image/*" onchange="evAddImgFile(this)" style="display:none;"></label>
+    <div style="height:1px;background:#374151;margin:6px 0;"></div>
+    <p style="color:#6b7280;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:0 0 4px;">Slide</p>
+    <label style="color:#9ca3af;font-size:11px;">Fundo</label>
+    <input type="color" id="ev-bg-pick" value="#ffffff" oninput="evChangeBg(this.value)" style="width:100%;height:32px;border-radius:6px;cursor:pointer;border:1px solid #4b5563;background:#374151;padding:2px;">
+  </div>
+  <!-- Canvas area -->
+  <div style="flex:1;overflow:auto;background:#4b5563;display:flex;align-items:flex-start;justify-content:center;padding:40px;">
+    <div style="position:relative;" id="ev-cv-wrap">
+      <!-- Property bar -->
+      <div id="ev-propbar">
+        <span style="color:#9ca3af;">Texto</span>
+        <input type="color" id="ev-pb-col" value="#000000" oninput="evApply('color',this.value)">
+        <span style="color:#9ca3af;">Fundo</span>
+        <input type="color" id="ev-pb-bg" value="#ffffff" oninput="evApply('backgroundColor',this.value)">
+        <button onclick="evApply('backgroundColor','transparent')">∅</button>
+        <div class="ev-sep"></div>
+        <span style="color:#9ca3af;">Tam.</span>
+        <select id="ev-pb-sz" onchange="evApply('fontSize',this.value+'px')">
+          <option>12</option><option>16</option><option>20</option><option>24</option>
+          <option>28</option><option>32</option><option>40</option><option>48</option>
+          <option>56</option><option>64</option><option>72</option><option>96</option>
+        </select>
+        <button onclick="evToggleBold()"><b>N</b></button>
+        <button onclick="evToggleItalic()" style="font-style:italic;">I</button>
+        <div class="ev-sep"></div>
+        <span style="color:#9ca3af;">Opac.</span>
+        <input type="range" id="ev-pb-op" min="10" max="100" value="100" oninput="evApply('opacity',this.value/100)">
+        <div class="ev-sep"></div>
+        <button onclick="evChangeZ(1)" title="Frente">↑</button>
+        <button onclick="evChangeZ(-1)" title="Atrás">↓</button>
+        <button onclick="evDupEl()" title="Duplicar">⎘</button>
+      </div>
+      <!-- Canvas 960×540 -->
+      <div id="ev-cv" onclick="evCvClick(event)"
+        style="width:960px;height:540px;background:#ffffff;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5);">
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Thumbnail strip -->
+<div id="ev-strip" style="height:112px;background:#1f2937;border-top:1px solid #374151;display:flex;align-items:center;gap:12px;padding:0 16px;overflow-x:auto;flex-shrink:0;"></div>
+<!-- Present overlay -->
+<div id="ev-present-ov">
+  <div style="position:absolute;top:16px;display:flex;gap:12px;align-items:center;z-index:10;">
+    <button onclick="evPNav(-1)" style="background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:999px;padding:6px 16px;cursor:pointer;font-size:14px;">← Anterior</button>
+    <span id="ev-p-count" style="color:rgba(255,255,255,.4);font-size:14px;">1 / 1</span>
+    <button onclick="evPNav(1)" style="background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:999px;padding:6px 16px;cursor:pointer;font-size:14px;">Próximo →</button>
+    <button onclick="evSetMode('edit')" style="background:rgba(220,38,38,.7);color:#fff;border:none;border-radius:999px;padding:6px 16px;cursor:pointer;font-size:14px;margin-left:16px;">✕ Sair</button>
+  </div>
+  <div id="ev-pcv" style="width:960px;height:540px;position:relative;overflow:hidden;pointer-events:none;"></div>
+</div>
 </div>
 
 <script>
@@ -1409,12 +1635,12 @@ function showNamePopper(p) {
 // ===================== UI UPDATES =====================
 function updateUI() {
   var n = participants.length;
-  document.getElementById('live-count-qr').textContent = n;
-  document.getElementById('word-count').textContent = n;
-  document.getElementById('raffle-count').textContent = n;
-  document.getElementById('impact-count').textContent = n;
-  var delEl = document.getElementById('delete-count');
-  if (delEl) delEl.textContent = n;
+  function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+  set('live-count-qr', n);
+  set('word-count', n);
+  set('raffle-count', n);
+  set('impact-count', n);
+  set('delete-count', n);
   buildWordCloud();
   syncAreaSlides();
   updateCounter();
@@ -1473,7 +1699,7 @@ function syncAreaSlides() {
     }
   });
 
-  var anchor = document.getElementById('slide-essencia');
+  var anchor = document.getElementById('slide-wpp-se-amostramento');
   Object.keys(areaGroups).forEach(function(key) {
     var group = areaGroups[key];
     if (!areaSlideMap[key]) {
@@ -1580,6 +1806,7 @@ function showSlide(idx) {
     renderQR();
     startCountdown();
   }
+  if (s.id === 'slide-wpp-se-amostramento') renderWhatsAppQR();
   if (s.id === 'slide-wordcloud') buildWordCloud();
 
   updateProgress();
@@ -1645,6 +1872,26 @@ function renderQR() {
   if (!host || host.children.length > 0) return;
   var url = FORM_URL;
   document.getElementById('form-url-display').textContent = url;
+  try {
+    new QRCode(host, {
+      text: url,
+      width: 210,
+      height: 210,
+      colorDark: '#0A0A0F',
+      colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch(e) {
+    host.innerHTML = '<div style="width:210px;height:210px;background:#fafafa;display:flex;align-items:center;justify-content:center;color:#888888;font-size:12px;text-align:center;padding:12px;border-radius:8px;">QR: carregue online para gerar</div>';
+  }
+}
+
+// ===================== WHATSAPP QR CODE =====================
+function renderWhatsAppQR() {
+  var host = document.getElementById('qrcode-wpp');
+  if (!host || host.children.length > 0) return;
+  var msg = 'Oi Wladson! Vi sua apresentação e quero receber o meu Mapa do Se Amostramento Profissional 🗺️';
+  var url = 'https://wa.me/5585921458820?text=' + encodeURIComponent(msg);
   try {
     new QRCode(host, {
       text: url,
@@ -1830,6 +2077,7 @@ function route() {
   var hash = window.location.hash;
   var deck = document.getElementById('deck');
   var form = document.getElementById('form-view');
+  var editor = document.getElementById('editor-view');
   var counter = document.getElementById('slide-counter');
   var footer = document.getElementById('footer-brand');
   var progress = document.getElementById('progress-bar');
@@ -1838,18 +2086,359 @@ function route() {
   if (hash === '#/form') {
     deck.style.display = 'none';
     form.classList.add('active');
+    editor.style.display = 'none';
     counter.style.display = 'none';
     footer.style.display = 'none';
     progress.style.display = 'none';
     banner.style.display = 'none';
+  } else if (hash === '#/editor') {
+    deck.style.display = 'none';
+    form.classList.remove('active');
+    editor.style.display = 'flex';
+    editor.style.flexDirection = 'column';
+    counter.style.display = 'none';
+    footer.style.display = 'none';
+    progress.style.display = 'none';
+    banner.style.display = 'none';
+    evInit();
   } else {
     deck.style.display = 'block';
     form.classList.remove('active');
+    editor.style.display = 'none';
     counter.style.display = 'block';
     footer.style.display = 'block';
     progress.style.display = 'block';
     if (rehearsalMode) banner.classList.add('show');
   }
+}
+
+// ===================== SLIDE EDITOR =====================
+var evSlides = [], evCurIdx = 0, evSelEl = null, evEditEl = null;
+var evElN = 1, evSlideN = 1, evPIdx = 0, evInited = false;
+var EV_CV, EV_STRIP, EV_PROPBAR;
+
+function evInit() {
+  if (evInited) return;
+  evInited = true;
+  EV_CV      = document.getElementById('ev-cv');
+  EV_STRIP   = document.getElementById('ev-strip');
+  EV_PROPBAR = document.getElementById('ev-propbar');
+  var saved = document.getElementById('ev-state');
+  if (saved && saved.textContent.trim()) {
+    try {
+      var s = JSON.parse(saved.textContent);
+      evSlides = s.slides || []; evElN = s.elN||100; evSlideN = s.slideN||2;
+    } catch(_) {}
+  }
+  if (!evSlides.length) evSlides = [evMkSlide()];
+  evRenderStrip();
+  evShowSlide(0, true);
+
+  // Keyboard shortcuts for editor
+  document.addEventListener('keydown', function(e) {
+    if (window.location.hash !== '#/editor') return;
+    var inPresent = document.getElementById('ev-present-ov').classList.contains('ev-on');
+    if (inPresent) {
+      if (e.key==='ArrowRight'||e.key===' '){e.preventDefault();evPNav(1);}
+      if (e.key==='ArrowLeft') evPNav(-1);
+      if (e.key==='Escape') evSetMode('edit');
+      return;
+    }
+    if (e.key==='Escape'){if(evEditEl)evExitEdit();else evDeselect();}
+    if ((e.key==='Delete'||e.key==='Backspace')&&evSelEl&&!evEditEl) {
+      if (['INPUT','SELECT','TEXTAREA'].indexOf(document.activeElement.tagName)>=0) return;
+      evRemoveEl(evSelEl);
+    }
+  });
+  document.addEventListener('mousedown', function(e) {
+    if (evEditEl && !evEditEl.contains(e.target)) evExitEdit();
+  });
+}
+
+function evMkSlide() { return {id:evSlideN++,bg:'#ffffff',html:''}; }
+
+function evSaveCur() {
+  if (!evSlides[evCurIdx]) return;
+  evSlides[evCurIdx].html = EV_CV.innerHTML;
+  evSlides[evCurIdx].bg   = EV_CV.style.background||'#ffffff';
+}
+
+function evShowSlide(idx, skipSave) {
+  if (!skipSave) evSaveCur();
+  evCurIdx = Math.max(0, Math.min(idx, evSlides.length-1));
+  var s = evSlides[evCurIdx];
+  EV_CV.innerHTML = s.html||'';
+  EV_CV.style.background = s.bg||'#ffffff';
+  document.getElementById('ev-bg-pick').value = evToHex(s.bg||'#ffffff');
+  EV_CV.querySelectorAll('.ev-el').forEach(function(el){
+    el.classList.remove('ev-sel');
+    evInitInteract(el);
+    evBindEl(el);
+  });
+  evDeselect();
+  evRenderStrip();
+}
+
+function evAddSlide() { evSaveCur(); evSlides.push(evMkSlide()); evShowSlide(evSlides.length-1); }
+
+function evDupSlide(i, e) {
+  e.stopPropagation(); evSaveCur();
+  var src=evSlides[i];
+  evSlides.splice(i+1,0,{id:evSlideN++,bg:src.bg,html:i===evCurIdx?EV_CV.innerHTML:src.html});
+  evCurIdx=-1; evShowSlide(i+1);
+}
+
+function evDelSlide(i, e) {
+  e.stopPropagation();
+  if (evSlides.length<=1) return;
+  evSaveCur(); evSlides.splice(i,1); evCurIdx=-1;
+  evShowSlide(Math.min(i,evSlides.length-1));
+}
+
+function evAddText(type) {
+  var el=evMkEl(); el.dataset.t=type;
+  el.style.left=type==='title'?'60px':'80px';
+  el.style.top=type==='title'?'60px':'220px';
+  el.style.width=type==='title'?'840px':'620px';
+  el.style.minHeight='60px'; el.style.padding='6px 10px';
+  el.style.fontFamily='sans-serif';
+  el.style.fontSize=type==='title'?'56px':'28px';
+  el.style.fontWeight=type==='title'?'800':'400';
+  el.style.color='#111'; el.style.lineHeight='1.25';
+  el.innerHTML=type==='title'?'Título do Slide':'Clique duplo para editar...';
+  evFinish(el);
+}
+
+function evAddShape(type) {
+  var el=evMkEl(); el.dataset.t=type;
+  el.style.left='220px'; el.style.top='160px';
+  el.style.width='200px'; el.style.height='130px';
+  el.style.background='#6366f1';
+  el.style.borderRadius=type==='circle'?'50%':'10px';
+  evFinish(el);
+}
+
+function evAddImgURL() {
+  var url=document.getElementById('ev-img-url').value.trim();
+  if(!url)return; evMkImgEl(url);
+  document.getElementById('ev-img-url').value='';
+}
+
+function evAddImgFile(input) {
+  var file=input.files[0]; if(!file)return;
+  var fr=new FileReader();
+  fr.onload=function(e){evMkImgEl(e.target.result);};
+  fr.readAsDataURL(file); input.value='';
+}
+
+function evMkImgEl(src) {
+  var el=evMkEl(); el.dataset.t='image';
+  el.style.left='80px'; el.style.top='80px';
+  el.style.width='320px'; el.style.height='220px';
+  var img=document.createElement('img');
+  img.src=src; img.style.cssText='width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;';
+  el.appendChild(img); evFinish(el);
+}
+
+function evMkEl() {
+  var el=document.createElement('div');
+  el.id='eev-'+(evElN++); el.className='ev-el'; return el;
+}
+
+function evFinish(el) {
+  var d=document.createElement('button'); d.className='ev-del'; d.innerHTML='&times;';
+  d.onmousedown=function(e){e.stopPropagation();evRemoveEl(el);}; el.appendChild(d);
+  var r=document.createElement('div'); r.className='ev-rsz'; el.appendChild(r);
+  EV_CV.appendChild(el); evInitInteract(el); evBindEl(el); evSelectEl(el);
+}
+
+function evRemoveEl(el) {
+  if(evSelEl===el){evSelEl=null;EV_PROPBAR.style.display='none';}
+  if(evEditEl===el)evEditEl=null; el.remove();
+}
+
+function evInitInteract(el) {
+  try{interact(el).unset();}catch(_){}
+  interact(el)
+    .draggable({ignoreFrom:'.ev-del,.ev-rsz',listeners:{
+      start:function(){evSelectEl(el);},
+      move:function(ev){
+        el.style.left=((parseFloat(el.style.left)||0)+ev.dx)+'px';
+        el.style.top=((parseFloat(el.style.top)||0)+ev.dy)+'px';
+        evPosBar();
+      }
+    }})
+    .resizable({edges:{right:true,bottom:true,bottomRight:'.ev-rsz'},listeners:{
+      start:function(){evSelectEl(el);},
+      move:function(ev){
+        el.style.width=Math.max(40,ev.rect.width)+'px';
+        el.style.height=Math.max(20,ev.rect.height)+'px';
+        evPosBar();
+      }
+    }});
+}
+
+function evBindEl(el) {
+  el.addEventListener('mousedown',function(e){
+    if(e.target.classList.contains('ev-del')||e.target.classList.contains('ev-rsz'))return;
+    e.stopPropagation(); if(el!==evSelEl)evSelectEl(el);
+  });
+  el.addEventListener('dblclick',function(e){
+    var t=el.dataset.t;
+    if(t==='title'||t==='body'||t==='text'){e.stopPropagation();evEnterEdit(el);}
+  });
+}
+
+function evSelectEl(el) {
+  if(evSelEl&&evSelEl!==el)evSelEl.classList.remove('ev-sel');
+  if(evEditEl&&evEditEl!==el)evExitEdit();
+  evSelEl=el; el.classList.add('ev-sel'); evShowBar(el);
+}
+
+function evDeselect() {
+  evExitEdit();
+  if(evSelEl)evSelEl.classList.remove('ev-sel');
+  evSelEl=null; if(EV_PROPBAR)EV_PROPBAR.style.display='none';
+}
+
+function evCvClick(e){if(e.target===EV_CV)evDeselect();}
+
+function evEnterEdit(el) {
+  evExitEdit(); evEditEl=el;
+  el.contentEditable='true'; el.classList.add('ev-edit');
+  try{interact(el).draggable({enabled:false});}catch(_){}
+  el.focus();
+  var r=document.createRange(); r.selectNodeContents(el); r.collapse(false);
+  var s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+
+function evExitEdit() {
+  if(!evEditEl)return;
+  evEditEl.contentEditable='false'; evEditEl.classList.remove('ev-edit');
+  try{interact(evEditEl).draggable({enabled:true});}catch(_){}
+  evEditEl=null;
+}
+
+function evShowBar(el) {
+  EV_PROPBAR.style.display='flex'; evPosBar();
+  var cs=getComputedStyle(el);
+  document.getElementById('ev-pb-col').value=evToHex(cs.color);
+  document.getElementById('ev-pb-bg').value=evToHex(cs.backgroundColor);
+  document.getElementById('ev-pb-op').value=Math.round((parseFloat(cs.opacity)||1)*100);
+  var fs=parseInt(cs.fontSize)||28, sel=document.getElementById('ev-pb-sz');
+  for(var i=0;i<sel.options.length;i++)if(+sel.options[i].value===fs){sel.value=sel.options[i].value;break;}
+}
+
+function evPosBar() {
+  if(!evSelEl)return;
+  var top=parseFloat(evSelEl.style.top)||0, left=parseFloat(evSelEl.style.left)||0;
+  EV_PROPBAR.style.top=Math.max(0,top-48)+'px';
+  EV_PROPBAR.style.left=Math.max(0,left)+'px';
+}
+
+function evApply(prop,val){if(evSelEl)evSelEl.style[prop]=val;}
+
+function evToggleBold() {
+  if(!evSelEl)return;
+  evSelEl.style.fontWeight=parseInt(getComputedStyle(evSelEl).fontWeight)>=700?'400':'800';
+}
+
+function evToggleItalic() {
+  if(!evSelEl)return;
+  evSelEl.style.fontStyle=getComputedStyle(evSelEl).fontStyle==='italic'?'normal':'italic';
+}
+
+function evChangeZ(d) {
+  if(!evSelEl)return;
+  evSelEl.style.zIndex=Math.max(0,(parseInt(evSelEl.style.zIndex)||0)+d);
+}
+
+function evDupEl() {
+  if(!evSelEl)return;
+  var clone=evSelEl.cloneNode(true); clone.id='eev-'+(evElN++);
+  clone.style.left=(parseFloat(evSelEl.style.left)+20)+'px';
+  clone.style.top=(parseFloat(evSelEl.style.top)+20)+'px';
+  var d=clone.querySelector('.ev-del');
+  if(d)d.onmousedown=function(e){e.stopPropagation();evRemoveEl(clone);};
+  EV_CV.appendChild(clone); evInitInteract(clone); evBindEl(clone); evSelectEl(clone);
+}
+
+function evChangeBg(c) {
+  EV_CV.style.background=c;
+  if(evSlides[evCurIdx])evSlides[evCurIdx].bg=c;
+}
+
+function evRenderStrip() {
+  if(!EV_STRIP)return;
+  EV_STRIP.innerHTML='';
+  evSlides.forEach(function(slide,i){
+    var wrap=document.createElement('div'); wrap.className='ev-th'+(i===evCurIdx?' ev-active':'');
+    wrap.onclick=function(){evShowSlide(i);}; wrap.title='Slide '+(i+1);
+    var inner=document.createElement('div'); inner.className='ev-th-inner';
+    inner.style.background=(i===evCurIdx?EV_CV.style.background:slide.bg)||'#fff';
+    inner.innerHTML=(i===evCurIdx?EV_CV.innerHTML:slide.html)||'';
+    inner.querySelectorAll('.ev-el').forEach(function(el){el.classList.remove('ev-sel');});
+    inner.querySelectorAll('.ev-del,.ev-rsz').forEach(function(el){el.style.display='none';});
+    var num=document.createElement('div'); num.className='ev-th-num'; num.textContent=i+1;
+    var btns=document.createElement('div'); btns.className='ev-th-btns';
+    var dup=document.createElement('button');
+    dup.style.cssText='width:18px;height:18px;border:none;border-radius:3px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;background:rgba(99,102,241,.85);';
+    dup.innerHTML='⎘'; dup.title='Duplicar'; dup.onclick=function(e){evDupSlide(i,e);}; btns.appendChild(dup);
+    if(evSlides.length>1){
+      var del=document.createElement('button');
+      del.style.cssText='width:18px;height:18px;border:none;border-radius:3px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;background:rgba(239,68,68,.85);';
+      del.innerHTML='×'; del.title='Excluir'; del.onclick=function(e){evDelSlide(i,e);}; btns.appendChild(del);
+    }
+    wrap.appendChild(inner); wrap.appendChild(num); wrap.appendChild(btns); EV_STRIP.appendChild(wrap);
+  });
+}
+
+function evSetMode(mode) {
+  if(mode==='present'){
+    evSaveCur(); evPIdx=evCurIdx; evRenderPresent();
+    document.getElementById('ev-present-ov').classList.add('ev-on');
+    document.getElementById('ev-btn-edit').style.background='transparent';
+    document.getElementById('ev-btn-edit').style.color='#9ca3af';
+    document.getElementById('ev-btn-present').style.background='#6366f1';
+    document.getElementById('ev-btn-present').style.color='#fff';
+  } else {
+    document.getElementById('ev-present-ov').classList.remove('ev-on');
+    document.getElementById('ev-btn-edit').style.background='#6366f1';
+    document.getElementById('ev-btn-edit').style.color='#fff';
+    document.getElementById('ev-btn-present').style.background='transparent';
+    document.getElementById('ev-btn-present').style.color='#9ca3af';
+  }
+}
+
+function evRenderPresent() {
+  var pc=document.getElementById('ev-pcv'), s=evSlides[evPIdx];
+  pc.innerHTML=s.html||''; pc.style.background=s.bg||'#fff';
+  pc.querySelectorAll('.ev-del,.ev-rsz').forEach(function(el){el.style.display='none';});
+  pc.querySelectorAll('.ev-el').forEach(function(el){el.classList.remove('ev-sel');el.style.cursor='default';});
+  document.getElementById('ev-p-count').textContent=(evPIdx+1)+' / '+evSlides.length;
+}
+
+function evPNav(d){var n=evPIdx+d;if(n>=0&&n<evSlides.length){evPIdx=n;evRenderPresent();}}
+
+function evDownload() {
+  evDeselect(); evSaveCur();
+  var state={slides:evSlides,elN:evElN,slideN:evSlideN};
+  var tag=document.getElementById('ev-state');
+  if(!tag){tag=document.createElement('script');tag.id='ev-state';tag.type='application/json';document.body.appendChild(tag);}
+  tag.textContent=JSON.stringify(state);
+  var html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+  tag.textContent='';
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='meu-slide-editavel.html'; document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(a.href);
+}
+
+function evToHex(c) {
+  if(!c||c==='transparent'||c==='rgba(0, 0, 0, 0)')return '#ffffff';
+  if(c.startsWith('#'))return c.length===4?'#'+[...c.slice(1)].map(function(x){return x+x;}).join(''):c;
+  var m=c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  return m?'#'+[m[1],m[2],m[3]].map(function(n){return(+n).toString(16).padStart(2,'0');}).join(''):'#ffffff';
 }
 
 // ===================== BOOT =====================
