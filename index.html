@@ -1536,12 +1536,12 @@ function showNamePopper(p) {
 // ===================== UI UPDATES =====================
 function updateUI() {
   var n = participants.length;
-  document.getElementById('live-count-qr').textContent = n;
-  var wcEl = document.getElementById('word-count'); if (wcEl) wcEl.textContent = n;
-  document.getElementById('raffle-count').textContent = n;
-  document.getElementById('impact-count').textContent = n;
-  var delEl = document.getElementById('delete-count');
-  if (delEl) delEl.textContent = n;
+  function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+  set('live-count-qr', n);
+  set('word-count', n);
+  set('raffle-count', n);
+  set('impact-count', n);
+  set('delete-count', n);
   buildWordCloud();
   syncAreaSlides();
   updateCounter();
