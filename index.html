@@ -461,7 +461,7 @@ body {
   font-family: 'Inter', sans-serif;
   font-size: clamp(9px, 0.75vw, 11px);
   font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
-  color: #25D366; text-align: center;
+  color: var(--pink); text-align: center;
 }
 .wpp-right {
   display: flex; flex-direction: column;
@@ -469,9 +469,9 @@ body {
 }
 .wpp-badge {
   display: inline-flex; align-items: center; gap: 7px;
-  background: rgba(37,211,102,0.12);
-  border: 1px solid rgba(37,211,102,0.3);
-  color: #25D366;
+  background: rgba(232,24,109,0.10);
+  border: 1px solid rgba(232,24,109,0.30);
+  color: var(--pink);
   font-size: clamp(10px, 0.85vw, 12px);
   font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
   padding: 5px 14px; border-radius: 999px;
@@ -491,8 +491,8 @@ body {
 }
 .wpp-cta-box {
   display: flex; align-items: center; gap: 16px;
-  background: rgba(37,211,102,0.08);
-  border: 1.5px solid rgba(37,211,102,0.25);
+  background: rgba(232,24,109,0.07);
+  border: 1.5px solid rgba(232,24,109,0.25);
   border-radius: 16px;
   padding: clamp(14px, 2vh, 20px) clamp(18px, 2vw, 26px);
   margin-top: 4px;
@@ -501,7 +501,7 @@ body {
 .wpp-cta-label {
   font-family: 'Space Grotesk', sans-serif;
   font-size: clamp(14px, 1.25vw, 19px); font-weight: 700;
-  color: #25D366;
+  color: var(--pink);
 }
 .wpp-cta-hint {
   font-size: clamp(11px, 0.9vw, 14px);
@@ -1763,7 +1763,7 @@ function renderQR() {
 function renderWhatsAppQR() {
   var host = document.getElementById('qrcode-wpp');
   if (!host || host.children.length > 0) return;
-  var msg = 'Oi Wladson! Vi sua apresentação e quero receber o meu Mapa do Se Amostramento Profissional 🗺️';
+  var msg = 'Oi! Vi a apresentação e quero receber o meu Mapa do Se Amostramento Astral 🗺️';
   var url = 'https://wa.me/5585921458820?text=' + encodeURIComponent(msg);
   try {
     new QRCode(host, {
