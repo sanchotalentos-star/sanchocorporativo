@@ -1165,29 +1165,6 @@ body {
     </ul>
   </div>
 
-  <!-- SLIDE 8B — WHATSAPP SE AMOSTRAMENTO (dark) -->
-  <div class="slide dark" id="slide-wpp-se-amostramento" data-frags="0" style="align-items:center;">
-    <div class="kicker"><span class="accent">Pr&oacute;ximo passo</span></div>
-    <div class="wpp-layout">
-      <div class="wpp-qr-box">
-        <div id="qrcode-wpp"></div>
-        <div class="wpp-qr-label">&#128262; WhatsApp</div>
-      </div>
-      <div class="wpp-right">
-        <div class="wpp-badge">&#9889; Se Amostramento Profissional</div>
-        <div class="wpp-title">Seu <span class="hl">mapa</span><br>come&ccedil;a aqui.</div>
-        <div class="wpp-desc">Isso aqui qualquer um pode fazer.<br>Para ir al&eacute;m e receber o seu mapa completo do <strong style="color:var(--white)">Se Amostramento Profissional</strong>...</div>
-        <div class="wpp-cta-box">
-          <div class="wpp-cta-icon">&#128247;</div>
-          <div>
-            <div class="wpp-cta-label">Escaneie e envie uma mensagem</div>
-            <div class="wpp-cta-hint">Voc&ecirc; receber&aacute; seu Mapa do Se Amostramento Profissional personalizado</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- SLIDE 9 — WORD CLOUD (light) -->
   <div class="slide light" id="slide-wordcloud" data-frags="0" style="align-items:center;text-align:center;">
     <div class="kicker"><span class="accent">O que a sala disse sobre si mesma</span></div>
@@ -1206,7 +1183,30 @@ body {
     <div class="impact-big-sub">participaram em<br>poucos minutos.</div>
   </div>
 
-  <!-- AREA SLIDES inserted by JS before slide-essencia -->
+  <!-- AREA SLIDES inserted by JS before slide-wpp-se-amostramento -->
+
+  <!-- SLIDE CTA — WHATSAPP SE AMOSTRAMENTO ASTRAL (dark) -->
+  <div class="slide dark" id="slide-wpp-se-amostramento" data-frags="0" style="align-items:center;">
+    <div class="kicker"><span class="accent">Pr&oacute;ximo passo</span></div>
+    <div class="wpp-layout">
+      <div class="wpp-qr-box">
+        <div id="qrcode-wpp"></div>
+        <div class="wpp-qr-label">&#128262; WhatsApp</div>
+      </div>
+      <div class="wpp-right">
+        <div class="wpp-badge">&#9889; Se Amostramento Astral</div>
+        <div class="wpp-title">Isso aqui<br>qualquer um<br>pode fazer.</div>
+        <div class="wpp-desc">Para voc&ecirc; avan&ccedil;ar para o pr&oacute;ximo passo e receber o <strong style="color:var(--yellow)">MAPA do seu Se Amostramento Astral</strong>...</div>
+        <div class="wpp-cta-box">
+          <div class="wpp-cta-icon">&#128247;</div>
+          <div>
+            <div class="wpp-cta-label">Escaneie e envie uma mensagem</div>
+            <div class="wpp-cta-hint">Voc&ecirc; receber&aacute; seu Mapa do Se Amostramento Astral personalizado</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- SLIDE 11 — ESSENCIA (light) -->
   <div class="slide light" id="slide-essencia" data-frags="5">
@@ -1572,7 +1572,7 @@ function syncAreaSlides() {
     }
   });
 
-  var anchor = document.getElementById('slide-essencia');
+  var anchor = document.getElementById('slide-wpp-se-amostramento');
   Object.keys(areaGroups).forEach(function(key) {
     var group = areaGroups[key];
     if (!areaSlideMap[key]) {
