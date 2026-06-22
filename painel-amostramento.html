@@ -16,12 +16,13 @@
 :root {
   --pink:      #E8186D;
   --pink-dark: #B01254;
-  --yellow:    #F5E600;
+  --amber:     #F59E0B;
   --dark:      #0A0A0F;
-  --card:      #13131A;
-  --border:    rgba(255,255,255,0.07);
-  --text:      #FFFFFF;
-  --muted:     rgba(255,255,255,0.4);
+  --bg:        #F7F8FA;
+  --card:      #FFFFFF;
+  --border:    #E5E7EB;
+  --text:      #0A0A0F;
+  --muted:     #6B7280;
   --cor-I: #8B5CF6;
   --cor-C: #E8186D;
   --cor-O: #2563EB;
@@ -32,7 +33,7 @@
 
 body {
   font-family: 'Barlow', sans-serif;
-  background: var(--dark);
+  background: var(--bg);
   color: var(--text);
   min-height: 100vh;
 }
@@ -46,12 +47,13 @@ body {
   padding: 24px;
 }
 .login-card {
-  background: #fff;
+  background: var(--card);
   border-radius: 20px;
   padding: 40px 36px;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+  border: 1px solid var(--border);
 }
 .login-badge {
   display: inline-block;
@@ -128,7 +130,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(10,10,15,0.95);
+  background: rgba(247,248,250,0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   padding: 0 24px;
@@ -164,7 +166,7 @@ body {
   50%       { opacity: 0.3; }
 }
 .btn-logout {
-  background: rgba(255,255,255,0.06);
+  background: rgba(0,0,0,0.04);
   border: 1px solid var(--border);
   color: var(--muted);
   font-family: 'Barlow', sans-serif;
@@ -175,7 +177,7 @@ body {
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-.btn-logout:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.btn-logout:hover { background: rgba(0,0,0,0.08); color: var(--text); }
 
 /* Content */
 .content {
@@ -188,6 +190,7 @@ body {
   font-size: clamp(22px, 4vw, 30px);
   font-weight: 900;
   letter-spacing: -0.025em;
+  color: var(--dark);
   margin-bottom: 4px;
 }
 .page-sub {
@@ -208,6 +211,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 20px 20px 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
 }
 .stat-label {
   font-size: 10px;
@@ -236,6 +240,7 @@ body {
   border-radius: 14px;
   padding: 22px 22px 18px;
   margin-bottom: 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
 }
 .card-title {
   font-size: 13px;
@@ -258,7 +263,7 @@ body {
 }
 .profile-bar-bg {
   height: 8px;
-  background: rgba(255,255,255,0.06);
+  background: rgba(0,0,0,0.07);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -290,7 +295,7 @@ body {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 10px;
-  color: #fff;
+  color: var(--text);
   font-family: 'Barlow', sans-serif;
   font-size: 14px;
   outline: none;
@@ -304,19 +309,19 @@ body {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 10px;
-  color: #fff;
+  color: var(--text);
   font-family: 'Barlow', sans-serif;
   font-size: 14px;
   outline: none;
   cursor: pointer;
   -webkit-appearance: none;
 }
-.filter-select option { background: #1a1a24; }
+.filter-select option { background: #fff; }
 
 .btn-export {
   padding: 10px 18px;
-  background: rgba(232,24,109,0.1);
-  border: 1px solid rgba(232,24,109,0.3);
+  background: rgba(232,24,109,0.08);
+  border: 1px solid rgba(232,24,109,0.25);
   border-radius: 10px;
   color: var(--pink);
   font-family: 'Barlow', sans-serif;
@@ -326,7 +331,7 @@ body {
   transition: background 0.2s;
   white-space: nowrap;
 }
-.btn-export:hover { background: rgba(232,24,109,0.18); }
+.btn-export:hover { background: rgba(232,24,109,0.16); }
 
 /* Table */
 .table-wrap {
@@ -334,6 +339,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
 }
 .table-count {
   padding: 14px 20px;
@@ -360,7 +366,7 @@ thead th {
   cursor: pointer;
   user-select: none;
 }
-thead th:hover { color: rgba(255,255,255,0.7); }
+thead th:hover { color: var(--text); }
 thead th.sorted { color: var(--pink); }
 
 tbody tr {
@@ -368,17 +374,17 @@ tbody tr {
   transition: background 0.12s;
 }
 tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: rgba(255,255,255,0.03); }
+tbody tr:hover { background: rgba(0,0,0,0.02); }
 
 tbody td {
   padding: 13px 16px;
   font-size: 14px;
-  color: rgba(255,255,255,0.8);
+  color: rgba(10,10,15,0.7);
   vertical-align: middle;
 }
-td.td-name { font-weight: 700; color: #fff; }
+td.td-name { font-weight: 700; color: var(--text); }
 td.td-wpp a {
-  color: #22c55e;
+  color: #16a34a;
   text-decoration: none;
   font-weight: 600;
 }
@@ -417,7 +423,7 @@ td.td-date {
 }
 .spinner {
   width: 32px; height: 32px;
-  border: 3px solid rgba(255,255,255,0.08);
+  border: 3px solid rgba(0,0,0,0.08);
   border-top-color: var(--pink);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
@@ -436,7 +442,8 @@ td.td-date {
   font-weight: 700;
   padding: 2px 7px;
   border-radius: 4px;
-  background: rgba(255,255,255,0.06);
+  background: rgba(0,0,0,0.06);
+  color: var(--muted);
 }
 
 @media (max-width: 768px) {
@@ -494,7 +501,7 @@ td.td-date {
       </div>
       <div class="stat-card">
         <div class="stat-label">Últimas 24h</div>
-        <div class="stat-value" id="stat-hoje" style="color:var(--yellow)">—</div>
+        <div class="stat-value" id="stat-hoje" style="color:var(--amber)">—</div>
         <div class="stat-sub">novos registros</div>
       </div>
       <div class="stat-card">
