@@ -440,6 +440,82 @@ body {
 }
 .presenter-btns button:hover { background: rgba(17,17,17,0.1); border-color: rgba(17,17,17,0.25); }
 
+/* ===================== WHATSAPP SE AMOSTRAMENTO SLIDE ===================== */
+#slide-wpp-se-amostramento { align-items: center; }
+.wpp-layout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(28px, 4vw, 68px);
+  width: 100%; max-width: 940px; align-items: center;
+  margin-top: clamp(10px, 1.5vh, 20px);
+}
+.wpp-qr-box {
+  background: white;
+  border-radius: 20px;
+  padding: clamp(14px, 1.8vw, 24px);
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+#qrcode-wpp canvas, #qrcode-wpp img { display: block; }
+.wpp-qr-label {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(9px, 0.75vw, 11px);
+  font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: #25D366; text-align: center;
+}
+.wpp-right {
+  display: flex; flex-direction: column;
+  gap: clamp(12px, 1.8vh, 22px);
+}
+.wpp-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(37,211,102,0.12);
+  border: 1px solid rgba(37,211,102,0.3);
+  color: #25D366;
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 999px;
+  width: fit-content;
+}
+.wpp-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(28px, 4vw, 62px);
+  font-weight: 800; line-height: 1.08;
+  color: var(--white);
+}
+.wpp-title .hl { color: var(--yellow); }
+.wpp-desc {
+  font-size: clamp(15px, 1.3vw, 20px);
+  color: rgba(255,255,255,0.60);
+  line-height: 1.6; max-width: 480px;
+}
+.wpp-cta-box {
+  display: flex; align-items: center; gap: 16px;
+  background: rgba(37,211,102,0.08);
+  border: 1.5px solid rgba(37,211,102,0.25);
+  border-radius: 16px;
+  padding: clamp(14px, 2vh, 20px) clamp(18px, 2vw, 26px);
+  margin-top: 4px;
+}
+.wpp-cta-icon { font-size: clamp(28px, 3vw, 40px); flex-shrink: 0; }
+.wpp-cta-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(14px, 1.25vw, 19px); font-weight: 700;
+  color: #25D366;
+}
+.wpp-cta-hint {
+  font-size: clamp(11px, 0.9vw, 14px);
+  color: rgba(255,255,255,0.45);
+  margin-top: 4px; line-height: 1.5;
+}
+@media (max-width: 768px) {
+  .wpp-layout { grid-template-columns: 1fr; gap: 20px; text-align: center; }
+  .wpp-qr-box { max-width: 180px; margin: 0 auto; }
+  #qrcode-wpp canvas, #qrcode-wpp img { width: 180px !important; height: 180px !important; }
+  .wpp-right { align-items: center; }
+  .wpp-desc { text-align: center; }
+}
+
 /* +1 pop */
 .plus-one-pop {
   position: fixed;
@@ -1089,6 +1165,29 @@ body {
     </ul>
   </div>
 
+  <!-- SLIDE 8B — WHATSAPP SE AMOSTRAMENTO (dark) -->
+  <div class="slide dark" id="slide-wpp-se-amostramento" data-frags="0" style="align-items:center;">
+    <div class="kicker"><span class="accent">Pr&oacute;ximo passo</span></div>
+    <div class="wpp-layout">
+      <div class="wpp-qr-box">
+        <div id="qrcode-wpp"></div>
+        <div class="wpp-qr-label">&#128262; WhatsApp</div>
+      </div>
+      <div class="wpp-right">
+        <div class="wpp-badge">&#9889; Se Amostramento Profissional</div>
+        <div class="wpp-title">Seu <span class="hl">mapa</span><br>come&ccedil;a aqui.</div>
+        <div class="wpp-desc">Isso aqui qualquer um pode fazer.<br>Para ir al&eacute;m e receber o seu mapa completo do <strong style="color:var(--white)">Se Amostramento Profissional</strong>...</div>
+        <div class="wpp-cta-box">
+          <div class="wpp-cta-icon">&#128247;</div>
+          <div>
+            <div class="wpp-cta-label">Escaneie e envie uma mensagem</div>
+            <div class="wpp-cta-hint">Voc&ecirc; receber&aacute; seu Mapa do Se Amostramento Profissional personalizado</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- SLIDE 9 — WORD CLOUD (light) -->
   <div class="slide light" id="slide-wordcloud" data-frags="0" style="align-items:center;text-align:center;">
     <div class="kicker"><span class="accent">O que a sala disse sobre si mesma</span></div>
@@ -1580,6 +1679,7 @@ function showSlide(idx) {
     renderQR();
     startCountdown();
   }
+  if (s.id === 'slide-wpp-se-amostramento') renderWhatsAppQR();
   if (s.id === 'slide-wordcloud') buildWordCloud();
 
   updateProgress();
@@ -1645,6 +1745,26 @@ function renderQR() {
   if (!host || host.children.length > 0) return;
   var url = FORM_URL;
   document.getElementById('form-url-display').textContent = url;
+  try {
+    new QRCode(host, {
+      text: url,
+      width: 210,
+      height: 210,
+      colorDark: '#0A0A0F',
+      colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch(e) {
+    host.innerHTML = '<div style="width:210px;height:210px;background:#fafafa;display:flex;align-items:center;justify-content:center;color:#888888;font-size:12px;text-align:center;padding:12px;border-radius:8px;">QR: carregue online para gerar</div>';
+  }
+}
+
+// ===================== WHATSAPP QR CODE =====================
+function renderWhatsAppQR() {
+  var host = document.getElementById('qrcode-wpp');
+  if (!host || host.children.length > 0) return;
+  var msg = 'Oi Wladson! Vi sua apresentação e quero receber o meu Mapa do Se Amostramento Profissional 🗺️';
+  var url = 'https://wa.me/5585921458820?text=' + encodeURIComponent(msg);
   try {
     new QRCode(host, {
       text: url,
