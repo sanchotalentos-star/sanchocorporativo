@@ -1557,14 +1557,9 @@ function updateUI() {
 function buildWordCloud() {
   var host = document.getElementById('wordCloud');
   if (!host) return;
-  var staticCloud = document.getElementById('staticCloud');
-  // remove dynamic pills only (keep staticCloud)
+  // remove dynamic pills only (keep staticCloud always visible)
   Array.from(host.children).forEach(function(c) { if (c.id !== 'staticCloud') c.remove(); });
-  if (participants.length === 0) {
-    if (staticCloud) staticCloud.style.display = '';
-    return;
-  }
-  if (staticCloud) staticCloud.style.display = 'none';
+  if (participants.length === 0) return;
   var groups = {};
   participants.forEach(function(p) {
     var key = (p.palavra || '').trim().toLowerCase();
