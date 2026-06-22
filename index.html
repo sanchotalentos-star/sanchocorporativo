@@ -1537,7 +1537,7 @@ function showNamePopper(p) {
 function updateUI() {
   var n = participants.length;
   document.getElementById('live-count-qr').textContent = n;
-  document.getElementById('word-count').textContent = n;
+  var wcEl = document.getElementById('word-count'); if (wcEl) wcEl.textContent = n;
   document.getElementById('raffle-count').textContent = n;
   document.getElementById('impact-count').textContent = n;
   var delEl = document.getElementById('delete-count');
