@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>M-SAP · Método Se Amostramento Profissional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root {
+  --roxo:       #7C3AED;
+  --roxo-vivo:  #9333EA;
+  --roxo-claro: #A78BFA;
+  --azul:       #2563EB;
+  --azul-vivo:  #3B82F6;
+  --dark:       #030308;
+  --card:       rgba(255,255,255,.045);
+  --card-hov:   rgba(255,255,255,.075);
+  --border:     rgba(255,255,255,.09);
+  --border-hov: rgba(255,255,255,.22);
+  --text:       #ffffff;
+  --muted:      rgba(255,255,255,.55);
+  --dim:        rgba(255,255,255,.30);
+  --cor-I:      #A78BFA;
+  --cor-C:      #F472B6;
+  --cor-O:      #60A5FA;
+  --cor-A:      #FB923C;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background:
+    radial-gradient(ellipse 55% 45% at 0% 0%,   rgba(37,99,235,.55)  0%, transparent 65%),
+    radial-gradient(ellipse 55% 45% at 100% 100%, rgba(124,58,237,.65) 0%, transparent 65%),
+    #030308;
+  min-height: 100vh;
+  color: var(--text);
+}
+
+/* ============================================================
+   SECTIONS (hash routing)
+   ============================================================ */
+.section { display: none; min-height: 100vh; }
+.section.active { display: block; }
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 36px 20px 80px;
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+#prog-bar {
+  position: fixed; top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--azul-vivo), var(--roxo-vivo));
+  transition: width .4s ease;
+  z-index: 200;
+  width: 0;
+}
+
+/* ============================================================
+   DEMO BANNER
+   ============================================================ */
+#demo-banner {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0;
+  background: rgba(124,58,237,.14);
+  border-bottom: 1px solid rgba(124,58,237,.35);
+  color: rgba(255,255,255,.7);
+  font-size: 11px; text-align: center;
+  padding: 6px 16px; z-index: 9999;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+#demo-banner.show { display: block; }
+body.demo-on { padding-top: 28px; }
+
+/* ============================================================
+   LOGO MARK
+   ============================================================ */
+.logo-wrap {
+  text-align: center;
+  margin-bottom: 36px;
+  padding-top: 20px;
+}
+.logo-pre {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 11px;
+  letter-spacing: .42em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 4px;
+}
+.logo-main {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: clamp(50px, 14vw, 88px);
+  line-height: .9; text-transform: uppercase;
+  letter-spacing: -.01em; color: white;
+  display: block;
+}
+.logo-o {
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 3.5px solid white; border-radius: 11px;
+  width: .75em; height: .8em;
+  vertical-align: -4px; margin-left: 2px;
+  font-size: inherit; font-weight: inherit;
+}
+.logo-post {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 11px;
+  letter-spacing: .42em; text-transform: uppercase;
+  color: white; margin-top: 5px;
+}
+.logo-tagline {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: .28em; text-transform: uppercase;
+  color: var(--muted); margin-top: 5px;
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+.kicker {
+  font-size: 10px; font-weight: 800;
+  letter-spacing: .28em; text-transform: uppercase;
+  color: var(--roxo-claro); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.kicker::before {
+  content: ''; display: block;
+  width: 18px; height: 2px;
+  background: var(--roxo-claro); flex-shrink: 0;
+}
+.display {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: clamp(32px, 9vw, 54px);
+  line-height: 1.05; text-transform: uppercase;
+  letter-spacing: -.01em; color: white;
+  margin-bottom: 14px;
+}
+.display .hl { color: var(--roxo-claro); }
+.lead {
+  font-size: 15px; line-height: 1.72;
+  color: var(--muted); margin-bottom: 22px;
+}
+.sec-label {
+  font-size: 10px; font-weight: 800;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--dim); margin-bottom: 10px;
+}
+
+/* ============================================================
+   QUOTE
+   ============================================================ */
+.quote-block {
+  border-left: 2px solid rgba(167,139,250,.35);
+  padding: 12px 16px; margin-bottom: 22px;
+  font-size: 13px; font-style: italic;
+  color: var(--muted); line-height: 1.65;
+}
+
+/* ============================================================
+   CARD
+   ============================================================ */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: clamp(18px, 5vw, 30px);
+}
+
+/* ============================================================
+   FORM
+   ============================================================ */
+.fg { margin-bottom: 14px; }
+.fl {
+  display: block; font-size: 13px;
+  font-weight: 700; color: rgba(255,255,255,.8);
+  margin-bottom: 7px; letter-spacing: .02em;
+}
+.fl span { font-size: 11px; font-weight: 400; color: var(--dim); margin-left: 4px; }
+.fi {
+  width: 100%; padding: 13px 15px;
+  background: rgba(255,255,255,.05);
+  border: 1.5px solid var(--border); border-radius: 10px;
+  color: white; font-family: 'Barlow', sans-serif; font-size: 15px;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  -webkit-appearance: none;
+}
+.fi:focus {
+  border-color: var(--roxo-vivo);
+  box-shadow: 0 0 0 3px rgba(147,51,234,.18);
+  background: rgba(255,255,255,.07);
+}
+.fi::placeholder { color: var(--dim); }
+.ferr {
+  font-size: 12px; color: #F87171;
+  margin-top: -8px; margin-bottom: 8px; display: none;
+}
+.ferr.show { display: block; }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-p {
+  width: 100%; padding: 15px 22px;
+  background: linear-gradient(135deg, var(--azul), var(--roxo-vivo));
+  color: white; border: none; border-radius: 12px;
+  font-family: 'Barlow', sans-serif; font-size: 15px;
+  font-weight: 800; letter-spacing: .03em; text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity .2s, transform .12s, box-shadow .2s;
+  box-shadow: 0 6px 24px rgba(124,58,237,.3);
+}
+.btn-p:hover { opacity: .9; box-shadow: 0 10px 32px rgba(124,58,237,.45); }
+.btn-p:active { transform: scale(.98); }
+.btn-p:disabled {
+  background: rgba(255,255,255,.07);
+  box-shadow: none; cursor: not-allowed; color: var(--dim);
+}
+.btn-s {
+  width: 100%; padding: 13px 22px;
+  background: transparent;
+  color: var(--roxo-claro);
+  border: 1.5px solid rgba(167,139,250,.3);
+  border-radius: 12px; font-family: 'Barlow', sans-serif;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: all .2s; letter-spacing: .02em;
+}
+.btn-s:hover { border-color: var(--roxo-claro); background: rgba(167,139,250,.08); }
+.btn-ghost {
+  background: none; border: none;
+  color: var(--muted); font-family: 'Barlow', sans-serif;
+  font-size: 13px; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.btn-ghost:hover { color: white; }
+
+/* ============================================================
+   BIO BLOCK
+   ============================================================ */
+.bio {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px; margin-bottom: 24px;
+}
+.bio-av {
+  width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--azul), var(--roxo-vivo));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: 18px; color: white;
+}
+.bio-name { font-weight: 800; font-size: 14px; color: white; margin-bottom: 1px; }
+.bio-role {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--roxo-claro); margin-bottom: 7px;
+}
+.bio-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+/* ============================================================
+   QUESTION
+   ============================================================ */
+.q-head {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 28px;
+}
+.q-back {
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--muted); width: 40px; height: 40px; border-radius: 50%;
+  font-size: 17px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.q-back:hover { border-color: var(--border-hov); color: white; }
+.q-pline {
+  flex: 1; height: 3px;
+  background: rgba(255,255,255,.08); border-radius: 2px; overflow: hidden;
+}
+.q-pfill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--azul-vivo), var(--roxo-vivo));
+  transition: width .4s ease;
+}
+.q-ctr {
+  font-size: 11px; font-weight: 700; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--dim); white-space: nowrap;
+}
+.q-ctr strong { color: rgba(255,255,255,.7); }
+.q-text {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900; font-size: clamp(22px, 6.5vw, 36px);
+  text-transform: uppercase; line-height: 1.1; color: white; margin-bottom: 24px;
+}
+.opts { display: flex; flex-direction: column; gap: 9px; margin-bottom: 24px; }
+.opt {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 14px 15px;
+  text-align: left; cursor: pointer;
+  transition: all .17s; font-family: 'Barlow', sans-serif;
+  font-size: 14px; font-weight: 600; color: rgba(255,255,255,.75);
+  line-height: 1.4; display: flex; align-items: center; gap: 11px;
+  -webkit-tap-highlight-color: transparent;
+}
+.opt:hover { border-color: var(--border-hov); background: var(--card-hov); color: white; }
+.opt.sel { border-color: var(--roxo-vivo); background: rgba(147,51,234,.12); color: white; }
+.opt.sel .ob { background: var(--roxo-vivo); border-color: var(--roxo-vivo); color: white; }
+.ob {
+  width: 27px; height: 27px; border-radius: 50%;
+  border: 2px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 900; color: var(--dim); transition: all .17s;
+  letter-spacing: 0;
+}
+
+/* ============================================================
+   RESULT
+   ============================================================ */
+.r-hero { text-align: center; padding: 32px 0 28px; }
+.r-badge {
+  display: inline-block; font-size: 10px; font-weight: 800;
+  letter-spacing: .28em; text-transform: uppercase;
+  padding: 5px 15px; border-radius: 999px; margin-bottom: 14px;
+}
+.r-nome {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+  font-size: clamp(48px, 13vw, 78px); text-transform: uppercase;
+  line-height: .9; letter-spacing: -.01em; margin-bottom: 8px;
+}
+.r-lema {
+  font-size: 10px; font-weight: 800; letter-spacing: .38em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 28px;
+}
+.score-bars { margin-bottom: 24px; display: flex; flex-direction: column; gap: 9px; }
+.score-row { display: grid; grid-template-columns: 110px 1fr 40px; align-items: center; gap: 9px; }
+.score-lbl { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.score-track { height: 6px; background: rgba(255,255,255,.07); border-radius: 3px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 3px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+.score-pct { font-size: 12px; font-weight: 800; text-align: right; }
+
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 22px; }
+.dash-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 13px 14px;
+}
+.dash-full { grid-column: 1 / -1; }
+.dash-lbl { font-size: 9px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: var(--dim); margin-bottom: 8px; }
+.tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.tag {
+  padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600;
+  background: rgba(255,255,255,.055); border: 1px solid var(--border);
+  color: rgba(255,255,255,.65);
+}
+
+.divider { height: 1px; background: var(--border); margin: 26px 0; }
+
+.sec-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px; margin-bottom: 22px;
+}
+.sec-tipo {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+  font-size: 26px; text-transform: uppercase; margin-bottom: 2px;
+}
+.sec-lema { font-size: 10px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--dim); margin-bottom: 8px; }
+.sec-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* AI Plan */
+.plan-loading { text-align: center; padding: 36px 20px; }
+.plan-spin {
+  width: 34px; height: 34px; border: 3px solid rgba(255,255,255,.1);
+  border-top-color: var(--roxo-vivo); border-radius: 50%;
+  animation: spin .8s linear infinite; margin: 0 auto 14px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.plan-msg { font-size: 13px; color: var(--muted); letter-spacing: .02em; }
+.plan-txt {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px;
+  font-size: 14px; line-height: 1.78; color: rgba(255,255,255,.83);
+  white-space: pre-wrap;
+}
+.plan-err { text-align: center; padding: 26px 20px; font-size: 13px; color: var(--muted); }
+
+/* Mantra */
+.mantra { text-align: center; padding: 30px 20px; }
+.mantra-t {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+  font-size: clamp(26px, 7.5vw, 42px); text-transform: uppercase;
+  color: white; margin-bottom: 7px;
+}
+.mantra-s { font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+
+.save-note {
+  margin-top: 18px; padding: 11px 14px;
+  background: rgba(255,255,255,.035); border: 1px solid var(--border);
+  border-radius: 9px; font-size: 12px; color: var(--muted);
+  text-align: center; line-height: 1.5;
+}
+
+/* ============================================================
+   TRILHA
+   ============================================================ */
+.nav-bar {
+  display: flex; align-items: center; gap: 12px; padding: 12px 0; margin-bottom: 22px;
+}
+.nav-back {
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--muted); width: 38px; height: 38px; border-radius: 50%;
+  font-size: 17px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; transition: all .2s;
+}
+.nav-back:hover { border-color: var(--border-hov); color: white; }
+.nav-title {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+  font-size: 20px; text-transform: uppercase; letter-spacing: .05em;
+}
+
+.tmod {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; margin-bottom: 9px; overflow: hidden;
+}
+.tmod-head {
+  padding: 16px 18px; display: flex; align-items: center; gap: 13px;
+  cursor: pointer; transition: background .2s; -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.tmod-head:hover { background: var(--card-hov); }
+.tmod-num {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+  font-size: 26px; color: var(--roxo-claro); line-height: 1; min-width: 30px;
+}
+.tmod-info { flex: 1; }
+.tmod-name { font-weight: 800; font-size: 14px; color: white; line-height: 1.3; }
+.tmod-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.tmod-chev { color: var(--dim); font-size: 14px; transition: transform .25s; flex-shrink: 0; }
+.tmod.open .tmod-chev { transform: rotate(180deg); }
+.tmod-body {
+  display: none; padding: 0 18px 18px;
+  border-top: 1px solid var(--border);
+}
+.tmod.open .tmod-body { display: block; }
+
+.taula {
+  padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.055);
+}
+.taula:last-child { border-bottom: none; padding-bottom: 0; }
+.taula-lbl { font-size: 9px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: var(--dim); margin-bottom: 4px; }
+.taula-title { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.88); margin-bottom: 4px; }
+.taula-desc { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.foot {
+  text-align: center; padding: 16px 0 0;
+  font-size: 9px; font-weight: 800; letter-spacing: .3em;
+  text-transform: uppercase; color: var(--dim);
+}
+
+/* ============================================================
+   RECOVER
+   ============================================================ */
+.recover { text-align: center; margin-top: 18px; }
+</style>
+</head>
+<body>
+
+<div id="prog-bar"></div>
+<div id="demo-banner">MODO ENSAIO ATIVO — dados não serão salvos</div>
+
+<!-- ============================================================
+     #INICIO
+     ============================================================ -->
+<div class="section" id="s-inicio">
+<div class="container">
+
+  <div class="logo-wrap">
+    <div class="logo-pre">MÉTODO</div>
+    <div class="logo-main">SE<br>AMOSTRA<br>MENT<span class="logo-o">O</span></div>
+    <div class="logo-post">PROFISSIONAL</div>
+    <div class="logo-tagline">COMUNICAÇÃO CORPORATIVA</div>
+  </div>
+
+  <div class="kicker">Sancho Gestão de Carreiras</div>
+  <h1 class="display">Quantas oportunidades você já <span class="hl">perdeu</span> porque as pessoas não sabem o que você faz?</h1>
+  <p class="lead">O mercado não premia apenas competência. O mercado premia <strong style="color:white">competência conhecida.</strong></p>
+
+  <div class="bio">
+    <div class="bio-av">WS</div>
+    <div>
+      <div class="bio-name">Wladson Sidney</div>
+      <div class="bio-role">Presidente ADVB Ceará · CEO Sancho</div>
+      <div class="bio-desc">Empresário, apresentador e mestre na arte do Se Amostramento Profissional. Formado nas ruas do Conjunto Ceará, presidente da ADVB, fundador da Sancho Gestão de Carreiras — uma das maiores agências de talentos e personalidades do Nordeste. Estudioso do comportamento humano, graduado em Gestão Estratégica de Marketing com MBA em Administração e Negócios. Autor de <em>"Quais os benefícios de acordar cedo? NÃO TEM."</em> Pai afetuoso, cristão avesso à religiosidade, motociclista, faixa preta de jiu-jitsu.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="sec-label" style="margin-bottom:16px">Antes de começar</div>
+    <div class="fg">
+      <label class="fl" for="f-nome">Nome completo <span>*</span></label>
+      <input class="fi" id="f-nome" type="text" placeholder="Seu nome completo" autocomplete="name">
+    </div>
+    <div class="ferr" id="e-nome">Por favor, informe seu nome.</div>
+    <div class="fg">
+      <label class="fl" for="f-wpp">WhatsApp <span>*</span></label>
+      <input class="fi" id="f-wpp" type="tel" placeholder="(00) 00000-0000" autocomplete="tel">
+    </div>
+    <div class="ferr" id="e-wpp">Por favor, informe seu WhatsApp.</div>
+    <div class="fg">
+      <label class="fl" for="f-email">E-mail <span>opcional</span></label>
+      <input class="fi" id="f-email" type="email" placeholder="seu@email.com" autocomplete="email">
+    </div>
+    <div class="fg" style="margin-bottom:20px">
+      <label class="fl" for="f-area">Área de atuação <span>*</span></label>
+      <input class="fi" id="f-area" type="text" placeholder="Ex: marketing, advocacia, saúde...">
+    </div>
+    <div class="ferr" id="e-area">Por favor, informe sua área de atuação.</div>
+    <button class="btn-p" onclick="startTest()">Descobrir meu Se Amostramento →</button>
+  </div>
+
+  <div class="recover">
+    <button class="btn-ghost" onclick="doRecover()">Já fiz o teste — recuperar meu resultado</button>
+  </div>
+
+  <div class="foot" style="margin-top:32px">SANCHO · M-SAP · Método Se Amostramento Profissional</div>
+</div>
+</div>
+
+<!-- ============================================================
+     #TESTE
+     ============================================================ -->
+<div class="section" id="s-teste">
+<div class="container" style="padding-top:20px">
+
+  <div class="q-head">
+    <button class="q-back" onclick="qBack()">←</button>
+    <div class="q-pline"><div class="q-pfill" id="q-pfill"></div></div>
+    <span class="q-ctr"><strong id="q-num">1</strong><span> / 25</span></span>
+  </div>
+
+  <div id="q-intro" style="display:none;margin-bottom:22px">
+    <div class="quote-block">
+      Teste com base no estudo realizado pelo "pai da tecnologia de dominação cerebral", o pesquisador e autor americano de criatividade William Edward Herrmann. Sintetizadas em quatro personalidades dominantes — Idealizador, Organizador, Comunicador e Ativador — geralmente temos os quatro tipos, sendo que dois se sobressaem. Não existe um perfil melhor que o outro: existe o seu, e você é excelente em ser você.<br><br>
+      <em>"Tipo é uma disposição geral que se observa nos indivíduos, caracterizando-os quanto a interesses, preferências e habilidades." — Jung (1967: 551)</em>
+    </div>
+  </div>
+
+  <h2 class="q-text" id="q-text"></h2>
+  <div class="opts" id="q-opts"></div>
+  <button class="btn-p" id="q-next" onclick="qNext()" disabled>Próxima →</button>
+
+</div>
+</div>
+
+<!-- ============================================================
+     #RESULTADO
+     ============================================================ -->
+<div class="section" id="s-resultado">
+<div class="container">
+
+  <div class="r-hero">
+    <div class="r-badge" id="r-badge"></div>
+    <div class="r-nome" id="r-nome"></div>
+    <div class="r-lema" id="r-lema"></div>
+  </div>
+
+  <div class="sec-label">Mapa de perfis</div>
+  <div class="score-bars" id="r-scores"></div>
+
+  <div class="divider"></div>
+
+  <div class="sec-label" style="margin-bottom:12px">Dashboard do perfil dominante</div>
+  <div class="dash-grid" id="r-dash"></div>
+
+  <div class="divider"></div>
+
+  <div class="sec-label" style="margin-bottom:9px">Perfil de apoio</div>
+  <div class="sec-card" id="r-sec"></div>
+
+  <div class="divider"></div>
+
+  <div class="sec-label" style="margin-bottom:5px">Plano de Ação — Se Amostramento</div>
+  <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px">Gerado para o seu perfil e área de atuação. Personalizado pela combinação única dos seus tipos.</p>
+
+  <div id="plan-loading" class="plan-loading">
+    <div class="plan-spin"></div>
+    <div class="plan-msg" id="plan-msg">Montando seu plano...</div>
+  </div>
+  <div id="plan-txt" class="plan-txt" style="display:none"></div>
+
+  <div class="mantra">
+    <div class="mantra-t">Seja você<br>com força.</div>
+    <div class="mantra-s">Autoridade não nasce da intensidade — nasce da consistência.</div>
+  </div>
+
+  <div class="save-note" id="r-note">Processando...</div>
+
+  <div style="margin-top:22px;display:flex;flex-direction:column;gap:10px">
+    <button class="btn-p" onclick="navigate('trilha')">Explorar os 7 módulos do método →</button>
+    <button class="btn-s" onclick="navigate('inicio')">Refazer o teste</button>
+  </div>
+
+  <div class="foot" style="margin-top:32px">SANCHO · M-SAP · Método Se Amostramento Profissional</div>
+</div>
+</div>
+
+<!-- ============================================================
+     #TRILHA
+     ============================================================ -->
+<div class="section" id="s-trilha">
+<div class="container">
+
+  <div class="nav-bar">
+    <button class="nav-back" onclick="trailBack()">←</button>
+    <div class="nav-title">Os 7 Módulos</div>
+  </div>
+
+  <div class="kicker" style="margin-bottom:16px">Trilha de conteúdo</div>
+  <h2 class="display" style="font-size:clamp(26px,6.5vw,40px);margin-bottom:7px">Método Se Amostramento Profissional</h2>
+  <p class="lead" style="font-size:13.5px;margin-bottom:26px">Navegue pelos módulos, leia os resumos de cada aula e prepare-se para se amostrar com força. Clique em qualquer módulo para expandir.</p>
+
+  <div id="trail"></div>
+
+  <div class="mantra" style="padding:22px 16px">
+    <div class="mantra-t" style="font-size:clamp(20px,5.5vw,30px)">Siga o plano.</div>
+    <div class="mantra-s">Encerramento do Método — Módulo 7</div>
+  </div>
+
+  <button class="btn-s" onclick="trailBack()" style="margin-top:8px">← Voltar para meu resultado</button>
+
+  <div class="foot" style="margin-top:28px">SANCHO · M-SAP · Método Se Amostramento Profissional</div>
+</div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIGURAÇÃO
+   ============================================================ */
+
+// Firebase: crie um projeto em console.firebase.google.com e cole as credenciais abaixo.
+const FB_CFG = {
+  apiKey:            "AIzaSyCwDVpeSEJt4H9ZMjmRSoBssav9HCv_dCQ",
+  authDomain:        "msap-amostramento.firebaseapp.com",
+  databaseURL:       "https://msap-amostramento-default-rtdb.firebaseio.com",
+  projectId:         "msap-amostramento",
+  storageBucket:     "msap-amostramento.firebasestorage.app",
+  messagingSenderId: "725731863533",
+  appId:             "1:725731863533:web:d8f4b8fcb4e7305c7155e4",
+};
+
+
+/* ============================================================
+   DADOS
+   ============================================================ */
+const QS = [
+  { q:"Meu lema é...", opts:[
+    {t:"Fazer o que precisa ser feito",p:"I"},
+    {t:"Fazer bem feito",p:"O"},
+    {t:"Fazer junto com o grupo",p:"C"},
+    {t:"Simplesmente fazer",p:"A"}]},
+  { q:"Eu vejo a morte como...", opts:[
+    {t:"Uma grande aventura misteriosa",p:"I"},
+    {t:"Oportunidade para rever os falecidos",p:"C"},
+    {t:"Um modo de receber recompensas",p:"O"},
+    {t:"Algo que sempre chega muito cedo",p:"A"}]},
+  { q:"Eu penso que...", opts:[
+    {t:"Unidos venceremos, divididos perderemos",p:"C"},
+    {t:"O ataque é melhor que a defesa",p:"A"},
+    {t:"É bom ser manso, mas andar com um porrete",p:"I"},
+    {t:"Um homem prevenido vale por dois",p:"O"}]},
+  { q:"Eu sempre gostei de...", opts:[
+    {t:"Explorar",p:"I"},
+    {t:"Evitar surpresas",p:"O"},
+    {t:"Focalizar a meta",p:"A"},
+    {t:"Realizar uma abordagem natural",p:"C"}]},
+  { q:"Tempo para mim é...", opts:[
+    {t:"Algo que detesto desperdiçar",p:"A"},
+    {t:"Um grande ciclo",p:"C"},
+    {t:"Uma flecha que leva ao inevitável",p:"O"},
+    {t:"Irrelevante",p:"I"}]},
+  { q:"Não existe nada de errado em...", opts:[
+    {t:"Se colocar na frente",p:"A"},
+    {t:"Colocar os outros na frente",p:"C"},
+    {t:"Mudar de ideia",p:"I"},
+    {t:"Ser consistente",p:"O"}]},
+  { q:"Eu gosto de buscar conselhos de...", opts:[
+    {t:"Pessoas bem-sucedidas",p:"A"},
+    {t:"Anciões e conselheiros",p:"C"},
+    {t:"Autoridades no assunto",p:"O"},
+    {t:"Lugares, os mais estranhos",p:"I"}]},
+  { q:"Minha filosofia de vida...", opts:[
+    {t:"Há ganhadores e perdedores, e eu acredito ser um ganhador",p:"A"},
+    {t:"Para eu ganhar, ninguém precisa perder",p:"C"},
+    {t:"Para ganhar é preciso seguir as regras",p:"O"},
+    {t:"Para ganhar, é necessário inventar novas regras",p:"I"}]},
+  { q:"Eu gosto de mudanças se...", opts:[
+    {t:"Me der uma vantagem competitiva",p:"A"},
+    {t:"For divertido e puder ser compartilhado",p:"C"},
+    {t:"Me der mais liberdade e variedade",p:"I"},
+    {t:"Melhorar ou me der mais controle",p:"O"}]},
+  { q:"Eu gosto de...", opts:[
+    {t:"Complexidade, mesmo se confuso",p:"I"},
+    {t:"Ordem e sistematização",p:"O"},
+    {t:"Calor humano e animação",p:"C"},
+    {t:"Coisas claras e simples",p:"A"}]},
+  { q:"Se eu fosse bilionário...", opts:[
+    {t:"Faria doações para muitas entidades",p:"C"},
+    {t:"Criaria uma poupança avantajada",p:"O"},
+    {t:"Faria o que desse na cabeça",p:"I"},
+    {t:"Exibiria bastante com algumas pessoas",p:"A"}]},
+  { q:"Eu prefiro...", opts:[
+    {t:"Perguntas a respostas",p:"I"},
+    {t:"Ter todos os detalhes",p:"O"},
+    {t:"Vantagens a meu favor",p:"A"},
+    {t:"Que todos tenham a chance de ser ouvidos",p:"C"}]},
+  { q:"Eu gosto de chegar...", opts:[
+    {t:"Na frente",p:"A"},
+    {t:"Junto",p:"C"},
+    {t:"Na hora",p:"O"},
+    {t:"Em outro lugar",p:"I"}]},
+  { q:"Eu penso que...", opts:[
+    {t:"Não é fácil ficar encurralado",p:"I"},
+    {t:"É preferível olhar, antes de pular",p:"O"},
+    {t:"Duas cabeças pensam melhor que uma",p:"C"},
+    {t:"Se você não tem condições de competir, não se meta",p:"A"}]},
+  { q:"Um ótimo dia para mim é quando...", opts:[
+    {t:"Consigo fazer muitas coisas",p:"A"},
+    {t:"Me divirto com meus amigos",p:"C"},
+    {t:"Tudo segue conforme planejado",p:"O"},
+    {t:"Desfruto de coisas novas e estimulantes",p:"I"}]},
+  { q:"Eu acredito em...", opts:[
+    {t:"Aquele que hesita está perdido",p:"A"},
+    {t:"De grão em grão a galinha enche o papo",p:"O"},
+    {t:"O que vai, volta",p:"C"},
+    {t:"Um sorriso ou uma careta é o mesmo para quem é cego",p:"I"}]},
+  { q:"Eu também acredito...", opts:[
+    {t:"O destino é mais importante que a jornada",p:"A"},
+    {t:"A jornada é mais importante que o destino",p:"C"},
+    {t:"Um centavo economizado é um centavo ganho",p:"O"},
+    {t:"Bastam um navio e uma estrela para navegar",p:"I"}]},
+  { q:"Eu acredito ainda que...", opts:[
+    {t:"É melhor prudência do que arrependimento",p:"O"},
+    {t:"A autoridade deve ser desafiada",p:"I"},
+    {t:"Ganhar é fundamental",p:"A"},
+    {t:"O coletivo é mais importante do que o individual",p:"C"}]},
+  { q:"Eu sou...", opts:[
+    {t:"Idealista, criativo e visionário",p:"I"},
+    {t:"Divertido, espiritual e benéfico",p:"C"},
+    {t:"Confiável, meticuloso e previsível",p:"O"},
+    {t:"Focado, determinado e persistente",p:"A"}]},
+  { q:"Eu me divirto quando...", opts:[
+    {t:"Estou me exercitando",p:"A"},
+    {t:"Tenho novidades",p:"I"},
+    {t:"Estou com os outros",p:"C"},
+    {t:"Determino as regras",p:"O"}]},
+  { q:"Eu gosto de...", opts:[
+    {t:"Ser piloto",p:"A"},
+    {t:"Conversar com os passageiros",p:"C"},
+    {t:"Planejar a viagem",p:"O"},
+    {t:"Explorar novas rotas",p:"I"}]},
+  { q:"Para conseguir obter bons resultados é preciso...", opts:[
+    {t:"Ter incertezas",p:"I"},
+    {t:"Controlar o essencial",p:"O"},
+    {t:"Diversão e celebração",p:"C"},
+    {t:"Planejar e obter recursos",p:"A"}]},
+  { q:"Minha preocupação é...", opts:[
+    {t:"Gerar a ideia global",p:"I"},
+    {t:"Fazer com que as pessoas gostem",p:"C"},
+    {t:"Fazer com que funcione",p:"O"},
+    {t:"Fazer com que aconteça",p:"A"}]},
+  { q:"Se você quiser se dar bem comigo...", opts:[
+    {t:"Me dê liberdade",p:"I"},
+    {t:"Me deixe saber sua expectativa",p:"O"},
+    {t:"Lidere, siga ou saia do caminho",p:"A"},
+    {t:"Seja amigável, carinhoso e compreensivo",p:"C"}]},
+  { q:"Eu gosto de...", opts:[
+    {t:"Fazer progresso",p:"A"},
+    {t:"Construir memórias",p:"C"},
+    {t:"Fazer sentido",p:"O"},
+    {t:"Tornar as pessoas confortáveis",p:"I"}]},
+];
+
+const PERFIS = {
+  I:{
+    nome:"Idealizador",lema:"FAZER DIFERENTE",cor:"#A78BFA",
+    move:"Criatividade & Liberdade / Inspirar ideias",
+    comportamento:["Criativo","Intuitivo","Foco no futuro","Distraído","Curioso","Informal/casual","Flexível"],
+    fortes:["Descontração","Diferença","Fantasia","Pensamento macro","Busca inovação","Provoca mudanças radicais","Antecipa o futuro","Criatividade"],
+    melhoras:["Falta de atenção para o aqui e agora","Impaciência e rebeldia","Defender o novo pelo novo"],
+    motivadores:["Liberdade de expressão","Ausência de controles rígidos","Ambiente descentralizado","Liberdade para fazer exceções","Autonomia para delegar tarefas e detalhes"],
+  },
+  C:{
+    nome:"Comunicador",lema:"FAZER JUNTO",cor:"#F472B6",
+    move:"Felicidade e Igualdade / Pensar nos outros",
+    comportamento:["Sensível","Foco em relacionamentos","Time","Tradicionalista","Busca contribuição","Busca harmonia","Delega autoridade"],
+    fortes:["Tradição","Diversão","Sentimento","Participação","Celebração","Preservação","Rituais","Comunicação harmoniosa","Cultura empresarial","Comunicação aberta"],
+    melhoras:["Esconder conflitos","Felicidade acima dos resultados","Manipulação através dos sentimentos"],
+    motivadores:["Segurança","Aceitação social","Construção do consenso","Reconhecimento da equipe","Supervisão compreensiva","Ambiente harmônico","Trabalho em grupo"],
+  },
+  O:{
+    nome:"Organizador",lema:"FAZER CERTO",cor:"#60A5FA",
+    move:"Ordem e Controle",
+    comportamento:["Detalhista","Organizado","Estrategista","Busca conhecimento","Pontual","Conservador","Previsível"],
+    fortes:["Regras","Normas","Qualidade","Metódico","Métodos","Procedimentos","Consistência","Conformidade","Lealdade e segurança","Responsabilidades"],
+    melhoras:["Dificuldade de se adaptar às mudanças","Pode impedir o progresso","Aversão a riscos","Detalhista/sistematizado demais"],
+    motivadores:["Certeza","Compreensão exata das regras","Conhecimento específico do trabalho","Ausência de riscos e erros","Ver o produto acabado — começo, meio e fim"],
+  },
+  A:{
+    nome:"Ativador",lema:"FAZER RÁPIDO",cor:"#FB923C",
+    move:"Ação e Resultados",
+    comportamento:["Senso de urgência","Ação/iniciativa","Impulsivo","Prático","Vence desafios","Aqui e agora","Autossuficiente","Não gosta de delegar"],
+    fortes:["Faz acontecer","Abolir a burocracia","Motivação","Age e depois pensa"],
+    melhoras:["Maior dificuldade para socialização","Faz do modo mais fácil","Relacionamento complicado"],
+    motivadores:["Liberdade para agir individualmente","Controle das próprias atividades","Resolver os problemas do seu jeito","Competição individual","Não ter que repetir tarefas"],
+  },
+};
+
+const MODULOS = [
+  {
+    num:"00",title:"Introdução",sub:"Por que surgiu o Se Amostramento Profissional",
+    aulas:[
+      {lbl:"Aula de apresentação",title:"Wladson Sidney — A origem do M-SAP",desc:"Por que Wladson Sidney criou o Método Se Amostramento Profissional e o que ele pode fazer pela sua carreira a partir de hoje."},
+      {lbl:"Atividade inicial",title:"Seu destaque no mercado",desc:"Gravação de vídeo pessoal respondendo: qual a importância do seu destaque no mercado de trabalho — para você, para a sociedade, para o segmento em que atua. Resposta individual, sem certo ou errado, conteúdo não divulgado."},
+    ]
+  },
+  {
+    num:"01",title:"O Despertar do Se Amostramento",sub:"Um bate-papo com sociologia",
+    aulas:[
+      {lbl:"Aula 01",title:"Por que perdemos a capacidade de se amostrar?",desc:"Reflexão sobre a liberdade natural da infância e como ela vai sendo suprimida. Referência a Montaigne: \"não faço nada sem alegria\" — e o que isso tem a ver com sua presença profissional."},
+      {lbl:"Aula 02",title:"Curtida não paga boleto",desc:"Desconstrução da ideia de que curtidas são indicador de sucesso profissional. Foco no que vale a pena mostrar — não no que incomoda ou gera polêmica vazia."},
+      {lbl:"Aula 03",title:"Identificando e valorizando habilidades individuais",desc:"Três clarezas que você precisa ter: fama ou importância? é sobre você ou os outros? em que você se apega para ter confiança?"},
+      {lbl:"Aula 04 — Atividade",title:"Se Amostramento em prática",desc:"Liste suas principais conquistas profissionais, a habilidade que mais te destaca e seu maior bloqueio atual (julgamento dos outros, vergonha, falta de conhecimento, medo, ou outro). Inclui material complementar de autoanálise."},
+    ]
+  },
+  {
+    num:"02",title:"Graduando o Se Amostramento",sub:"Autoconhecimento e habilidades únicas",
+    aulas:[
+      {lbl:"Aula 01",title:"A importância do autoconhecimento",desc:"Por que se conhecer profundamente é o primeiro passo para se posicionar com autenticidade e autoridade no mercado."},
+      {lbl:"Aula 02",title:"Quem é você no Se Amostramento?",desc:"Questionário de identificação: que tipo de criança você era; o que você ganha se comunicando melhor; como se enxerga hoje; principal inibidor; a quem você mais se parece. Mais: inventário de habilidades únicas — competências, diferenciais, personalidade/estilo de trabalho e valores no ambiente profissional."},
+      {lbl:"Aula 03",title:"Como explorar suas habilidades para se destacar",desc:"Identificação de objetivos e metas de carreira: onde você se vê em 5 anos, objetivos de curto e longo prazo, impacto desejado e como você mede seu próprio sucesso. Estudo de caso de profissional que usou habilidades únicas para se diferenciar."},
+    ]
+  },
+  {
+    num:"03",title:"Coragem pra Ser Estranho",sub:"Criatividade e inovação no trabalho",
+    aulas:[
+      {lbl:"Aula 01",title:"Combatendo o achismo",desc:"O achismo é o inimigo da autoridade. Como substituir opiniões sem base por posições sustentadas por experiência e consistência."},
+      {lbl:"Aula 02",title:"\"Que\" vs. \"Como\"",desc:"A diferença entre saber O QUE fazer e dominar o COMO fazer — e por que esse é o grande diferencial de quem se amostra com força."},
+      {lbl:"Aula 03",title:"Criatividade como vantagem competitiva",desc:"Tutorial para ser estranho (no bom sentido): seja você com força, junte-se com gente que presta, tenha fé e aja, seja feliz hoje, tenha um hobby que expanda quem você é."},
+      {lbl:"Atividade",title:"Se Amostramento criativo",desc:"Apresente em vídeo um personagem que superlativa sua característica pessoal mais forte — você mesma/mesmo no cúmulo do exagero. Sem filtro, sem cerimônia."},
+    ]
+  },
+  {
+    num:"04",title:"Como Marcar uma Presença?",sub:"Preparar → Apontar → Fogo",
+    aulas:[
+      {lbl:"Aula 01 — Introdução",title:"O tripé: Preparar → Apontar → Fogo",desc:"A estrutura completa de como marcar presença em qualquer ambiente — profissional, digital ou presencial. Três movimentos que transformam intenção em impacto."},
+      {lbl:"Aula 02",title:"PREPARAR: Preparação é quase tudo",desc:"Estudar antes de realizar qualquer apresentação: preparação mental, organização da fala (o quê, onde, quando, como, por quê), criatividade e envolvimento, humanização do tema com histórias e dados personificados."},
+      {lbl:"Aula 03",title:"APONTAR: Posicionamento",desc:"Coerência on e off — \"quem fica em cima do muro leva pedrada dos dois lados\" (Apocalipse 3:16). O papel da marca pessoal nos mercados offline e online: memorabilidade, networking, oportunidades, credibilidade, diferenciação, gestão de reputação. Estratégia: canais mais eficazes, como compartilhar conhecimento, mensagens-chave, ações de visibilidade."},
+      {lbl:"Aula 04",title:"FOGO: Plano de Ação — Framework ACDC",desc:"Construção da tática de apresentação usando o ACDC: Ancoragem da adrenalina (antídoto para o medo de não ser aprovado), Capacitação comprometida com a entrega (a apresentação é para você), Descubra seus parceiros de audiência, Coragem para seguir treinando (entonação, pausas, presença, gatilhos mentais)."},
+      {lbl:"Bloco complementar",title:"Identidade autêntica e consistente",desc:"Valores inegociáveis, motivação para se apresentar melhor, definição de autenticidade (\"ser você com força\"), atividade de expressão autêntica criativa e atividade em grupo de identificação de pontos fortes e fracos."},
+    ]
+  },
+  {
+    num:"05",title:"Como se Conectar com Gente que Presta?",sub:"Networking estratégico",
+    aulas:[
+      {lbl:"Aula 01",title:"Construção e manutenção de rede relevante",desc:"Conectar-se é esforço de entrega, não de interesse. A importância de entidades de classe e associações — referência à atuação de Wladson como diretor de experiência do associado na ADVB Ceará."},
+      {lbl:"Aula 02",title:"Criando oportunidades pelo networking",desc:"Como usar sua rede para criar oportunidades de negócio e colaboração: redes atuais, expansão de contatos, eventos e manutenção de relacionamentos ao longo do tempo."},
+      {lbl:"Atividade",title:"Plano de marketing pessoal",desc:"Desenvolva seu plano de marketing pessoal — estratégias de comunicação e promoção da sua imagem profissional — cruzando as respostas da autoanálise dos Módulos 1 e 2."},
+    ]
+  },
+  {
+    num:"06",title:"Treino",sub:"Estratégias de Posicionamento Online e Offline",
+    aulas:[
+      {lbl:"Conteúdo",title:"Seu arsenal de canais",desc:"Como adaptar suas habilidades únicas para o mercado on e offline. Arsenal disponível: blog pessoal, vídeos educacionais, podcasts, redes sociais especializadas (LinkedIn, Behance, GitHub, Dribbble), projetos colaborativos presenciais, testemunhos e recomendações como prova social, portfólio online, contribuição em comunidades online."},
+      {lbl:"Atividade",title:"Sua primeira campanha de conteúdo",desc:"Crie a primeira \"campanha\" de conteúdo para redes sociais, alinhada à sua marca pessoal, linha editorial e objetivos profissionais. Baseada em quem você é, não em fórmulas vazias de engajamento."},
+    ]
+  },
+  {
+    num:"07",title:"Escolha suas Batalhas",sub:"Construção de Carreira Sustentável e Significativa",
+    aulas:[
+      {lbl:"Conteúdo",title:"Carreira sustentável e satisfatória",desc:"Para uma carreira que dura e faz sentido: concentre energia nas escolhas certas; cuide dos seus aliados — mais importante que para onde ir é com quem ir; não brigue por aquilo que te distancia do seu objetivo."},
+      {lbl:"Encerramento",title:"Siga o plano.",desc:"O encerramento do Método Se Amostramento Profissional. Você tem o perfil, tem o plano, tem os módulos. Agora só falta uma coisa: seguir o plano. Seja você com força."},
+    ]
+  },
+];
+
+/* ============================================================
+   ESTADO
+   ============================================================ */
+let ST = {
+  user:    null,
+  answers: new Array(25).fill(null),
+  curQ:    0,
+  scores:  null,
+  domKey:  null,
+  secKey:  null,
+  plan:    null,
+  leadId:  null,
+  demo:    false,
+};
+
+/* ============================================================
+   FIREBASE
+   ============================================================ */
+let db = null;
+
+function fbInit() {
+  if (!FB_CFG.databaseURL || FB_CFG.databaseURL === 'COLE_AQUI') return;
+  try { firebase.initializeApp(FB_CFG); db = firebase.database().ref('msap'); }
+  catch(e) { console.warn('Firebase:', e); }
+}
+
+async function fbSaveLead() {
+  if (!db || ST.demo) return;
+  try {
+    const ref = await db.push({
+      nome: ST.user.nome, wpp: ST.user.wpp,
+      email: ST.user.email||'', area: ST.user.area,
+      ts: Date.now(),
+    });
+    ST.leadId = ref.key;
+  } catch(e) { console.warn('Lead:', e); }
+}
+
+async function fbSaveResult(plan) {
+  if (!db || !ST.leadId || ST.demo) return;
+  try {
+    await db.child(ST.leadId).update({
+      perfil_dom: PERFIS[ST.domKey].nome,
+      perfil_sec: PERFIS[ST.secKey].nome,
+      scores: ST.scores,
+      plano: plan||'',
+      ts_result: Date.now(),
+    });
+  } catch(e) { console.warn('Result:', e); }
+}
+
+async function fbLookup(wpp) {
+  if (!db) return null;
+  try {
+    const snap = await db.orderByChild('wpp').equalTo(wpp).limitToLast(1).once('value');
+    if (!snap.exists()) return null;
+    let r = null;
+    snap.forEach(c => { r = { key: c.key, ...c.val() }; });
+    return r;
+  } catch(e) { return null; }
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+const SECS = {inicio:'s-inicio',teste:'s-teste',resultado:'s-resultado',trilha:'s-trilha'};
+
+function navigate(h) { window.location.hash = h; }
+
+function render() {
+  const h = window.location.hash.replace('#','') || 'inicio';
+
+  // Guards
+  if (h==='resultado' && !ST.domKey) { navigate('inicio'); return; }
+  if (h==='teste'     && !ST.user)   { navigate('inicio'); return; }
+
+  // Show section
+  Object.values(SECS).forEach(id => document.getElementById(id).classList.remove('active'));
+  const id = SECS[h] || SECS.inicio;
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+
+  // Section-specific renders
+  if (h==='teste')    renderQ();
+  if (h==='resultado') renderResult();
+}
+
+window.addEventListener('hashchange', render);
+window.addEventListener('load', () => {
+  fbInit();
+  buildTrail();
+  render();
+  window.addEventListener('keydown', e => {
+    if ((e.key==='d'||e.key==='D') && !ST.demo) activateDemo();
+  });
+});
+
+/* ============================================================
+   DEMO MODE  (tecla D)
+   ============================================================ */
+function activateDemo() {
+  ST.demo = true;
+  const types = ['I','I','I','C','C','C','O','A'];
+  ST.user = { nome:'Wladson Teste', wpp:'85999990000', email:'', area:'gestão de carreiras' };
+  ST.answers = Array.from({length:25}, () => types[Math.floor(Math.random()*types.length)]);
+  ST.curQ = 24;
+
+  document.getElementById('demo-banner').classList.add('show');
+  document.body.classList.add('demo-on');
+
+  // Pre-fill form for visual reference
+  document.getElementById('f-nome').value = ST.user.nome;
+  document.getElementById('f-wpp').value  = ST.user.wpp;
+  document.getElementById('f-area').value = ST.user.area;
+
+  calcAndNavigate();
+}
+
+/* ============================================================
+   INÍCIO: FORM
+   ============================================================ */
+function startTest() {
+  const nome  = document.getElementById('f-nome').value.trim();
+  const wpp   = document.getElementById('f-wpp').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const area  = document.getElementById('f-area').value.trim();
+
+  const show = (id,v) => document.getElementById(id).classList.toggle('show',v);
+  let ok = true;
+  show('e-nome',!nome); if(!nome) ok=false;
+  show('e-wpp', !wpp);  if(!wpp)  ok=false;
+  show('e-area',!area); if(!area) ok=false;
+  if (!ok) return;
+
+  ST.user    = { nome, wpp, email, area };
+  ST.answers = new Array(25).fill(null);
+  ST.curQ    = 0;
+  ST.domKey  = null;
+  ST.plan    = null;
+  ST.leadId  = null;
+
+  fbSaveLead();
+  navigate('teste');
+}
+
+function doRecover() {
+  const wpp = prompt('Digite seu WhatsApp cadastrado:');
+  if (!wpp) return;
+  fbLookup(wpp.trim()).then(data => {
+    if (!data) { alert('Resultado não encontrado. Refaça o teste para gerar seu perfil.'); return; }
+    ST.user   = { nome:data.nome, wpp:data.wpp, email:data.email||'', area:data.area };
+    ST.domKey = Object.keys(PERFIS).find(k => PERFIS[k].nome === data.perfil_dom) || 'I';
+    ST.secKey = Object.keys(PERFIS).find(k => PERFIS[k].nome === data.perfil_sec) || 'C';
+    ST.scores = data.scores || {I:7,O:6,C:7,A:5};
+    ST.plan   = data.plano  || null;
+    navigate('resultado');
+  });
+}
+
+/* ============================================================
+   TESTE: PERGUNTAS
+   ============================================================ */
+const LETTERS = ['A','B','C','D'];
+
+function renderQ() {
+  const q = QS[ST.curQ];
+  const pct = (ST.curQ / 25) * 100;
+
+  document.getElementById('q-pfill').style.width = pct + '%';
+  document.getElementById('q-num').textContent   = ST.curQ + 1;
+  document.getElementById('q-text').textContent  = q.q;
+  document.getElementById('q-intro').style.display = ST.curQ === 0 ? 'block' : 'none';
+
+  const wrap = document.getElementById('q-opts');
+  wrap.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt' + (ST.answers[ST.curQ] === opt.p ? ' sel' : '');
+    btn.innerHTML = `<span class="ob">${LETTERS[i]}</span><span>${esc(opt.t)}</span>`;
+    btn.onclick = () => { ST.answers[ST.curQ] = opt.p; renderQ(); };
+    wrap.appendChild(btn);
+  });
+
+  const nxt = document.getElementById('q-next');
+  nxt.disabled = ST.answers[ST.curQ] === null;
+  nxt.textContent = ST.curQ === 24 ? 'Ver meu resultado →' : 'Próxima →';
+}
+
+function qBack() {
+  if (ST.curQ > 0) { ST.curQ--; window.scrollTo(0,0); renderQ(); }
+  else navigate('inicio');
+}
+
+function qNext() {
+  if (ST.answers[ST.curQ] === null) return;
+  if (ST.curQ < 24) { ST.curQ++; window.scrollTo(0,0); renderQ(); }
+  else calcAndNavigate();
+}
+
+/* ============================================================
+   RESULTADO: CÁLCULO
+   ============================================================ */
+function calcAndNavigate() {
+  const s = {I:0,O:0,C:0,A:0};
+  ST.answers.forEach(a => { if(a) s[a]++; });
+  const sorted = Object.entries(s).sort((a,b) => b[1]-a[1]);
+  ST.scores = s;
+  ST.domKey = sorted[0][0];
+  ST.secKey = sorted[1][0];
+  navigate('resultado');
+}
+
+let planPending = false;
+
+function renderResult() {
+  if (!ST.domKey) return;
+  const dom = PERFIS[ST.domKey];
+  const sec = PERFIS[ST.secKey];
+
+  // Hero
+  const badge = document.getElementById('r-badge');
+  badge.textContent = 'Perfil dominante';
+  badge.style.cssText = `background:${dom.cor}1a;color:${dom.cor};border:1px solid ${dom.cor}44`;
+  document.getElementById('r-nome').textContent = dom.nome;
+  document.getElementById('r-nome').style.color = dom.cor;
+  document.getElementById('r-lema').textContent  = dom.lema;
+
+  // Score bars
+  const total = Object.values(ST.scores).reduce((a,b)=>a+b,0);
+  const order = Object.entries(ST.scores).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('r-scores').innerHTML = order.map(([k,v]) => {
+    const pct = total>0 ? Math.round(v/total*100) : 25;
+    return `<div class="score-row">
+      <div class="score-lbl">${PERFIS[k].nome}</div>
+      <div class="score-track"><div class="score-fill" style="width:${pct}%;background:${PERFIS[k].cor}"></div></div>
+      <div class="score-pct" style="color:${PERFIS[k].cor}">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  // Dashboard
+  document.getElementById('r-dash').innerHTML = `
+    <div class="dash-card dash-full">
+      <div class="dash-lbl">O que lhe move</div>
+      <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,.85)">${esc(dom.move)}</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-lbl">Pontos fortes</div>
+      <div class="tags">${dom.fortes.map(f=>`<span class="tag">${esc(f)}</span>`).join('')}</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-lbl">Comportamento</div>
+      <div class="tags">${dom.comportamento.map(c=>`<span class="tag">${esc(c)}</span>`).join('')}</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-lbl">Áreas de melhoria</div>
+      <div class="tags">${dom.melhoras.map(m=>`<span class="tag">${esc(m)}</span>`).join('')}</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-lbl">O que te motiva</div>
+      <div class="tags">${dom.motivadores.map(m=>`<span class="tag">${esc(m)}</span>`).join('')}</div>
+    </div>`;
+
+  // Secondary
+  document.getElementById('r-sec').innerHTML = `
+    <div class="sec-tipo" style="color:${sec.cor}">${esc(sec.nome)}</div>
+    <div class="sec-lema">${esc(sec.lema)}</div>
+    <p class="sec-desc">O que lhe move: ${esc(sec.move)}.<br>Pontos fortes: ${sec.fortes.slice(0,4).map(f=>esc(f)).join(', ')}.</p>`;
+
+  // Plan — only fetch if not yet fetched this session
+  if (ST.plan) {
+    showPlan(ST.plan);
+    document.getElementById('r-note').textContent = 'Resultado recuperado. Você pode explorar os módulos agora.';
+  } else if (!planPending) {
+    planPending = true;
+    resetPlanUI();
+    generatePlan().finally(() => { planPending = false; });
+  }
+}
+
+/* ============================================================
+   PLAN UI HELPERS
+   ============================================================ */
+function resetPlanUI() {
+  document.getElementById('plan-loading').style.display = 'block';
+  document.getElementById('plan-txt').style.display     = 'none';
+  document.getElementById('plan-msg').textContent       = 'Montando seu plano...';
+}
+
+function showPlan(text) {
+  document.getElementById('plan-loading').style.display = 'none';
+  document.getElementById('plan-txt').style.display     = 'block';
+  document.getElementById('plan-txt').textContent       = text;
+}
+
+/* ============================================================
+   GERADOR DE PLANO LOCAL (sem custo de API)
+   ============================================================ */
+
+// Textos de abertura por tipo dominante
+const ABERTURA = {
+  I: (nome, sec) => `${nome}, você é ${PERFIS.I.nome} com apoio de ${PERFIS[sec].nome} — a combinação de quem enxerga o futuro e tem a estrutura (ou o povo) certo para chegar lá. Sua cabeça não para. Isso é poder. O problema é que poder parado não amostramento nenhum.`,
+  O: (nome, sec) => `${nome}, você é ${PERFIS.O.nome} com apoio de ${PERFIS[sec].nome}. Você é a pessoa que faz certo, que entrega, que não deixa ralo aberto. O mercado precisa de gente como você. O detalhe é que mercado nenhum premia o que não vê.`,
+  C: (nome, sec) => `${nome}, você é ${PERFIS.C.nome} com apoio de ${PERFIS[sec].nome}. Sua maior força é o que as pessoas sentem quando estão perto de você. Agora vamos fazer o mercado sentir isso à distância também.`,
+  A: (nome, sec) => `${nome}, você é ${PERFIS.A.nome} com apoio de ${PERFIS[sec].nome}. Você faz acontecer. Enquanto a galera ainda está no PowerPoint, você já está no meio do caminho. Isso é Se Amostramento na veia — falta só direcionar essa energia para o lugar certo.`,
+};
+
+// Hipótese de nível por tipo dominante
+const NIVEL = {
+  I: `Hipótese de ponto de partida: você provavelmente está no Nível 1 (Existir) ou 2 (Aparecer). O Idealizador tem tanto projeto na cabeça que fica pulando de ideia em ideia e nunca se associa de fato a um tema. As pessoas sabem que você é criativo — mas não sabem exatamente no quê você é referência. É aí que o Se Amostramento entra.`,
+  O: `Hipótese de ponto de partida: você provavelmente está no Nível 1 (Existir) ou 2 (Aparecer). O Organizador entrega tanto que acha que o trabalho fala por si. Não fala. Qualidade invisível não vira autoridade. Você precisa começar a mostrar o processo, não só o resultado.`,
+  C: `Hipótese de ponto de partida: você provavelmente está entre o Nível 2 (Aparecer) e o 3 (Compartilhar). O Comunicador tem facilidade com pessoas, mas costuma usar isso em contextos fechados — reunião, grupo de WhatsApp, círculo de amigos. Hora de abrir esse círculo.`,
+  A: `Hipótese de ponto de partida: você provavelmente está no Nível 2 (Aparecer) ou 3 (Compartilhar). O Ativador aparece naturalmente — o problema é a consistência. Você vai com tudo por duas semanas e some por dois meses. Autoridade não nasce da intensidade, nasce da consistência.`,
+};
+
+// Ações por tipo dominante (função que recebe área)
+const ACOES = {
+  I: area => [
+    `Escolha UM tema dentro de ${area} onde você tem opinião formada e experiência real. Só um. Esqueça os outros por agora. Se Amostramento exige foco — você não pode ser referência em tudo ao mesmo tempo.`,
+    `Documente uma ideia inovadora que você aplicou em ${area} — o que era o problema, o que você pensou diferente, qual foi o resultado. Publique no LinkedIn em formato de texto curto. Sem dançinha, sem trend. Só o conteúdo.`,
+    `Use seu olhar de futuro: escreva uma previsão ou tendência para ${area} nos próximos 12 meses. Assine com seu nome. Quem erra uma previsão honesta aprende. Quem acerta, vira referência.`,
+    `Encontre 2 ou 3 pessoas em ${area} que você admira e que já estão no Nível 4 ou 5. Conecte-se com intenção de trocar, não de pedir. Rede que presta se constrói com entrega, não com interesse.`,
+  ],
+  O: area => [
+    `Escolha um processo, método ou checklist que você usa em ${area} e que ninguém mais na sua rede fala sobre. Escreva sobre ele. Não precisa ser perfeito — precisa ser verdadeiro e útil.`,
+    `Toda semana, compartilhe um "antes e depois" de um resultado que você entregou em ${area}. Sem exagero, sem glamour. Dados reais, processo real. É isso que constrói credibilidade de Organizador.`,
+    `Identifique os erros mais comuns que você vê em ${area} e escreva sobre um deles. Quem aponta o erro com conhecimento e solução vira consultor. Quem fica calado, vira coadjuvante.`,
+    `Participe ativamente de pelo menos uma associação, grupo ou comunidade ligada a ${area}. Não como ouvinte — como quem contribui. Lealdade e consistência são os maiores ativos do Organizador.`,
+  ],
+  C: area => [
+    `Use sua habilidade de conexão para criar ou participar de uma roda de conversa, live ou papo sobre um tema de ${area}. Não precisa ser palestrante — pode ser mediador. Quem conecta pessoas também vira referência.`,
+    `Toda semana, parabenize publicamente alguém de ${area} por um resultado ou atitude que você genuinamente admira. Quem celebra os outros cria comunidade. Comunidade é o maior palco do Comunicador.`,
+    `Compartilhe uma história pessoal ligada a ${area} — um desafio que você enfrentou, o que aprendeu. Comunicador tem o dom da narrativa. Use esse dom a serviço da sua autoridade, não só do relacionamento.`,
+    `Defina sua mensagem-chave em ${area}: o que você defende? Qual é a sua posição? Comunicador sem posição fica bonito mas não vira referência. Escolha um lado — o lado certo para você.`,
+  ],
+  A: area => [
+    `Defina uma ação de Se Amostramento que você vai fazer toda semana, sem falta, por 90 dias. Uma publicação, um conteúdo, uma participação. Coloque no calendário. Ativador precisa de meta tangível para manter consistência.`,
+    `Documente um resultado concreto que você alcançou em ${area} — número, prazo, impacto. Ativador é movido por resultados. Mostre os resultados. Quem prova que faz não precisa convencer ninguém.`,
+    `Busque uma liderança visível em ${area}: fale em um evento, grave um vídeo direto ao ponto, escreva um artigo de opinião. Ativador tem presença natural — canalize isso para o Se Amostramento profissional.`,
+    `Identifique onde estão as pessoas que tomam decisão em ${area} e apareça nesses espaços. Câmara de comércio, associação, evento do setor. Ativador cresce quando compete no campo certo.`,
+  ],
+};
+
+// Alerta por tipo dominante
+const ALERTA = {
+  I: `⚠ Atenção, ${PERFIS.I.nome}: seu maior inimigo no Se Amostramento é a dispersão. Você vai ter dez ideias novas enquanto lê este plano. Escolha uma e vai até o fim. O mercado não premia quem tem mil projetos — premia quem resolve um problema de forma consistente. Antídoto: toda vez que surgir uma ideia nova, anote e deixe para depois. Agora, foca no plano.`,
+  O: `⚠ Atenção, ${PERFIS.O.nome}: seu maior inimigo no Se Amostramento é esperar estar perfeito para aparecer. Você vai revisar o post dez vezes antes de publicar — e às vezes não publicar. Feito imperfeito que aparece vale mais que perfeito que ninguém vê. Antídoto: defina uma regra: se está 80% bom, publica. Ponto.`,
+  C: `⚠ Atenção, ${PERFIS.C.nome}: seu maior inimigo no Se Amostramento é esconder conflitos e não ter posição. Você quer agradar a todos e acaba não representando nada. Autoridade exige opinião. Quem fica em cima do muro leva pedrada dos dois lados. Antídoto: uma vez por mês, publique algo em que você tem uma posição clara — mesmo que não seja a posição de todo mundo.`,
+  A: `⚠ Atenção, ${PERFIS.A.nome}: seu maior inimigo no Se Amostramento é a inconsistência. Você arranca com tudo e para do nada. O mercado não esquece quem aparece — mas também não perdoa quem some. Antídoto: menos intensidade, mais frequência. Uma publicação por semana toda semana supera dez publicações em um dia.`,
+};
+
+function gerarPlano(nome, area, domKey, secKey) {
+  const primeiroNome = nome.split(' ')[0];
+  const abertura = ABERTURA[domKey](primeiroNome, secKey);
+  const nivel    = NIVEL[domKey];
+  const acoes    = ACOES[domKey](area);
+  const alerta   = ALERTA[domKey];
+
+  return [
+    abertura,
+    '',
+    '─── EM QUAL NÍVEL VOCÊ ESTÁ? ───',
+    nivel,
+    '',
+    '─── SUAS AÇÕES DE SE AMOSTRAMENTO ───',
+    ...acoes.map((a, i) => `${i+1}. ${a}`),
+    '',
+    alerta,
+    '',
+    '─── FECHAMENTO ───',
+    `${primeiroNome}, autoridade não nasce da intensidade — nasce da consistência. O macaco que treina todo dia vira referência. O que treina só quando está motivado, vira amador com boa intenção. Você tem o perfil, tem a área, tem o plano. Agora siga o plano. Seja você com força.`,
+  ].join('\n');
+}
+
+async function generatePlan() {
+  const note = document.getElementById('r-note');
+
+  // Simula carregamento por 1.2s para dar feedback visual
+  await new Promise(r => setTimeout(r, 1200));
+
+  const plan = gerarPlano(ST.user.nome, ST.user.area, ST.domKey, ST.secKey);
+  ST.plan = plan;
+  showPlan(plan);
+  await fbSaveResult(plan);
+  note.textContent = ST.demo
+    ? 'Modo ensaio — dados não salvos.'
+    : 'Resultado salvo! Recupere pelo seu WhatsApp a qualquer momento.';
+}
+
+/* ============================================================
+   TRILHA
+   ============================================================ */
+function buildTrail() {
+  document.getElementById('trail').innerHTML = MODULOS.map((m,i) => `
+    <div class="tmod" id="tm${i}">
+      <div class="tmod-head" onclick="togMod(${i})">
+        <div class="tmod-num">${esc(m.num)}</div>
+        <div class="tmod-info">
+          <div class="tmod-name">${esc(m.title)}</div>
+          <div class="tmod-sub">${esc(m.sub)}</div>
+        </div>
+        <div class="tmod-chev">▾</div>
+      </div>
+      <div class="tmod-body">
+        ${m.aulas.map(a=>`
+          <div class="taula">
+            <div class="taula-lbl">${esc(a.lbl)}</div>
+            <div class="taula-title">${esc(a.title)}</div>
+            <div class="taula-desc">${esc(a.desc)}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function togMod(i) {
+  document.getElementById('tm'+i).classList.toggle('open');
+}
+
+function trailBack() {
+  navigate(ST.domKey ? 'resultado' : 'inicio');
+}
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
