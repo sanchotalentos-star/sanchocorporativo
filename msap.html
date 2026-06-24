@@ -597,10 +597,6 @@ body.demo-on { padding-top: 28px; }
     <div class="plan-msg" id="plan-msg">Montando seu plano...</div>
   </div>
   <div id="plan-txt" class="plan-txt" style="display:none"></div>
-  <div id="plan-err" class="plan-err" style="display:none">
-    <p style="margin-bottom:13px">Não foi possível gerar o plano agora.</p>
-    <button class="btn-s" onclick="retryPlan()">Gerar novamente</button>
-  </div>
 
   <div class="mantra">
     <div class="mantra-t">Seja você<br>com força.</div>
@@ -662,9 +658,6 @@ const FB_CFG = {
   appId:             "1:725731863533:web:d8f4b8fcb4e7305c7155e4",
 };
 
-// Claude API: gere em console.anthropic.com
-// Para produção configure um proxy server-side — não exponha a chave no frontend.
-const CLAUDE_KEY = "COLE_SUA_CHAVE_ANTHROPIC_AQUI";
 
 /* ============================================================
    DADOS
@@ -1182,137 +1175,110 @@ function renderResult() {
 /* ============================================================
    PLAN UI HELPERS
    ============================================================ */
-const PLAN_MSGS = [
-  'Montando seu plano...',
-  'Cruzando seu perfil com sua área de atuação...',
-  'Calibrando para o seu tipo dominante...',
-  'Quase pronto...',
-];
-
 function resetPlanUI() {
   document.getElementById('plan-loading').style.display = 'block';
   document.getElementById('plan-txt').style.display     = 'none';
-  document.getElementById('plan-err').style.display     = 'none';
-  document.getElementById('plan-msg').textContent       = PLAN_MSGS[0];
+  document.getElementById('plan-msg').textContent       = 'Montando seu plano...';
 }
 
 function showPlan(text) {
   document.getElementById('plan-loading').style.display = 'none';
   document.getElementById('plan-txt').style.display     = 'block';
-  document.getElementById('plan-err').style.display     = 'none';
   document.getElementById('plan-txt').textContent       = text;
 }
 
-function showPlanErr() {
-  document.getElementById('plan-loading').style.display = 'none';
-  document.getElementById('plan-txt').style.display     = 'none';
-  document.getElementById('plan-err').style.display     = 'block';
-}
-
-function retryPlan() {
-  resetPlanUI();
-  generatePlan();
-}
-
 /* ============================================================
-   CLAUDE API
+   GERADOR DE PLANO LOCAL (sem custo de API)
    ============================================================ */
+
+// Textos de abertura por tipo dominante
+const ABERTURA = {
+  I: (nome, sec) => `${nome}, você é ${PERFIS.I.nome} com apoio de ${PERFIS[sec].nome} — a combinação de quem enxerga o futuro e tem a estrutura (ou o povo) certo para chegar lá. Sua cabeça não para. Isso é poder. O problema é que poder parado não amostramento nenhum.`,
+  O: (nome, sec) => `${nome}, você é ${PERFIS.O.nome} com apoio de ${PERFIS[sec].nome}. Você é a pessoa que faz certo, que entrega, que não deixa ralo aberto. O mercado precisa de gente como você. O detalhe é que mercado nenhum premia o que não vê.`,
+  C: (nome, sec) => `${nome}, você é ${PERFIS.C.nome} com apoio de ${PERFIS[sec].nome}. Sua maior força é o que as pessoas sentem quando estão perto de você. Agora vamos fazer o mercado sentir isso à distância também.`,
+  A: (nome, sec) => `${nome}, você é ${PERFIS.A.nome} com apoio de ${PERFIS[sec].nome}. Você faz acontecer. Enquanto a galera ainda está no PowerPoint, você já está no meio do caminho. Isso é Se Amostramento na veia — falta só direcionar essa energia para o lugar certo.`,
+};
+
+// Hipótese de nível por tipo dominante
+const NIVEL = {
+  I: `Hipótese de ponto de partida: você provavelmente está no Nível 1 (Existir) ou 2 (Aparecer). O Idealizador tem tanto projeto na cabeça que fica pulando de ideia em ideia e nunca se associa de fato a um tema. As pessoas sabem que você é criativo — mas não sabem exatamente no quê você é referência. É aí que o Se Amostramento entra.`,
+  O: `Hipótese de ponto de partida: você provavelmente está no Nível 1 (Existir) ou 2 (Aparecer). O Organizador entrega tanto que acha que o trabalho fala por si. Não fala. Qualidade invisível não vira autoridade. Você precisa começar a mostrar o processo, não só o resultado.`,
+  C: `Hipótese de ponto de partida: você provavelmente está entre o Nível 2 (Aparecer) e o 3 (Compartilhar). O Comunicador tem facilidade com pessoas, mas costuma usar isso em contextos fechados — reunião, grupo de WhatsApp, círculo de amigos. Hora de abrir esse círculo.`,
+  A: `Hipótese de ponto de partida: você provavelmente está no Nível 2 (Aparecer) ou 3 (Compartilhar). O Ativador aparece naturalmente — o problema é a consistência. Você vai com tudo por duas semanas e some por dois meses. Autoridade não nasce da intensidade, nasce da consistência.`,
+};
+
+// Ações por tipo dominante (função que recebe área)
+const ACOES = {
+  I: area => [
+    `Escolha UM tema dentro de ${area} onde você tem opinião formada e experiência real. Só um. Esqueça os outros por agora. Se Amostramento exige foco — você não pode ser referência em tudo ao mesmo tempo.`,
+    `Documente uma ideia inovadora que você aplicou em ${area} — o que era o problema, o que você pensou diferente, qual foi o resultado. Publique no LinkedIn em formato de texto curto. Sem dançinha, sem trend. Só o conteúdo.`,
+    `Use seu olhar de futuro: escreva uma previsão ou tendência para ${area} nos próximos 12 meses. Assine com seu nome. Quem erra uma previsão honesta aprende. Quem acerta, vira referência.`,
+    `Encontre 2 ou 3 pessoas em ${area} que você admira e que já estão no Nível 4 ou 5. Conecte-se com intenção de trocar, não de pedir. Rede que presta se constrói com entrega, não com interesse.`,
+  ],
+  O: area => [
+    `Escolha um processo, método ou checklist que você usa em ${area} e que ninguém mais na sua rede fala sobre. Escreva sobre ele. Não precisa ser perfeito — precisa ser verdadeiro e útil.`,
+    `Toda semana, compartilhe um "antes e depois" de um resultado que você entregou em ${area}. Sem exagero, sem glamour. Dados reais, processo real. É isso que constrói credibilidade de Organizador.`,
+    `Identifique os erros mais comuns que você vê em ${area} e escreva sobre um deles. Quem aponta o erro com conhecimento e solução vira consultor. Quem fica calado, vira coadjuvante.`,
+    `Participe ativamente de pelo menos uma associação, grupo ou comunidade ligada a ${area}. Não como ouvinte — como quem contribui. Lealdade e consistência são os maiores ativos do Organizador.`,
+  ],
+  C: area => [
+    `Use sua habilidade de conexão para criar ou participar de uma roda de conversa, live ou papo sobre um tema de ${area}. Não precisa ser palestrante — pode ser mediador. Quem conecta pessoas também vira referência.`,
+    `Toda semana, parabenize publicamente alguém de ${area} por um resultado ou atitude que você genuinamente admira. Quem celebra os outros cria comunidade. Comunidade é o maior palco do Comunicador.`,
+    `Compartilhe uma história pessoal ligada a ${area} — um desafio que você enfrentou, o que aprendeu. Comunicador tem o dom da narrativa. Use esse dom a serviço da sua autoridade, não só do relacionamento.`,
+    `Defina sua mensagem-chave em ${area}: o que você defende? Qual é a sua posição? Comunicador sem posição fica bonito mas não vira referência. Escolha um lado — o lado certo para você.`,
+  ],
+  A: area => [
+    `Defina uma ação de Se Amostramento que você vai fazer toda semana, sem falta, por 90 dias. Uma publicação, um conteúdo, uma participação. Coloque no calendário. Ativador precisa de meta tangível para manter consistência.`,
+    `Documente um resultado concreto que você alcançou em ${area} — número, prazo, impacto. Ativador é movido por resultados. Mostre os resultados. Quem prova que faz não precisa convencer ninguém.`,
+    `Busque uma liderança visível em ${area}: fale em um evento, grave um vídeo direto ao ponto, escreva um artigo de opinião. Ativador tem presença natural — canalize isso para o Se Amostramento profissional.`,
+    `Identifique onde estão as pessoas que tomam decisão em ${area} e apareça nesses espaços. Câmara de comércio, associação, evento do setor. Ativador cresce quando compete no campo certo.`,
+  ],
+};
+
+// Alerta por tipo dominante
+const ALERTA = {
+  I: `⚠ Atenção, ${PERFIS.I.nome}: seu maior inimigo no Se Amostramento é a dispersão. Você vai ter dez ideias novas enquanto lê este plano. Escolha uma e vai até o fim. O mercado não premia quem tem mil projetos — premia quem resolve um problema de forma consistente. Antídoto: toda vez que surgir uma ideia nova, anote e deixe para depois. Agora, foca no plano.`,
+  O: `⚠ Atenção, ${PERFIS.O.nome}: seu maior inimigo no Se Amostramento é esperar estar perfeito para aparecer. Você vai revisar o post dez vezes antes de publicar — e às vezes não publicar. Feito imperfeito que aparece vale mais que perfeito que ninguém vê. Antídoto: defina uma regra: se está 80% bom, publica. Ponto.`,
+  C: `⚠ Atenção, ${PERFIS.C.nome}: seu maior inimigo no Se Amostramento é esconder conflitos e não ter posição. Você quer agradar a todos e acaba não representando nada. Autoridade exige opinião. Quem fica em cima do muro leva pedrada dos dois lados. Antídoto: uma vez por mês, publique algo em que você tem uma posição clara — mesmo que não seja a posição de todo mundo.`,
+  A: `⚠ Atenção, ${PERFIS.A.nome}: seu maior inimigo no Se Amostramento é a inconsistência. Você arranca com tudo e para do nada. O mercado não esquece quem aparece — mas também não perdoa quem some. Antídoto: menos intensidade, mais frequência. Uma publicação por semana toda semana supera dez publicações em um dia.`,
+};
+
+function gerarPlano(nome, area, domKey, secKey) {
+  const primeiroNome = nome.split(' ')[0];
+  const abertura = ABERTURA[domKey](primeiroNome, secKey);
+  const nivel    = NIVEL[domKey];
+  const acoes    = ACOES[domKey](area);
+  const alerta   = ALERTA[domKey];
+
+  return [
+    abertura,
+    '',
+    '─── EM QUAL NÍVEL VOCÊ ESTÁ? ───',
+    nivel,
+    '',
+    '─── SUAS AÇÕES DE SE AMOSTRAMENTO ───',
+    ...acoes.map((a, i) => `${i+1}. ${a}`),
+    '',
+    alerta,
+    '',
+    '─── FECHAMENTO ───',
+    `${primeiroNome}, autoridade não nasce da intensidade — nasce da consistência. O macaco que treina todo dia vira referência. O que treina só quando está motivado, vira amador com boa intenção. Você tem o perfil, tem a área, tem o plano. Agora siga o plano. Seja você com força.`,
+  ].join('\n');
+}
+
 async function generatePlan() {
   const note = document.getElementById('r-note');
 
-  // Demo fallback
-  if (ST.demo || !CLAUDE_KEY || CLAUDE_KEY==='COLE_SUA_CHAVE_ANTHROPIC_AQUI') {
-    await new Promise(r=>setTimeout(r,1400));
-    const mock = `${PERFIS[ST.domKey].nome} com apoio de ${PERFIS[ST.secKey].nome} — este é o seu Se Amostramento.\n\n(Modo ensaio ativo — configure a chave Claude para gerar o plano personalizado.)\n\nSeja você com força.`;
-    ST.plan = mock;
-    showPlan(mock);
-    note.textContent = ST.demo ? 'Modo ensaio — dados não salvos.' : 'Resultado calculado.';
-    return;
-  }
+  // Simula carregamento por 1.2s para dar feedback visual
+  await new Promise(r => setTimeout(r, 1200));
 
-  let mi = 0;
-  const iv = setInterval(() => {
-    mi = (mi+1) % PLAN_MSGS.length;
-    const el = document.getElementById('plan-msg');
-    if (el) el.textContent = PLAN_MSGS[mi];
-  }, 2200);
-
-  const dom = PERFIS[ST.domKey];
-  const sec = PERFIS[ST.secKey];
-  const total = Object.values(ST.scores).reduce((a,b)=>a+b,0);
-  const dist  = Object.entries(ST.scores)
-    .sort((a,b)=>b[1]-a[1])
-    .map(([k,v])=>`${PERFIS[k].nome}: ${total>0?Math.round(v/total*100):0}%`)
-    .join(', ');
-
-  const sys = `Você é um assistente que escreve, na voz de Wladson Sidney, planos de ação de "Se Amostramento Profissional" — método de Wladson Sidney (Presidente ADVB Ceará, CEO Sancho Gestão de Carreiras).
-
-REGRAS DE CONTEÚDO (não negociáveis):
-- O método NUNCA recomenda fórmulas vazias de engajamento (dancinhas, polêmica gratuita). A autenticidade vem antes do alcance.
-- Mantra central do método: "Seja você com força." Não tente ser quem você não é.
-- Autoridade é diferente de arrogância: autoridade é compartilhar experiência, entregar valor e servir — não buscar aplauso.
-- O plano deve levar a pessoa a transitar pelos 5 Níveis do Se Amostramento:
-  1. Existir (você faz, mas ninguém sabe)
-  2. Aparecer (começa a mostrar, ainda com vergonha)
-  3. Compartilhar (divide conhecimento, é associado a um tema)
-  4. Influenciar (procuram sua opinião)
-  5. Referência (quando falam do assunto, falam de você)
-- Use o tipo dominante e o tipo de apoio para calibrar AÇÕES CONCRETAS e a forma de comunicação — não apenas descrever a personalidade.
-- Ações devem ser práticas e específicas à área de atuação informada, nunca genéricas.
-- Tom: direto, acolhedor, com humor seco característico de Wladson. Evitar linguagem corporativa fria ou "coach motivacional" genérico.
-
-ESTRUTURA OBRIGATÓRIA DA RESPOSTA:
-1. Abertura curta nomeando o perfil dominante + de apoio da pessoa
-2. Em qual dos 5 Níveis ela provavelmente está hoje, e por quê (inferir com base no perfil, avisar que é hipótese de ponto de partida)
-3. 3 a 5 ações concretas de Se Amostramento, adaptadas ao perfil dominante e à área de atuação informada
-4. 1 alerta sobre o "Ponto de Melhoria" do perfil dominante que pode sabotar o Se Amostramento, com como mitigar
-5. Fechamento reforçando "Seja você com força" e o conceito de consistência ("autoridade não nasce da intensidade, nasce da consistência")`;
-
-  const usr = `Crie um plano de ação de Se Amostramento Profissional para:
-- Nome: ${ST.user.nome}
-- Área de atuação: ${ST.user.area}
-- Perfil dominante: ${dom.nome} (${dom.lema})
-  O que lhe move: ${dom.move}
-  Comportamento: ${dom.comportamento.join(', ')}
-  Pontos Fortes: ${dom.fortes.join(', ')}
-  Pontos de Melhoria: ${dom.melhoras.join(', ')}
-  Motivadores: ${dom.motivadores.join(', ')}
-- Perfil de apoio: ${sec.nome} (${sec.lema})
-  O que lhe move: ${sec.move}
-  Pontos Fortes: ${sec.fortes.join(', ')}
-- Distribuição completa dos tipos: ${dist}`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type':                             'application/json',
-        'x-api-key':                                CLAUDE_KEY,
-        'anthropic-version':                        '2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true',
-      },
-      body: JSON.stringify({
-        model:      'claude-sonnet-4-6',
-        max_tokens: 1200,
-        system:     sys,
-        messages:   [{ role:'user', content:usr }],
-      }),
-    });
-    clearInterval(iv);
-    if (!res.ok) throw new Error('API ' + res.status);
-    const data = await res.json();
-    const plan = data.content[0].text;
-    ST.plan = plan;
-    showPlan(plan);
-    await fbSaveResult(plan);
-    note.textContent = 'Resultado salvo! Recupere pelo seu WhatsApp a qualquer momento.';
-  } catch(e) {
-    clearInterval(iv);
-    console.error('Claude:', e);
-    showPlanErr();
-    fbSaveResult('');
-    note.textContent = 'Resultado salvo.';
-  }
+  const plan = gerarPlano(ST.user.nome, ST.user.area, ST.domKey, ST.secKey);
+  ST.plan = plan;
+  showPlan(plan);
+  await fbSaveResult(plan);
+  note.textContent = ST.demo
+    ? 'Modo ensaio — dados não salvos.'
+    : 'Resultado salvo! Recupere pelo seu WhatsApp a qualquer momento.';
 }
 
 /* ============================================================
