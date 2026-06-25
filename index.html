@@ -462,7 +462,7 @@ body {
   font-family: 'Inter', sans-serif;
   font-size: clamp(9px, 0.75vw, 11px);
   font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
-  color: #25D366; text-align: center;
+  color: var(--pink); text-align: center;
 }
 .wpp-right {
   display: flex; flex-direction: column;
@@ -470,9 +470,9 @@ body {
 }
 .wpp-badge {
   display: inline-flex; align-items: center; gap: 7px;
-  background: rgba(37,211,102,0.12);
-  border: 1px solid rgba(37,211,102,0.3);
-  color: #25D366;
+  background: rgba(232,24,109,0.10);
+  border: 1px solid rgba(232,24,109,0.30);
+  color: var(--pink);
   font-size: clamp(10px, 0.85vw, 12px);
   font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
   padding: 5px 14px; border-radius: 999px;
@@ -492,8 +492,8 @@ body {
 }
 .wpp-cta-box {
   display: flex; align-items: center; gap: 16px;
-  background: rgba(37,211,102,0.08);
-  border: 1.5px solid rgba(37,211,102,0.25);
+  background: rgba(232,24,109,0.07);
+  border: 1.5px solid rgba(232,24,109,0.25);
   border-radius: 16px;
   padding: clamp(14px, 2vh, 20px) clamp(18px, 2vw, 26px);
   margin-top: 4px;
@@ -502,7 +502,7 @@ body {
 .wpp-cta-label {
   font-family: 'Space Grotesk', sans-serif;
   font-size: clamp(14px, 1.25vw, 19px); font-weight: 700;
-  color: #25D366;
+  color: var(--pink);
 }
 .wpp-cta-hint {
   font-size: clamp(11px, 0.9vw, 14px);
@@ -1187,20 +1187,10 @@ body {
   <div class="slide light" id="slide-wordcloud" data-frags="0" style="align-items:center;text-align:center;">
     <div class="kicker"><span class="accent">O que a sala disse sobre si mesma</span></div>
     <div class="display" style="font-size:clamp(26px,3.6vw,52px);">A palavra que <span class="hl">te define</span></div>
-    <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:clamp(6px,1.2vw,18px);padding:clamp(10px,2vh,24px) 0;max-width:900px;">
-      <span style="font-size:clamp(28px,4.2vw,62px);font-weight:900;color:var(--text-dark);">Criativo</span>
-      <span style="font-size:clamp(16px,2vw,30px);font-weight:700;color:var(--pink);">Impressão</span>
-      <span style="font-size:clamp(22px,3.2vw,48px);font-weight:800;color:var(--pink);">Marketing</span>
-      <span style="font-size:clamp(13px,1.3vw,20px);font-weight:500;color:var(--text-muted);">Sucesso</span>
-      <span style="font-size:clamp(18px,2.4vw,36px);font-weight:700;color:var(--text-dark);">Arte</span>
-      <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Desenho</span>
-      <span style="font-size:clamp(20px,2.8vw,42px);font-weight:800;color:var(--text-dark);">Perspectiva</span>
-      <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Promoção</span>
-      <span style="font-size:clamp(18px,2.2vw,34px);font-weight:700;color:var(--pink);">Ideia</span>
-      <span style="font-size:clamp(20px,2.6vw,40px);font-weight:800;color:var(--text-dark);">Estilo</span>
-      <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Comercial</span>
-      <span style="font-size:clamp(16px,1.8vw,28px);font-weight:700;color:var(--pink);">Cor</span>
-      <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Esboço</span>
+    <div id="wordCloud"></div>
+    <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;">
+      <span class="word-count-display" id="word-count">0</span>
+      <span style="font-size:clamp(13px,1.1vw,17px);color:var(--text-muted);">palavras registradas</span>
     </div>
   </div>
 
@@ -1477,13 +1467,13 @@ body {
 <script>
 // ===================== CONFIG =====================
 var firebaseConfig = {
-  apiKey:            "COLE_AQUI",
-  authDomain:        "COLE_AQUI",
-  databaseURL:       "COLE_AQUI",
-  projectId:         "COLE_AQUI",
-  storageBucket:     "COLE_AQUI",
-  messagingSenderId: "COLE_AQUI",
-  appId:             "COLE_AQUI"
+  apiKey:            "AIzaSyAGfJn3Mnl59xhe9G4xEX0bWMtzVe9NOEU",
+  authDomain:        "sancho-workshop.firebaseapp.com",
+  databaseURL:       "https://sancho-workshop-default-rtdb.firebaseio.com",
+  projectId:         "sancho-workshop",
+  storageBucket:     "sancho-workshop.firebasestorage.app",
+  messagingSenderId: "134141850640",
+  appId:             "1:134141850640:web:bdb6136b245a1d803d4695"
 };
 
 var FORM_URL = window.location.href.split('#')[0] + '#/form';
@@ -1889,7 +1879,7 @@ function renderQR() {
 function renderWhatsAppQR() {
   var host = document.getElementById('qrcode-wpp');
   if (!host || host.children.length > 0) return;
-  var msg = 'Oi Wladson! Vi sua apresentação e quero receber o meu Mapa do Se Amostramento Profissional 🗺️';
+  var msg = 'Oi! Vi a apresentação e quero receber o meu Mapa do Se Amostramento Astral 🗺️';
   var url = 'https://wa.me/5585921458820?text=' + encodeURIComponent(msg);
   try {
     new QRCode(host, {
