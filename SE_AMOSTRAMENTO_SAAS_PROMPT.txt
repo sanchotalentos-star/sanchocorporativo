@@ -1,0 +1,974 @@
+# SE Amostramento Pro — Plataforma SaaS EdTech B2B
+
+## OBJETIVO
+Criar do zero uma plataforma SaaS EdTech B2B chamada **SE Amostramento Pro** — um produto
+de capacitação em Comunicação Corporativa baseado no Método SE Amostramento Profissional.
+A plataforma vende acesso a trilhas de comunicação, workshops e materiais exclusivos do método
+para profissionais autônomos, equipes e empresas de todos os portes.
+
+Não há nenhum projeto base. Construa tudo do zero.
+
+---
+
+## STACK OBRIGATÓRIA
+
+- **Frontend**: React 18 + TypeScript + Vite + TailwindCSS v4 + shadcn/ui +
+  TanStack Router (file-based) + TanStack Query + Framer Motion + Lucide React
+  (ícones exclusivamente) + Sonner (toasts) + Recharts (gráficos) + Zod
+  (validação)
+- **Backend**: Supabase (PostgreSQL + Auth + Edge Functions + Storage + Realtime)
+- **Pagamentos**: Stripe (Hosted Checkout — card e PIX)
+- **Email**: Resend
+- **Regras rígidas de código**:
+  - Zero `any` em TypeScript — use `unknown` com type guard
+  - Zod em todos os formulários e Edge Functions
+  - Nenhuma dependência nova além das listadas acima
+  - Mobile-first obrigatório (375px como base)
+  - WCAG 2.1 AA em todos os componentes
+  - ARIA correto em todos os elementos interativos
+  - Lucide React como única fonte de ícones
+  - Nunca editar `routeTree.gen.ts` manualmente
+
+---
+
+## DESIGN SYSTEM — SE AMOSTRAMENTO PRO
+
+### Identidade Visual
+O design segue a identidade do Método SE Amostramento Profissional: visual escuro,
+premium e corporativo com gradiente roxo-azul, tipografia bold e personalidade de marca
+forte. O tema padrão é **dark mode** com opção de light mode.
+
+### Paleta de cores
+```css
+/* Tons principais — Roxo marca */
+--color-primary:        #7B2FBE;  /* Roxo marca — CTAs primários, botões principais */
+--color-primary-hover:  #6B21A8;  /* Hover de CTA primário */
+--color-primary-dark:   #4C1D95;  /* Seções hero, footer */
+--color-primary-light:  #9D4FE3;  /* Gradiente, destaques leves */
+
+/* Tons de apoio — Azul elétrico */
+--color-accent:         #2979FF;  /* Links, ícones de ação, bordas ativas */
+--color-accent-light:   #5C9DFF;  /* Hover de elementos accent */
+--color-accent-glow:    #1565C0;  /* Sombra/glow azul em elementos premium */
+
+/* Gradiente de marca */
+--gradient-brand: linear-gradient(135deg, #2979FF 0%, #7B2FBE 50%, #4C1D95 100%);
+--gradient-hero:  linear-gradient(135deg, #080810 0%, #1A0A2E 50%, #0D1533 100%);
+--gradient-card:  linear-gradient(135deg, rgba(123,47,190,0.15) 0%, rgba(41,121,255,0.08) 100%);
+
+/* Fundos Dark (tema padrão) */
+--color-bg:             #080810;  /* Fundo base — preto profundo */
+--color-surface:        #0F0F1A;  /* Superfície secundária */
+--color-card:           #18182A;  /* Cards e painéis */
+--color-card-hover:     #1E1E34;  /* Hover de cards */
+--color-border:         #2A2A40;  /* Bordas suaves */
+--color-border-active:  #7B2FBE;  /* Bordas de elementos ativos */
+
+/* Textos Dark */
+--color-text-primary:   #FFFFFF;  /* Texto principal */
+--color-text-secondary: #C4B5FD;  /* Texto secundário — roxo claro */
+--color-text-muted:     #7C7C9C;  /* Labels, placeholders */
+
+/* Destaque / Premium */
+--color-neon:           #BF5AF2;  /* Neon roxo para badges premium */
+--color-neon-hover:     #A855F7;  /* Hover neon */
+--color-success:        #22C55E;  /* Sucesso */
+--color-warning:        #F59E0B;  /* Alerta */
+--color-danger:         #EF4444;  /* Erro / perigo */
+
+/* Light mode (alternativo) */
+--color-bg-light:       #FFFFFF;
+--color-surface-light:  #F4F0FF;  /* Fundo levemente lilás */
+--color-card-light:     #FFFFFF;
+--color-border-light:   #E2D9F3;
+--color-text-primary-light:   #1A0A2E;
+--color-text-secondary-light: #4C1D95;
+--color-text-muted-light:     #6B6B8A;
+```
+
+### Regras de uso
+- CTA primário: fundo `#7B2FBE`, texto `#FFFFFF`, hover `#6B21A8`
+- CTA secundário: borda `#2979FF`, texto `#2979FF`, hover com fundo `rgba(41,121,255,0.1)`
+- Badge premium / plano Elite: fundo `#BF5AF2`, texto `#FFFFFF`
+- Gradiente de marca em banners, heroes e CTAs de destaque: `var(--gradient-brand)`
+- Hero sections: `var(--gradient-hero)` sobre fundo escuro
+- Cards no dark mode: `#18182A` com borda `#2A2A40`
+- NUNCA usar texto muted (`#7C7C9C`) em fundo escuro sem tamanho mínimo 14px
+- Tipografia: **Space Grotesk** (sans-serif) para UI e body; **Bebas Neue** ou **Oswald** para headings grandes e logo text (bold, condensed, uppercase — refletindo a identidade visual do método)
+- Todos os botões primários com border-radius de 8px; não arredondar excessivamente
+- Inputs com borda `#2A2A40` e focus ring `#7B2FBE`
+
+### Efeitos visuais de marca
+- Glow roxo sutil em elementos de destaque: `box-shadow: 0 0 20px rgba(123,47,190,0.4)`
+- Glow azul em hover de elementos accent: `box-shadow: 0 0 16px rgba(41,121,255,0.35)`
+- Gradiente de fundo nos heroes com partículas/ruído sutil simulando a identidade do PDF
+- Cards com borda `1px solid #2A2A40` e hover com `1px solid #7B2FBE`
+
+---
+
+## ENTIDADES DO NEGÓCIO
+
+### Tipos de conta (enum `account_type`)
+- `individual` — Profissional autônomo / Pessoa Física
+- `startup` — Equipe pequena com até 15 usuários
+- `empresa` — Empresa com até 50 usuários
+- `corporativo` — Empresa sem limite de usuários (plano enterprise)
+
+### Papéis (enum `user_role`)
+- `admin` — Equipe interna da SE Amostramento (acesso total)
+- `org_admin` — Gestor da empresa cliente (gerencia membros da própria org)
+- `membro` — Usuário final que consome conteúdo
+
+### Planos de assinatura
+- **Solo** (individual): 1 usuário, acesso ao Método SE básico + trilhas essenciais
+- **Team** (startup): até 15 usuários, método completo + workshops gravados + materiais
+- **Empresa** (empresa): até 50 usuários, tudo + simulações práticas + relatórios de evolução
+- **Corporativo** (corporativo): usuários ilimitados, tudo + consultoria dedicada + customização de acesso por departamento + eventos ao vivo
+
+---
+
+## BANCO DE DADOS — MIGRATIONS SUPABASE
+
+Crie os arquivos em `supabase/migrations/` com esta ordem:
+
+### 001_core_schema.sql
+```sql
+-- Extensões
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- Enums
+CREATE TYPE account_type AS ENUM ('individual', 'startup', 'empresa', 'corporativo');
+CREATE TYPE user_role AS ENUM ('admin', 'org_admin', 'membro');
+CREATE TYPE subscription_status AS ENUM ('active', 'trialing', 'past_due', 'canceled', 'paused');
+CREATE TYPE content_type AS ENUM ('video', 'pdf', 'slide', 'quiz', 'simulacao', 'live');
+CREATE TYPE request_status AS ENUM ('pending', 'approved', 'rejected');
+
+-- Organizações (empresas clientes)
+CREATE TABLE organizations (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name            TEXT NOT NULL,
+  slug            TEXT UNIQUE NOT NULL,
+  account_type    account_type NOT NULL DEFAULT 'individual',
+  logo_url        TEXT,
+  website         TEXT,
+  cnpj            TEXT,
+  max_members     INTEGER NOT NULL DEFAULT 1,
+  is_active       BOOLEAN NOT NULL DEFAULT true,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Perfis de usuário (vinculados ao Supabase Auth)
+CREATE TABLE profiles (
+  id              UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  org_id          UUID REFERENCES organizations(id) ON DELETE SET NULL,
+  role            user_role NOT NULL DEFAULT 'membro',
+  full_name       TEXT NOT NULL,
+  email           TEXT NOT NULL,
+  avatar_url      TEXT,
+  bio             TEXT,
+  department      TEXT,
+  job_title       TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Assinaturas
+CREATE TABLE subscriptions (
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id                UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  stripe_customer_id    TEXT,
+  stripe_subscription_id TEXT,
+  plan_name             TEXT NOT NULL,
+  account_type          account_type NOT NULL,
+  status                subscription_status NOT NULL DEFAULT 'trialing',
+  current_period_start  TIMESTAMPTZ,
+  current_period_end    TIMESTAMPTZ,
+  created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Solicitações de acesso
+CREATE TABLE account_requests (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  full_name     TEXT NOT NULL,
+  email         TEXT NOT NULL,
+  org_name      TEXT,
+  account_type  account_type NOT NULL DEFAULT 'individual',
+  job_title     TEXT,
+  message       TEXT,
+  status        request_status NOT NULL DEFAULT 'pending',
+  reviewed_by   UUID REFERENCES profiles(id),
+  reviewed_at   TIMESTAMPTZ,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Trigger: atualiza updated_at automaticamente
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN NEW.updated_at = now(); RETURN NEW; END; $$;
+
+CREATE TRIGGER trg_organizations_updated_at
+  BEFORE UPDATE ON organizations FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+CREATE TRIGGER trg_profiles_updated_at
+  BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Trigger: cria profile automaticamente ao criar usuário no Auth
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
+BEGIN
+  INSERT INTO profiles (id, email, full_name)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1))
+  )
+  ON CONFLICT (id) DO NOTHING;
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN RETURN NEW;
+END; $$;
+
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+```
+
+### 002_content_schema.sql
+```sql
+-- Trilhas de comunicação corporativa
+CREATE TABLE trails (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title         TEXT NOT NULL,
+  description   TEXT,
+  thumbnail_url TEXT,
+  category      TEXT NOT NULL DEFAULT 'comunicacao', -- comunicacao | oratoria | lideranca | apresentacao | negociacao
+  level         TEXT NOT NULL DEFAULT 'essencial',   -- essencial | intermediario | avancado | master
+  duration_min  INTEGER DEFAULT 0,
+  is_published  BOOLEAN NOT NULL DEFAULT false,
+  is_featured   BOOLEAN NOT NULL DEFAULT false,
+  order_index   INTEGER NOT NULL DEFAULT 0,
+  instructor_name TEXT,
+  instructor_bio  TEXT,
+  instructor_avatar_url TEXT,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Módulos dentro de uma trilha
+CREATE TABLE trail_modules (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trail_id    UUID NOT NULL REFERENCES trails(id) ON DELETE CASCADE,
+  title       TEXT NOT NULL,
+  description TEXT,
+  order_index INTEGER NOT NULL DEFAULT 0,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Conteúdos (aulas, PDFs, slides, quizzes, simulações, lives)
+CREATE TABLE contents (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  module_id     UUID NOT NULL REFERENCES trail_modules(id) ON DELETE CASCADE,
+  title         TEXT NOT NULL,
+  description   TEXT,
+  content_type  content_type NOT NULL DEFAULT 'video',
+  storage_path  TEXT,
+  external_url  TEXT,
+  duration_min  INTEGER DEFAULT 0,
+  order_index   INTEGER NOT NULL DEFAULT 0,
+  is_published  BOOLEAN NOT NULL DEFAULT false,
+  is_preview    BOOLEAN NOT NULL DEFAULT false, -- amostra gratuita
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Sessões ao vivo / workshops (lives)
+CREATE TABLE live_sessions (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trail_id        UUID REFERENCES trails(id) ON DELETE SET NULL,
+  title           TEXT NOT NULL,
+  description     TEXT,
+  scheduled_at    TIMESTAMPTZ NOT NULL,
+  duration_min    INTEGER DEFAULT 90,
+  meeting_url     TEXT,
+  recording_url   TEXT,
+  is_published    BOOLEAN NOT NULL DEFAULT false,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Acesso de organizações a trilhas
+CREATE TABLE org_trail_access (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id      UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  trail_id    UUID NOT NULL REFERENCES trails(id) ON DELETE CASCADE,
+  granted_by  UUID REFERENCES profiles(id),
+  expires_at  TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(org_id, trail_id)
+);
+
+-- Acesso de organizações a conteúdos individuais
+CREATE TABLE org_content_access (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id      UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  content_id  UUID NOT NULL REFERENCES contents(id) ON DELETE CASCADE,
+  granted_by  UUID REFERENCES profiles(id),
+  expires_at  TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(org_id, content_id)
+);
+
+CREATE TRIGGER trg_trails_updated_at
+  BEFORE UPDATE ON trails FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER trg_contents_updated_at
+  BEFORE UPDATE ON contents FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER trg_live_sessions_updated_at
+  BEFORE UPDATE ON live_sessions FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+```
+
+### 003_progress_gamification.sql
+```sql
+-- Progresso por conteúdo
+CREATE TABLE user_progress (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id           UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  content_id        UUID NOT NULL REFERENCES contents(id) ON DELETE CASCADE,
+  completed         BOOLEAN NOT NULL DEFAULT false,
+  progress_percent  INTEGER NOT NULL DEFAULT 0 CHECK (progress_percent BETWEEN 0 AND 100),
+  last_position_sec INTEGER NOT NULL DEFAULT 0,
+  completed_at      TIMESTAMPTZ,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(user_id, content_id)
+);
+
+-- Progresso por trilha (calculado via trigger)
+CREATE TABLE user_trail_progress (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id           UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  trail_id          UUID NOT NULL REFERENCES trails(id) ON DELETE CASCADE,
+  completed_modules INTEGER NOT NULL DEFAULT 0,
+  total_modules     INTEGER NOT NULL DEFAULT 0,
+  progress_percent  INTEGER NOT NULL DEFAULT 0,
+  completed         BOOLEAN NOT NULL DEFAULT false,
+  completed_at      TIMESTAMPTZ,
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(user_id, trail_id)
+);
+
+-- Certificados emitidos
+CREATE TABLE certificates (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  trail_id    UUID NOT NULL REFERENCES trails(id) ON DELETE CASCADE,
+  issued_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  cert_url    TEXT,
+  UNIQUE(user_id, trail_id)
+);
+
+-- Conquistas disponíveis
+CREATE TABLE achievements (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title       TEXT NOT NULL,
+  description TEXT NOT NULL,
+  icon        TEXT NOT NULL DEFAULT 'award',
+  points      INTEGER NOT NULL DEFAULT 10,
+  condition   JSONB NOT NULL DEFAULT '{}'
+);
+
+-- Conquistas desbloqueadas por usuário
+CREATE TABLE user_achievements (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id        UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  achievement_id UUID NOT NULL REFERENCES achievements(id) ON DELETE CASCADE,
+  unlocked_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(user_id, achievement_id)
+);
+
+-- Pontuação agregada
+CREATE TABLE user_scores (
+  user_id       UUID PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
+  total_points  INTEGER NOT NULL DEFAULT 0,
+  streak_days   INTEGER NOT NULL DEFAULT 0,
+  last_activity DATE,
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Anotações do usuário em conteúdos
+CREATE TABLE content_notes (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id       UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  content_id    UUID NOT NULL REFERENCES contents(id) ON DELETE CASCADE,
+  timestamp_sec INTEGER,
+  body          TEXT NOT NULL,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Inscrições em lives
+CREATE TABLE live_registrations (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  live_session_id UUID NOT NULL REFERENCES live_sessions(id) ON DELETE CASCADE,
+  attended        BOOLEAN NOT NULL DEFAULT false,
+  registered_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(user_id, live_session_id)
+);
+
+-- Log de auditoria
+CREATE TABLE audit_log (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  actor_id   UUID REFERENCES profiles(id),
+  action     TEXT NOT NULL,
+  table_name TEXT,
+  record_id  UUID,
+  metadata   JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Seed de conquistas iniciais
+INSERT INTO achievements (title, description, icon, points, condition) VALUES
+  ('Primeira Aula', 'Completou seu primeiro conteúdo do método', 'play-circle', 10, '{"type":"content_completed","count":1}'),
+  ('Comunicador em Formação', 'Completou 10 conteúdos', 'mic', 50, '{"type":"content_completed","count":10}'),
+  ('Método Concluído', 'Completou sua primeira trilha do Método SE', 'award', 100, '{"type":"trail_completed","count":1}'),
+  ('Presença Constante', 'Acessou a plataforma 7 dias seguidos', 'calendar', 70, '{"type":"streak","days":7}'),
+  ('Comunicador Expert', 'Atingiu 500 pontos na plataforma', 'zap', 200, '{"type":"points","total":500}'),
+  ('Certificado SE', 'Obteve seu primeiro certificado do Método SE', 'file-check', 150, '{"type":"certificate","count":1}'),
+  ('Participante Live', 'Participou de um workshop ao vivo', 'video', 60, '{"type":"live_attended","count":1}'),
+  ('Mestre da Comunicação', 'Completou todas as trilhas disponíveis', 'crown', 500, '{"type":"all_trails_completed"}');
+```
+
+### 004_rls_policies.sql
+```sql
+-- RLS: organizations
+ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "org_members_see_own_org" ON organizations
+  FOR SELECT TO authenticated
+  USING (id = (SELECT org_id FROM profiles WHERE id = auth.uid()));
+
+CREATE POLICY "admin_full_access_orgs" ON organizations
+  FOR ALL TO authenticated
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+-- RLS: profiles
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "users_see_own_profile" ON profiles
+  FOR SELECT TO authenticated
+  USING (id = auth.uid());
+
+CREATE POLICY "users_see_same_org_profiles" ON profiles
+  FOR SELECT TO authenticated
+  USING (
+    org_id IS NOT NULL AND
+    org_id = (SELECT org_id FROM profiles WHERE id = auth.uid())
+  );
+
+CREATE POLICY "users_update_own_profile" ON profiles
+  FOR UPDATE TO authenticated
+  USING (id = auth.uid());
+
+CREATE POLICY "admin_full_access_profiles" ON profiles
+  FOR ALL TO authenticated
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+-- RLS: account_requests
+ALTER TABLE account_requests ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "anon_can_request_access" ON account_requests
+  FOR INSERT TO anon, authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "admin_manages_requests" ON account_requests
+  FOR ALL TO authenticated
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+-- RLS: trails
+ALTER TABLE trails ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "members_see_accessible_trails" ON trails
+  FOR SELECT TO authenticated
+  USING (
+    is_published = true AND (
+      (SELECT role FROM profiles WHERE id = auth.uid()) = 'admin'
+      OR is_preview = true
+      OR EXISTS (
+        SELECT 1 FROM org_trail_access ota
+        JOIN profiles p ON p.org_id = ota.org_id
+        WHERE p.id = auth.uid() AND ota.trail_id = trails.id
+        AND (ota.expires_at IS NULL OR ota.expires_at > now())
+      )
+    )
+  );
+
+CREATE POLICY "admin_full_access_trails" ON trails
+  FOR ALL TO authenticated
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+-- RLS: contents
+ALTER TABLE contents ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "members_see_accessible_contents" ON contents
+  FOR SELECT TO authenticated
+  USING (
+    is_published = true AND (
+      (SELECT role FROM profiles WHERE id = auth.uid()) = 'admin'
+      OR is_preview = true
+      OR EXISTS (
+        SELECT 1 FROM org_content_access oca
+        JOIN profiles p ON p.org_id = oca.org_id
+        WHERE p.id = auth.uid() AND oca.content_id = contents.id
+        AND (oca.expires_at IS NULL OR oca.expires_at > now())
+      )
+      OR EXISTS (
+        SELECT 1 FROM org_trail_access ota
+        JOIN profiles p ON p.org_id = ota.org_id
+        JOIN trail_modules tm ON tm.trail_id = ota.trail_id
+        WHERE p.id = auth.uid() AND tm.id = contents.module_id
+        AND (ota.expires_at IS NULL OR ota.expires_at > now())
+      )
+    )
+  );
+
+CREATE POLICY "admin_full_access_contents" ON contents
+  FOR ALL TO authenticated
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+-- RLS: user_progress
+ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "users_own_progress" ON user_progress
+  FOR ALL TO authenticated
+  USING (user_id = auth.uid());
+
+CREATE POLICY "org_admin_see_org_progress" ON user_progress
+  FOR SELECT TO authenticated
+  USING (
+    (SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'org_admin')
+    AND user_id IN (
+      SELECT id FROM profiles WHERE org_id = (
+        SELECT org_id FROM profiles WHERE id = auth.uid()
+      )
+    )
+  );
+
+-- RLS: certificates
+ALTER TABLE certificates ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_certificates" ON certificates FOR SELECT TO authenticated USING (user_id = auth.uid());
+CREATE POLICY "admin_manages_certificates" ON certificates FOR ALL TO authenticated
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+-- RLS: user_scores
+ALTER TABLE user_scores ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_scores" ON user_scores FOR ALL TO authenticated USING (user_id = auth.uid());
+CREATE POLICY "org_can_see_scores" ON user_scores FOR SELECT TO authenticated
+  USING (user_id IN (SELECT id FROM profiles WHERE org_id = (SELECT org_id FROM profiles WHERE id = auth.uid())));
+
+-- RLS: content_notes
+ALTER TABLE content_notes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_notes" ON content_notes FOR ALL TO authenticated USING (user_id = auth.uid());
+
+-- RLS: live_sessions
+ALTER TABLE live_sessions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "members_see_published_lives" ON live_sessions FOR SELECT TO authenticated USING (is_published = true);
+CREATE POLICY "admin_full_access_lives" ON live_sessions FOR ALL TO authenticated
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+-- RLS: live_registrations
+ALTER TABLE live_registrations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_own_registrations" ON live_registrations FOR ALL TO authenticated USING (user_id = auth.uid());
+CREATE POLICY "admin_see_all_registrations" ON live_registrations FOR SELECT TO authenticated
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+-- RLS: audit_log
+ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "admin_sees_audit" ON audit_log FOR SELECT TO authenticated
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+CREATE POLICY "system_inserts_audit" ON audit_log FOR INSERT TO authenticated WITH CHECK (true);
+```
+
+---
+
+## ESTRUTURA DE ROTAS (TanStack Router file-based)
+src/routes/
+
+├── __root.tsx          — Layout raiz com skip-to-content e AnimatePresence
+
+├── index.tsx           — Landing page pública
+
+├── auth.tsx            — Login / Solicitar Acesso / Recuperar senha
+
+├── dashboard/
+
+│   ├── admin.tsx       — Layout admin com sidebar (AuthGuard role="admin")
+
+│   ├── admin/
+
+│   │   ├── index.tsx          — Visão geral: KPIs + gráficos + usuários online
+
+│   │   ├── clientes.tsx       — Gestão de organizações clientes
+
+│   │   ├── membros.tsx        — Gestão de usuários/membros
+
+│   │   ├── solicitacoes.tsx   — Fila de aprovação de novas contas
+
+│   │   ├── trilhas.tsx        — CRUD de trilhas e módulos do Método SE
+
+│   │   ├── upload.tsx         — Upload de conteúdos (4 steps)
+
+│   │   ├── lives.tsx          — Gestão de workshops e sessões ao vivo
+
+│   │   ├── acesso.tsx         — Controle de acesso por organização
+
+│   │   └── relatorios.tsx     — Engajamento, evolução, ranking por org
+
+│   ├── membro.tsx      — Layout membro com sidebar (AuthGuard role="membro|org_admin")
+
+│   └── membro/
+
+│       ├── index.tsx          — Home: trilhas em andamento + próximas lives
+
+│       ├── trilhas.tsx        — Catálogo de trilhas do Método SE
+
+│       ├── trilha.$id.tsx     — Detalhe de trilha com módulos
+
+│       ├── player.$id.tsx     — Player de conteúdo com anotações
+
+│       ├── materiais.tsx      — Slides, PDFs e materiais de apoio
+
+│       ├── lives.tsx          — Próximas lives e workshops ao vivo
+
+│       ├── progresso.tsx      — KPIs pessoais + conquistas + streak + certificados
+
+│       └── ranking.tsx        — Ranking da organização
+
+---
+
+## TELAS E COMPONENTES
+
+### 1. Landing Page (`/`)
+- Navbar com logo SE AMOSTRAMENTO PRO + CTA "Solicitar Acesso" e "Entrar"
+  - Logo: texto bold uppercase com estilo da marca (roxo/branco)
+  - Fundo navbar: `rgba(8,8,16,0.95)` com backdrop-blur
+- **Hero section** com gradiente escuro (`var(--gradient-hero)`):
+  - Headline impactante: "Domine a Comunicação Corporativa. Domine o Ambiente."
+  - Subheadline sobre o Método SE Amostramento Profissional
+  - CTA primário roxo + CTA secundário outline azul
+  - Imagem/visual de fundo com gradiente azul-roxo (referência ao PDF)
+  - Badge animado: "Método exclusivo de Comunicação Corporativa"
+- **Seção "O Método SE"**: 3 pilares do método com ícones Lucide + descrição (cards dark com borda roxa)
+- **Seção de planos**: 4 cards dark (Solo / Team / Empresa / Corporativo) com badges de tipo e CTA por plano
+  - Plano destaque (Team) com borda roxa e badge "Mais Popular"
+- **Seção de depoimentos**: 3 cards com citações fictícias realistas de profissionais e executivos
+- **Seção de features**: grid com ícones Lucide + descrição de cada diferencial do método
+- **Seção "Próximas Lives"**: cards de workshops com data, horário e botão de inscrição
+- **Footer dark**: `var(--color-bg)` com logo, links de produto, empresa e contato; tagline "Comunicação que transforma carreiras"
+
+### 2. Autenticação (`/auth`)
+Tabs com 3 estados, tema dark:
+- **Entrar**: email + senha, "Esqueci a senha", botão roxo primário
+- **Solicitar Acesso**: nome, email, nome da empresa, tipo de conta (select com os 4 tipos), cargo, mensagem opcional — ao submeter insere em `account_requests` e mostra confirmação com animação
+- **Recuperar senha**: email → link de redefinição via Supabase Auth
+- Validação Zod em todos os campos
+- Estados de loading, erro e sucesso com Sonner
+- Background com gradiente `var(--gradient-hero)` + logo da marca centralizada
+
+### 3. Dashboard Admin
+
+**Visão Geral (`/dashboard/admin`)**
+- 4 KPI cards dark com count-up: Total de Clientes, Membros Ativos, Trilhas Publicadas, Usuários Online (Realtime)
+- Gráfico de acessos diários (linha com cor roxa) — últimos 30 dias
+- Gráfico de membros por tipo de conta (barras com gradiente roxo-azul)
+- Tabela compacta das últimas solicitações pendentes com botão de aprovação rápida
+- Cards de alertas: organizações com assinatura vencendo em 7 dias
+- Próximas lives agendadas com contagem de inscritos
+
+**Gestão de Clientes (`/dashboard/admin/clientes`)**
+- Tabela com colunas: Logo, Nome da Org, Tipo (badge colorido por porte), Membros Ativos / Limite, Plano, Status da Assinatura, Ações
+- Filtros: tipo de conta, status de assinatura, busca por nome
+- Modal de detalhes da org: dados gerais + lista de membros + histórico de pagamentos
+- Ações: Editar, Desativar, Ver membros, Gerenciar acesso a trilhas
+
+**Gestão de Membros (`/dashboard/admin/membros`)**
+- Tabela com: Avatar, Nome, Email, Organização, Cargo, Papel (badge), Último acesso, Certificados, Ações
+- Filtros: organização, papel, status de atividade
+- Modal de detalhes: progresso nas trilhas, pontuação, conquistas, certificados emitidos
+- Ações: Alterar papel, Desativar, Redefinir senha, Ver progresso, Emitir certificado
+
+**Solicitações (`/dashboard/admin/solicitacoes`)**
+- Lista com badge de contagem pendente na sidebar
+- Cards por solicitação: nome, email, empresa, tipo de conta, mensagem, data
+- Ações: Aprovar (cria org + usuário via Edge Function) / Rejeitar (com motivo)
+- Filtro por status: pendente / aprovado / rejeitado
+
+**Upload de Conteúdo (`/dashboard/admin/upload`)**
+Stepper animado em 4 passos:
+1. **Selecionar trilha e módulo** — dropdowns hierárquicos com busca
+2. **Fazer upload** — drag-and-drop com barra de progresso roxa, preview para PDFs/slides/vídeos
+3. **Configurar acesso** — selecionar quais organizações podem ver + data de expiração opcional + marcar como preview gratuito
+4. **Revisar e publicar** — resumo completo com checkbox "Publicar imediatamente"
+
+**Gestão de Lives (`/dashboard/admin/lives`)**
+- Lista de sessões ao vivo: título, data/hora, trilha associada, inscritos, status
+- Modal de criação/edição de live: título, descrição, data, duração, link da sala, trilha vinculada
+- Após a live: campo para URL da gravação
+- Filtros: status (agendada / realizada / cancelada), trilha
+
+**Controle de Acesso (`/dashboard/admin/acesso`)**
+- Matriz visual: linhas = organizações, colunas = trilhas
+- Célula com toggle de acesso + indicador de expiração
+- Filtros por tipo de organização e categoria de trilha
+- Ação em lote: conceder/revogar acesso para múltiplas orgs
+
+**Relatórios (`/dashboard/admin/relatorios`)**
+- KPIs: taxa de conclusão média por trilha, membros mais ativos, certificados emitidos
+- Gráfico de evolução de membros por semana
+- Ranking por organização: % de conclusão + pontos totais
+- Gráfico de conteúdos mais assistidos
+- Participação em lives por sessão
+- Export CSV de dados agregados
+
+### 4. Dashboard Membro
+
+**Home (`/dashboard/membro`)**
+- Banner de boas-vindas com gradiente roxo-azul: nome do usuário, streak atual e pontuação
+- Seção "Continue de onde parou": cards horizontais de conteúdos em progresso
+- Seção "Trilhas do Método SE": grid 3 col com cards de trilha (tema dark)
+- Seção "Próximas Lives": card compacto com data + botão de inscrição
+- Seção "Conquistas Recentes": badges desbloqueados com animação
+
+**Trilhas (`/dashboard/membro/trilhas`)**
+- Filtros por categoria (comunicação / oratória / liderança / apresentação / negociação), nível e status
+- Grid responsivo de cards dark: thumbnail 16:9, título, categoria badge roxo, nível, progresso bar, duração
+- Hover com lift + sombra roxa: `box-shadow: 0 8px 32px rgba(123,47,190,0.3)`
+- Empty state quando nenhuma trilha está disponível
+
+**Detalhe de Trilha (`/dashboard/membro/trilha.$id`)**
+- Header com gradiente escuro + thumbnail + título + descrição + progresso geral
+- Info do instrutor: avatar + nome + bio
+- Accordion de módulos com lista de conteúdos
+- Indicador de status por conteúdo: não iniciado / em andamento / concluído (ícones Lucide)
+- Badge "Preview Gratuito" em conteúdos is_preview
+- Botão "Continuar" leva ao próximo conteúdo não concluído
+
+**Player (`/dashboard/membro/player.$id`)**
+- Área principal dark de conteúdo (vídeo embed ou PDF viewer)
+- Painel lateral de anotações com tema dark: campo de texto com timestamp automático, lista de notas, edição inline, export .md
+- Marcação de "Concluído" com animação de partículas roxas
+- Navegação para conteúdo anterior / próximo
+- Progresso sincronizado com `user_progress`
+
+**Materiais (`/dashboard/membro/materiais`)**
+- Grid de PDFs, slides e materiais de apoio
+- Filtro por tipo (Slide / PDF / Resumo / Template) e trilha de origem
+- Busca por título
+- Card dark com ícone Lucide, título, trilha origem, botão Download com ícone
+
+**Workshops ao Vivo (`/dashboard/membro/lives`)**
+- Cards de próximas lives com gradiente roxo, data/hora, instrutor, vagas disponíveis
+- Botão "Inscrever-se" com confirmação via Sonner
+- Seção de gravações anteriores: cards com thumbnail + título + duração
+- Badge "Inscrito" em lives onde já se registrou
+
+**Meu Progresso (`/dashboard/membro/progresso`)**
+- 4 KPI cards dark com count-up: Conteúdos Concluídos, Trilhas Completas, Pontos Acumulados, Streak Atual
+- Progress bar geral com gradiente roxo-azul
+- Grid de conquistas: desbloqueadas (coloridas com glow roxo) vs bloqueadas (cinza + dica)
+- Gráfico de atividade semanal (barras roxas)
+- Seção de Certificados: grid de certificados emitidos com botão de download/compartilhar
+
+**Ranking (`/dashboard/membro/ranking`)**
+- Tabela dark de ranking da organização: posição, avatar, nome, cargo, pontos, conquistas
+- Linha do usuário atual destacada com fundo `rgba(123,47,190,0.2)` e borda roxa
+- Top 3 com ícones de medalha (ouro/prata/bronze) — Gold usa neon roxo para a paleta da marca
+- Filtro por período: semana / mês / total
+
+---
+
+## COMPONENTES REUTILIZÁVEIS
+
+Crie em `src/components/`:
+```
+ui/
+  Button.tsx          — variantes: primary (roxo), secondary (outline azul), ghost, neon, danger
+  Badge.tsx           — variantes: default, primary (roxo), accent (azul), neon, success, warning, danger, outline
+  Card.tsx            — dark card com border, hover com borda roxa, gradient card
+  ProgressBar.tsx     — gradiente roxo-azul com animação de fill
+  CountUp.tsx         — animação numérica com Framer Motion
+  EmptyState.tsx      — ícone Lucide + título + descrição + CTA opcional (tema dark)
+  Skeleton.tsx        — placeholder animado dark para loading states
+  StatusChip.tsx      — chips coloridos para status de assinatura/conteúdo
+  GlowCard.tsx        — card com efeito glow roxo-azul no hover
+  ClientOnly.tsx      — wrapper para componentes que não rodam em SSR
+
+layout/
+  DashboardShell.tsx  — sidebar dark + topbar + outlet
+  Sidebar.tsx         — nav items com ícones Lucide, badge de notificação, logo SE no topo
+  Topbar.tsx          — título da página + notificações + avatar dropdown (tema dark)
+  AuthGuard.tsx       — redireciona se não autenticado ou sem permissão
+
+admin/
+  OrgTable.tsx        — tabela de organizações com ações
+  MemberTable.tsx     — tabela de membros com ações
+  RequestCard.tsx     — card de solicitação dark com aprovar/rejeitar
+  UploadWizard.tsx    — stepper de upload em 4 passos com barra de progresso roxa
+  AccessMatrix.tsx    — matriz de controle de acesso
+  KpiCard.tsx         — card dark de métrica com count-up e variação %
+  LiveManager.tsx     — gestão de sessões ao vivo
+
+membro/
+  TrailCard.tsx       — card dark de trilha com progresso e glow hover
+  ContentItem.tsx     — item de conteúdo na lista de módulos
+  AchievementBadge.tsx — badge de conquista com animação de unlock e glow roxo
+  NotePanel.tsx       — painel lateral dark de anotações
+  RankingTable.tsx    — tabela de ranking dark com destaque do usuário atual
+  CertificateCard.tsx — card de certificado emitido com opção de download
+  LiveCard.tsx        — card de sessão ao vivo com countdown e status
+```
+
+---
+
+## EDGE FUNCTIONS SUPABASE
+
+### `provision-access` (POST)
+Chamada quando admin aprova uma solicitação.
+1. Valida JWT (admin apenas)
+2. Cria organização em `organizations`
+3. Cria usuário no Supabase Auth com senha temporária
+4. Cria profile com `org_id` e `role = 'org_admin'`
+5. Envia email de boas-vindas via Resend com senha temporária e link para a plataforma
+6. Atualiza `account_requests` status para `approved`
+7. Insere em `audit_log`
+
+```typescript
+const schema = z.object({
+  request_id:   z.string().uuid(),
+  org_name:     z.string().min(2),
+  account_type: z.enum(['individual', 'startup', 'empresa', 'corporativo']),
+  plan_name:    z.string(),
+})
+```
+
+### `manage-member` (POST)
+Operações de membros que requerem service_role:
+- `action: 'invite'` — cria usuário e vincula à org
+- `action: 'remove'` — desvincula da org e desativa
+- `action: 'change_role'` — altera role do profile
+
+### `issue-certificate` (POST)
+Emissão de certificado ao concluir trilha:
+1. Valida conclusão da trilha (user_trail_progress.completed = true)
+2. Gera registro em `certificates`
+3. Envia email via Resend com link do certificado
+4. Insere conquista "Certificado SE" em `user_achievements` se aplicável
+
+```typescript
+const schema = z.object({
+  user_id:  z.string().uuid(),
+  trail_id: z.string().uuid(),
+})
+```
+
+---
+
+## MOCKS DE DADOS
+
+Crie em `src/lib/mocks/` para garantir que as telas renderizem sem dados reais:
+
+- `organizations.ts` — 5 organizações com tipos variados (incluindo nomes corporativos realistas)
+- `trails.ts` — 6 trilhas do Método SE com módulos e conteúdos (ex: "Comunicação de Alto Impacto", "Oratória Executiva", "Apresentações que Convencem")
+- `members.ts` — 12 membros de 3 organizações com cargos executivos realistas
+- `achievements.ts` — 8 conquistas com status variados
+- `requests.ts` — 4 solicitações pendentes de empresas
+- `analytics.ts` — dados para gráficos dos últimos 30 dias
+- `lives.ts` — 4 sessões ao vivo (2 futuras, 2 gravadas)
+- `certificates.ts` — 3 certificados emitidos
+
+---
+
+## ANIMAÇÕES (Framer Motion)
+
+Crie `src/lib/motion.ts` com variants reutilizáveis:
+
+```typescript
+export const fadeInUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+}
+
+export const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+}
+
+export const scaleIn = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.25 } },
+}
+
+export const glowPulse = {
+  initial: { boxShadow: '0 0 0px rgba(123,47,190,0)' },
+  animate: {
+    boxShadow: ['0 0 20px rgba(123,47,190,0.4)', '0 0 40px rgba(123,47,190,0.2)', '0 0 20px rgba(123,47,190,0.4)'],
+    transition: { duration: 2, repeat: Infinity },
+  },
+}
+
+export const slideInFromLeft = {
+  hidden: { opacity: 0, x: -24 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.4 } },
+}
+```
+
+Toda animação deve verificar `prefers-reduced-motion` e zerar duração quando ativo.
+
+---
+
+## CONFIGURAÇÕES DE AMBIENTE
+
+```env
+# .env.local
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_anon_key
+VITE_STRIPE_PUBLISHABLE_KEY=your_stripe_key
+```
+
+---
+
+## REGRAS FINAIS
+
+1. Nunca editar `routeTree.gen.ts` — o TanStack Router plugin regenera automaticamente
+2. Usar `src/lib/supabase.ts` como cliente singleton do Supabase
+3. Todos os formulários com React Hook Form + Zod + `zodResolver`
+4. Toasts via Sonner (não alert/window.confirm)
+5. Todos os modais via `Dialog` do shadcn/ui com focus trap
+6. Skeleton loading dark em toda listagem que aguarda dados do Supabase
+7. Nenhum `console.log` em produção — use `console.warn` apenas para debug
+8. Imports de ícones sempre do Lucide React, nunca de outra lib
+9. Paleta SE Amostramento aplicada via CSS variables — não hardcode hex inline
+10. `AuthGuard` em todas as rotas protegidas antes de qualquer fetch
+11. **Dark mode é o padrão** — usar `class="dark"` no `<html>` por padrão; light mode como alternativa via toggle
+12. Fontes: carregar **Space Grotesk** e **Oswald** do Google Fonts para reproduzir a identidade visual bold do Método SE
+13. Todos os backgrounds principais usando `var(--color-bg)` (#080810) — nunca branco como padrão
+14. Cards com borda roxa no hover: `hover:border-[#7B2FBE]` ou via CSS var
+
+---
+
+## ENTREGÁVEIS ESPERADOS
+
+Ao concluir, a plataforma deve ter:
+
+- [ ] Landing page pública dark com hero de impacto + as 6 seções principais
+- [ ] Fluxo de autenticação completo (login + solicitar acesso + recuperar senha) com tema dark
+- [ ] Dashboard admin com todas as 8 telas navegáveis com dados mock
+- [ ] Dashboard membro com todas as 8 telas navegáveis com dados mock
+- [ ] 4 migrations SQL aplicáveis ao Supabase em sequência
+- [ ] 3 Edge Functions esqueleto com validação Zod
+- [ ] Design system dark completo com tokens da paleta SE Amostramento
+- [ ] Todos os componentes reutilizáveis listados acima criados
+- [ ] Responsivo em 375px, 768px e 1280px
+- [ ] Zero erros de TypeScript (`tsc --noEmit` passando)
+- [ ] Gradientes de marca aplicados nos heroes e banners (azul → roxo)
+- [ ] Fontes Space Grotesk (body) e Oswald (headings) aplicadas
