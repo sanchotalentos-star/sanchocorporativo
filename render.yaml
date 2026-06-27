@@ -1,9 +1,10 @@
 services:
   - type: web
-    name: marca-que-vende-workshop
+    name: arquitetura-relevancia-hub
     env: static
-    staticPublishPath: .
-    buildCommand: ""
+    rootDir: arquitetura-hub
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
     headers:
       - path: /*
         name: Cache-Control
