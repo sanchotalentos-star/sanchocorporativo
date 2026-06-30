@@ -68,13 +68,13 @@ function AuthPage() {
           </div>
           <div>
             <p className="font-black text-lg text-white leading-tight uppercase tracking-tight">Arquitetura de Relevância</p>
-            <p className="text-sm text-white/60 font-medium uppercase tracking-widest">Hub de Autoridade</p>
+            <p className="text-sm text-white/60 font-medium uppercase tracking-widest">Hub de Autoridade — by Wladson Sidney</p>
           </div>
         </div>
 
         {/* Headline */}
         <div className="relative">
-          <p className="text-white/50 text-sm font-bold uppercase tracking-widest mb-3">by Wladson Sancho</p>
+          <p className="text-white/50 text-sm font-bold uppercase tracking-widest mb-3">by Wladson Sidney</p>
           <h1 className="text-5xl font-black text-white leading-[1.05] mb-6 uppercase tracking-tight">
             Construa sua<br />
             <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(90deg, #d4a8ff, #ffffff)' }}>
