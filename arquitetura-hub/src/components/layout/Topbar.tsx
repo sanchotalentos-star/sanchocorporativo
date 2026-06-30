@@ -10,21 +10,21 @@ export function Topbar({ onMenuClick, title }: TopbarProps) {
   const { user } = useAuth()
 
   return (
-    <header className="h-14 border-b border-[#1A2E4A] bg-[#070E1A] flex items-center justify-between px-6">
+    <header className="h-14 border-b border-gray-200 bg-white flex items-center justify-between px-6">
       <div className="flex items-center gap-4">
         {onMenuClick && (
-          <button onClick={onMenuClick} className="lg:hidden text-[#4A7FA5] hover:text-white">
+          <button onClick={onMenuClick} className="lg:hidden text-gray-400 hover:text-gray-700">
             <Menu size={20} />
           </button>
         )}
-        {title && <h1 className="text-base font-semibold text-white">{title}</h1>}
+        {title && <h1 className="text-base font-black text-gray-900 uppercase tracking-tight">{title}</h1>}
       </div>
       <div className="flex items-center gap-3">
-        <button className="relative p-2 text-[#4A7FA5] hover:text-white rounded-lg hover:bg-[#0A1E30] transition-colors">
+        <button className="relative p-2 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
           <Bell size={17} />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#F59E0B] rounded-full" />
+          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#7B2FBE] rounded-full" />
         </button>
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center text-white text-sm font-bold">
+        <div className="w-8 h-8 rounded-full bg-[#7B2FBE] flex items-center justify-center text-white text-sm font-bold shadow-sm shadow-[#7B2FBE]/20">
           {user?.full_name?.charAt(0) ?? 'U'}
         </div>
       </div>

@@ -30,37 +30,37 @@ function KpisPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Meus KPIs</h1>
-        <p className="text-[#4A7FA5] mt-1">Acompanhe e atualize seus indicadores de performance</p>
+        <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Meus KPIs</h1>
+        <p className="text-gray-400 mt-1 text-sm">Acompanhe e atualize seus indicadores de performance</p>
       </div>
 
       {/* Status summary */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-            <CheckCircle className="text-emerald-400" size={20} />
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+            <CheckCircle className="text-emerald-500" size={20} />
           </div>
           <div>
-            <p className="text-2xl font-bold text-emerald-400">{green}</p>
-            <p className="text-xs text-[#4A7FA5]">No alvo</p>
+            <p className="text-2xl font-black text-emerald-500">{green}</p>
+            <p className="text-xs text-gray-400 font-medium">No alvo</p>
           </div>
         </div>
-        <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-            <AlertCircle className="text-amber-400" size={20} />
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+            <AlertCircle className="text-amber-500" size={20} />
           </div>
           <div>
-            <p className="text-2xl font-bold text-amber-400">{yellow}</p>
-            <p className="text-xs text-[#4A7FA5]">Atenção</p>
+            <p className="text-2xl font-black text-amber-500">{yellow}</p>
+            <p className="text-xs text-gray-400 font-medium">Atenção</p>
           </div>
         </div>
-        <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
-            <XCircle className="text-red-400" size={20} />
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+            <XCircle className="text-red-500" size={20} />
           </div>
           <div>
-            <p className="text-2xl font-bold text-red-400">{red}</p>
-            <p className="text-xs text-[#4A7FA5]">Crítico</p>
+            <p className="text-2xl font-black text-red-500">{red}</p>
+            <p className="text-xs text-gray-400 font-medium">Crítico</p>
           </div>
         </div>
       </div>

@@ -54,38 +54,41 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#060D1A] flex">
-      {/* Left panel — branding */}
+    <div className="min-h-screen bg-white flex">
+      {/* Left panel — SE Amostramento brand gradient */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #0D2140 0%, #070E1A 100%)' }}>
-        <div className="absolute inset-0 opacity-20"
-          style={{ backgroundImage: 'radial-gradient(circle at 30% 70%, #F59E0B33 0%, transparent 60%)' }} />
+        style={{ background: 'linear-gradient(135deg, #1a0533 0%, #3d1278 50%, #7B2FBE 100%)' }}>
+        <div className="absolute inset-0 opacity-30"
+          style={{ backgroundImage: 'radial-gradient(circle at 30% 70%, #ffffff18 0%, transparent 60%)' }} />
 
         {/* Logo */}
         <div className="relative flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center shadow-lg shadow-amber-500/30">
+          <div className="w-11 h-11 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-sm">
             <BookOpen size={20} className="text-white" />
           </div>
           <div>
-            <p className="font-black text-lg text-white leading-tight">Arquitetura de Relevância</p>
-            <p className="text-sm text-[#4A7FA5]">Hub de Autoridade — by Wladson Sancho</p>
+            <p className="font-black text-lg text-white leading-tight uppercase tracking-tight">Arquitetura de Relevância</p>
+            <p className="text-sm text-white/60 font-medium uppercase tracking-widest">Hub de Autoridade</p>
           </div>
         </div>
 
         {/* Headline */}
         <div className="relative">
-          <h1 className="text-5xl font-black text-white leading-tight mb-6">
+          <p className="text-white/50 text-sm font-bold uppercase tracking-widest mb-3">by Wladson Sancho</p>
+          <h1 className="text-5xl font-black text-white leading-[1.05] mb-6 uppercase tracking-tight">
             Construa sua<br />
-            <span className="text-[#F59E0B]">Autoridade</span><br />
+            <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(90deg, #d4a8ff, #ffffff)' }}>
+              Autoridade
+            </span><br />
             de Mercado
           </h1>
-          <p className="text-[#4A7FA5] text-lg leading-relaxed max-w-md">
-            Acompanhe sua jornada de posicionamento, gerencie OKRs, pilares estratégicos e evolua semana a semana com o programa Arquitetura de Relevância.
+          <p className="text-white/60 text-base leading-relaxed max-w-md">
+            Acompanhe sua jornada de posicionamento, gerencie OKRs, pilares estratégicos e evolua semana a semana.
           </p>
 
-          <div className="flex flex-wrap gap-3 mt-8">
+          <div className="flex flex-wrap gap-2 mt-8">
             {['OKRs', 'Posicionamento', 'Autoridade', 'KPIs', 'Agenda', 'Marketing'].map(tag => (
-              <span key={tag} className="text-xs font-bold bg-[#F59E0B]/15 border border-[#F59E0B]/30 text-[#F59E0B] px-3 py-1.5 rounded-full">
+              <span key={tag} className="text-xs font-black bg-white/10 border border-white/20 text-white px-3 py-1.5 rounded-full uppercase tracking-wide">
                 {tag}
               </span>
             ))}
@@ -95,36 +98,39 @@ function AuthPage() {
         {/* Phases */}
         <div className="relative grid grid-cols-4 gap-2">
           {['OKR & MVP', 'Autoridade', 'PDCA→OKR', 'Escala'].map((phase, i) => (
-            <div key={phase} className="rounded-xl bg-[#0A1420] border border-[#1A2E4A] p-3 text-center">
+            <div key={phase} className="rounded-xl bg-white/10 border border-white/15 p-3 text-center backdrop-blur-sm">
               <div className={`w-6 h-6 rounded-lg mx-auto mb-1 flex items-center justify-center text-xs font-black ${
-                i === 0 ? 'bg-[#F59E0B] text-black' : 'bg-[#112240] text-[#3A5A7A]'
+                i === 0 ? 'bg-white text-[#7B2FBE]' : 'bg-white/15 text-white/40'
               }`}>{i + 1}</div>
-              <p className="text-[10px] text-[#4A7FA5] font-medium">{phase}</p>
+              <p className={`text-[10px] font-bold uppercase tracking-wide ${i === 0 ? 'text-white' : 'text-white/40'}`}>{phase}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Right panel — form */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
+      {/* Right panel — clean white form */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-white">
         <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex items-center gap-2 mb-8 lg:hidden">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-[#7B2FBE] flex items-center justify-center">
               <BookOpen size={16} className="text-white" />
             </div>
             <div>
-              <p className="font-black text-white text-sm">Arquitetura de Relevância</p>
-              <p className="text-xs text-[#4A7FA5]">Hub de Autoridade</p>
+              <p className="font-black text-gray-900 text-sm uppercase tracking-tight">Arquitetura de Relevância</p>
+              <p className="text-xs text-[#7B2FBE] font-bold uppercase tracking-widest">Hub de Autoridade</p>
             </div>
           </div>
 
+          <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight mb-1">Acesse sua conta</h2>
+          <p className="text-sm text-gray-400 mb-6">Entre com suas credenciais ou solicite acesso ao programa.</p>
+
           {/* Tabs */}
-          <div className="flex rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-1 mb-6">
+          <div className="flex rounded-2xl bg-gray-100 border border-gray-200 p-1 mb-6">
             <button
               onClick={() => setTab('login')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                tab === 'login' ? 'bg-[#F59E0B] text-black' : 'text-[#4A7FA5] hover:text-white'
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all uppercase tracking-wide ${
+                tab === 'login' ? 'bg-[#7B2FBE] text-white shadow-sm' : 'text-gray-400 hover:text-gray-700'
               }`}
             >
               <LogIn size={15} />
@@ -132,8 +138,8 @@ function AuthPage() {
             </button>
             <button
               onClick={() => setTab('request')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                tab === 'request' ? 'bg-[#F59E0B] text-black' : 'text-[#4A7FA5] hover:text-white'
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all uppercase tracking-wide ${
+                tab === 'request' ? 'bg-[#7B2FBE] text-white shadow-sm' : 'text-gray-400 hover:text-gray-700'
               }`}
             >
               <UserPlus size={15} />
@@ -144,33 +150,33 @@ function AuthPage() {
           {tab === 'login' ? (
             <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-[#4A7FA5] uppercase tracking-wider block mb-2">Email</label>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Email</label>
                 <input
                   type="email"
                   placeholder="seu@email.com"
-                  className="w-full bg-[#0D1B2E] border border-[#1A2E4A] rounded-xl px-4 py-3 text-white placeholder:text-[#3A5A7A] focus:outline-none focus:border-[#F59E0B] text-sm transition-colors"
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 text-sm transition-colors"
                   {...loginForm.register('email')}
                 />
                 {loginForm.formState.errors.email && (
-                  <p className="text-xs text-red-400 mt-1">{loginForm.formState.errors.email.message}</p>
+                  <p className="text-xs text-red-500 mt-1">{loginForm.formState.errors.email.message}</p>
                 )}
               </div>
               <div>
-                <label className="text-xs font-bold text-[#4A7FA5] uppercase tracking-wider block mb-2">Senha</label>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Senha</label>
                 <input
                   type="password"
                   placeholder="••••••••"
-                  className="w-full bg-[#0D1B2E] border border-[#1A2E4A] rounded-xl px-4 py-3 text-white placeholder:text-[#3A5A7A] focus:outline-none focus:border-[#F59E0B] text-sm transition-colors"
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 text-sm transition-colors"
                   {...loginForm.register('password')}
                 />
                 {loginForm.formState.errors.password && (
-                  <p className="text-xs text-red-400 mt-1">{loginForm.formState.errors.password.message}</p>
+                  <p className="text-xs text-red-500 mt-1">{loginForm.formState.errors.password.message}</p>
                 )}
               </div>
               <button
                 type="submit"
                 disabled={loginForm.formState.isSubmitting}
-                className="w-full flex items-center justify-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] disabled:opacity-60 text-black font-bold py-3 rounded-xl transition-colors mt-2"
+                className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-60 text-white font-black py-3 rounded-xl transition-colors mt-2 uppercase tracking-wide shadow-md shadow-[#7B2FBE]/20"
               >
                 {loginForm.formState.isSubmitting ? 'Entrando...' : (
                   <>Entrar no Hub <ArrowRight size={16} /></>
@@ -180,43 +186,43 @@ function AuthPage() {
           ) : (
             <form onSubmit={requestForm.handleSubmit(onRequest)} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-[#4A7FA5] uppercase tracking-wider block mb-2">Nome completo</label>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Nome completo</label>
                 <input
                   placeholder="Seu nome"
-                  className="w-full bg-[#0D1B2E] border border-[#1A2E4A] rounded-xl px-4 py-3 text-white placeholder:text-[#3A5A7A] focus:outline-none focus:border-[#F59E0B] text-sm transition-colors"
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 text-sm transition-colors"
                   {...requestForm.register('full_name')}
                 />
                 {requestForm.formState.errors.full_name && (
-                  <p className="text-xs text-red-400 mt-1">{requestForm.formState.errors.full_name.message}</p>
+                  <p className="text-xs text-red-500 mt-1">{requestForm.formState.errors.full_name.message}</p>
                 )}
               </div>
               <div>
-                <label className="text-xs font-bold text-[#4A7FA5] uppercase tracking-wider block mb-2">Email</label>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Email</label>
                 <input
                   type="email"
                   placeholder="seu@email.com"
-                  className="w-full bg-[#0D1B2E] border border-[#1A2E4A] rounded-xl px-4 py-3 text-white placeholder:text-[#3A5A7A] focus:outline-none focus:border-[#F59E0B] text-sm transition-colors"
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 text-sm transition-colors"
                   {...requestForm.register('email')}
                 />
                 {requestForm.formState.errors.email && (
-                  <p className="text-xs text-red-400 mt-1">{requestForm.formState.errors.email.message}</p>
+                  <p className="text-xs text-red-500 mt-1">{requestForm.formState.errors.email.message}</p>
                 )}
               </div>
               <div>
-                <label className="text-xs font-bold text-[#4A7FA5] uppercase tracking-wider block mb-2">Por que quer participar?</label>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Por que quer participar?</label>
                 <textarea
                   placeholder="Conte sobre você e seus objetivos profissionais..."
                   rows={4}
-                  className="w-full bg-[#0D1B2E] border border-[#1A2E4A] rounded-xl px-4 py-3 text-white placeholder:text-[#3A5A7A] focus:outline-none focus:border-[#F59E0B] text-sm transition-colors resize-none"
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 text-sm transition-colors resize-none"
                   {...requestForm.register('mensagem')}
                 />
                 {requestForm.formState.errors.mensagem && (
-                  <p className="text-xs text-red-400 mt-1">{requestForm.formState.errors.mensagem.message}</p>
+                  <p className="text-xs text-red-500 mt-1">{requestForm.formState.errors.mensagem.message}</p>
                 )}
               </div>
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-black font-bold py-3 rounded-xl transition-colors"
+                className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white font-black py-3 rounded-xl transition-colors uppercase tracking-wide shadow-md shadow-[#7B2FBE]/20"
               >
                 Enviar Solicitação <ArrowRight size={16} />
               </button>

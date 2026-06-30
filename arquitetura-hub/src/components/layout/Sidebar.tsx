@@ -48,58 +48,53 @@ export function Sidebar() {
   const nav = user?.role === 'admin' ? adminNav : membroNav
 
   return (
-    <aside className="flex flex-col w-64 min-h-screen bg-[#070E1A] border-r border-[#1A2E4A]">
+    <aside className="flex flex-col w-64 min-h-screen bg-white border-r border-gray-200">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-[#1A2E4A]">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center shadow-lg shadow-amber-500/20">
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-100">
+        <div className="w-9 h-9 rounded-xl bg-[#7B2FBE] flex items-center justify-center shadow-md shadow-[#7B2FBE]/20">
           <BookOpen size={16} className="text-white" />
         </div>
         <div>
-          <p className="text-sm font-bold text-white leading-tight">Arquitetura de</p>
-          <p className="text-xs text-[#4A7FA5]">Relevância Hub</p>
+          <p className="text-sm font-black text-gray-900 leading-tight uppercase tracking-tight">Arquitetura de</p>
+          <p className="text-[11px] text-[#7B2FBE] font-semibold uppercase tracking-widest">Relevância Hub</p>
         </div>
       </div>
 
       {/* User info */}
-      <div className="px-5 py-4 border-b border-[#1A2E4A]">
+      <div className="px-5 py-4 border-b border-gray-100">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center text-sm font-bold text-white shadow-md">
+          <div className="w-9 h-9 rounded-full bg-[#7B2FBE] flex items-center justify-center text-sm font-bold text-white shadow-sm">
             {user?.full_name?.charAt(0) ?? 'U'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white truncate">{user?.full_name}</p>
-            <p className="text-xs text-[#4A7FA5] capitalize">{user?.role}</p>
+            <p className="text-sm font-semibold text-gray-900 truncate">{user?.full_name}</p>
+            <p className="text-xs text-gray-400 capitalize">{user?.role}</p>
           </div>
         </div>
       </div>
 
       {/* Phase tracker (only for membros) */}
       {user?.role !== 'admin' && (
-        <div className="px-5 py-3 border-b border-[#1A2E4A]">
-          <p className="text-[10px] font-bold text-[#4A7FA5] uppercase tracking-widest mb-2">Fase Atual</p>
+        <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Fase Atual</p>
           <div className="flex items-center gap-1">
             {phases.map((phase, i) => (
               <div key={phase.num} className="flex items-center gap-1">
                 <div className={cn(
-                  'flex flex-col items-center',
-                  i > 0 && ''
+                  'w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black transition-all',
+                  phase.active
+                    ? 'bg-[#7B2FBE] text-white shadow-sm shadow-[#7B2FBE]/30'
+                    : 'bg-gray-200 text-gray-400'
                 )}>
-                  <div className={cn(
-                    'w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold transition-all',
-                    phase.active
-                      ? 'bg-[#F59E0B] text-white shadow-md shadow-amber-500/30'
-                      : 'bg-[#112240] text-[#3A5A7A] border border-[#1A2E4A]'
-                  )}>
-                    {phase.num}
-                  </div>
+                  {phase.num}
                 </div>
                 {i < phases.length - 1 && (
-                  <div className="w-3 h-px bg-[#1A2E4A]" />
+                  <div className="w-3 h-px bg-gray-200" />
                 )}
               </div>
             ))}
           </div>
-          <p className="text-xs text-[#F59E0B] font-medium mt-1.5">Fase 1 — {phases[0].label}</p>
+          <p className="text-xs text-[#7B2FBE] font-bold mt-1.5 uppercase tracking-wide">Fase 1 — {phases[0].label}</p>
         </div>
       )}
 
@@ -117,14 +112,17 @@ export function Sidebar() {
                 className={cn(
                   'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
                   active
-                    ? 'bg-[#0F2A47] text-white border border-[#1A4A6E]'
-                    : 'text-[#4A7FA5] hover:text-white hover:bg-[#0A1E30]'
+                    ? 'bg-[#7B2FBE] text-white shadow-sm shadow-[#7B2FBE]/20'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                 )}
               >
-                <item.icon size={16} className={active ? 'text-[#F59E0B]' : ''} />
+                <item.icon size={16} className={active ? 'text-white' : ''} />
                 <span className="flex-1">{item.label}</span>
                 {item.badge && (
-                  <span className="text-[9px] font-bold bg-[#F59E0B] text-black px-1.5 py-0.5 rounded-md">
+                  <span className={cn(
+                    'text-[9px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wide',
+                    active ? 'bg-white/20 text-white' : 'bg-[#7B2FBE]/10 text-[#7B2FBE]'
+                  )}>
                     {item.badge}
                   </span>
                 )}
@@ -135,10 +133,10 @@ export function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <div className="px-3 pb-5 border-t border-[#1A2E4A] pt-3">
+      <div className="px-3 pb-5 border-t border-gray-100 pt-3">
         <button
           onClick={() => void logout()}
-          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-[#4A7FA5] hover:text-red-400 hover:bg-red-500/10 transition-all"
+          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
         >
           <LogOut size={16} />
           Sair

@@ -9,7 +9,7 @@ interface CalendarioEditorialProps {
 
 const tipoColors: Record<EventoTipo, string> = {
   'Conteúdo': '#3B82F6',
-  'Evento': '#8B5CF6',
+  'Evento': '#7B2FBE',
   'Mídia': '#F59E0B',
   'Relacionamento': '#10B981',
   'Meta': '#EF4444',
@@ -46,16 +46,16 @@ export function CalendarioEditorial({ eventos }: CalendarioEditorialProps) {
   return (
     <div className="grid lg:grid-cols-3 gap-4">
       {/* Calendar */}
-      <div className="lg:col-span-2 bg-[#0D1B2E] rounded-2xl border border-[#1A2E4A] p-5">
+      <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-bold text-white">
+          <h2 className="font-black text-gray-900 uppercase tracking-tight">
             {monthNames[current.month]} {current.year}
           </h2>
           <div className="flex gap-1">
-            <button onClick={prev} className="p-1.5 rounded-lg hover:bg-[#112240] text-[#4A7FA5] hover:text-white transition-colors">
+            <button onClick={prev} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors">
               <ChevronLeft size={17} />
             </button>
-            <button onClick={next} className="p-1.5 rounded-lg hover:bg-[#112240] text-[#4A7FA5] hover:text-white transition-colors">
+            <button onClick={next} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors">
               <ChevronRight size={17} />
             </button>
           </div>
@@ -63,7 +63,7 @@ export function CalendarioEditorial({ eventos }: CalendarioEditorialProps) {
 
         <div className="grid grid-cols-7 mb-2">
           {['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d => (
-            <div key={d} className="text-center text-[10px] font-bold text-[#4A7FA5] uppercase tracking-wider py-1">{d}</div>
+            <div key={d} className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest py-1">{d}</div>
           ))}
         </div>
 
@@ -83,10 +83,10 @@ export function CalendarioEditorial({ eventos }: CalendarioEditorialProps) {
                 className={cn(
                   'relative aspect-square flex flex-col items-center justify-start pt-1.5 rounded-xl text-xs transition-all',
                   isSelected
-                    ? 'bg-[#F59E0B] text-black font-bold'
+                    ? 'bg-[#7B2FBE] text-white font-black shadow-sm shadow-[#7B2FBE]/20'
                     : isToday
-                    ? 'bg-[#F59E0B]/15 text-[#F59E0B] font-bold border border-[#F59E0B]/30'
-                    : 'hover:bg-[#112240] text-[#A0C0D8]'
+                    ? 'bg-[#7B2FBE]/10 text-[#7B2FBE] font-black border border-[#7B2FBE]/25'
+                    : 'hover:bg-gray-100 text-gray-700'
                 )}
               >
                 <span className="text-xs font-semibold">{day}</span>
@@ -96,7 +96,7 @@ export function CalendarioEditorial({ eventos }: CalendarioEditorialProps) {
                       <span
                         key={ev.id}
                         className="w-1.5 h-1.5 rounded-full"
-                        style={{ background: isSelected ? 'rgba(0,0,0,0.4)' : tipoColors[ev.tipo] }}
+                        style={{ background: isSelected ? 'rgba(255,255,255,0.7)' : tipoColors[ev.tipo] }}
                       />
                     ))}
                   </div>
@@ -108,40 +108,40 @@ export function CalendarioEditorial({ eventos }: CalendarioEditorialProps) {
       </div>
 
       {/* Day detail */}
-      <div className="bg-[#0D1B2E] rounded-2xl border border-[#1A2E4A] p-5">
-        <h3 className="font-bold text-white mb-4">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+        <h3 className="font-black text-gray-900 uppercase tracking-tight mb-4">
           {selectedDay ? `Dia ${selectedDay} — ${monthNames[current.month]}` : 'Selecione um dia'}
         </h3>
         {selectedDayEvents.length === 0 ? (
-          <p className="text-sm text-[#4A7FA5] text-center py-8">Nenhum evento neste dia</p>
+          <p className="text-sm text-gray-400 text-center py-8">Nenhum evento neste dia</p>
         ) : (
           <div className="space-y-3">
             {selectedDayEvents.map(ev => {
               const color = tipoColors[ev.tipo]
               return (
-                <div key={ev.id} className="p-3 rounded-xl border border-[#1A2E4A] bg-[#0A1420]">
+                <div key={ev.id} className="p-3 rounded-xl border border-gray-100 bg-gray-50">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-semibold text-white">{ev.titulo}</p>
+                    <p className="text-sm font-semibold text-gray-900">{ev.titulo}</p>
                     <span
-                      className="text-[10px] font-bold px-2 py-0.5 rounded-md flex-shrink-0"
-                      style={{ background: `${color}20`, color }}
+                      className="text-[10px] font-black px-2 py-0.5 rounded-md flex-shrink-0 uppercase tracking-wide"
+                      style={{ background: `${color}15`, color }}
                     >
                       {ev.tipo}
                     </span>
                   </div>
-                  {ev.hora && <p className="text-xs text-[#4A7FA5] mt-1">{ev.hora}</p>}
-                  {ev.local && <p className="text-xs text-[#A0C0D8] mt-0.5">{ev.local}</p>}
+                  {ev.hora && <p className="text-xs text-gray-400 mt-1">{ev.hora}</p>}
+                  {ev.local && <p className="text-xs text-gray-500 mt-0.5">{ev.local}</p>}
                 </div>
               )
             })}
           </div>
         )}
 
-        <div className="mt-6 pt-4 border-t border-[#1A2E4A]">
-          <p className="text-[10px] font-bold text-[#4A7FA5] uppercase tracking-widest mb-3">Legenda</p>
+        <div className="mt-6 pt-4 border-t border-gray-100">
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Legenda</p>
           <div className="space-y-2">
             {(Object.entries(tipoColors) as [EventoTipo, string][]).map(([tipo, color]) => (
-              <div key={tipo} className="flex items-center gap-2 text-xs text-[#4A7FA5]">
+              <div key={tipo} className="flex items-center gap-2 text-xs text-gray-500">
                 <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
                 {tipo}
               </div>

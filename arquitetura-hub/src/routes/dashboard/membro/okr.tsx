@@ -27,7 +27,7 @@ interface Objective {
 }
 
 const categoriaColors: Record<string, string> = {
-  'Autoridade': '#8B5CF6',
+  'Autoridade': '#7B2FBE',
   'Receita': '#10B981',
   'Alcance': '#3B82F6',
   'Produto': '#F59E0B',
@@ -99,10 +99,10 @@ function OkrPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Meus OKRs</h1>
-          <p className="text-[#4A7FA5] mt-1">Objetivos e Resultados-Chave para este trimestre</p>
+          <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Meus OKRs</h1>
+          <p className="text-gray-400 mt-1 text-sm">Objetivos e Resultados-Chave para este trimestre</p>
         </div>
-        <button className="flex items-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-black text-sm font-bold px-4 py-2.5 rounded-xl transition-colors">
+        <button className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-black px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-[#7B2FBE]/20 uppercase tracking-wide">
           <Plus size={16} />
           Novo Objetivo
         </button>
@@ -115,26 +115,26 @@ function OkrPage() {
         animate="visible"
         className="grid grid-cols-3 gap-3"
       >
-        <motion.div variants={fadeInUp} className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-4">
+        <motion.div variants={fadeInUp} className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1">
-            <Target size={15} className="text-[#4A7FA5]" />
-            <p className="text-xs text-[#4A7FA5] uppercase tracking-wider">Objetivos</p>
+            <Target size={15} className="text-gray-400" />
+            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Objetivos</p>
           </div>
-          <p className="text-2xl font-black text-white">{okrs.length}</p>
+          <p className="text-2xl font-black text-gray-900">{okrs.length}</p>
         </motion.div>
-        <motion.div variants={fadeInUp} className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-4">
+        <motion.div variants={fadeInUp} className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1">
-            <Crosshair size={15} className="text-[#4A7FA5]" />
-            <p className="text-xs text-[#4A7FA5] uppercase tracking-wider">Key Results</p>
+            <Crosshair size={15} className="text-gray-400" />
+            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Key Results</p>
           </div>
-          <p className="text-2xl font-black text-white">{doneKrs}<span className="text-[#4A7FA5] text-base font-normal">/{totalKrs}</span></p>
+          <p className="text-2xl font-black text-gray-900">{doneKrs}<span className="text-gray-400 text-base font-normal">/{totalKrs}</span></p>
         </motion.div>
-        <motion.div variants={fadeInUp} className="rounded-2xl bg-[#0D1B2E] border border-[#F59E0B]/30 p-4">
+        <motion.div variants={fadeInUp} className="rounded-2xl bg-white border border-[#7B2FBE]/30 shadow-sm shadow-[#7B2FBE]/5 p-4">
           <div className="flex items-center gap-2 mb-1">
-            <TrendingUp size={15} className="text-[#F59E0B]" />
-            <p className="text-xs text-[#4A7FA5] uppercase tracking-wider">Progresso Geral</p>
+            <TrendingUp size={15} className="text-[#7B2FBE]" />
+            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Progresso Geral</p>
           </div>
-          <p className="text-2xl font-black text-[#F59E0B]">{overallProgress}%</p>
+          <p className="text-2xl font-black text-[#7B2FBE]">{overallProgress}%</p>
         </motion.div>
       </motion.div>
 
@@ -144,7 +144,7 @@ function OkrPage() {
           const objProgress = obj.keyResults.length > 0
             ? Math.round(obj.keyResults.reduce((s, kr) => s + getProgress(kr.atual, kr.meta), 0) / obj.keyResults.length)
             : 0
-          const color = categoriaColors[obj.categoria] ?? '#4A7FA5'
+          const color = categoriaColors[obj.categoria] ?? '#6B7280'
 
           return (
             <motion.div
@@ -152,60 +152,60 @@ function OkrPage() {
               variants={fadeInUp}
               initial="hidden"
               animate="visible"
-              className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] overflow-hidden"
+              className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden"
             >
               {/* Objective header */}
               <button
                 onClick={() => toggleExpanded(obj.id)}
-                className="w-full flex items-center gap-4 p-5 text-left hover:bg-[#112240] transition-colors"
+                className="w-full flex items-center gap-4 p-5 text-left hover:bg-gray-50 transition-colors"
               >
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: `${color}18`, border: `1px solid ${color}30` }}>
+                  style={{ background: `${color}12`, border: `1px solid ${color}25` }}>
                   <Crosshair size={18} style={{ color }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md" style={{ background: `${color}20`, color }}>
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wide" style={{ background: `${color}15`, color }}>
                       {obj.categoria}
                     </span>
-                    <span className="text-[10px] text-[#4A7FA5]">{obj.trimestre}</span>
+                    <span className="text-[10px] text-gray-400 font-medium">{obj.trimestre}</span>
                   </div>
-                  <p className="text-sm font-semibold text-white truncate">{obj.titulo}</p>
+                  <p className="text-sm font-semibold text-gray-900 truncate">{obj.titulo}</p>
                   <div className="flex items-center gap-2 mt-1.5">
-                    <div className="flex-1 h-1.5 rounded-full bg-[#112240]">
+                    <div className="flex-1 h-1.5 rounded-full bg-gray-100">
                       <div
                         className="h-full rounded-full transition-all"
                         style={{ width: `${objProgress}%`, background: color }}
                       />
                     </div>
-                    <span className="text-xs font-bold flex-shrink-0" style={{ color }}>{objProgress}%</span>
+                    <span className="text-xs font-black flex-shrink-0" style={{ color }}>{objProgress}%</span>
                   </div>
                 </div>
-                {obj.expanded ? <ChevronUp size={16} className="text-[#4A7FA5] flex-shrink-0" /> : <ChevronDown size={16} className="text-[#4A7FA5] flex-shrink-0" />}
+                {obj.expanded ? <ChevronUp size={16} className="text-gray-400 flex-shrink-0" /> : <ChevronDown size={16} className="text-gray-400 flex-shrink-0" />}
               </button>
 
               {/* Key Results */}
               {obj.expanded && (
-                <div className="border-t border-[#1A2E4A] divide-y divide-[#1A2E4A]/50">
+                <div className="border-t border-gray-100 divide-y divide-gray-100">
                   {obj.keyResults.map((kr) => {
                     const pct = getProgress(kr.atual, kr.meta)
                     const done = pct >= 100
                     return (
                       <div key={kr.id} className="px-5 py-4 flex items-start gap-3">
                         {done
-                          ? <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0 mt-0.5" />
-                          : <Circle size={16} className="text-[#4A7FA5] flex-shrink-0 mt-0.5" />
+                          ? <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                          : <Circle size={16} className="text-gray-300 flex-shrink-0 mt-0.5" />
                         }
                         <div className="flex-1 min-w-0">
-                          <p className={cn('text-sm', done ? 'text-[#4A7FA5] line-through' : 'text-white')}>{kr.descricao}</p>
+                          <p className={cn('text-sm', done ? 'text-gray-400 line-through' : 'text-gray-700')}>{kr.descricao}</p>
                           <div className="flex items-center gap-2 mt-2">
-                            <div className="flex-1 h-1 rounded-full bg-[#112240]">
+                            <div className="flex-1 h-1 rounded-full bg-gray-100">
                               <div
                                 className="h-full rounded-full transition-all"
                                 style={{ width: `${pct}%`, background: done ? '#10B981' : color }}
                               />
                             </div>
-                            <span className="text-xs text-[#4A7FA5] flex-shrink-0 whitespace-nowrap">
+                            <span className="text-xs text-gray-400 flex-shrink-0 whitespace-nowrap">
                               {kr.atual}/{kr.meta} {kr.unit}
                             </span>
                           </div>
@@ -216,7 +216,7 @@ function OkrPage() {
                           min={0}
                           max={kr.meta * 2}
                           onChange={e => updateKr(obj.id, kr.id, Number(e.target.value))}
-                          className="w-20 text-sm text-right bg-[#112240] border border-[#1A2E4A] rounded-lg px-2 py-1 text-white focus:outline-none focus:border-[#F59E0B] flex-shrink-0"
+                          className="w-20 text-sm text-right bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-gray-900 focus:outline-none focus:border-[#7B2FBE] focus:ring-1 focus:ring-[#7B2FBE]/20 flex-shrink-0"
                         />
                       </div>
                     )

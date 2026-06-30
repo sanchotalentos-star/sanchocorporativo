@@ -16,8 +16,8 @@ function AdminRelatorios() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Relatórios Globais</h1>
-        <p className="text-[#4A7FA5] mt-1">Visão consolidada de todos os participantes</p>
+        <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Relatórios Globais</h1>
+        <p className="text-gray-400 mt-1 text-sm">Visão consolidada de todos os participantes</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -27,21 +27,21 @@ function AdminRelatorios() {
           { label: 'Crescimento', value: `+${growthPct}%` },
           { label: 'Participantes', value: mockMembers.length },
         ].map(item => (
-          <div key={item.label} className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-5">
-            <p className="text-xs text-[#4A7FA5] uppercase tracking-wider">{item.label}</p>
-            <p className="text-2xl font-bold text-white mt-1">{item.value}</p>
+          <div key={item.label} className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5">
+            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{item.label}</p>
+            <p className="text-2xl font-black text-gray-900 mt-1">{item.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-5">
-        <h3 className="text-sm font-bold text-white mb-4">Crescimento Agregado</h3>
+      <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5">
+        <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight mb-4">Crescimento Agregado</h3>
         <GlobalKpiOverview data={mockAggregateGrowth} />
       </div>
 
-      <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#1A2E4A]">
-          <h3 className="text-sm font-bold text-white">Ranking Geral</h3>
+      <div className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">Ranking Geral</h3>
         </div>
         <RankingTable members={mockMembers} />
       </div>

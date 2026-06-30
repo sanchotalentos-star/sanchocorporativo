@@ -33,11 +33,11 @@ const canalIcons: Record<Canal, React.ElementType> = {
 
 const canalColors: Record<Canal, string> = {
   LinkedIn: '#3B82F6',
-  Instagram: '#8B5CF6',
+  Instagram: '#7B2FBE',
   YouTube: '#EF4444',
   Podcast: '#F59E0B',
   Email: '#10B981',
-  Blog: '#4A7FA5',
+  Blog: '#6B7280',
   Live: '#EC4899',
 }
 
@@ -80,10 +80,10 @@ function MarketingPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Agenda de Marketing Anual</h1>
-          <p className="text-[#4A7FA5] mt-1">Planeje suas ações de conteúdo e distribuição ao longo do ano</p>
+          <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Agenda de Marketing Anual</h1>
+          <p className="text-gray-400 mt-1 text-sm">Planeje suas ações de conteúdo e distribuição ao longo do ano</p>
         </div>
-        <button className="flex items-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-black text-sm font-bold px-4 py-2.5 rounded-xl transition-colors">
+        <button className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-black px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-[#7B2FBE]/20 uppercase tracking-wide">
           <Plus size={16} />
           Nova Ação
         </button>
@@ -91,17 +91,17 @@ function MarketingPage() {
 
       {/* Progress bar */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-5">
+        className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Megaphone size={16} className="text-[#F59E0B]" />
-            <p className="text-sm font-semibold text-white">Execução do Plano Anual</p>
+            <Megaphone size={16} className="text-[#7B2FBE]" />
+            <p className="text-sm font-black text-gray-900 uppercase tracking-tight">Execução do Plano Anual</p>
           </div>
-          <span className="text-sm font-bold text-[#F59E0B]">{concluidas}/{acoes.length} ações</span>
+          <span className="text-sm font-black text-[#7B2FBE]">{concluidas}/{acoes.length} ações</span>
         </div>
-        <div className="w-full h-2.5 rounded-full bg-[#112240]">
-          <div className="h-full rounded-full bg-gradient-to-r from-[#F59E0B] to-[#D97706] transition-all duration-500"
-            style={{ width: `${progresso}%` }} />
+        <div className="w-full h-2.5 rounded-full bg-gray-100">
+          <div className="h-full rounded-full transition-all duration-500"
+            style={{ width: `${progresso}%`, background: 'linear-gradient(90deg, #7B2FBE, #a855f7)' }} />
         </div>
       </motion.div>
 
@@ -123,14 +123,14 @@ function MarketingPage() {
               variants={fadeInUp}
               onClick={() => setCanalFiltro(active ? null : canal)}
               className={cn(
-                'rounded-xl p-3 flex flex-col items-center gap-1.5 border transition-all',
-                active ? 'border-opacity-60 bg-opacity-10' : 'border-[#1A2E4A] bg-[#0D1B2E] hover:border-[#2A4A6E]'
+                'rounded-xl p-3 flex flex-col items-center gap-1.5 border transition-all bg-white',
+                active ? '' : 'border-gray-200 hover:border-gray-300 shadow-sm'
               )}
-              style={active ? { background: `${color}12`, borderColor: `${color}50` } : {}}
+              style={active ? { background: `${color}10`, borderColor: `${color}40` } : {}}
             >
-              <Icon size={15} style={{ color: active ? color : '#4A7FA5' }} />
-              <p className="text-[10px] font-semibold" style={{ color: active ? color : '#4A7FA5' }}>{canal}</p>
-              <span className="text-[10px] font-bold text-white">{count}</span>
+              <Icon size={15} style={{ color: active ? color : '#9CA3AF' }} />
+              <p className="text-[10px] font-black uppercase tracking-wide" style={{ color: active ? color : '#9CA3AF' }}>{canal}</p>
+              <span className="text-[10px] font-bold text-gray-900">{count}</span>
             </motion.button>
           )
         })}
@@ -141,8 +141,8 @@ function MarketingPage() {
         <button
           onClick={() => setMesFiltro(null)}
           className={cn(
-            'flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors',
-            mesFiltro === null ? 'bg-[#F59E0B] text-black' : 'bg-[#112240] text-[#4A7FA5] hover:text-white'
+            'flex-shrink-0 text-xs font-black px-3 py-1.5 rounded-lg transition-colors uppercase tracking-wide',
+            mesFiltro === null ? 'bg-[#7B2FBE] text-white shadow-sm' : 'bg-gray-100 text-gray-400 hover:text-gray-700'
           )}
         >
           Todos
@@ -152,8 +152,8 @@ function MarketingPage() {
             key={mes}
             onClick={() => setMesFiltro(mesFiltro === i + 1 ? null : i + 1)}
             className={cn(
-              'flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors',
-              mesFiltro === i + 1 ? 'bg-[#F59E0B] text-black' : 'bg-[#112240] text-[#4A7FA5] hover:text-white'
+              'flex-shrink-0 text-xs font-black px-3 py-1.5 rounded-lg transition-colors uppercase tracking-wide',
+              mesFiltro === i + 1 ? 'bg-[#7B2FBE] text-white shadow-sm' : 'bg-gray-100 text-gray-400 hover:text-gray-700'
             )}
           >
             {mes}
@@ -164,9 +164,9 @@ function MarketingPage() {
       {/* Actions list */}
       <div className="space-y-2">
         {filtered.length === 0 ? (
-          <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-8 text-center">
-            <Calendar size={32} className="text-[#1A2E4A] mx-auto mb-2" />
-            <p className="text-[#4A7FA5] text-sm">Nenhuma ação para este filtro</p>
+          <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 text-center">
+            <Calendar size={32} className="text-gray-200 mx-auto mb-2" />
+            <p className="text-gray-400 text-sm">Nenhuma ação para este filtro</p>
           </div>
         ) : filtered.map((acao) => {
           const Icon = canalIcons[acao.canal]
@@ -178,8 +178,8 @@ function MarketingPage() {
               initial="hidden"
               animate="visible"
               className={cn(
-                'rounded-xl bg-[#0D1B2E] border px-4 py-3.5 flex items-center gap-3 group transition-all',
-                acao.concluida ? 'border-[#112240] opacity-60' : 'border-[#1A2E4A] hover:border-[#2A4A6E]'
+                'rounded-xl bg-white border px-4 py-3.5 flex items-center gap-3 group transition-all shadow-sm',
+                acao.concluida ? 'border-gray-100 opacity-60' : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
               )}
             >
               <button
@@ -194,27 +194,27 @@ function MarketingPage() {
               </button>
 
               <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ background: `${color}15` }}>
+                style={{ background: `${color}12` }}>
                 <Icon size={13} style={{ color }} />
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className={cn('text-sm font-medium', acao.concluida ? 'line-through text-[#4A7FA5]' : 'text-white')}>
+                <p className={cn('text-sm font-semibold', acao.concluida ? 'line-through text-gray-400' : 'text-gray-900')}>
                   {acao.titulo}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md"
-                    style={{ background: `${color}15`, color }}>
+                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wide"
+                    style={{ background: `${color}12`, color }}>
                     {acao.canal}
                   </span>
-                  <span className="text-[10px] text-[#4A7FA5]">{acao.frequencia}</span>
-                  <span className="text-[10px] text-[#4A7FA5]">• {meses[acao.mes - 1]}</span>
+                  <span className="text-[10px] text-gray-400 font-medium">{acao.frequencia}</span>
+                  <span className="text-[10px] text-gray-400">• {meses[acao.mes - 1]}</span>
                 </div>
               </div>
 
               <button
                 onClick={() => deleteAcao(acao.id)}
-                className="opacity-0 group-hover:opacity-100 text-[#4A7FA5] hover:text-red-400 transition-all"
+                className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-400 transition-all"
               >
                 <Trash2 size={14} />
               </button>

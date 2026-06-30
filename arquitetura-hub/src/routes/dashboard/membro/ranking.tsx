@@ -13,8 +13,8 @@ function RankingPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Ranking do Programa</h1>
-        <p className="text-[#4A7FA5] mt-1">Veja sua posição em relação aos outros participantes</p>
+        <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Ranking do Programa</h1>
+        <p className="text-gray-400 mt-1 text-sm">Veja sua posição em relação aos outros participantes</p>
       </div>
       <RankingTable members={mockMembers} currentUserId={user?.id} />
     </div>

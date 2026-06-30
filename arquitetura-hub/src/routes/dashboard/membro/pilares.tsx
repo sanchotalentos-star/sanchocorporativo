@@ -42,12 +42,12 @@ function PilaresPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Pilares Estratégicos</h1>
-          <p className="text-[#4A7FA5] mt-1">Gerencie as dimensões da sua arquitetura de relevância</p>
+          <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Pilares Estratégicos</h1>
+          <p className="text-gray-400 mt-1 text-sm">Gerencie as dimensões da sua arquitetura de relevância</p>
         </div>
-        <div className="text-right bg-[#0D1B2E] border border-[#1A2E4A] rounded-2xl px-5 py-3">
-          <p className="text-3xl font-black text-[#F59E0B]">{overallPct}%</p>
-          <p className="text-xs text-[#4A7FA5]">{doneAcoes}/{totalAcoes} ações</p>
+        <div className="text-right bg-white border border-[#7B2FBE]/20 rounded-2xl px-5 py-3 shadow-sm shadow-[#7B2FBE]/5">
+          <p className="text-3xl font-black text-[#7B2FBE]">{overallPct}%</p>
+          <p className="text-xs text-gray-400">{doneAcoes}/{totalAcoes} ações</p>
         </div>
       </div>
 
