@@ -36,7 +36,13 @@ const quickLinks = [
 
 function MembroDashboard() {
   const { user } = useAuth()
-  const member = mockMembers.find(m => m.id === user?.id) ?? mockMembers[0]
+  const foundMember = mockMembers.find(m => m.id === user?.id)
+  const member = foundMember ?? {
+    ...mockMembers[0],
+    id: user?.id ?? 'me',
+    full_name: user?.full_name ?? mockMembers[0].full_name,
+    email: user?.email ?? mockMembers[0].email,
+  }
 
   const today = new Date()
   const upcomingEvents = mockEventos

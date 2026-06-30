@@ -22,7 +22,13 @@ const leadSources = [
 
 function RelatoriosPage() {
   const { user } = useAuth()
-  const member = mockMembers.find(m => m.id === user?.id) ?? mockMembers[0]
+  const foundMember = mockMembers.find(m => m.id === user?.id)
+  const member = foundMember ?? {
+    ...mockMembers[0],
+    id: user?.id ?? 'me',
+    full_name: user?.full_name ?? mockMembers[0].full_name,
+    email: user?.email ?? mockMembers[0].email,
+  }
 
   const totalAlcance = member.growth.reduce((s, g) => s + g.alcance, 0)
   const totalLeads = member.growth.reduce((s, g) => s + g.leads, 0)
