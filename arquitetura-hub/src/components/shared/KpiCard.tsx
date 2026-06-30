@@ -22,34 +22,39 @@ export function KpiCard({ label, value, unit, trend, icon: Icon, accent, classNa
     <motion.div
       variants={fadeInUp}
       className={cn(
-        'rounded-xl border p-5 bg-white shadow-sm',
-        accent ? 'border-[#D97706] bg-gradient-to-br from-amber-50 to-white' : 'border-[#E2E8F0]',
+        'rounded-2xl border p-5 relative overflow-hidden',
+        accent
+          ? 'bg-gradient-to-br from-[#1A2A0A] to-[#0D1B2E] border-[#F59E0B]/30'
+          : 'bg-[#0D1B2E] border-[#1A2E4A]',
         className
       )}
     >
+      {accent && (
+        <div className="absolute inset-0 bg-gradient-to-br from-[#F59E0B]/5 to-transparent pointer-events-none" />
+      )}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-[#475569] font-medium truncate">{label}</p>
-          <div className="flex items-baseline gap-1 mt-1">
-            <span className={cn('text-2xl font-bold', accent ? 'text-[#B45309]' : 'text-[#0F172A]')}>
+          <p className="text-xs text-[#4A7FA5] font-medium uppercase tracking-wider truncate">{label}</p>
+          <div className="flex items-baseline gap-1 mt-2">
+            <span className={cn('text-2xl font-bold', accent ? 'text-[#F59E0B]' : 'text-white')}>
               {value}
             </span>
-            {unit && <span className="text-sm text-[#94A3B8]">{unit}</span>}
+            {unit && <span className="text-sm text-[#4A7FA5]">{unit}</span>}
           </div>
           {trend !== undefined && (
-            <div className={cn('flex items-center gap-1 mt-1 text-xs font-medium',
-              trendUp ? 'text-green-600' : trendDown ? 'text-red-500' : 'text-[#94A3B8]'
+            <div className={cn('flex items-center gap-1 mt-1.5 text-xs font-medium',
+              trendUp ? 'text-emerald-400' : trendDown ? 'text-red-400' : 'text-[#4A7FA5]'
             )}>
-              {trendUp ? <TrendingUp size={12} /> : trendDown ? <TrendingDown size={12} /> : <Minus size={12} />}
-              {trend > 0 ? '+' : ''}{trend}%
+              {trendUp ? <TrendingUp size={11} /> : trendDown ? <TrendingDown size={11} /> : <Minus size={11} />}
+              {trend > 0 ? '+' : ''}{trend}% este mês
             </div>
           )}
         </div>
         {Icon && (
-          <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
-            accent ? 'bg-[#D97706]/15' : 'bg-[#1B3A5C]/10'
+          <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0',
+            accent ? 'bg-[#F59E0B]/15' : 'bg-[#112240]'
           )}>
-            <Icon size={20} className={accent ? 'text-[#D97706]' : 'text-[#1B3A5C]'} />
+            <Icon size={19} className={accent ? 'text-[#F59E0B]' : 'text-[#4A7FA5]'} />
           </div>
         )}
       </div>

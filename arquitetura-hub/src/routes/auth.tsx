@@ -4,13 +4,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { Star, LogIn, UserPlus } from 'lucide-react'
+import { BookOpen, LogIn, UserPlus, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/context/AuthContext'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
 import { fadeInUp } from '@/lib/motion'
 
 export const Route = createFileRoute('/auth')({
@@ -32,7 +28,7 @@ type LoginForm = z.infer<typeof loginSchema>
 type RequestForm = z.infer<typeof requestSchema>
 
 function AuthPage() {
-  const [tab, setTab] = useState('login')
+  const [tab, setTab] = useState<'login' | 'request'>('login')
   const { login } = useAuth()
   const navigate = useNavigate()
 
@@ -52,98 +48,182 @@ function AuthPage() {
   }
 
   function onRequest(data: RequestForm) {
+    console.log(data)
     toast.success('Solicitação enviada! Entraremos em contato em breve.')
     requestForm.reset()
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1B3A5C] to-[#0F172A] flex items-center justify-center px-4 py-12">
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="w-full max-w-md">
+    <div className="min-h-screen bg-[#060D1A] flex">
+      {/* Left panel — branding */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #0D2140 0%, #070E1A 100%)' }}>
+        <div className="absolute inset-0 opacity-20"
+          style={{ backgroundImage: 'radial-gradient(circle at 30% 70%, #F59E0B33 0%, transparent 60%)' }} />
+
         {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-[#D97706] flex items-center justify-center">
-            <Star size={20} className="text-white" />
+        <div className="relative flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center shadow-lg shadow-amber-500/30">
+            <BookOpen size={20} className="text-white" />
           </div>
-          <div className="text-white">
-            <p className="font-bold text-lg leading-tight">Arquitetura de Relevância</p>
-            <p className="text-xs text-white/60">Hub de Autoridade</p>
+          <div>
+            <p className="font-black text-lg text-white leading-tight">Arquitetura de Relevância</p>
+            <p className="text-sm text-[#4A7FA5]">Hub de Autoridade — by Wladson Sancho</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <Tabs value={tab} onValueChange={setTab}>
-            <TabsList className="w-full mb-6">
-              <TabsTrigger value="login" className="flex-1">
-                <LogIn size={16} className="mr-1.5" /> Entrar
-              </TabsTrigger>
-              <TabsTrigger value="request" className="flex-1">
-                <UserPlus size={16} className="mr-1.5" /> Solicitar Acesso
-              </TabsTrigger>
-            </TabsList>
+        {/* Headline */}
+        <div className="relative">
+          <h1 className="text-5xl font-black text-white leading-tight mb-6">
+            Construa sua<br />
+            <span className="text-[#F59E0B]">Autoridade</span><br />
+            de Mercado
+          </h1>
+          <p className="text-[#4A7FA5] text-lg leading-relaxed max-w-md">
+            Acompanhe sua jornada de posicionamento, gerencie OKRs, pilares estratégicos e evolua semana a semana com o programa Arquitetura de Relevância.
+          </p>
 
-            <TabsContent value="login">
-              <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="seu@email.com" className="mt-1" {...loginForm.register('email')} />
-                  {loginForm.formState.errors.email && (
-                    <p className="text-xs text-red-500 mt-1">{loginForm.formState.errors.email.message}</p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="password">Senha</Label>
-                  <Input id="password" type="password" placeholder="••••••••" className="mt-1" {...loginForm.register('password')} />
-                  {loginForm.formState.errors.password && (
-                    <p className="text-xs text-red-500 mt-1">{loginForm.formState.errors.password.message}</p>
-                  )}
-                </div>
-                <Button type="submit" className="w-full" disabled={loginForm.formState.isSubmitting}>
-                  {loginForm.formState.isSubmitting ? 'Entrando...' : 'Entrar'}
-                </Button>
-                <div className="mt-4 p-3 bg-[#F1F5F9] rounded-lg text-xs text-[#475569]">
-                  <p className="font-semibold mb-1">Credenciais de demo:</p>
-                  <p>Admin: demo@admin.com / demo</p>
-                  <p>Membro: demo@membro.com / demo</p>
-                </div>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="request">
-              <form onSubmit={requestForm.handleSubmit(onRequest)} className="space-y-4">
-                <div>
-                  <Label htmlFor="full_name">Nome completo</Label>
-                  <Input id="full_name" placeholder="Seu nome" className="mt-1" {...requestForm.register('full_name')} />
-                  {requestForm.formState.errors.full_name && (
-                    <p className="text-xs text-red-500 mt-1">{requestForm.formState.errors.full_name.message}</p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="req_email">Email</Label>
-                  <Input id="req_email" type="email" placeholder="seu@email.com" className="mt-1" {...requestForm.register('email')} />
-                  {requestForm.formState.errors.email && (
-                    <p className="text-xs text-red-500 mt-1">{requestForm.formState.errors.email.message}</p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="mensagem">Por que quer participar?</Label>
-                  <textarea
-                    id="mensagem"
-                    placeholder="Conte sobre você e seus objetivos..."
-                    className="mt-1 flex min-h-[80px] w-full rounded-lg border border-[#E2E8F0] bg-white px-3 py-2 text-sm placeholder:text-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#1B3A5C]"
-                    {...requestForm.register('mensagem')}
-                  />
-                  {requestForm.formState.errors.mensagem && (
-                    <p className="text-xs text-red-500 mt-1">{requestForm.formState.errors.mensagem.message}</p>
-                  )}
-                </div>
-                <Button type="submit" variant="accent" className="w-full">
-                  Enviar Solicitação
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
+          <div className="flex flex-wrap gap-3 mt-8">
+            {['OKRs', 'Posicionamento', 'Autoridade', 'KPIs', 'Agenda', 'Marketing'].map(tag => (
+              <span key={tag} className="text-xs font-bold bg-[#F59E0B]/15 border border-[#F59E0B]/30 text-[#F59E0B] px-3 py-1.5 rounded-full">
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
-      </motion.div>
+
+        {/* Phases */}
+        <div className="relative grid grid-cols-4 gap-2">
+          {['OKR & MVP', 'Autoridade', 'PDCA→OKR', 'Escala'].map((phase, i) => (
+            <div key={phase} className="rounded-xl bg-[#0A1420] border border-[#1A2E4A] p-3 text-center">
+              <div className={`w-6 h-6 rounded-lg mx-auto mb-1 flex items-center justify-center text-xs font-black ${
+                i === 0 ? 'bg-[#F59E0B] text-black' : 'bg-[#112240] text-[#3A5A7A]'
+              }`}>{i + 1}</div>
+              <p className="text-[10px] text-[#4A7FA5] font-medium">{phase}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Right panel — form */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12">
+        <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="w-full max-w-md">
+          {/* Mobile logo */}
+          <div className="flex items-center gap-2 mb-8 lg:hidden">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center">
+              <BookOpen size={16} className="text-white" />
+            </div>
+            <div>
+              <p className="font-black text-white text-sm">Arquitetura de Relevância</p>
+              <p className="text-xs text-[#4A7FA5]">Hub de Autoridade</p>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-1 mb-6">
+            <button
+              onClick={() => setTab('login')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                tab === 'login' ? 'bg-[#F59E0B] text-black' : 'text-[#4A7FA5] hover:text-white'
+              }`}
+            >
+              <LogIn size={15} />
+              Entrar
+            </button>
+            <button
+              onClick={() => setTab('request')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                tab === 'request' ? 'bg-[#F59E0B] text-black' : 'text-[#4A7FA5] hover:text-white'
+              }`}
+            >
+              <UserPlus size={15} />
+              Solicitar Acesso
+            </button>
+          </div>
+
+          {tab === 'login' ? (
+            <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-[#4A7FA5] uppercase tracking-wider block mb-2">Email</label>
+                <input
+                  type="email"
+                  placeholder="seu@email.com"
+                  className="w-full bg-[#0D1B2E] border border-[#1A2E4A] rounded-xl px-4 py-3 text-white placeholder:text-[#3A5A7A] focus:outline-none focus:border-[#F59E0B] text-sm transition-colors"
+                  {...loginForm.register('email')}
+                />
+                {loginForm.formState.errors.email && (
+                  <p className="text-xs text-red-400 mt-1">{loginForm.formState.errors.email.message}</p>
+                )}
+              </div>
+              <div>
+                <label className="text-xs font-bold text-[#4A7FA5] uppercase tracking-wider block mb-2">Senha</label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  className="w-full bg-[#0D1B2E] border border-[#1A2E4A] rounded-xl px-4 py-3 text-white placeholder:text-[#3A5A7A] focus:outline-none focus:border-[#F59E0B] text-sm transition-colors"
+                  {...loginForm.register('password')}
+                />
+                {loginForm.formState.errors.password && (
+                  <p className="text-xs text-red-400 mt-1">{loginForm.formState.errors.password.message}</p>
+                )}
+              </div>
+              <button
+                type="submit"
+                disabled={loginForm.formState.isSubmitting}
+                className="w-full flex items-center justify-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] disabled:opacity-60 text-black font-bold py-3 rounded-xl transition-colors mt-2"
+              >
+                {loginForm.formState.isSubmitting ? 'Entrando...' : (
+                  <>Entrar no Hub <ArrowRight size={16} /></>
+                )}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={requestForm.handleSubmit(onRequest)} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-[#4A7FA5] uppercase tracking-wider block mb-2">Nome completo</label>
+                <input
+                  placeholder="Seu nome"
+                  className="w-full bg-[#0D1B2E] border border-[#1A2E4A] rounded-xl px-4 py-3 text-white placeholder:text-[#3A5A7A] focus:outline-none focus:border-[#F59E0B] text-sm transition-colors"
+                  {...requestForm.register('full_name')}
+                />
+                {requestForm.formState.errors.full_name && (
+                  <p className="text-xs text-red-400 mt-1">{requestForm.formState.errors.full_name.message}</p>
+                )}
+              </div>
+              <div>
+                <label className="text-xs font-bold text-[#4A7FA5] uppercase tracking-wider block mb-2">Email</label>
+                <input
+                  type="email"
+                  placeholder="seu@email.com"
+                  className="w-full bg-[#0D1B2E] border border-[#1A2E4A] rounded-xl px-4 py-3 text-white placeholder:text-[#3A5A7A] focus:outline-none focus:border-[#F59E0B] text-sm transition-colors"
+                  {...requestForm.register('email')}
+                />
+                {requestForm.formState.errors.email && (
+                  <p className="text-xs text-red-400 mt-1">{requestForm.formState.errors.email.message}</p>
+                )}
+              </div>
+              <div>
+                <label className="text-xs font-bold text-[#4A7FA5] uppercase tracking-wider block mb-2">Por que quer participar?</label>
+                <textarea
+                  placeholder="Conte sobre você e seus objetivos profissionais..."
+                  rows={4}
+                  className="w-full bg-[#0D1B2E] border border-[#1A2E4A] rounded-xl px-4 py-3 text-white placeholder:text-[#3A5A7A] focus:outline-none focus:border-[#F59E0B] text-sm transition-colors resize-none"
+                  {...requestForm.register('mensagem')}
+                />
+                {requestForm.formState.errors.mensagem && (
+                  <p className="text-xs text-red-400 mt-1">{requestForm.formState.errors.mensagem.message}</p>
+                )}
+              </div>
+              <button
+                type="submit"
+                className="w-full flex items-center justify-center gap-2 bg-[#F59E0B] hover:bg-[#D97706] text-black font-bold py-3 rounded-xl transition-colors"
+              >
+                Enviar Solicitação <ArrowRight size={16} />
+              </button>
+            </form>
+          )}
+        </motion.div>
+      </div>
     </div>
   )
 }

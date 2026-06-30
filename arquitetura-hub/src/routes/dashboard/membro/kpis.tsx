@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { CheckCircle, AlertCircle, XCircle } from 'lucide-react'
 import { KpiTable } from '@/components/membro/KpiTable'
-import { Card, CardContent } from '@/components/ui/card'
 import { mockKpis } from '@/lib/mocks/kpis'
 import { getPercent, getStatusColor } from '@/lib/utils'
 import type { KpiEntry } from '@/types'
@@ -31,39 +30,39 @@ function KpisPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#0F172A]">Meus KPIs</h1>
-        <p className="text-[#475569] mt-1">Acompanhe e atualize seus indicadores de performance</p>
+        <h1 className="text-2xl font-bold text-white">Meus KPIs</h1>
+        <p className="text-[#4A7FA5] mt-1">Acompanhe e atualize seus indicadores de performance</p>
       </div>
 
       {/* Status summary */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <CheckCircle className="text-green-500 flex-shrink-0" size={24} />
-            <div>
-              <p className="text-2xl font-bold text-green-600">{green}</p>
-              <p className="text-xs text-[#94A3B8]">No alvo</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <AlertCircle className="text-yellow-500 flex-shrink-0" size={24} />
-            <div>
-              <p className="text-2xl font-bold text-yellow-600">{yellow}</p>
-              <p className="text-xs text-[#94A3B8]">Atenção</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <XCircle className="text-red-500 flex-shrink-0" size={24} />
-            <div>
-              <p className="text-2xl font-bold text-red-600">{red}</p>
-              <p className="text-xs text-[#94A3B8]">Crítico</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+            <CheckCircle className="text-emerald-400" size={20} />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-emerald-400">{green}</p>
+            <p className="text-xs text-[#4A7FA5]">No alvo</p>
+          </div>
+        </div>
+        <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+            <AlertCircle className="text-amber-400" size={20} />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-amber-400">{yellow}</p>
+            <p className="text-xs text-[#4A7FA5]">Atenção</p>
+          </div>
+        </div>
+        <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+            <XCircle className="text-red-400" size={20} />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-red-400">{red}</p>
+            <p className="text-xs text-[#4A7FA5]">Crítico</p>
+          </div>
+        </div>
       </div>
 
       <KpiTable kpis={kpis} onUpdateAtual={handleUpdateAtual} />

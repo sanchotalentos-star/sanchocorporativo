@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
 import type { Evento, EventoTipo } from '@/types'
 
 interface CalendarioEditorialProps {
@@ -9,19 +8,11 @@ interface CalendarioEditorialProps {
 }
 
 const tipoColors: Record<EventoTipo, string> = {
-  'Conteúdo': 'blue',
-  'Evento': 'purple',
-  'Mídia': 'accent',
-  'Relacionamento': 'green',
-  'Meta': 'yellow',
-}
-
-const tipoDots: Record<EventoTipo, string> = {
-  'Conteúdo': 'bg-blue-500',
-  'Evento': 'bg-purple-500',
-  'Mídia': 'bg-amber-500',
-  'Relacionamento': 'bg-green-500',
-  'Meta': 'bg-yellow-500',
+  'Conteúdo': '#3B82F6',
+  'Evento': '#8B5CF6',
+  'Mídia': '#F59E0B',
+  'Relacionamento': '#10B981',
+  'Meta': '#EF4444',
 }
 
 export function CalendarioEditorial({ eventos }: CalendarioEditorialProps) {
@@ -46,41 +37,36 @@ export function CalendarioEditorial({ eventos }: CalendarioEditorialProps) {
   const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
   function prev() {
-    setCurrent(c => {
-      if (c.month === 0) return { year: c.year - 1, month: 11 }
-      return { year: c.year, month: c.month - 1 }
-    })
+    setCurrent(c => c.month === 0 ? { year: c.year - 1, month: 11 } : { year: c.year, month: c.month - 1 })
   }
   function next() {
-    setCurrent(c => {
-      if (c.month === 11) return { year: c.year + 1, month: 0 }
-      return { year: c.year, month: c.month + 1 }
-    })
+    setCurrent(c => c.month === 11 ? { year: c.year + 1, month: 0 } : { year: c.year, month: c.month + 1 })
   }
 
   return (
-    <div className="grid lg:grid-cols-3 gap-6">
+    <div className="grid lg:grid-cols-3 gap-4">
       {/* Calendar */}
-      <div className="lg:col-span-2 bg-white rounded-xl border border-[#E2E8F0] p-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-[#0F172A]">
+      <div className="lg:col-span-2 bg-[#0D1B2E] rounded-2xl border border-[#1A2E4A] p-5">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="font-bold text-white">
             {monthNames[current.month]} {current.year}
           </h2>
           <div className="flex gap-1">
-            <button onClick={prev} className="p-1 rounded hover:bg-[#F1F5F9] text-[#475569]"><ChevronLeft size={18} /></button>
-            <button onClick={next} className="p-1 rounded hover:bg-[#F1F5F9] text-[#475569]"><ChevronRight size={18} /></button>
+            <button onClick={prev} className="p-1.5 rounded-lg hover:bg-[#112240] text-[#4A7FA5] hover:text-white transition-colors">
+              <ChevronLeft size={17} />
+            </button>
+            <button onClick={next} className="p-1.5 rounded-lg hover:bg-[#112240] text-[#4A7FA5] hover:text-white transition-colors">
+              <ChevronRight size={17} />
+            </button>
           </div>
         </div>
 
-        {/* Day names */}
         <div className="grid grid-cols-7 mb-2">
           {['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d => (
-            <div key={d} className="text-center text-xs font-medium text-[#94A3B8] py-1">{d}</div>
+            <div key={d} className="text-center text-[10px] font-bold text-[#4A7FA5] uppercase tracking-wider py-1">{d}</div>
           ))}
         </div>
 
-        {/* Days grid */}
         <div className="grid grid-cols-7 gap-1">
           {Array.from({ length: startPad }).map((_, i) => (
             <div key={`pad-${i}`} />
@@ -95,15 +81,23 @@ export function CalendarioEditorial({ eventos }: CalendarioEditorialProps) {
                 key={day}
                 onClick={() => setSelectedDay(day === selectedDay ? null : day)}
                 className={cn(
-                  'relative aspect-square flex flex-col items-center justify-start pt-1 rounded-lg text-sm transition-colors',
-                  isSelected ? 'bg-[#1B3A5C] text-white' : isToday ? 'bg-[#1B3A5C]/10 text-[#1B3A5C] font-bold' : 'hover:bg-[#F1F5F9] text-[#0F172A]'
+                  'relative aspect-square flex flex-col items-center justify-start pt-1.5 rounded-xl text-xs transition-all',
+                  isSelected
+                    ? 'bg-[#F59E0B] text-black font-bold'
+                    : isToday
+                    ? 'bg-[#F59E0B]/15 text-[#F59E0B] font-bold border border-[#F59E0B]/30'
+                    : 'hover:bg-[#112240] text-[#A0C0D8]'
                 )}
               >
-                <span className="text-xs font-medium">{day}</span>
+                <span className="text-xs font-semibold">{day}</span>
                 {dayEvs.length > 0 && (
                   <div className="flex gap-0.5 mt-0.5 flex-wrap justify-center">
                     {dayEvs.slice(0, 3).map(ev => (
-                      <span key={ev.id} className={cn('w-1.5 h-1.5 rounded-full', tipoDots[ev.tipo], isSelected ? 'opacity-80' : '')} />
+                      <span
+                        key={ev.id}
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{ background: isSelected ? 'rgba(0,0,0,0.4)' : tipoColors[ev.tipo] }}
+                      />
                     ))}
                   </div>
                 )}
@@ -114,36 +108,41 @@ export function CalendarioEditorial({ eventos }: CalendarioEditorialProps) {
       </div>
 
       {/* Day detail */}
-      <div className="bg-white rounded-xl border border-[#E2E8F0] p-4">
-        <h3 className="font-semibold text-[#0F172A] mb-4">
-          {selectedDay ? `Dia ${selectedDay}` : 'Selecione um dia'}
+      <div className="bg-[#0D1B2E] rounded-2xl border border-[#1A2E4A] p-5">
+        <h3 className="font-bold text-white mb-4">
+          {selectedDay ? `Dia ${selectedDay} — ${monthNames[current.month]}` : 'Selecione um dia'}
         </h3>
         {selectedDayEvents.length === 0 ? (
-          <p className="text-sm text-[#94A3B8] text-center py-8">Nenhum evento neste dia</p>
+          <p className="text-sm text-[#4A7FA5] text-center py-8">Nenhum evento neste dia</p>
         ) : (
           <div className="space-y-3">
-            {selectedDayEvents.map(ev => (
-              <div key={ev.id} className="p-3 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0]">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-medium text-[#0F172A]">{ev.titulo}</p>
-                  <Badge variant={tipoColors[ev.tipo] as 'blue' | 'purple' | 'accent' | 'green' | 'yellow'}>
-                    {ev.tipo}
-                  </Badge>
+            {selectedDayEvents.map(ev => {
+              const color = tipoColors[ev.tipo]
+              return (
+                <div key={ev.id} className="p-3 rounded-xl border border-[#1A2E4A] bg-[#0A1420]">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-semibold text-white">{ev.titulo}</p>
+                    <span
+                      className="text-[10px] font-bold px-2 py-0.5 rounded-md flex-shrink-0"
+                      style={{ background: `${color}20`, color }}
+                    >
+                      {ev.tipo}
+                    </span>
+                  </div>
+                  {ev.hora && <p className="text-xs text-[#4A7FA5] mt-1">{ev.hora}</p>}
+                  {ev.local && <p className="text-xs text-[#A0C0D8] mt-0.5">{ev.local}</p>}
                 </div>
-                {ev.hora && <p className="text-xs text-[#94A3B8] mt-1">{ev.hora}</p>}
-                {ev.local && <p className="text-xs text-[#475569] mt-0.5">{ev.local}</p>}
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
 
-        {/* Legend */}
-        <div className="mt-6 pt-4 border-t border-[#E2E8F0]">
-          <p className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wide mb-2">Legenda</p>
-          <div className="space-y-1.5">
-            {(Object.entries(tipoDots) as [EventoTipo, string][]).map(([tipo, dot]) => (
-              <div key={tipo} className="flex items-center gap-2 text-xs text-[#475569]">
-                <span className={cn('w-2 h-2 rounded-full flex-shrink-0', dot)} />
+        <div className="mt-6 pt-4 border-t border-[#1A2E4A]">
+          <p className="text-[10px] font-bold text-[#4A7FA5] uppercase tracking-widest mb-3">Legenda</p>
+          <div className="space-y-2">
+            {(Object.entries(tipoColors) as [EventoTipo, string][]).map(([tipo, color]) => (
+              <div key={tipo} className="flex items-center gap-2 text-xs text-[#4A7FA5]">
+                <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
                 {tipo}
               </div>
             ))}

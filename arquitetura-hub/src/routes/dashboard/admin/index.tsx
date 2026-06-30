@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 import { Users, TrendingUp, Target, Award } from 'lucide-react'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { GlobalKpiOverview } from '@/components/admin/GlobalKpiOverview'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
 import { mockMembers } from '@/lib/mocks/members'
@@ -23,16 +22,15 @@ function AdminOverview() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#0F172A]">Painel Administrativo</h1>
-        <p className="text-[#475569] mt-1">Visão geral de todos os participantes do programa</p>
+        <h1 className="text-2xl font-bold text-white">Painel Administrativo</h1>
+        <p className="text-[#4A7FA5] mt-1">Visão geral de todos os participantes do programa</p>
       </div>
 
-      {/* KPI cards */}
       <motion.div
         variants={staggerContainer}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3"
       >
         <KpiCard label="Total de Membros" value={totalMembers} icon={Users} />
         <KpiCard label="Score Médio" value={avgScore} unit="pts" icon={Award} accent />
@@ -40,63 +38,55 @@ function AdminOverview() {
         <KpiCard label="Leads Totais" value={totalLeads} icon={Target} />
       </motion.div>
 
-      {/* Growth chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Crescimento Agregado — Últimos 6 Meses</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <GlobalKpiOverview data={mockAggregateGrowth} />
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-5">
+        <h3 className="text-sm font-bold text-white mb-4">Crescimento Agregado — Últimos 6 Meses</h3>
+        <GlobalKpiOverview data={mockAggregateGrowth} />
+      </div>
 
-      {/* Member cards grid */}
       <div>
-        <h2 className="text-lg font-semibold text-[#0F172A] mb-4">Participantes</h2>
+        <h2 className="text-sm font-bold text-[#4A7FA5] uppercase tracking-widest mb-3">Participantes</h2>
         <motion.div
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-4"
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-3"
         >
           {[...mockMembers].sort((a, b) => b.score - a.score).map((member) => {
-            const color = member.score >= 80 ? 'bg-green-500' : member.score >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-            const textColor = member.score >= 80 ? 'text-green-600' : member.score >= 60 ? 'text-yellow-600' : 'text-red-600'
+            const scoreColor = member.score >= 80 ? '#10B981' : member.score >= 60 ? '#F59E0B' : '#EF4444'
+            const barColor = member.score >= 80 ? 'bg-emerald-500' : member.score >= 60 ? 'bg-amber-500' : 'bg-red-500'
             return (
               <motion.div key={member.id} variants={fadeInUp}>
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-5">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-[#1B3A5C] flex items-center justify-center text-white font-bold">
-                        {member.full_name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-[#0F172A]">{member.full_name}</p>
-                        <p className="text-xs text-[#94A3B8]">{member.email}</p>
-                      </div>
-                      <span className={cn('ml-auto text-xl font-bold', textColor)}>{member.score}</span>
+                <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] hover:border-[#2A4A6E] p-5 transition-all">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center text-black font-bold text-sm">
+                      {member.full_name.charAt(0)}
                     </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs text-[#475569]">
-                        <span>Score de Autoridade</span>
-                        <span>{member.score}%</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-white truncate">{member.full_name}</p>
+                      <p className="text-xs text-[#4A7FA5] truncate">{member.email}</p>
+                    </div>
+                    <span className="text-xl font-black" style={{ color: scoreColor }}>{member.score}</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs text-[#4A7FA5]">
+                      <span>Score de Autoridade</span>
+                      <span style={{ color: scoreColor }}>{member.score}%</span>
+                    </div>
+                    <Progress value={member.score} indicatorClassName={barColor} className="bg-[#112240]" />
+                    <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-[#1A2E4A]">
+                      <div className="text-center">
+                        <p className="text-xs text-[#4A7FA5]">Leads</p>
+                        <p className="font-semibold text-white">{member.leads}</p>
                       </div>
-                      <Progress value={member.score} indicatorClassName={color} />
-                      <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-[#E2E8F0]">
-                        <div className="text-center">
-                          <p className="text-xs text-[#94A3B8]">Leads</p>
-                          <p className="font-semibold text-[#0F172A]">{member.leads}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-xs text-[#94A3B8]">Alcance</p>
-                          <p className="font-semibold text-[#0F172A]">
-                            {member.alcance >= 1000 ? `${(member.alcance / 1000).toFixed(1)}k` : member.alcance}
-                          </p>
-                        </div>
+                      <div className="text-center">
+                        <p className="text-xs text-[#4A7FA5]">Alcance</p>
+                        <p className="font-semibold text-white">
+                          {member.alcance >= 1000 ? `${(member.alcance / 1000).toFixed(1)}k` : member.alcance}
+                        </p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </motion.div>
             )
           })}

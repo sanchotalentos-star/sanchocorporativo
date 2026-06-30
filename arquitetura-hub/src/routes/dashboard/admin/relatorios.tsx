@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { GlobalKpiOverview } from '@/components/admin/GlobalKpiOverview'
 import { mockAggregateGrowth } from '@/lib/mocks/analytics'
 import { mockMembers } from '@/lib/mocks/members'
@@ -17,39 +16,35 @@ function AdminRelatorios() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#0F172A]">Relatórios Globais</h1>
-        <p className="text-[#475569] mt-1">Visão consolidada de todos os participantes</p>
+        <h1 className="text-2xl font-bold text-white">Relatórios Globais</h1>
+        <p className="text-[#4A7FA5] mt-1">Visão consolidada de todos os participantes</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Alcance Total', value: `${(totalReach / 1000).toFixed(1)}k` },
           { label: 'Leads Gerados', value: totalLeads },
           { label: 'Crescimento', value: `+${growthPct}%` },
           { label: 'Participantes', value: mockMembers.length },
         ].map(item => (
-          <Card key={item.label}>
-            <CardContent className="p-5">
-              <p className="text-sm text-[#475569]">{item.label}</p>
-              <p className="text-2xl font-bold text-[#0F172A] mt-1">{item.value}</p>
-            </CardContent>
-          </Card>
+          <div key={item.label} className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-5">
+            <p className="text-xs text-[#4A7FA5] uppercase tracking-wider">{item.label}</p>
+            <p className="text-2xl font-bold text-white mt-1">{item.value}</p>
+          </div>
         ))}
       </div>
 
-      <Card>
-        <CardHeader><CardTitle>Crescimento Agregado</CardTitle></CardHeader>
-        <CardContent>
-          <GlobalKpiOverview data={mockAggregateGrowth} />
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] p-5">
+        <h3 className="text-sm font-bold text-white mb-4">Crescimento Agregado</h3>
+        <GlobalKpiOverview data={mockAggregateGrowth} />
+      </div>
 
-      <Card>
-        <CardHeader><CardTitle>Ranking Geral</CardTitle></CardHeader>
-        <CardContent className="p-0">
-          <RankingTable members={mockMembers} />
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl bg-[#0D1B2E] border border-[#1A2E4A] overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#1A2E4A]">
+          <h3 className="text-sm font-bold text-white">Ranking Geral</h3>
+        </div>
+        <RankingTable members={mockMembers} />
+      </div>
     </div>
   )
 }
