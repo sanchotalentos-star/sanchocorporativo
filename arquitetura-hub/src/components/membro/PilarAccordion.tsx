@@ -3,7 +3,6 @@ import { ChevronDown, Check, Plus } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { getPercent } from '@/lib/utils'
-import { Progress } from '@/components/ui/progress'
 import type { Pilar, PilarAcao } from '@/types'
 
 interface PilarAccordionProps {
@@ -28,22 +27,27 @@ export function PilarAccordion({ pilar, onToggleAcao, onAddAcao }: PilarAccordio
   }
 
   return (
-    <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+    <div className="rounded-2xl border border-[#1A2E4A] bg-[#0D1B2E] overflow-hidden">
       <button
-        className="w-full flex items-center gap-4 p-4 text-left hover:bg-[#F1F5F9] transition-colors"
+        className="w-full flex items-center gap-4 p-4 text-left hover:bg-[#112240] transition-colors"
         onClick={() => setOpen(!open)}
       >
         <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: pilar.cor }} />
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-[#0F172A]">{pilar.nome}</p>
-          <p className="text-xs text-[#94A3B8] mt-0.5">{done}/{pilar.acoes.length} ações concluídas</p>
+          <p className="font-semibold text-white">{pilar.nome}</p>
+          <p className="text-xs text-[#4A7FA5] mt-0.5">{done}/{pilar.acoes.length} ações concluídas</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="w-24 hidden sm:block">
-            <Progress value={pct} indicatorClassName="" style={{ '--tw-bg': pilar.cor } as React.CSSProperties} />
+          <div className="w-20 hidden sm:flex items-center gap-2">
+            <div className="flex-1 h-1.5 rounded-full bg-[#112240]">
+              <div
+                className="h-full rounded-full transition-all"
+                style={{ width: `${pct}%`, background: pilar.cor }}
+              />
+            </div>
           </div>
-          <span className="text-sm font-medium text-[#475569]">{pct}%</span>
-          <ChevronDown size={16} className={cn('text-[#94A3B8] transition-transform', open && 'rotate-180')} />
+          <span className="text-sm font-bold" style={{ color: pilar.cor }}>{pct}%</span>
+          <ChevronDown size={15} className={cn('text-[#4A7FA5] transition-transform', open && 'rotate-180')} />
         </div>
       </button>
 
@@ -56,8 +60,10 @@ export function PilarAccordion({ pilar, onToggleAcao, onAddAcao }: PilarAccordio
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 space-y-2">
-              <p className="text-sm text-[#475569] mb-3">{pilar.descricao}</p>
+            <div className="px-4 pb-4 space-y-2 border-t border-[#1A2E4A] pt-3">
+              {pilar.descricao && (
+                <p className="text-sm text-[#4A7FA5] mb-3">{pilar.descricao}</p>
+              )}
               {pilar.acoes.map((acao) => (
                 <AcaoItem
                   key={acao.id}
@@ -74,21 +80,21 @@ export function PilarAccordion({ pilar, onToggleAcao, onAddAcao }: PilarAccordio
                     onChange={e => setNewText(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') handleAdd(); if (e.key === 'Escape') setAdding(false) }}
                     placeholder="Descreva a ação..."
-                    className="flex-1 text-sm border border-[#E2E8F0] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1B3A5C]"
+                    className="flex-1 text-sm border border-[#1A2E4A] rounded-xl px-3 py-2 bg-[#0A1420] text-white placeholder:text-[#3A5A7A] focus:outline-none focus:border-[#F59E0B]"
                   />
-                  <button onClick={handleAdd} className="px-3 py-2 bg-[#1B3A5C] text-white rounded-lg text-sm font-medium hover:bg-[#152E4A]">
+                  <button onClick={handleAdd} className="px-3 py-2 bg-[#F59E0B] text-black rounded-xl text-sm font-bold hover:bg-[#D97706]">
                     Adicionar
                   </button>
-                  <button onClick={() => setAdding(false)} className="px-3 py-2 text-sm text-[#475569] hover:bg-[#F1F5F9] rounded-lg">
+                  <button onClick={() => setAdding(false)} className="px-3 py-2 text-sm text-[#4A7FA5] hover:text-white rounded-xl hover:bg-[#112240]">
                     Cancelar
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={() => setAdding(true)}
-                  className="flex items-center gap-2 text-sm text-[#1B3A5C] hover:text-[#152E4A] font-medium mt-2"
+                  className="flex items-center gap-2 text-sm text-[#4A7FA5] hover:text-white font-medium mt-2 transition-colors"
                 >
-                  <Plus size={16} />
+                  <Plus size={15} />
                   Adicionar ação
                 </button>
               )}
@@ -105,17 +111,17 @@ function AcaoItem({ acao, cor, onToggle }: { acao: PilarAcao; cor: string; onTog
     <button
       onClick={onToggle}
       className={cn(
-        'w-full flex items-start gap-3 p-3 rounded-lg text-left transition-colors',
-        acao.concluida ? 'bg-green-50' : 'bg-[#F1F5F9] hover:bg-[#E2E8F0]'
+        'w-full flex items-start gap-3 p-3 rounded-xl text-left transition-colors',
+        acao.concluida ? 'bg-emerald-500/10' : 'bg-[#0A1420] hover:bg-[#112240]'
       )}
     >
       <div className={cn(
-        'w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5 border-2 transition-colors',
-        acao.concluida ? 'border-green-500 bg-green-500' : 'border-[#94A3B8] bg-white'
+        'w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border-2 transition-colors',
+        acao.concluida ? 'border-emerald-500 bg-emerald-500' : 'border-[#2A4A6E] bg-transparent'
       )}>
-        {acao.concluida && <Check size={12} className="text-white" />}
+        {acao.concluida && <Check size={11} className="text-white" />}
       </div>
-      <span className={cn('text-sm', acao.concluida ? 'line-through text-[#94A3B8]' : 'text-[#0F172A]')}>
+      <span className={cn('text-sm', acao.concluida ? 'line-through text-[#3A5A7A]' : 'text-[#A0C0D8]')}>
         {acao.texto}
       </span>
     </button>

@@ -17,7 +17,10 @@ import { Route as DashboardMembroIndexRouteImport } from './routes/dashboard/mem
 import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard/admin/index'
 import { Route as DashboardMembroRelatoriosRouteImport } from './routes/dashboard/membro/relatorios'
 import { Route as DashboardMembroRankingRouteImport } from './routes/dashboard/membro/ranking'
+import { Route as DashboardMembroPosicionamentoRouteImport } from './routes/dashboard/membro/posicionamento'
 import { Route as DashboardMembroPilaresRouteImport } from './routes/dashboard/membro/pilares'
+import { Route as DashboardMembroOkrRouteImport } from './routes/dashboard/membro/okr'
+import { Route as DashboardMembroMarketingRouteImport } from './routes/dashboard/membro/marketing'
 import { Route as DashboardMembroKpisRouteImport } from './routes/dashboard/membro/kpis'
 import { Route as DashboardMembroAgendaRouteImport } from './routes/dashboard/membro/agenda'
 import { Route as DashboardAdminRelatoriosRouteImport } from './routes/dashboard/admin/relatorios'
@@ -64,11 +67,28 @@ const DashboardMembroRankingRoute = DashboardMembroRankingRouteImport.update({
   path: '/ranking',
   getParentRoute: () => DashboardMembroRoute,
 } as any)
+const DashboardMembroPosicionamentoRoute =
+  DashboardMembroPosicionamentoRouteImport.update({
+    id: '/posicionamento',
+    path: '/posicionamento',
+    getParentRoute: () => DashboardMembroRoute,
+  } as any)
 const DashboardMembroPilaresRoute = DashboardMembroPilaresRouteImport.update({
   id: '/pilares',
   path: '/pilares',
   getParentRoute: () => DashboardMembroRoute,
 } as any)
+const DashboardMembroOkrRoute = DashboardMembroOkrRouteImport.update({
+  id: '/okr',
+  path: '/okr',
+  getParentRoute: () => DashboardMembroRoute,
+} as any)
+const DashboardMembroMarketingRoute =
+  DashboardMembroMarketingRouteImport.update({
+    id: '/marketing',
+    path: '/marketing',
+    getParentRoute: () => DashboardMembroRoute,
+  } as any)
 const DashboardMembroKpisRoute = DashboardMembroKpisRouteImport.update({
   id: '/kpis',
   path: '/kpis',
@@ -100,7 +120,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/relatorios': typeof DashboardAdminRelatoriosRoute
   '/dashboard/membro/agenda': typeof DashboardMembroAgendaRoute
   '/dashboard/membro/kpis': typeof DashboardMembroKpisRoute
+  '/dashboard/membro/marketing': typeof DashboardMembroMarketingRoute
+  '/dashboard/membro/okr': typeof DashboardMembroOkrRoute
   '/dashboard/membro/pilares': typeof DashboardMembroPilaresRoute
+  '/dashboard/membro/posicionamento': typeof DashboardMembroPosicionamentoRoute
   '/dashboard/membro/ranking': typeof DashboardMembroRankingRoute
   '/dashboard/membro/relatorios': typeof DashboardMembroRelatoriosRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
@@ -113,7 +136,10 @@ export interface FileRoutesByTo {
   '/dashboard/admin/relatorios': typeof DashboardAdminRelatoriosRoute
   '/dashboard/membro/agenda': typeof DashboardMembroAgendaRoute
   '/dashboard/membro/kpis': typeof DashboardMembroKpisRoute
+  '/dashboard/membro/marketing': typeof DashboardMembroMarketingRoute
+  '/dashboard/membro/okr': typeof DashboardMembroOkrRoute
   '/dashboard/membro/pilares': typeof DashboardMembroPilaresRoute
+  '/dashboard/membro/posicionamento': typeof DashboardMembroPosicionamentoRoute
   '/dashboard/membro/ranking': typeof DashboardMembroRankingRoute
   '/dashboard/membro/relatorios': typeof DashboardMembroRelatoriosRoute
   '/dashboard/admin': typeof DashboardAdminIndexRoute
@@ -129,7 +155,10 @@ export interface FileRoutesById {
   '/dashboard/admin/relatorios': typeof DashboardAdminRelatoriosRoute
   '/dashboard/membro/agenda': typeof DashboardMembroAgendaRoute
   '/dashboard/membro/kpis': typeof DashboardMembroKpisRoute
+  '/dashboard/membro/marketing': typeof DashboardMembroMarketingRoute
+  '/dashboard/membro/okr': typeof DashboardMembroOkrRoute
   '/dashboard/membro/pilares': typeof DashboardMembroPilaresRoute
+  '/dashboard/membro/posicionamento': typeof DashboardMembroPosicionamentoRoute
   '/dashboard/membro/ranking': typeof DashboardMembroRankingRoute
   '/dashboard/membro/relatorios': typeof DashboardMembroRelatoriosRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
@@ -146,7 +175,10 @@ export interface FileRouteTypes {
     | '/dashboard/admin/relatorios'
     | '/dashboard/membro/agenda'
     | '/dashboard/membro/kpis'
+    | '/dashboard/membro/marketing'
+    | '/dashboard/membro/okr'
     | '/dashboard/membro/pilares'
+    | '/dashboard/membro/posicionamento'
     | '/dashboard/membro/ranking'
     | '/dashboard/membro/relatorios'
     | '/dashboard/admin/'
@@ -159,7 +191,10 @@ export interface FileRouteTypes {
     | '/dashboard/admin/relatorios'
     | '/dashboard/membro/agenda'
     | '/dashboard/membro/kpis'
+    | '/dashboard/membro/marketing'
+    | '/dashboard/membro/okr'
     | '/dashboard/membro/pilares'
+    | '/dashboard/membro/posicionamento'
     | '/dashboard/membro/ranking'
     | '/dashboard/membro/relatorios'
     | '/dashboard/admin'
@@ -174,7 +209,10 @@ export interface FileRouteTypes {
     | '/dashboard/admin/relatorios'
     | '/dashboard/membro/agenda'
     | '/dashboard/membro/kpis'
+    | '/dashboard/membro/marketing'
+    | '/dashboard/membro/okr'
     | '/dashboard/membro/pilares'
+    | '/dashboard/membro/posicionamento'
     | '/dashboard/membro/ranking'
     | '/dashboard/membro/relatorios'
     | '/dashboard/admin/'
@@ -246,11 +284,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardMembroRankingRouteImport
       parentRoute: typeof DashboardMembroRoute
     }
+    '/dashboard/membro/posicionamento': {
+      id: '/dashboard/membro/posicionamento'
+      path: '/posicionamento'
+      fullPath: '/dashboard/membro/posicionamento'
+      preLoaderRoute: typeof DashboardMembroPosicionamentoRouteImport
+      parentRoute: typeof DashboardMembroRoute
+    }
     '/dashboard/membro/pilares': {
       id: '/dashboard/membro/pilares'
       path: '/pilares'
       fullPath: '/dashboard/membro/pilares'
       preLoaderRoute: typeof DashboardMembroPilaresRouteImport
+      parentRoute: typeof DashboardMembroRoute
+    }
+    '/dashboard/membro/okr': {
+      id: '/dashboard/membro/okr'
+      path: '/okr'
+      fullPath: '/dashboard/membro/okr'
+      preLoaderRoute: typeof DashboardMembroOkrRouteImport
+      parentRoute: typeof DashboardMembroRoute
+    }
+    '/dashboard/membro/marketing': {
+      id: '/dashboard/membro/marketing'
+      path: '/marketing'
+      fullPath: '/dashboard/membro/marketing'
+      preLoaderRoute: typeof DashboardMembroMarketingRouteImport
       parentRoute: typeof DashboardMembroRoute
     }
     '/dashboard/membro/kpis': {
@@ -303,7 +362,10 @@ const DashboardAdminRouteWithChildren = DashboardAdminRoute._addFileChildren(
 interface DashboardMembroRouteChildren {
   DashboardMembroAgendaRoute: typeof DashboardMembroAgendaRoute
   DashboardMembroKpisRoute: typeof DashboardMembroKpisRoute
+  DashboardMembroMarketingRoute: typeof DashboardMembroMarketingRoute
+  DashboardMembroOkrRoute: typeof DashboardMembroOkrRoute
   DashboardMembroPilaresRoute: typeof DashboardMembroPilaresRoute
+  DashboardMembroPosicionamentoRoute: typeof DashboardMembroPosicionamentoRoute
   DashboardMembroRankingRoute: typeof DashboardMembroRankingRoute
   DashboardMembroRelatoriosRoute: typeof DashboardMembroRelatoriosRoute
   DashboardMembroIndexRoute: typeof DashboardMembroIndexRoute
@@ -312,7 +374,10 @@ interface DashboardMembroRouteChildren {
 const DashboardMembroRouteChildren: DashboardMembroRouteChildren = {
   DashboardMembroAgendaRoute: DashboardMembroAgendaRoute,
   DashboardMembroKpisRoute: DashboardMembroKpisRoute,
+  DashboardMembroMarketingRoute: DashboardMembroMarketingRoute,
+  DashboardMembroOkrRoute: DashboardMembroOkrRoute,
   DashboardMembroPilaresRoute: DashboardMembroPilaresRoute,
+  DashboardMembroPosicionamentoRoute: DashboardMembroPosicionamentoRoute,
   DashboardMembroRankingRoute: DashboardMembroRankingRoute,
   DashboardMembroRelatoriosRoute: DashboardMembroRelatoriosRoute,
   DashboardMembroIndexRoute: DashboardMembroIndexRoute,
