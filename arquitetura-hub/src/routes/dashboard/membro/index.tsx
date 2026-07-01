@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { Users, TrendingUp, Target, Award, ArrowRight, Calendar, Crosshair, Zap, Megaphone, CheckCircle2 } from 'lucide-react'
+import { Users, TrendingUp, Target, Award, ArrowRight, Calendar, Crosshair, Zap, Megaphone } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
@@ -110,15 +110,12 @@ function MembroDashboard() {
           {quickLinks.map((item) => (
             <motion.div key={item.href} variants={fadeInUp}>
               <Link to={item.href}>
-                <div className="group rounded-2xl bg-white border border-gray-200 p-4 hover:border-gray-300 hover:shadow-md transition-all cursor-pointer">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
-                    style={{ background: `${item.color}12`, border: `1px solid ${item.color}25` }}>
-                    <item.icon size={18} style={{ color: item.color }} />
-                  </div>
-                  <p className="text-sm font-black text-gray-900 uppercase tracking-tight">{item.label}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{item.desc}</p>
-                  <div className="flex items-center gap-1 mt-3 text-xs font-bold uppercase tracking-wide" style={{ color: item.color }}>
-                    Acessar <ArrowRight size={11} />
+                <div className="group rounded-2xl bg-white border border-gray-200 p-5 hover:border-gray-300 hover:shadow-md transition-all cursor-pointer">
+                  <item.icon size={20} style={{ color: item.color }} className="mb-4" />
+                  <p className="text-sm font-black text-gray-900 uppercase tracking-tight leading-tight">{item.label}</p>
+                  <p className="text-xs text-gray-400 mt-1 leading-relaxed">{item.desc}</p>
+                  <div className="flex items-center gap-1 mt-4 text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-gray-700 transition-colors">
+                    Acessar <ArrowRight size={10} />
                   </div>
                 </div>
               </Link>
@@ -174,24 +171,21 @@ function MembroDashboard() {
             {upcomingEvents.length === 0 ? (
               <p className="text-sm text-gray-400 py-4 text-center">Nenhum evento próximo</p>
             ) : upcomingEvents.map(ev => (
-              <div key={ev.id} className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-gray-50 transition-colors">
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-                  style={{ background: `${tipoColors[ev.tipo] ?? '#9CA3AF'}12` }}
-                >
-                  <Calendar size={13} style={{ color: tipoColors[ev.tipo] ?? '#9CA3AF' }} />
+              <div key={ev.id} className="flex items-start gap-3 py-2.5 border-b border-gray-100 last:border-0">
+                <div className="flex-shrink-0 text-center w-8 pt-0.5">
+                  <p className="text-[10px] font-black text-gray-400 uppercase leading-none">
+                    {ev.data.split('-')[1] ? ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(ev.data.split('-')[1]) - 1] : ''}
+                  </p>
+                  <p className="text-lg font-black text-gray-900 leading-none mt-0.5">{ev.data.split('-')[2]}</p>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{ev.titulo}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <p className="text-xs text-gray-400">{ev.data.split('-').reverse().join('/')}</p>
-                    <span
-                      className="text-[10px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wide"
-                      style={{ background: `${tipoColors[ev.tipo] ?? '#9CA3AF'}15`, color: tipoColors[ev.tipo] ?? '#9CA3AF' }}
-                    >
-                      {ev.tipo}
-                    </span>
-                  </div>
+                  <p className="text-sm font-semibold text-gray-900 truncate leading-tight">{ev.titulo}</p>
+                  <span
+                    className="text-[10px] font-black uppercase tracking-widest mt-0.5"
+                    style={{ color: tipoColors[ev.tipo] ?? '#9CA3AF' }}
+                  >
+                    {ev.tipo}
+                  </span>
                 </div>
               </div>
             ))}
@@ -230,11 +224,11 @@ function MembroDashboard() {
               <p className={`text-xs font-black mb-2 uppercase tracking-tight ${phase.active ? 'text-gray-900' : 'text-gray-400'}`}>
                 {phase.label}
               </p>
-              <div className="space-y-1">
+              <div className="space-y-1 mt-1">
                 {phase.deliverables.map((d) => (
                   <div key={d} className="flex items-center gap-1.5">
-                    <CheckCircle2 size={10} className={phase.active ? 'text-[#7B2FBE]' : 'text-gray-300'} />
-                    <span className={`text-[10px] ${phase.active ? 'text-gray-600' : 'text-gray-300'}`}>{d}</span>
+                    <span className={`w-1 h-1 rounded-full flex-shrink-0 ${phase.active ? 'bg-[#7B2FBE]' : 'bg-gray-300'}`} />
+                    <span className={`text-[10px] leading-relaxed ${phase.active ? 'text-gray-600' : 'text-gray-300'}`}>{d}</span>
                   </div>
                 ))}
               </div>

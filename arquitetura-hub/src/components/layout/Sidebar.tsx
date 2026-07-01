@@ -51,24 +51,24 @@ export function Sidebar() {
     <aside className="flex flex-col w-64 min-h-screen bg-white border-r border-gray-200">
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-100">
-        <div className="w-9 h-9 rounded-xl bg-[#7B2FBE] flex items-center justify-center shadow-md shadow-[#7B2FBE]/20">
-          <BookOpen size={16} className="text-white" />
+        <div className="w-8 h-8 rounded-lg bg-[#7B2FBE] flex items-center justify-center">
+          <BookOpen size={14} className="text-white" strokeWidth={2.5} />
         </div>
         <div>
-          <p className="text-sm font-black text-gray-900 leading-tight uppercase tracking-tight">Arquitetura de</p>
-          <p className="text-[11px] text-[#7B2FBE] font-semibold uppercase tracking-widest">Relevância Hub</p>
+          <p className="text-[11px] font-black text-gray-900 leading-tight uppercase tracking-tight">Arquitetura de Relevância</p>
+          <p className="text-[10px] text-[#7B2FBE] font-bold uppercase tracking-widest">Hub</p>
         </div>
       </div>
 
       {/* User info */}
       <div className="px-5 py-4 border-b border-gray-100">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-[#7B2FBE] flex items-center justify-center text-sm font-bold text-white shadow-sm">
+          <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center text-xs font-black text-white flex-shrink-0">
             {user?.full_name?.charAt(0) ?? 'U'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 truncate">{user?.full_name}</p>
-            <p className="text-xs text-gray-400 capitalize">{user?.role}</p>
+            <p className="text-[13px] font-semibold text-gray-900 truncate leading-tight">{user?.full_name}</p>
+            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">{user?.role}</p>
           </div>
         </div>
       </div>
@@ -110,17 +110,17 @@ export function Sidebar() {
             <Link key={item.href} to={item.href}>
               <div
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
+                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150',
                   active
-                    ? 'bg-[#7B2FBE] text-white shadow-sm shadow-[#7B2FBE]/20'
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                    ? 'bg-[#7B2FBE] text-white'
+                    : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
                 )}
               >
-                <item.icon size={16} className={active ? 'text-white' : ''} />
-                <span className="flex-1">{item.label}</span>
+                <item.icon size={15} strokeWidth={active ? 2.5 : 1.75} />
+                <span className={cn('flex-1 text-[13px]', active ? 'font-bold' : 'font-medium')}>{item.label}</span>
                 {item.badge && (
                   <span className={cn(
-                    'text-[9px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wide',
+                    'text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-widest',
                     active ? 'bg-white/20 text-white' : 'bg-[#7B2FBE]/10 text-[#7B2FBE]'
                   )}>
                     {item.badge}
