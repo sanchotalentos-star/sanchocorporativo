@@ -57,7 +57,7 @@ function AdminOverview() {
               <motion.div key={member.id} variants={fadeInUp}>
                 <div className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 p-5 transition-all">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-full bg-[#7B2FBE] flex items-center justify-center text-white font-black text-sm">
+                    <div className="w-10 h-10 rounded-lg bg-gray-900 flex items-center justify-center text-white font-black text-sm">
                       {member.full_name.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">

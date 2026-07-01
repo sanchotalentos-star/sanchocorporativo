@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { Users, TrendingUp, Target, Award, ArrowRight, Calendar, Crosshair, Zap, Megaphone } from 'lucide-react'
+import { Users, TrendingUp, Target, Award, ArrowRight } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
@@ -28,10 +28,10 @@ const phases = [
 ]
 
 const quickLinks = [
-  { label: 'Meus OKRs', desc: 'Objetivos e resultados-chave', href: '/dashboard/membro/okr', icon: Crosshair, color: '#3B82F6' },
-  { label: 'Posicionamento', desc: 'Zona de Genialidade', href: '/dashboard/membro/posicionamento', icon: Zap, color: '#7B2FBE' },
-  { label: 'Marketing Anual', desc: 'Agenda de conteúdo', href: '/dashboard/membro/marketing', icon: Megaphone, color: '#10B981' },
-  { label: 'Pilares', desc: 'Ações estratégicas', href: '/dashboard/membro/pilares', icon: Target, color: '#F59E0B' },
+  { num: '01', label: 'Meus OKRs', desc: 'Objetivos e resultados-chave', href: '/dashboard/membro/okr' },
+  { num: '02', label: 'Posicionamento', desc: 'Zona de Genialidade', href: '/dashboard/membro/posicionamento' },
+  { num: '03', label: 'Marketing Anual', desc: 'Agenda de conteúdo', href: '/dashboard/membro/marketing' },
+  { num: '04', label: 'Pilares', desc: 'Ações estratégicas', href: '/dashboard/membro/pilares' },
 ]
 
 function MembroDashboard() {
@@ -110,11 +110,11 @@ function MembroDashboard() {
           {quickLinks.map((item) => (
             <motion.div key={item.href} variants={fadeInUp}>
               <Link to={item.href}>
-                <div className="group rounded-2xl bg-white border border-gray-200 p-5 hover:border-gray-300 hover:shadow-md transition-all cursor-pointer">
-                  <item.icon size={20} style={{ color: item.color }} className="mb-4" />
-                  <p className="text-sm font-black text-gray-900 uppercase tracking-tight leading-tight">{item.label}</p>
-                  <p className="text-xs text-gray-400 mt-1 leading-relaxed">{item.desc}</p>
-                  <div className="flex items-center gap-1 mt-4 text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-gray-700 transition-colors">
+                <div className="group rounded-2xl bg-white border border-gray-200 p-5 hover:border-[#7B2FBE]/20 hover:shadow-sm transition-all cursor-pointer h-full flex flex-col">
+                  <span className="text-[11px] font-black text-[#7B2FBE] tracking-widest mb-3 block">{item.num}</span>
+                  <p className="text-sm font-black text-gray-900 uppercase tracking-tight leading-tight flex-1">{item.label}</p>
+                  <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">{item.desc}</p>
+                  <div className="flex items-center gap-1 mt-4 text-[10px] font-black uppercase tracking-widest text-gray-300 group-hover:text-[#7B2FBE] transition-colors">
                     Acessar <ArrowRight size={10} />
                   </div>
                 </div>

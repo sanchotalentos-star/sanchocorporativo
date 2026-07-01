@@ -24,7 +24,7 @@ export function Topbar({ onMenuClick, title }: TopbarProps) {
           <Bell size={17} />
           <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#7B2FBE] rounded-full" />
         </button>
-        <div className="w-8 h-8 rounded-full bg-[#7B2FBE] flex items-center justify-center text-white text-sm font-bold shadow-sm shadow-[#7B2FBE]/20">
+        <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center text-white text-xs font-black">
           {user?.full_name?.charAt(0) ?? 'U'}
         </div>
       </div>

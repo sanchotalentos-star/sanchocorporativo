@@ -3,7 +3,7 @@ import type { LucideIcon } from 'lucide-react'
 import {
   LayoutDashboard, Users, BarChart3, Target, Calendar,
   TrendingUp, Trophy, FileText, LogOut, Zap,
-  Crosshair, Megaphone, BookOpen
+  Crosshair, Megaphone
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
@@ -51,8 +51,8 @@ export function Sidebar() {
     <aside className="flex flex-col w-64 min-h-screen bg-white border-r border-gray-200">
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-100">
-        <div className="w-8 h-8 rounded-lg bg-[#7B2FBE] flex items-center justify-center">
-          <BookOpen size={14} className="text-white" strokeWidth={2.5} />
+        <div className="w-8 h-8 rounded flex items-center justify-center bg-[#7B2FBE]">
+          <span className="text-white font-black text-[10px] tracking-wider">AR</span>
         </div>
         <div>
           <p className="text-[11px] font-black text-gray-900 leading-tight uppercase tracking-tight">Arquitetura de Relevância</p>

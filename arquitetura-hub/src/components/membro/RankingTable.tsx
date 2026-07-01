@@ -51,11 +51,8 @@ export function RankingTable({ members, currentUserId }: RankingTableProps) {
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     <div className={cn(
-                      'w-8 h-8 rounded-full flex items-center justify-center text-sm font-black flex-shrink-0',
-                      pos === 1 ? 'bg-yellow-400 text-black' :
-                      pos === 2 ? 'bg-gray-300 text-white' :
-                      pos === 3 ? 'bg-amber-600 text-white' :
-                      'bg-gray-100 text-gray-500'
+                      'w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0',
+                      pos <= 3 ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-500'
                     )}>
                       {member.full_name.charAt(0)}
                     </div>

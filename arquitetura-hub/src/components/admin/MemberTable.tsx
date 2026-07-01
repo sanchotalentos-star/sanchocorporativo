@@ -30,7 +30,7 @@ export function MemberTable({ members }: MemberTableProps) {
               <tr key={member.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-[#7B2FBE] flex items-center justify-center text-white text-sm font-black flex-shrink-0">
+                    <div className="w-9 h-9 rounded-lg bg-gray-900 flex items-center justify-center text-white text-sm font-black flex-shrink-0">
                       {member.full_name.charAt(0)}
                     </div>
                     <div>
