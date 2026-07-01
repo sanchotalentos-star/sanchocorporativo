@@ -75,13 +75,12 @@ function AuthPage() {
 
         {/* Top bar */}
         <div className="relative flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 bg-[#7B2FBE] rounded flex items-center justify-center">
-              <span className="text-white font-black text-xs">AR</span>
-            </div>
-            <span className="text-white/80 text-sm font-medium tracking-wide">Arquitetura de Relevância</span>
+          <div className="flex items-center gap-3">
+            <span className="text-white font-black text-sm tracking-[0.18em] uppercase">AR</span>
+            <span className="text-white/20 font-thin text-lg leading-none select-none">|</span>
+            <span className="text-white/45 text-[11px] font-medium tracking-[0.14em] uppercase">Arquitetura de Relevância</span>
           </div>
-          <span className="text-white/30 text-xs font-medium tracking-widest uppercase">by Wladson Sidney</span>
+          <span className="text-white/20 text-[10px] font-medium tracking-[0.2em] uppercase">Wladson Sidney</span>
         </div>
 
         {/* Main headline */}
@@ -125,11 +124,10 @@ function AuthPage() {
           className="w-full max-w-[380px]"
         >
           {/* Mobile logo */}
-          <div className="flex items-center gap-2 mb-10 lg:hidden">
-            <div className="w-7 h-7 bg-[#7B2FBE] rounded flex items-center justify-center">
-              <span className="text-white font-black text-xs">AR</span>
-            </div>
-            <span className="text-gray-900 text-sm font-bold">Arquitetura de Relevância</span>
+          <div className="flex items-center gap-3 mb-10 lg:hidden">
+            <span className="text-gray-900 font-black text-sm tracking-[0.18em] uppercase">AR</span>
+            <span className="text-gray-200 font-thin text-lg leading-none select-none">|</span>
+            <span className="text-gray-500 text-[11px] font-medium tracking-[0.12em] uppercase">Arquitetura de Relevância</span>
           </div>
 
           {/* Heading */}

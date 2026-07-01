@@ -50,13 +50,12 @@ export function Sidebar() {
   return (
     <aside className="flex flex-col w-64 min-h-screen bg-white border-r border-gray-200">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-100">
-        <div className="w-8 h-8 rounded flex items-center justify-center bg-[#7B2FBE]">
-          <span className="text-white font-black text-[10px] tracking-wider">AR</span>
-        </div>
+      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-gray-100">
+        <span className="text-gray-900 font-black text-sm tracking-[0.18em] uppercase">AR</span>
+        <span className="text-gray-200 font-thin text-base leading-none select-none">|</span>
         <div>
-          <p className="text-[11px] font-black text-gray-900 leading-tight uppercase tracking-tight">Arquitetura de Relevância</p>
-          <p className="text-[10px] text-[#7B2FBE] font-bold uppercase tracking-widest">Hub</p>
+          <p className="text-[11px] font-black text-gray-900 leading-tight uppercase tracking-tight">Arquitetura</p>
+          <p className="text-[9px] text-[#7B2FBE] font-black uppercase tracking-[0.2em]">Hub</p>
         </div>
       </div>
 
