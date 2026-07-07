@@ -1,9 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2 } from 'lucide-react'
+import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
+import { getIdentidade } from '@/lib/identidade'
 
 export const Route = createFileRoute('/dashboard/membro/marketing')({
   component: MarketingPage,
@@ -49,6 +50,11 @@ function MarketingPage() {
   const [acoes, setAcoes] = useState<AcaoMarketing[]>(initialAcoes)
   const [mesFiltro, setMesFiltro] = useState<number | null>(null)
   const [canalFiltro, setCanalFiltro] = useState<Canal | null>(null)
+  const [identidadeOpen, setIdentidadeOpen] = useState(false)
+  const identidade = getIdentidade()
+  const publicoAlvo    = identidade?.pilares.publicoAlvo?.reflexao?.trim()
+  const proposta       = identidade?.pilares.proposta?.reflexao?.trim()
+  const formatoProduto = identidade?.pilares.formatoProduto?.reflexao?.trim()
 
   function toggleConcluida(id: string) {
     setAcoes(prev => prev.map(a => a.id === id ? { ...a, concluida: !a.concluida } : a))
@@ -97,6 +103,57 @@ function MarketingPage() {
             style={{ width: `${progresso}%`, background: 'linear-gradient(90deg, #7B2FBE, #a855f7)' }} />
         </div>
       </motion.div>
+
+      {/* Referência da identidade */}
+      {(publicoAlvo || proposta || formatoProduto) && (
+        <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+          className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden"
+        >
+          <button
+            onClick={() => setIdentidadeOpen(o => !o)}
+            className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors text-left"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">01</span>
+              <p className="text-sm font-bold text-gray-900">Base de Identidade</p>
+              <span className="text-xs text-gray-400">— ponto de partida do seu marketing</span>
+            </div>
+            {identidadeOpen
+              ? <ChevronUp size={14} className="text-gray-400 flex-shrink-0" />
+              : <ChevronDown size={14} className="text-gray-400 flex-shrink-0" />
+            }
+          </button>
+          {identidadeOpen && (
+            <div className="border-t border-gray-100 divide-y divide-gray-100 bg-gray-50/50">
+              {publicoAlvo && (
+                <div className="px-5 py-3.5">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">Para quem você fala</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{publicoAlvo}</p>
+                </div>
+              )}
+              {proposta && (
+                <div className="px-5 py-3.5">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">O que você entrega</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{proposta}</p>
+                </div>
+              )}
+              {formatoProduto && (
+                <div className="px-5 py-3.5">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">Como você chega ao mercado</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{formatoProduto}</p>
+                </div>
+              )}
+              <div className="px-5 py-3 flex justify-end">
+                <Link to="/dashboard/membro/posicionamento"
+                  className="text-xs font-semibold text-[#7B2FBE] hover:underline"
+                >
+                  Ver identidade completa
+                </Link>
+              </div>
+            </div>
+          )}
+        </motion.div>
+      )}
 
       {/* Estado vazio */}
       {acoes.length === 0 && (

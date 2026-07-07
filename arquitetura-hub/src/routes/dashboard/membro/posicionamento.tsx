@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { Lock, Sparkles, PenLine, MessageSquare, Search, Lightbulb, Target, Layers, ChevronRight, CheckCircle2, Circle, Download } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
+import { IDENTIDADE_KEY } from '@/lib/identidade'
 
 export const Route = createFileRoute('/dashboard/membro/posicionamento')({
   component: PosicionamentoPage,
@@ -118,13 +119,29 @@ const initialPilarStates: PilarStates = {
   formatoProduto: { reflexao: '', analise: '', analiseLocked: true, status: 'aguardando' },
 }
 
+function loadSaved(): { pilares: PilarStates; diferenciais: string[] } | null {
+  try {
+    const raw = localStorage.getItem(IDENTIDADE_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
 function PosicionamentoPage() {
   const { user }                        = useAuth()
-  const [pilares, setPilares]           = useState<PilarStates>(initialPilarStates)
+  const saved                           = useState(() => loadSaved())[0]
+  const [pilares, setPilares]           = useState<PilarStates>(saved?.pilares ?? initialPilarStates)
   const [genLocked]                     = useState(true)
   const [genText]                       = useState('')
-  const [diferenciais, setDiferenciais] = useState(['', '', ''])
+  const [diferenciais, setDiferenciais] = useState<string[]>(saved?.diferenciais ?? ['', '', ''])
   const toastedFields                   = useState(() => new Set<PilarField>())[0]
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(IDENTIDADE_KEY, JSON.stringify({ pilares, diferenciais }))
+    } catch {}
+  }, [pilares, diferenciais])
 
   const pilarLabels: Record<PilarField, string> = {
     publicoAlvo:    'Para Quem Você Fala',
