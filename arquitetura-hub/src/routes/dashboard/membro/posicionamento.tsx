@@ -2,9 +2,10 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
-import { Lock, Sparkles, PenLine, MessageSquare, Search, Lightbulb, Target, Layers, ChevronRight } from 'lucide-react'
+import { Lock, Sparkles, PenLine, MessageSquare, Search, Lightbulb, Target, Layers, ChevronRight, CheckCircle2, Circle, Download } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/context/AuthContext'
 
 export const Route = createFileRoute('/dashboard/membro/posicionamento')({
   component: PosicionamentoPage,
@@ -118,6 +119,7 @@ const initialPilarStates: PilarStates = {
 }
 
 function PosicionamentoPage() {
+  const { user }                        = useAuth()
   const [pilares, setPilares]           = useState<PilarStates>(initialPilarStates)
   const [genLocked]                     = useState(true)
   const [genText]                       = useState('')
@@ -211,6 +213,95 @@ function PosicionamentoPage() {
         {comReflexao === 0 && (
           <p className="text-xs text-gray-400 mt-3 text-center">
             Comece preenchendo sua percepção inicial em cada bloco. Leva menos de 10 minutos.
+          </p>
+        )}
+      </motion.div>
+
+      {/* Cartão de Identidade de Marca — monta em tempo real */}
+      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+        className={cn(
+          'rounded-2xl border p-5 transition-all',
+          comReflexao === total
+            ? 'border-[#7B2FBE]/30 bg-[#7B2FBE]/[0.03]'
+            : 'border-gray-200 bg-white shadow-sm'
+        )}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-[10px] font-bold text-[#7B2FBE] uppercase tracking-widest">
+              Cartão de Identidade de Marca
+            </p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Monta automaticamente conforme você preenche os blocos abaixo
+            </p>
+          </div>
+          {comReflexao === total && (
+            <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full">
+              <CheckCircle2 size={11} />
+              Pronto para a sessão
+            </span>
+          )}
+        </div>
+
+        {/* Cabeçalho do cartão */}
+        <div className="rounded-xl border border-[#7B2FBE]/20 overflow-hidden">
+          <div className="bg-[#7B2FBE] px-5 py-3 flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Arquitetura de Relevância</p>
+              <p className="text-sm font-black text-white mt-0.5">{user?.full_name ?? 'Seu Nome'}</p>
+            </div>
+            <Download size={14} className="text-white/40" />
+          </div>
+
+          <div className="divide-y divide-gray-100">
+            {PILARES.map((pilar) => {
+              const texto = pilares[pilar.id].reflexao.trim()
+              return (
+                <div key={pilar.id} className="px-5 py-3.5 flex items-start gap-3">
+                  <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest mt-0.5 w-5 flex-shrink-0">{pilar.num}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">{pilar.label}</p>
+                    {texto ? (
+                      <p className="text-sm text-gray-800 leading-relaxed">{texto}</p>
+                    ) : (
+                      <p className="text-sm text-gray-300 italic">Aguardando sua percepção...</p>
+                    )}
+                  </div>
+                  <div className="flex-shrink-0 mt-1">
+                    {texto
+                      ? <CheckCircle2 size={14} className="text-[#7B2FBE]" />
+                      : <Circle size={14} className="text-gray-200" />
+                    }
+                  </div>
+                </div>
+              )
+            })}
+
+            {/* Diferenciais no cartão */}
+            <div className="px-5 py-3.5 flex items-start gap-3">
+              <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest mt-0.5 w-5 flex-shrink-0">05</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">Diferenciais</p>
+                {diferenciais.some(d => d.trim()) ? (
+                  <div className="space-y-1">
+                    {diferenciais.filter(d => d.trim()).map((d, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <span className="w-1 h-1 rounded-full bg-[#7B2FBE] flex-shrink-0" />
+                        <p className="text-sm text-gray-800">{d}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-300 italic">Aguardando seus diferenciais...</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {comReflexao === total && (
+          <p className="text-xs text-center text-[#7B2FBE] font-semibold mt-3">
+            Leve este cartão para a sessão com seu mentor. Ele será o ponto de partida da construção.
           </p>
         )}
       </motion.div>
