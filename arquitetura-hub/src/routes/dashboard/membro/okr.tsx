@@ -176,6 +176,25 @@ const statusLabel: Record<AcaoStatus, string> = {
 ───────────────────────────────────────────── */
 function OkrPage() {
   const [okrs, setOkrs] = useState<Objective[]>(initialOkrs)
+  const [showNovoObj, setShowNovoObj] = useState(false)
+  const [novoForm, setNovoForm] = useState({ titulo: '', categoria: 'Autoridade', trimestre: 'Q1 2026' })
+
+  function addObjective() {
+    if (!novoForm.titulo.trim()) return
+    const novo: Objective = {
+      id: Date.now().toString(),
+      titulo: novoForm.titulo.trim(),
+      categoria: novoForm.categoria,
+      trimestre: novoForm.trimestre,
+      expanded: true,
+      pdcaTab: 'okr',
+      keyResults: [],
+      pdca: defaultPdca(1),
+    }
+    setOkrs(prev => [...prev, novo])
+    setNovoForm({ titulo: '', categoria: 'Autoridade', trimestre: 'Q1 2026' })
+    setShowNovoObj(false)
+  }
 
   /* ── atualizadores genéricos ── */
   function setObj(id: string, patch: Partial<Objective>) {
@@ -221,10 +240,82 @@ function OkrPage() {
           <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Meus OKRs + PDCA</h1>
           <p className="text-gray-400 mt-1 text-sm">Objetivos, resultados-chave e ciclo de execução</p>
         </div>
-        <button className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-black px-4 py-2.5 rounded-xl transition-colors uppercase tracking-wide">
+        <button
+          onClick={() => setShowNovoObj(true)}
+          className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-black px-4 py-2.5 rounded-xl transition-colors uppercase tracking-wide"
+        >
           <Plus size={15} /> Novo Objetivo
         </button>
       </div>
+
+      {/* Modal novo objetivo */}
+      {showNovoObj && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="w-full max-w-md rounded-2xl bg-white border border-gray-200 shadow-xl p-6 space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-black text-gray-900 uppercase tracking-tight">Novo Objetivo</h2>
+              <button onClick={() => setShowNovoObj(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Título do Objetivo</label>
+                <input
+                  type="text"
+                  value={novoForm.titulo}
+                  onChange={e => setNovoForm(f => ({ ...f, titulo: e.target.value }))}
+                  placeholder="Ex: Tornar-me referência em..."
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-[#7B2FBE] transition-colors"
+                  onKeyDown={e => e.key === 'Enter' && addObjective()}
+                  autoFocus
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Categoria</label>
+                  <select
+                    value={novoForm.categoria}
+                    onChange={e => setNovoForm(f => ({ ...f, categoria: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-[#7B2FBE] transition-colors bg-white"
+                  >
+                    {Object.keys(catColor).map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Trimestre</label>
+                  <select
+                    value={novoForm.trimestre}
+                    onChange={e => setNovoForm(f => ({ ...f, trimestre: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-[#7B2FBE] transition-colors bg-white"
+                  >
+                    {['Q1 2026','Q2 2026','Q3 2026','Q4 2026'].map(q => <option key={q}>{q}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={() => setShowNovoObj(false)}
+                className="flex-1 border border-gray-200 text-gray-600 text-sm font-black py-2.5 rounded-xl hover:bg-gray-50 transition-colors uppercase tracking-wide"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={addObjective}
+                disabled={!novoForm.titulo.trim()}
+                className="flex-1 bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-40 text-white text-sm font-black py-2.5 rounded-xl transition-colors uppercase tracking-wide"
+              >
+                Criar Objetivo
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Sumário */}
       <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-3 gap-3">
