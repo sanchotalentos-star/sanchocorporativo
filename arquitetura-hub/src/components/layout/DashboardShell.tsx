@@ -12,22 +12,21 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-[#FAFAFA]">
+
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div
-        className={cn(
-          'fixed inset-y-0 left-0 z-50 lg:static lg:z-auto transition-transform duration-200',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        )}
-      >
+      <div className={cn(
+        'fixed inset-y-0 left-0 z-50 lg:static lg:z-auto transition-transform duration-200',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      )}>
         <Sidebar />
       </div>
 
