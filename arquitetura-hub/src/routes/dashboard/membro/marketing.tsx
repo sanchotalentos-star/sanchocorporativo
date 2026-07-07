@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2 } from 'lucide-react'
+import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2, ChevronRight } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
@@ -77,13 +77,35 @@ function MarketingPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Cabeçalho + cadeia */}
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Agenda de Marketing Anual</h1>
-          <p className="text-gray-400 mt-1 text-sm">Planeje suas ações de conteúdo e distribuição ao longo do ano</p>
+        <div className="space-y-2">
+
+          {/* Mini cadeia */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <Link to="/dashboard/membro/posicionamento">
+              <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">01 Identidade</span>
+            </Link>
+            <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+            <Link to="/dashboard/membro/pilares">
+              <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">02 Pilares</span>
+            </Link>
+            <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+            <span className="text-xs font-bold text-[#7B2FBE] bg-[#7B2FBE]/10 px-2 py-0.5 rounded-md">
+              03 Marketing Anual
+            </span>
+            <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+            <Link to="/dashboard/membro/kpis">
+              <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">04 Resultados</span>
+            </Link>
+          </div>
+
+          <h1 className="text-2xl font-bold text-gray-900">Marketing Anual</h1>
+          <p className="text-gray-400 text-sm">
+            Construído sobre os pilares da sua marca — cada ação de conteúdo tem origem na sua identidade e nos canais definidos com o mentor
+          </p>
         </div>
-        <button className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-black px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-[#7B2FBE]/20 uppercase tracking-wide">
+        <button className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors flex-shrink-0">
           <Plus size={16} />
           Nova Ação
         </button>
@@ -165,8 +187,9 @@ function MarketingPage() {
       <div className="space-y-2">
         {filtered.length === 0 ? (
           <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 text-center">
-            <Calendar size={32} className="text-gray-200 mx-auto mb-2" />
-            <p className="text-gray-400 text-sm">Nenhuma ação para este filtro</p>
+            <Calendar size={32} className="text-gray-200 mx-auto mb-3" />
+            <p className="text-sm font-semibold text-gray-500 mb-1">Nenhuma ação para este filtro</p>
+            <p className="text-xs text-gray-400">As ações do calendário são definidas com seu mentor com base nos pilares da sua marca</p>
           </div>
         ) : filtered.map((acao) => {
           const Icon = canalIcons[acao.canal]
@@ -222,6 +245,42 @@ function MarketingPage() {
           )
         })}
       </div>
+      {/* Esta construção alimenta */}
+      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+        className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
+      >
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Esta construção alimenta</p>
+        <div className="grid sm:grid-cols-2 gap-3">
+
+          <Link to="/dashboard/membro/kpis">
+            <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">04</span>
+                <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
+              </div>
+              <p className="text-sm font-bold text-gray-800 leading-tight mb-1.5">Resultados</p>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Cada ação executada no calendário gera os indicadores de alcance, engajamento e leads que você acompanha nos resultados.
+              </p>
+            </div>
+          </Link>
+
+          <Link to="/dashboard/membro/okr">
+            <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">OKR</span>
+                <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
+              </div>
+              <p className="text-sm font-bold text-gray-800 leading-tight mb-1.5">Metas de Impacto</p>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Os resultados do marketing alimentam os ciclos de revisão das metas definidas com o mentor na sessão de OKR.
+              </p>
+            </div>
+          </Link>
+
+        </div>
+      </motion.div>
+
     </div>
   )
 }
