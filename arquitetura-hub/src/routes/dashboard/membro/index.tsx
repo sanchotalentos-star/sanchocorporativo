@@ -101,42 +101,37 @@ function MembroDashboard() {
   return (
     <div className="space-y-6">
 
-      {/* Hero */}
+      {/* Header */}
       <motion.div
         variants={fadeInUp}
         initial="hidden"
         animate="visible"
-        className="relative rounded-2xl overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #1a0533 0%, #3d1278 50%, #7B2FBE 100%)' }}
+        className="flex items-start justify-between gap-4"
       >
-        <div className="absolute inset-0 opacity-20"
-          style={{ backgroundImage: 'radial-gradient(circle at 80% 50%, #ffffff15 0%, transparent 60%)' }} />
-        <div className="relative px-6 py-7 flex items-center justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <p className="text-white/60 text-sm font-bold uppercase tracking-widest">Olá, {firstName}</p>
-            <h1 className="text-2xl font-black text-white mt-0.5 uppercase tracking-tight truncate">{fullName}</h1>
-            <p className="text-white/60 text-sm mt-2 max-w-sm leading-relaxed">
-              {faseAtual.heroDesc}
-            </p>
-            <div className="flex items-center gap-2 mt-4">
-              <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wide">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                Fase {faseAtual.num} de 4
-              </span>
-            </div>
+        <div>
+          <p className="text-xs text-gray-400 font-medium mb-0.5">Olá, {firstName}</p>
+          <h1 className="text-xl font-semibold text-gray-900">{fullName}</h1>
+          <p className="text-sm text-gray-500 mt-1.5 max-w-md leading-relaxed">
+            {faseAtual.heroDesc}
+          </p>
+          <div className="flex items-center gap-2 mt-3">
+            <span className="inline-flex items-center gap-1.5 border border-[#7B2FBE]/25 bg-[#7B2FBE]/5 text-[#7B2FBE] text-xs font-medium px-2.5 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#7B2FBE] animate-pulse" />
+              Fase {faseAtual.num} de 4 — {faseAtual.label}
+            </span>
           </div>
-          <div className="flex-shrink-0 text-right">
-            <p className="text-white/50 text-xs font-bold uppercase tracking-wide mb-1">Pontos de Evolução</p>
-            <p className="text-5xl font-black text-white leading-none">0</p>
-            <p className="text-white/50 text-xs mt-1 font-medium">de 100 pts</p>
-          </div>
+        </div>
+        <div className="text-right bg-white border border-gray-200 rounded-xl px-5 py-3 flex-shrink-0 shadow-sm">
+          <p className="text-xs text-gray-400 mb-1">Pontos de Evolução</p>
+          <p className="text-3xl font-semibold text-gray-900 leading-none">0</p>
+          <p className="text-xs text-gray-400 mt-1">de 100 pts</p>
         </div>
       </motion.div>
 
       {/* Mapa de Construção */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="space-y-3">
         <div>
-          <h2 className="text-sm font-bold text-gray-900">Mapa de Construção da sua Marca</h2>
+          <h2 className="text-sm font-semibold text-gray-800">Mapa de Construção da sua Marca</h2>
           <p className="text-xs text-gray-400 mt-0.5">
             Cada etapa se apoia na anterior. Comece pela Identidade e avance com seu mentor.
           </p>
@@ -147,15 +142,15 @@ function MembroDashboard() {
           <Link to="/dashboard/membro/posicionamento" className="flex-1">
             <div className="group h-full rounded-2xl lg:rounded-r-none lg:rounded-l-2xl border border-[#7B2FBE]/25 bg-[#7B2FBE]/[0.04] p-4 hover:bg-[#7B2FBE]/[0.07] transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">01</span>
-                <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">Em construção</span>
+                <span className="text-[11px] font-medium text-[#7B2FBE]">01</span>
+                <span className="text-[10px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">Em construção</span>
               </div>
-              <p className="text-sm font-bold text-gray-900 leading-tight">Identidade de Marca</p>
+              <p className="text-sm font-semibold text-gray-800 leading-tight">Identidade de Marca</p>
               <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
                 Quem você é, para quem fala, o que entrega de diferente e como chega ao mercado
               </p>
-              <div className="mt-3 pt-3 border-t border-[#7B2FBE]/15 flex items-center gap-1 text-[10px] font-bold text-[#7B2FBE] uppercase tracking-wide">
-                Preencher <ChevronRight size={10} />
+              <div className="mt-3 pt-3 border-t border-[#7B2FBE]/15 flex items-center gap-1 text-xs text-[#7B2FBE]">
+                Preencher <ChevronRight size={11} />
               </div>
             </div>
           </Link>
@@ -170,15 +165,15 @@ function MembroDashboard() {
           <Link to="/dashboard/membro/pilares" className="flex-1">
             <div className="group h-full border border-gray-200 bg-gray-50 p-4 hover:bg-gray-100 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-gray-400 tracking-widest">02</span>
-                <span className="text-[10px] font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Aguarda Identidade</span>
+                <span className="text-[11px] font-medium text-gray-400">02</span>
+                <span className="text-[10px] font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Aguarda Identidade</span>
               </div>
-              <p className="text-sm font-bold text-gray-400 leading-tight">Pilares da Marca</p>
+              <p className="text-sm font-semibold text-gray-400 leading-tight">Pilares da Marca</p>
               <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">
                 As frentes estratégicas de construção de presença definidas a partir da sua identidade
               </p>
-              <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase tracking-wide group-hover:text-gray-600 transition-colors">
-                Ver pilares <ChevronRight size={10} />
+              <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-1 text-xs text-gray-400 group-hover:text-gray-600 transition-colors">
+                Ver pilares <ChevronRight size={11} />
               </div>
             </div>
           </Link>
@@ -193,15 +188,15 @@ function MembroDashboard() {
           <Link to="/dashboard/membro/marketing" className="flex-1">
             <div className="group h-full border border-gray-200 bg-gray-50 p-4 hover:bg-gray-100 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-gray-400 tracking-widest">03</span>
-                <span className="text-[10px] font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Aguarda Pilares</span>
+                <span className="text-[11px] font-medium text-gray-400">03</span>
+                <span className="text-[10px] font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Aguarda Pilares</span>
               </div>
-              <p className="text-sm font-bold text-gray-400 leading-tight">Marketing Anual</p>
+              <p className="text-sm font-semibold text-gray-400 leading-tight">Marketing Anual</p>
               <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">
                 Calendário de conteúdo e ações baseado nos pilares e no público definidos
               </p>
-              <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase tracking-wide group-hover:text-gray-600 transition-colors">
-                Ver calendário <ChevronRight size={10} />
+              <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-1 text-xs text-gray-400 group-hover:text-gray-600 transition-colors">
+                Ver calendário <ChevronRight size={11} />
               </div>
             </div>
           </Link>
@@ -216,15 +211,15 @@ function MembroDashboard() {
           <Link to="/dashboard/membro/kpis" className="flex-1">
             <div className="group h-full rounded-2xl lg:rounded-l-none lg:rounded-r-2xl border border-gray-200 bg-gray-50 p-4 hover:bg-gray-100 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-gray-400 tracking-widest">04</span>
-                <span className="text-[10px] font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Aguarda Execução</span>
+                <span className="text-[11px] font-medium text-gray-400">04</span>
+                <span className="text-[10px] font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Aguarda Execução</span>
               </div>
-              <p className="text-sm font-bold text-gray-400 leading-tight">Resultados</p>
+              <p className="text-sm font-semibold text-gray-400 leading-tight">Resultados</p>
               <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">
                 Indicadores de alcance, autoridade e crescimento ao longo da jornada
               </p>
-              <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase tracking-wide group-hover:text-gray-600 transition-colors">
-                Ver indicadores <ChevronRight size={10} />
+              <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-1 text-xs text-gray-400 group-hover:text-gray-600 transition-colors">
+                Ver indicadores <ChevronRight size={11} />
               </div>
             </div>
           </Link>
@@ -291,7 +286,7 @@ function MembroDashboard() {
 
       {/* Quick links */}
       <div>
-        <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Ferramentas do Programa</h2>
+        <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">Ferramentas do Programa</h2>
         <motion.div
           variants={staggerContainer}
           initial="hidden"
@@ -301,12 +296,12 @@ function MembroDashboard() {
           {quickLinks.map((item) => (
             <motion.div key={item.href} variants={fadeInUp}>
               <Link to={item.href}>
-                <div className="group rounded-2xl bg-white border border-gray-200 p-5 hover:border-[#7B2FBE]/20 hover:shadow-sm transition-all cursor-pointer h-full flex flex-col">
-                  <span className="text-[11px] font-black text-[#7B2FBE] tracking-widest mb-3 block">{item.num}</span>
-                  <p className="text-sm font-black text-gray-900 uppercase tracking-tight leading-tight flex-1">{item.label}</p>
+                <div className="group rounded-xl bg-white border border-gray-200 p-4 hover:border-[#7B2FBE]/25 hover:shadow-sm transition-all cursor-pointer h-full flex flex-col">
+                  <span className="text-[11px] font-medium text-[#7B2FBE] mb-2 block">{item.num}</span>
+                  <p className="text-sm font-semibold text-gray-800 leading-tight flex-1">{item.label}</p>
                   <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">{item.desc}</p>
-                  <div className="flex items-center gap-1 mt-4 text-[10px] font-black uppercase tracking-widest text-gray-300 group-hover:text-[#7B2FBE] transition-colors">
-                    Acessar <ArrowRight size={10} />
+                  <div className="flex items-center gap-1 mt-3 text-xs text-gray-300 group-hover:text-[#7B2FBE] transition-colors">
+                    Acessar <ArrowRight size={11} />
                   </div>
                 </div>
               </Link>
@@ -324,8 +319,8 @@ function MembroDashboard() {
           className="lg:col-span-2 rounded-2xl bg-white border border-gray-200 shadow-sm p-5"
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">Evolução ao Longo do Programa</h3>
-            <Link to="/dashboard/membro/relatorios" className="text-xs text-gray-400 hover:text-[#7B2FBE] flex items-center gap-1 transition-colors font-bold uppercase tracking-wide">
+            <h3 className="text-sm font-semibold text-gray-800">Evolução ao Longo do Programa</h3>
+            <Link to="/dashboard/membro/relatorios" className="text-xs text-gray-400 hover:text-[#7B2FBE] flex items-center gap-1 transition-colors">
               Ver mais <ArrowRight size={11} />
             </Link>
           </div>
@@ -342,8 +337,8 @@ function MembroDashboard() {
           className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5"
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">Próximos Eventos</h3>
-            <Link to="/dashboard/membro/agenda" className="text-xs text-gray-400 hover:text-[#7B2FBE] flex items-center gap-1 transition-colors font-bold uppercase tracking-wide">
+            <h3 className="text-sm font-semibold text-gray-800">Próximos Eventos</h3>
+            <Link to="/dashboard/membro/agenda" className="text-xs text-gray-400 hover:text-[#7B2FBE] flex items-center gap-1 transition-colors">
               Ver agenda <ArrowRight size={11} />
             </Link>
           </div>
@@ -394,7 +389,7 @@ function MembroDashboard() {
         animate="visible"
         className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5"
       >
-        <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight mb-4">Jornada do Programa</h3>
+        <h3 className="text-sm font-semibold text-gray-800 mb-4">Jornada do Programa</h3>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {phases.map((phase) => (
             <div
@@ -415,7 +410,7 @@ function MembroDashboard() {
                   <span className="text-[10px] font-black bg-[#7B2FBE] text-white px-1.5 py-0.5 rounded-md uppercase tracking-wide">Atual</span>
                 )}
               </div>
-              <p className={`text-xs font-black mb-2 uppercase tracking-tight ${phase.active ? 'text-gray-900' : 'text-gray-400'}`}>
+              <p className={`text-xs font-semibold mb-2 ${phase.active ? 'text-gray-900' : 'text-gray-400'}`}>
                 {phase.label}
               </p>
               <div className="space-y-1">

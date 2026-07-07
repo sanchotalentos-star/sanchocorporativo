@@ -16,14 +16,14 @@ interface NavItem {
 }
 
 const adminNav: NavItem[] = [
-  { label: 'Visão Geral',  href: '/dashboard/admin',           icon: LayoutDashboard },
-  { label: 'Membros',      href: '/dashboard/admin/membros',   icon: Users           },
-  { label: 'Relatórios',   href: '/dashboard/admin/relatorios', icon: FileText       },
+  { label: 'Visão Geral',  href: '/dashboard/admin',            icon: LayoutDashboard },
+  { label: 'Membros',      href: '/dashboard/admin/membros',    icon: Users           },
+  { label: 'Relatórios',  href: '/dashboard/admin/relatorios',  icon: FileText        },
 ]
 
 const membroNav: NavItem[] = [
-  { label: 'Início',            href: '/dashboard/membro',               icon: Home        },
-  { label: 'Metas de Impacto',  href: '/dashboard/membro/okr',           icon: Rocket      },
+  { label: 'Início',            href: '/dashboard/membro',                icon: Home        },
+  { label: 'Metas de Impacto',  href: '/dashboard/membro/okr',            icon: Rocket      },
   { label: 'Minha Identidade',  href: '/dashboard/membro/posicionamento', icon: Compass     },
   { label: 'Pilares da Marca',  href: '/dashboard/membro/pilares',        icon: Layers      },
   { label: 'Marketing Anual',   href: '/dashboard/membro/marketing',      icon: Megaphone   },
@@ -48,27 +48,28 @@ export function Sidebar() {
   const currentStage = 1
 
   return (
-    <aside className="flex flex-col w-64 min-h-screen bg-white border-r border-gray-100">
+    <aside className="flex flex-col w-60 min-h-screen bg-[#1B1F2E] border-r border-white/5">
 
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-6 py-5 border-b border-gray-100">
-        <span className="text-[13px] font-black text-gray-900 tracking-[0.18em] uppercase">AR</span>
-        <span className="text-gray-200 font-thin text-lg leading-none select-none">|</span>
+      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-white/5">
+        <div className="w-7 h-7 rounded-md bg-[#7B2FBE] flex items-center justify-center flex-shrink-0">
+          <span className="text-[11px] font-bold text-white tracking-wide">AR</span>
+        </div>
         <div>
-          <p className="text-[11px] font-bold text-gray-700 leading-tight">Arquitetura</p>
-          <p className="text-[9px] text-[#7B2FBE] font-black uppercase tracking-[0.2em]">de Relevância</p>
+          <p className="text-[12px] font-semibold text-white leading-tight">Arquitetura</p>
+          <p className="text-[10px] text-[#7B2FBE] font-medium">de Relevância</p>
         </div>
       </div>
 
       {/* User info */}
-      <div className="px-5 py-4 border-b border-gray-100">
+      <div className="px-4 py-3.5 border-b border-white/5">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#7B2FBE] flex items-center justify-center text-xs font-black text-white flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-[#7B2FBE] flex items-center justify-center text-xs font-semibold text-white flex-shrink-0">
             {user?.full_name?.charAt(0) ?? 'U'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-gray-900 truncate leading-tight">{user?.full_name}</p>
-            <p className="text-[10px] text-gray-400 font-medium mt-0.5">
+            <p className="text-[13px] font-medium text-white truncate leading-tight">{user?.full_name}</p>
+            <p className="text-[11px] text-gray-500 mt-0.5">
               {user?.role === 'admin' ? 'Mentor' : 'Mentorado(a)'}
             </p>
           </div>
@@ -77,8 +78,8 @@ export function Sidebar() {
 
       {/* Journey tracker — only for membros */}
       {user?.role !== 'admin' && (
-        <div className="px-5 py-4 border-b border-gray-100">
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Sua Jornada</p>
+        <div className="px-4 py-4 border-b border-white/5">
+          <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-3">Sua Jornada</p>
           <div className="space-y-2">
             {journeyStages.map((stage) => {
               const isDone    = stage.num < currentStage
@@ -86,32 +87,29 @@ export function Sidebar() {
               return (
                 <div key={stage.num} className="flex items-center gap-2.5">
                   <div className={cn(
-                    'w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-all',
-                    isDone    ? 'bg-[#7B2FBE]'                        : '',
-                    isCurrent ? 'border-2 border-[#7B2FBE] bg-white'  : '',
-                    !isDone && !isCurrent ? 'border-2 border-gray-200 bg-white' : '',
+                    'w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0',
+                    isDone    ? 'bg-[#7B2FBE]'                          : '',
+                    isCurrent ? 'border-2 border-[#7B2FBE] bg-[#1B1F2E]' : '',
+                    !isDone && !isCurrent ? 'border border-white/10 bg-[#1B1F2E]' : '',
                   )}>
                     {isDone    && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                     {isCurrent && <div className="w-1.5 h-1.5 rounded-full bg-[#7B2FBE]" />}
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 flex items-center justify-between gap-1">
                     <span className={cn(
-                      'text-[11px] leading-none block',
-                      isCurrent ? 'text-[#7B2FBE] font-semibold' :
-                      isDone    ? 'text-gray-400 line-through'    :
-                                  'text-gray-300'
+                      'text-[11px] leading-none',
+                      isCurrent ? 'text-white font-medium' :
+                      isDone    ? 'text-gray-600 line-through'    :
+                                  'text-gray-600'
                     )}>
                       {stage.label}
                     </span>
                     {isCurrent && (
-                      <span className="text-[9px] text-gray-400 mt-0.5 block">{stage.desc}</span>
+                      <span className="text-[9px] font-medium bg-[#7B2FBE]/20 text-[#a855f7] px-1.5 py-0.5 rounded">
+                        Atual
+                      </span>
                     )}
                   </div>
-                  {isCurrent && (
-                    <span className="ml-auto text-[9px] font-black bg-[#7B2FBE]/10 text-[#7B2FBE] px-1.5 py-0.5 rounded-md uppercase tracking-wide">
-                      Atual
-                    </span>
-                  )}
                 </div>
               )
             })}
@@ -120,7 +118,7 @@ export function Sidebar() {
       )}
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
         {nav.map((item) => {
           const active =
             pathname === item.href || (
@@ -132,20 +130,17 @@ export function Sidebar() {
           return (
             <Link key={item.href} to={item.href}>
               <div className={cn(
-                'relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-150',
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-150 cursor-pointer',
                 active
-                  ? 'bg-[#7B2FBE]/[0.08] text-[#7B2FBE]'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-white/10 text-white'
+                  : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
               )}>
-                {active && (
-                  <div className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-[#7B2FBE]" />
-                )}
-                <item.icon size={16} strokeWidth={active ? 2.5 : 1.75} className="flex-shrink-0" />
-                <span className={cn('flex-1 text-[13px]', active ? 'font-semibold' : 'font-medium')}>
+                <item.icon size={15} strokeWidth={active ? 2 : 1.75} className="flex-shrink-0" />
+                <span className={cn('flex-1 text-[13px]', active ? 'font-medium text-white' : 'font-normal')}>
                   {item.label}
                 </span>
                 {item.badge && (
-                  <span className="text-[9px] font-black bg-[#7B2FBE]/10 text-[#7B2FBE] px-1.5 py-0.5 rounded-md uppercase tracking-widest">
+                  <span className="text-[9px] font-medium bg-[#7B2FBE]/20 text-[#a855f7] px-1.5 py-0.5 rounded">
                     {item.badge}
                   </span>
                 )}
@@ -156,12 +151,12 @@ export function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <div className="px-3 pb-5 border-t border-gray-100 pt-3">
+      <div className="px-2 pb-4 border-t border-white/5 pt-3">
         <button
           onClick={() => void logout()}
-          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
+          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-normal text-gray-500 hover:text-red-400 hover:bg-white/5 transition-all"
         >
-          <LogOut size={16} />
+          <LogOut size={15} />
           Sair da plataforma
         </button>
       </div>

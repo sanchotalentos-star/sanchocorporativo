@@ -72,14 +72,14 @@ function PilaresPage() {
             </Link>
           </div>
 
-          <h1 className="text-2xl font-bold text-gray-900">Pilares da Marca</h1>
+          <h1 className="text-xl font-semibold text-gray-900">Pilares da Marca</h1>
           <p className="text-gray-400 text-sm">
             Definidos com seu mentor a partir da sua identidade — cada pilar traduz quem você é em ações concretas de presença
           </p>
         </div>
 
         <div className="text-right bg-white border border-[#7B2FBE]/20 rounded-2xl px-5 py-3 shadow-sm flex-shrink-0">
-          <p className="text-3xl font-black text-[#7B2FBE]">{overallPct}%</p>
+          <p className="text-3xl font-semibold text-[#7B2FBE]">{overallPct}%</p>
           <p className="text-xs text-gray-400">{doneAcoes}/{totalAcoes} ações</p>
         </div>
       </div>
@@ -94,8 +94,8 @@ function PilaresPage() {
         >
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">01</span>
-              <p className="text-sm font-bold text-gray-900">Identidade de Marca</p>
+              <span className="text-[10px] font-medium text-[#7B2FBE]">01</span>
+              <p className="text-sm font-medium text-gray-900">Identidade de Marca</p>
             </div>
             {identidadePreenchida > 0 && (
               <span className="text-[10px] font-semibold text-[#7B2FBE] bg-[#7B2FBE]/10 px-2 py-0.5 rounded-full">
@@ -129,11 +129,11 @@ function PilaresPage() {
                   const texto = identidade?.pilares[field]?.reflexao?.trim()
                   return (
                     <div key={field} className="px-5 py-3.5 flex items-start gap-3">
-                      <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest w-5 flex-shrink-0 mt-0.5">
+                      <span className="text-[10px] font-medium text-[#7B2FBE] w-5 flex-shrink-0 mt-0.5">
                         0{i + 1}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">
+                        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-1">
                           {PILAR_LABELS[field]}
                         </p>
                         {texto
@@ -146,9 +146,9 @@ function PilaresPage() {
                 })}
                 {identidade && identidade.diferenciais.some(d => d.trim()) && (
                   <div className="px-5 py-3.5 flex items-start gap-3">
-                    <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest w-5 flex-shrink-0 mt-0.5">05</span>
+                    <span className="text-[10px] font-medium text-[#7B2FBE] w-5 flex-shrink-0 mt-0.5">05</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">Diferenciais</p>
+                      <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">Diferenciais</p>
                       <div className="space-y-1">
                         {identidade.diferenciais.filter(d => d.trim()).map((d, i) => (
                           <div key={i} className="flex items-center gap-2">
@@ -212,16 +212,16 @@ function PilaresPage() {
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"
         className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
       >
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Esta construção alimenta</p>
+        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Esta construção alimenta</p>
         <div className="grid sm:grid-cols-2 gap-3">
 
           <Link to="/dashboard/membro/marketing">
             <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">03</span>
+                <span className="text-[10px] font-medium text-[#7B2FBE]">03</span>
                 <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
               </div>
-              <p className="text-sm font-bold text-gray-800 leading-tight mb-1.5">Marketing Anual</p>
+              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Marketing Anual</p>
               <p className="text-xs text-gray-500 leading-relaxed">
                 Cada pilar define um eixo de conteúdo e presença. O calendário de marketing é construído sobre essas frentes.
               </p>
@@ -231,10 +231,10 @@ function PilaresPage() {
           <Link to="/dashboard/membro/kpis">
             <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">04</span>
+                <span className="text-[10px] font-medium text-[#7B2FBE]">04</span>
                 <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
               </div>
-              <p className="text-sm font-bold text-gray-800 leading-tight mb-1.5">Resultados</p>
+              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Resultados</p>
               <p className="text-xs text-gray-500 leading-relaxed">
                 As ações de cada pilar geram os indicadores de alcance, autoridade e crescimento que você acompanha nos resultados.
               </p>

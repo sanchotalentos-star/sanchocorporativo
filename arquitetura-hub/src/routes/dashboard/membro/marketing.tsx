@@ -79,10 +79,10 @@ function MarketingPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Agenda de Marketing Anual</h1>
+          <h1 className="text-xl font-semibold text-gray-900">Agenda de Marketing Anual</h1>
           <p className="text-gray-400 mt-1 text-sm">Planeje suas ações de conteúdo e distribuição ao longo do ano</p>
         </div>
-        <button className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-black px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-[#7B2FBE]/20 uppercase tracking-wide">
+        <button className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm shadow-[#7B2FBE]/20">
           <Plus size={16} />
           Nova Ação
         </button>
@@ -94,9 +94,9 @@ function MarketingPage() {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Megaphone size={16} className="text-[#7B2FBE]" />
-            <p className="text-sm font-black text-gray-900 uppercase tracking-tight">Execução do Plano Anual</p>
+            <p className="text-sm font-semibold text-gray-900">Execução do Plano Anual</p>
           </div>
-          <span className="text-sm font-black text-[#7B2FBE]">{concluidas}/{acoes.length} ações</span>
+          <span className="text-sm font-medium text-[#7B2FBE]">{concluidas}/{acoes.length} ações</span>
         </div>
         <div className="w-full h-2.5 rounded-full bg-gray-100">
           <div className="h-full rounded-full transition-all duration-500"
@@ -114,8 +114,8 @@ function MarketingPage() {
             className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors text-left"
           >
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">01</span>
-              <p className="text-sm font-bold text-gray-900">Base de Identidade</p>
+              <span className="text-[10px] font-medium text-[#7B2FBE]">01</span>
+              <p className="text-sm font-medium text-gray-800">Base de Identidade</p>
               <span className="text-xs text-gray-400">— ponto de partida do seu marketing</span>
             </div>
             {identidadeOpen
@@ -127,19 +127,19 @@ function MarketingPage() {
             <div className="border-t border-gray-100 divide-y divide-gray-100 bg-gray-50/50">
               {publicoAlvo && (
                 <div className="px-5 py-3.5">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">Para quem você fala</p>
+                  <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-1">Para quem você fala</p>
                   <p className="text-sm text-gray-700 leading-relaxed">{publicoAlvo}</p>
                 </div>
               )}
               {proposta && (
                 <div className="px-5 py-3.5">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">O que você entrega</p>
+                  <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-1">O que você entrega</p>
                   <p className="text-sm text-gray-700 leading-relaxed">{proposta}</p>
                 </div>
               )}
               {formatoProduto && (
                 <div className="px-5 py-3.5">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">Como você chega ao mercado</p>
+                  <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-1">Como você chega ao mercado</p>
                   <p className="text-sm text-gray-700 leading-relaxed">{formatoProduto}</p>
                 </div>
               )}
@@ -193,7 +193,7 @@ function MarketingPage() {
               style={active ? { background: `${color}10`, borderColor: `${color}40` } : {}}
             >
               <Icon size={15} style={{ color: active ? color : '#9CA3AF' }} />
-              <p className="text-[10px] font-black uppercase tracking-wide" style={{ color: active ? color : '#9CA3AF' }}>{canal}</p>
+              <p className="text-[10px] font-medium uppercase tracking-wide" style={{ color: active ? color : '#9CA3AF' }}>{canal}</p>
               <span className="text-[10px] font-bold text-gray-900">{count}</span>
             </motion.button>
           )
@@ -205,7 +205,7 @@ function MarketingPage() {
         <button
           onClick={() => setMesFiltro(null)}
           className={cn(
-            'flex-shrink-0 text-xs font-black px-3 py-1.5 rounded-lg transition-colors uppercase tracking-wide',
+            'flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors uppercase tracking-wide',
             mesFiltro === null ? 'bg-[#7B2FBE] text-white shadow-sm' : 'bg-gray-100 text-gray-400 hover:text-gray-700'
           )}
         >
@@ -216,7 +216,7 @@ function MarketingPage() {
             key={mes}
             onClick={() => setMesFiltro(mesFiltro === i + 1 ? null : i + 1)}
             className={cn(
-              'flex-shrink-0 text-xs font-black px-3 py-1.5 rounded-lg transition-colors uppercase tracking-wide',
+              'flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors uppercase tracking-wide',
               mesFiltro === i + 1 ? 'bg-[#7B2FBE] text-white shadow-sm' : 'bg-gray-100 text-gray-400 hover:text-gray-700'
             )}
           >
@@ -267,7 +267,7 @@ function MarketingPage() {
                   {acao.titulo}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wide"
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md uppercase tracking-wide"
                     style={{ background: `${color}12`, color }}>
                     {acao.canal}
                   </span>

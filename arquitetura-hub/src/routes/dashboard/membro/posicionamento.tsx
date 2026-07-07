@@ -275,7 +275,7 @@ function PosicionamentoPage() {
               const texto = pilares[pilar.id].reflexao.trim()
               return (
                 <div key={pilar.id} className="px-5 py-3.5 flex items-start gap-3">
-                  <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest mt-0.5 w-5 flex-shrink-0">{pilar.num}</span>
+                  <span className="text-[10px] font-medium text-[#7B2FBE] mt-0.5 w-5 flex-shrink-0">{pilar.num}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">{pilar.label}</p>
                     {texto ? (
@@ -296,7 +296,7 @@ function PosicionamentoPage() {
 
             {/* Diferenciais no cartão */}
             <div className="px-5 py-3.5 flex items-start gap-3">
-              <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest mt-0.5 w-5 flex-shrink-0">05</span>
+              <span className="text-[10px] font-medium text-[#7B2FBE] mt-0.5 w-5 flex-shrink-0">05</span>
               <div className="flex-1 min-w-0">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">Diferenciais</p>
                 {diferenciais.some(d => d.trim()) ? (
@@ -446,7 +446,7 @@ function PosicionamentoPage() {
           </div>
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">00</span>
+              <span className="text-[10px] font-medium text-[#7B2FBE]">00</span>
               <p className={cn('text-base font-bold', genLocked ? 'text-gray-400' : 'text-gray-900')}>
                 Seu Maior Diferencial
               </p>
@@ -482,16 +482,16 @@ function PosicionamentoPage() {
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"
         className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
       >
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Esta construção alimenta</p>
+        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Esta construção alimenta</p>
         <div className="grid sm:grid-cols-3 gap-3">
 
           <Link to="/dashboard/membro/pilares">
             <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">02</span>
+                <span className="text-[10px] font-medium text-[#7B2FBE]">02</span>
                 <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
               </div>
-              <p className="text-sm font-bold text-gray-800 leading-tight mb-1.5">Pilares da Marca</p>
+              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Pilares da Marca</p>
               <p className="text-xs text-gray-500 leading-relaxed">
                 Seu público e sua proposta definem as frentes estratégicas de presença que o mentor vai construir com você.
               </p>
@@ -501,10 +501,10 @@ function PosicionamentoPage() {
           <Link to="/dashboard/membro/marketing">
             <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">03</span>
+                <span className="text-[10px] font-medium text-[#7B2FBE]">03</span>
                 <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
               </div>
-              <p className="text-sm font-bold text-gray-800 leading-tight mb-1.5">Marketing Anual</p>
+              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Marketing Anual</p>
               <p className="text-xs text-gray-500 leading-relaxed">
                 Sua história, seu diferencial e seu formato de produto guiam os temas, canais e frequência do calendário.
               </p>
@@ -514,10 +514,10 @@ function PosicionamentoPage() {
           <Link to="/dashboard/membro/kpis">
             <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">04</span>
+                <span className="text-[10px] font-medium text-[#7B2FBE]">04</span>
                 <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
               </div>
-              <p className="text-sm font-bold text-gray-800 leading-tight mb-1.5">Resultados</p>
+              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Resultados</p>
               <p className="text-xs text-gray-500 leading-relaxed">
                 A clareza do seu posicionamento determina quais indicadores fazem sentido acompanhar na sua jornada.
               </p>
@@ -533,7 +533,7 @@ function PosicionamentoPage() {
       >
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">05</span>
+            <span className="text-[10px] font-medium text-[#7B2FBE]">05</span>
             <p className="text-sm font-semibold text-gray-900">O Que Te Destaca da Concorrência</p>
           </div>
           <p className="text-xs text-gray-500">
