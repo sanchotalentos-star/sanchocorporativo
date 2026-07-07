@@ -28,10 +28,10 @@ type LoginForm = z.infer<typeof loginSchema>
 type RequestForm = z.infer<typeof requestSchema>
 
 const features = [
-  { num: '01', label: 'OKRs & Metas', desc: 'Objetivos e resultados-chave por trimestre' },
-  { num: '02', label: 'Posicionamento', desc: 'Zona de Genialidade e proposta de valor' },
-  { num: '03', label: 'Marketing Anual', desc: 'Agenda de conteúdo e distribuição' },
-  { num: '04', label: 'Score de Autoridade', desc: 'Acompanhe sua evolução semana a semana' },
+  { num: '01', label: 'OKRs & Metas',       desc: 'Objetivos e resultados-chave por trimestre' },
+  { num: '02', label: 'Posicionamento',      desc: 'Zona de Genialidade e proposta de valor'    },
+  { num: '03', label: 'Marketing Anual',     desc: 'Agenda de conteúdo e distribuição'          },
+  { num: '04', label: 'Score de Autoridade', desc: 'Acompanhe sua evolução semana a semana'     },
 ]
 
 function AuthPage() {
@@ -39,7 +39,7 @@ function AuthPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  const loginForm = useForm<LoginForm>({ resolver: zodResolver(loginSchema) })
+  const loginForm   = useForm<LoginForm>({ resolver: zodResolver(loginSchema) })
   const requestForm = useForm<RequestForm>({ resolver: zodResolver(requestSchema) })
 
   async function onLogin(data: LoginForm) {
@@ -63,50 +63,47 @@ function AuthPage() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
 
-      {/* LEFT — editorial brand panel */}
-      <div className="hidden lg:flex lg:w-[52%] flex-col justify-between bg-[#0E0E0E] p-12 relative overflow-hidden">
-
-        {/* Subtle texture lines */}
-        <div className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: 'repeating-linear-gradient(0deg, #fff 0px, #fff 1px, transparent 1px, transparent 60px), repeating-linear-gradient(90deg, #fff 0px, #fff 1px, transparent 1px, transparent 60px)',
-          }}
-        />
+      {/* LEFT — brand panel */}
+      <div className="hidden lg:flex lg:w-[52%] flex-col justify-between bg-[#1B1F2E] p-12">
 
         {/* Top bar */}
-        <div className="relative flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-white font-black text-sm tracking-[0.18em] uppercase">AR</span>
-            <span className="text-white/20 font-thin text-lg leading-none select-none">|</span>
-            <span className="text-white/45 text-[11px] font-medium tracking-[0.14em] uppercase">Arquitetura de Relevância</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-md bg-[#7B2FBE] flex items-center justify-center flex-shrink-0">
+              <span className="text-[11px] font-bold text-white tracking-wide">AR</span>
+            </div>
+            <div>
+              <p className="text-[12px] font-semibold text-white leading-tight">Arquitetura</p>
+              <p className="text-[10px] text-[#7B2FBE] font-medium">de Relevância</p>
+            </div>
           </div>
-          <span className="text-white/20 text-[10px] font-medium tracking-[0.2em] uppercase">Wladson Sidney</span>
+          <span className="text-white/30 text-[11px] font-medium">Wladson Sidney</span>
         </div>
 
         {/* Main headline */}
-        <div className="relative">
-          <p className="text-[#7B2FBE] text-xs font-black uppercase tracking-[0.3em] mb-5">
+        <div>
+          <span className="inline-block text-[#7B2FBE] text-xs font-medium tracking-widest uppercase mb-5 border border-[#7B2FBE]/30 bg-[#7B2FBE]/10 px-3 py-1 rounded-full">
             Programa de Autoridade
-          </p>
-          <h1 className="text-white font-black leading-[0.92] mb-8" style={{ fontSize: 'clamp(3rem, 5vw, 5rem)' }}>
+          </span>
+          <h1 className="text-white font-bold leading-[1.05] mb-6" style={{ fontSize: 'clamp(2.5rem, 4.5vw, 4.5rem)' }}>
             Construa sua<br />
             <span className="text-[#7B2FBE]">Autoridade</span><br />
             de Mercado.
           </h1>
-          <p className="text-white/40 text-base leading-relaxed max-w-sm font-light">
+          <p className="text-white/45 text-base leading-relaxed max-w-sm font-light">
             Acompanhe sua jornada de posicionamento e evolua com métricas reais de autoridade.
           </p>
         </div>
 
         {/* Feature list */}
-        <div className="relative">
+        <div>
           <div className="border-t border-white/10 mb-6" />
           <div className="grid grid-cols-2 gap-x-8 gap-y-5">
             {features.map((f) => (
               <div key={f.num}>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[#7B2FBE] text-[10px] font-black tracking-widest">{f.num}</span>
-                  <span className="text-white text-sm font-bold">{f.label}</span>
+                  <span className="text-[#7B2FBE] text-[10px] font-medium">{f.num}</span>
+                  <span className="text-white text-sm font-medium">{f.label}</span>
                 </div>
                 <p className="text-white/30 text-xs leading-relaxed pl-5">{f.desc}</p>
               </div>
@@ -124,15 +121,19 @@ function AuthPage() {
           className="w-full max-w-[380px]"
         >
           {/* Mobile logo */}
-          <div className="flex items-center gap-3 mb-10 lg:hidden">
-            <span className="text-gray-900 font-black text-sm tracking-[0.18em] uppercase">AR</span>
-            <span className="text-gray-200 font-thin text-lg leading-none select-none">|</span>
-            <span className="text-gray-500 text-[11px] font-medium tracking-[0.12em] uppercase">Arquitetura de Relevância</span>
+          <div className="flex items-center gap-2.5 mb-10 lg:hidden">
+            <div className="w-7 h-7 rounded-md bg-[#7B2FBE] flex items-center justify-center flex-shrink-0">
+              <span className="text-[11px] font-bold text-white tracking-wide">AR</span>
+            </div>
+            <div>
+              <p className="text-[12px] font-semibold text-gray-900 leading-tight">Arquitetura</p>
+              <p className="text-[10px] text-[#7B2FBE] font-medium">de Relevância</p>
+            </div>
           </div>
 
           {/* Heading */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-black text-gray-900 leading-tight mb-1">
+          <div className="mb-7">
+            <h2 className="text-xl font-semibold text-gray-900 leading-tight mb-1">
               {tab === 'login' ? 'Entre na plataforma' : 'Solicite seu acesso'}
             </h2>
             <p className="text-sm text-gray-400">
@@ -142,24 +143,24 @@ function AuthPage() {
             </p>
           </div>
 
-          {/* Tab toggle — minimal text style */}
-          <div className="flex gap-6 mb-8 border-b border-gray-100 pb-0">
+          {/* Tab toggle */}
+          <div className="flex gap-6 mb-7 border-b border-gray-100 pb-0">
             <button
               onClick={() => setTab('login')}
-              className={`pb-3 text-sm font-bold transition-all border-b-2 -mb-px ${
+              className={`pb-3 text-sm font-medium transition-all border-b-2 -mb-px ${
                 tab === 'login'
                   ? 'border-[#7B2FBE] text-gray-900'
-                  : 'border-transparent text-gray-400 hover:text-gray-700'
+                  : 'border-transparent text-gray-400 hover:text-gray-600'
               }`}
             >
               Entrar
             </button>
             <button
               onClick={() => setTab('request')}
-              className={`pb-3 text-sm font-bold transition-all border-b-2 -mb-px ${
+              className={`pb-3 text-sm font-medium transition-all border-b-2 -mb-px ${
                 tab === 'request'
                   ? 'border-[#7B2FBE] text-gray-900'
-                  : 'border-transparent text-gray-400 hover:text-gray-700'
+                  : 'border-transparent text-gray-400 hover:text-gray-600'
               }`}
             >
               Solicitar Acesso
@@ -167,13 +168,13 @@ function AuthPage() {
           </div>
 
           {tab === 'login' ? (
-            <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-5">
+            <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Email</label>
+                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Email</label>
                 <input
                   type="email"
                   placeholder="seu@email.com"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
                   {...loginForm.register('email')}
                 />
                 {loginForm.formState.errors.email && (
@@ -181,11 +182,11 @@ function AuthPage() {
                 )}
               </div>
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Senha</label>
+                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Senha</label>
                 <input
                   type="password"
                   placeholder="••••••••"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
                   {...loginForm.register('password')}
                 />
                 {loginForm.formState.errors.password && (
@@ -195,7 +196,7 @@ function AuthPage() {
               <button
                 type="submit"
                 disabled={loginForm.formState.isSubmitting}
-                className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-50 text-white font-black py-3.5 rounded-lg transition-colors text-sm uppercase tracking-wide mt-2"
+                className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-50 text-white font-medium py-3 rounded-lg transition-colors text-sm mt-2"
               >
                 {loginForm.formState.isSubmitting ? 'Entrando...' : (
                   <>Entrar no Hub <ArrowRight size={15} /></>
@@ -203,12 +204,12 @@ function AuthPage() {
               </button>
             </form>
           ) : (
-            <form onSubmit={requestForm.handleSubmit(onRequest)} className="space-y-5">
+            <form onSubmit={requestForm.handleSubmit(onRequest)} className="space-y-4">
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Nome completo</label>
+                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Nome completo</label>
                 <input
                   placeholder="Seu nome"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
                   {...requestForm.register('full_name')}
                 />
                 {requestForm.formState.errors.full_name && (
@@ -216,11 +217,11 @@ function AuthPage() {
                 )}
               </div>
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Email</label>
+                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Email</label>
                 <input
                   type="email"
                   placeholder="seu@email.com"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
                   {...requestForm.register('email')}
                 />
                 {requestForm.formState.errors.email && (
@@ -228,11 +229,11 @@ function AuthPage() {
                 )}
               </div>
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Por que quer participar?</label>
+                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Por que quer participar?</label>
                 <textarea
                   placeholder="Conte sobre você e seus objetivos..."
                   rows={4}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors resize-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors resize-none"
                   {...requestForm.register('mensagem')}
                 />
                 {requestForm.formState.errors.mensagem && (
@@ -241,7 +242,7 @@ function AuthPage() {
               </div>
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white font-black py-3.5 rounded-lg transition-colors text-sm uppercase tracking-wide"
+                className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white font-medium py-3 rounded-lg transition-colors text-sm"
               >
                 Enviar Solicitação <ArrowUpRight size={15} />
               </button>
