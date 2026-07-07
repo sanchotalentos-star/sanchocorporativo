@@ -34,11 +34,10 @@ const membroNav: NavItem[] = [
 ]
 
 const journeyStages = [
-  { num: 1, label: 'Descoberta'  },
-  { num: 2, label: 'Diferencial' },
-  { num: 3, label: 'Mensagem'    },
-  { num: 4, label: 'Estratégia'  },
-  { num: 5, label: 'Expansão'    },
+  { num: 1, label: 'OKR & MVP',          desc: 'Metas + produto' },
+  { num: 2, label: 'Primeiras Vitórias', desc: 'Posicionamento'  },
+  { num: 3, label: 'Plano em Ação',      desc: 'PDCA ciclo 1'    },
+  { num: 4, label: 'Escala',             desc: 'Autoridade'      },
 ]
 
 export function Sidebar() {
@@ -95,14 +94,19 @@ export function Sidebar() {
                     {isDone    && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                     {isCurrent && <div className="w-1.5 h-1.5 rounded-full bg-[#7B2FBE]" />}
                   </div>
-                  <span className={cn(
-                    'text-[11px] leading-none',
-                    isCurrent ? 'text-[#7B2FBE] font-semibold' :
-                    isDone    ? 'text-gray-400 line-through'    :
-                                'text-gray-300'
-                  )}>
-                    {stage.label}
-                  </span>
+                  <div className="flex-1 min-w-0">
+                    <span className={cn(
+                      'text-[11px] leading-none block',
+                      isCurrent ? 'text-[#7B2FBE] font-semibold' :
+                      isDone    ? 'text-gray-400 line-through'    :
+                                  'text-gray-300'
+                    )}>
+                      {stage.label}
+                    </span>
+                    {isCurrent && (
+                      <span className="text-[9px] text-gray-400 mt-0.5 block">{stage.desc}</span>
+                    )}
+                  </div>
                   {isCurrent && (
                     <span className="ml-auto text-[9px] font-black bg-[#7B2FBE]/10 text-[#7B2FBE] px-1.5 py-0.5 rounded-md uppercase tracking-wide">
                       Atual

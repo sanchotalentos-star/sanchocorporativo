@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, ChevronDown, ChevronUp, CheckCircle2, Circle, XCircle, AlertCircle, Target, TrendingUp, Crosshair } from 'lucide-react'
+import { Plus, ChevronDown, ChevronUp, CheckCircle2, Circle, XCircle, AlertCircle, Target, TrendingUp, Crosshair, Rocket } from 'lucide-react'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
@@ -80,70 +80,7 @@ function defaultPdca(semana = 1): PdcaCiclo {
   }
 }
 
-const initialOkrs: Objective[] = [
-  {
-    id: 'o1',
-    titulo: 'Tornar-me referência no meu nicho de mercado',
-    categoria: 'Autoridade',
-    trimestre: 'Q1 2026',
-    expanded: true,
-    pdcaTab: 'okr',
-    keyResults: [
-      { id: 'kr1', descricao: 'Publicar 3 artigos no LinkedIn com +500 impressões', meta: 3,    atual: 1,   unit: 'artigos'    },
-      { id: 'kr2', descricao: 'Conquistar 1.000 seguidores engajados',              meta: 1000, atual: 320, unit: 'seguidores' },
-      { id: 'kr3', descricao: 'Participar de 2 podcasts como convidado(a)',          meta: 2,    atual: 0,   unit: 'podcasts'   },
-    ],
-    pdca: {
-      diagnostico:    'Hoje publico esporadicamente e sem consistência. Seguidores crescem lento.',
-      metaEspecifica: 'Publicar 1x por semana e alcançar 500 seguidores até o final do ciclo.',
-      riscos:         'Falta de tempo para produção de conteúdo; bloqueio criativo.',
-      semanaAtual: 2,
-      acoes: [
-        { id: 'a1', descricao: 'Escrever rascunho do artigo sobre autoridade de nicho', semana: 1, status: 'feito',     obs: ''           },
-        { id: 'a2', descricao: 'Publicar artigo revisado no LinkedIn',                   semana: 1, status: 'feito',     obs: ''           },
-        { id: 'a3', descricao: 'Responder 10 comentários de outros criadores',           semana: 1, status: 'nao_feito', obs: 'Esqueci.'   },
-        { id: 'a4', descricao: 'Gravar pitch de apresentação para podcast',              semana: 2, status: 'pendente',  obs: ''           },
-        { id: 'a5', descricao: 'Enviar proposta para 3 podcasts do nicho',               semana: 2, status: 'pendente',  obs: ''           },
-        { id: 'a6', descricao: 'Publicar 2º artigo',                                     semana: 2, status: 'pendente',  obs: ''           },
-        { id: 'a7', descricao: 'Analisar métricas e ajustar pauta',                      semana: 3, status: 'pendente',  obs: ''           },
-        { id: 'a8', descricao: 'Publicar 3º artigo',                                     semana: 3, status: 'pendente',  obs: ''           },
-        { id: 'a9', descricao: 'Gravar depoimento para portfólio de autoridade',         semana: 4, status: 'pendente',  obs: ''           },
-      ],
-      ajustes: [
-        { id: 'aj1', texto: 'Reduzir frequência de respostas de 10 para 5 — mais qualidade, menos volume',      status: 'pendente' },
-        { id: 'aj2', texto: 'Bloquear 30 min toda segunda para rascunho de artigo — elimina bloqueio criativo', status: 'pendente' },
-        { id: 'aj3', texto: 'Priorizar 1 podcast grande em vez de 3 menores — impacto mais direto no KR2',       status: 'pendente' },
-      ],
-    },
-  },
-  {
-    id: 'o2',
-    titulo: 'Lançar meu primeiro produto digital',
-    categoria: 'Produto',
-    trimestre: 'Q1 2026',
-    expanded: false,
-    pdcaTab: 'okr',
-    keyResults: [
-      { id: 'kr4', descricao: 'Definir e documentar o MVP do produto', meta: 1,  atual: 0, unit: 'documento'  },
-      { id: 'kr5', descricao: 'Validar com 10 potenciais clientes',    meta: 10, atual: 3, unit: 'validações' },
-      { id: 'kr6', descricao: 'Pré-venda com 5 compradores',           meta: 5,  atual: 0, unit: 'pré-vendas' },
-    ],
-    pdca: defaultPdca(),
-  },
-  {
-    id: 'o3',
-    titulo: 'Aumentar receita recorrente em 30%',
-    categoria: 'Receita',
-    trimestre: 'Q2 2026',
-    expanded: false,
-    pdcaTab: 'okr',
-    keyResults: [
-      { id: 'kr7', descricao: 'Gerar R$ 10k em novas receitas',       meta: 10000, atual: 0, unit: 'R$'      },
-      { id: 'kr8', descricao: 'Converter 5 leads em clientes pagantes', meta: 5,    atual: 0, unit: 'clientes' },
-    ],
-    pdca: defaultPdca(),
-  },
-]
+const initialOkrs: Objective[] = []
 
 /* ─────────────────────────────────────────────
    HELPERS
@@ -237,8 +174,8 @@ function OkrPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Meus OKRs + PDCA</h1>
-          <p className="text-gray-400 mt-1 text-sm">Objetivos, resultados-chave e ciclo de execução</p>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Metas de Impacto</h1>
+          <p className="text-gray-500 mt-1 text-sm">O que você quer conquistar nos próximos 3 meses — definido com seu mentor, executado por você</p>
         </div>
         <button
           onClick={() => setShowNovoObj(true)}
@@ -342,6 +279,48 @@ function OkrPage() {
         </motion.div>
       </motion.div>
 
+      {/* Empty state — nenhuma meta definida ainda */}
+      {okrs.length === 0 && (
+        <motion.div
+          variants={fadeInUp} initial="hidden" animate="visible"
+          className="rounded-2xl border border-gray-100 bg-white shadow-sm p-12 flex flex-col items-center text-center"
+        >
+          <div className="w-16 h-16 rounded-2xl bg-[#7B2FBE]/10 flex items-center justify-center mb-5">
+            <Rocket size={28} className="text-[#7B2FBE]" />
+          </div>
+          <h2 className="text-lg font-semibold text-gray-800 mb-2">Suas metas ainda estão sendo desenhadas</h2>
+          <p className="text-sm text-gray-500 max-w-sm leading-relaxed mb-1">
+            Na próxima sessão com seu mentor, vocês vão definir juntos o que você quer conquistar nos próximos 3 meses.
+          </p>
+          <p className="text-xs text-gray-400 max-w-xs leading-relaxed mb-8">
+            Cada meta nasce de uma conversa real — não de um template. O seu mentor vai guiar esse processo.
+          </p>
+
+          {/* Jornada do programa — o que vem em cada fase */}
+          <div className="w-full max-w-lg border-t border-gray-100 pt-8">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-5">O que acontece em cada fase</p>
+            <div className="grid grid-cols-2 gap-3 text-left">
+              {[
+                { fase: '01', nome: 'OKR & MVP',          desc: 'Suas metas de impacto + formatação do produto' },
+                { fase: '02', nome: 'Primeiras Vitórias', desc: 'Posicionamento, marketing e agenda de eventos' },
+                { fase: '03', nome: 'Plano em Ação',      desc: 'Execução do plano + revisão de metas + storytelling' },
+                { fase: '04', nome: 'Escala',             desc: 'Segundo ciclo de execução + autoridade de mercado' },
+              ].map(f => (
+                <div key={f.fase} className="rounded-xl bg-gray-50 border border-gray-100 p-4">
+                  <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest block mb-1">Fase {f.fase}</span>
+                  <p className="text-xs font-semibold text-gray-800 mb-1">{f.nome}</p>
+                  <p className="text-[11px] text-gray-400 leading-relaxed">{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-300 mt-6 italic">
+            Você pode adicionar uma meta manualmente se já tiver clareza — mas o ideal é fazer isso com o mentor.
+          </p>
+        </motion.div>
+      )}
+
       {/* Cards de OKR */}
       <div className="space-y-3">
         {okrs.map((obj) => {
@@ -384,7 +363,7 @@ function OkrPage() {
                   {/* ── tabs OKR | P | D | C | A ── */}
                   <div className="border-t border-gray-100 flex">
                     {(['okr', 'p', 'd', 'c', 'a'] as const).map((tab) => {
-                      const labels = { okr: 'Key Results', p: 'Plan', d: 'Do', c: 'Check', a: 'Act' }
+                      const labels = { okr: 'Como Vou Medir', p: 'O Que Fazer', d: 'Minha Semana', c: 'Como Estou', a: 'O Que Melhorar' }
                       const active = obj.pdcaTab === tab
                       return (
                         <button key={tab} onClick={() => setObj(obj.id, { pdcaTab: tab })}
