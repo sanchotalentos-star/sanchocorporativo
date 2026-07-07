@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
-import { Lock, Sparkles, PenLine, MessageSquare, Search, Lightbulb, Target, Layers, ChevronRight, CheckCircle2, Circle, Download } from 'lucide-react'
+import { Lock, Sparkles, PenLine, MessageSquare, Search, Lightbulb, Target, Layers, ChevronRight, CheckCircle2, Circle, Download, Users } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
@@ -110,6 +110,30 @@ const PILARES: {
   },
 ]
 
+// Caminhos sugeridos por pilar — aparecem quando o campo tem texto
+const PILAR_CAMINHOS: Record<PilarField, { titulo: string; texto: string }[]> = {
+  publicoAlvo: [
+    { titulo: 'Especificidade gera atração', texto: 'Quanto mais preciso o perfil, mais magnético o posicionamento. O mentor vai aprofundar até o nível de consciência e dor que esse público carrega hoje — é aí que está o ouro.' },
+    { titulo: 'Nomeie a dor melhor que eles', texto: 'O maior diferencial de um posicionamento forte é descrever a dor do cliente melhor do que ele mesmo consegue. Quando ele lê sua comunicação e pensa "é exatamente sobre mim", o posicionamento está funcionando.' },
+    { titulo: 'Base de tudo que vem depois', texto: 'Produto, preço, canal, história — tudo será calibrado para esse público. Quanto mais claro ele for agora, mais coerente e poderoso será tudo que você construir em cima.' },
+  ],
+  proposta: [
+    { titulo: 'O cliente compra o destino', texto: 'Seu cliente compra a transformação, não o processo. Traduzir o que você faz em resultado concreto e mensurável é o núcleo da sua proposta — e o que diferencia posicionamentos genéricos de magnéticos.' },
+    { titulo: 'Prazo define a promessa', texto: '"Em 90 dias" converte mais do que "ao longo da jornada". O mentor vai ajudar a encontrar o prazo real que você consegue garantir e que o cliente considera crível.' },
+    { titulo: 'O núcleo da sua Zona de Genialidade', texto: 'O que existe de genuinamente único no seu jeito de trabalhar — algo que ninguém faz exatamente como você? Esse é o diferenciador que vai sustentar sua autoridade no longo prazo.' },
+  ],
+  storytelling: [
+    { titulo: 'Antes, virada e depois', texto: 'A estrutura que mais conecta: onde você estava (dor ou limitação), o que mudou (momento de virada) e onde chegou (estado atual que prova que a transformação é real e possível).' },
+    { titulo: 'Reconhecimento cria conexão', texto: 'Quando seu público lê sua história e pensa "eu já me senti assim", a conexão acontece instantaneamente. A especificidade do seu "antes" é o que gera identificação — não precisa ser dramático, precisa ser verdadeiro.' },
+    { titulo: 'Sua maior prova de autoridade', texto: 'Sua história mostra que você viveu o que ensina. É a prova social mais autêntica que existe — e o mentor vai extrair os elementos que geram mais autoridade e conexão para o seu posicionamento.' },
+  ],
+  formatoProduto: [
+    { titulo: 'Formato comunica posicionamento', texto: 'Mentoria individual comunica exclusividade e alto valor. Grupo comunica comunidade. Curso comunica escala. A escolha precisa estar alinhada com quem você quer atrair e como quer ser percebido.' },
+    { titulo: 'Preço é uma declaração', texto: 'O valor que você pratica comunica onde você está no mercado. Um preço alinhado com a transformação entregue é diferente de um preço competitivo — e o mentor vai ajudar a encontrar esse equilíbrio.' },
+    { titulo: 'Canal onde seu público já confia', texto: 'O melhor canal de aquisição é onde seu público ideal já está e já tem o hábito de buscar referências. Com o perfil definido, fica claro se ele está no LinkedIn, Instagram, em eventos ou em indicações.' },
+  ],
+}
+
 type PilarStates = Record<PilarField, PilarData>
 
 const initialPilarStates: PilarStates = {
@@ -126,6 +150,106 @@ function loadSaved(): { pilares: PilarStates; diferenciais: string[] } | null {
   } catch {
     return null
   }
+}
+
+// Componente: Zona de Genialidade em Formação
+function ZonaDeGenialidade({ pilares, diferenciais }: { pilares: PilarStates; diferenciais: string[] }) {
+  const publico  = pilares.publicoAlvo.reflexao.trim()
+  const proposta = pilares.proposta.reflexao.trim()
+  const historia = pilares.storytelling.reflexao.trim()
+  const formato  = pilares.formatoProduto.reflexao.trim()
+  const difs     = diferenciais.filter(d => d.trim())
+
+  const filledCount = [publico, proposta, historia, formato].filter(Boolean).length
+  if (filledCount < 2) return null
+
+  const short = (text: string, max = 130) => text.length > max ? text.slice(0, max).trimEnd() + '…' : text
+
+  return (
+    <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+      className="rounded-2xl border border-[#7B2FBE]/25 bg-[#7B2FBE]/[0.03] p-5"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Sparkles size={15} className="text-[#7B2FBE]" />
+          <p className="text-sm font-semibold text-gray-900">Zona de Genialidade em Formação</p>
+        </div>
+        <span className="text-[10px] font-medium bg-[#7B2FBE]/10 text-[#7B2FBE] px-2.5 py-1 rounded-full">
+          {filledCount}/4 blocos
+        </span>
+      </div>
+
+      <div className="space-y-3">
+        {proposta && (
+          <div className="flex items-start gap-3">
+            <div className="w-5 h-5 rounded bg-[#7B2FBE] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Target size={10} className="text-white" />
+            </div>
+            <div>
+              <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-0.5">Transformação que você gera</p>
+              <p className="text-xs text-gray-700 leading-relaxed">{short(proposta)}</p>
+            </div>
+          </div>
+        )}
+
+        {publico && (
+          <div className="flex items-start gap-3">
+            <div className="w-5 h-5 rounded bg-[#7B2FBE] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Users size={10} className="text-white" />
+            </div>
+            <div>
+              <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-0.5">Para quem essa transformação acontece</p>
+              <p className="text-xs text-gray-700 leading-relaxed">{short(publico)}</p>
+            </div>
+          </div>
+        )}
+
+        {difs.length > 0 && (
+          <div className="flex items-start gap-3">
+            <div className="w-5 h-5 rounded bg-[#7B2FBE] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Sparkles size={10} className="text-white" />
+            </div>
+            <div>
+              <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-0.5">O que te diferencia</p>
+              <p className="text-xs text-gray-700 leading-relaxed">{difs.join(' · ')}</p>
+            </div>
+          </div>
+        )}
+
+        {historia && (
+          <div className="flex items-start gap-3">
+            <div className="w-5 h-5 rounded bg-[#7B2FBE] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Lightbulb size={10} className="text-white" />
+            </div>
+            <div>
+              <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-0.5">O que te capacita</p>
+              <p className="text-xs text-gray-700 leading-relaxed">{short(historia)}</p>
+            </div>
+          </div>
+        )}
+
+        {formato && (
+          <div className="flex items-start gap-3">
+            <div className="w-5 h-5 rounded bg-[#7B2FBE] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Layers size={10} className="text-white" />
+            </div>
+            <div>
+              <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-0.5">Como você chega</p>
+              <p className="text-xs text-gray-700 leading-relaxed">{short(formato)}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4 pt-4 border-t border-[#7B2FBE]/10">
+        <p className="text-xs text-[#7B2FBE] leading-relaxed">
+          {filledCount < 4
+            ? `Complete os ${4 - filledCount} bloco${4 - filledCount > 1 ? 's' : ''} restante${4 - filledCount > 1 ? 's' : ''} para revelar sua Zona de Genialidade completa. Seu mentor vai sintetizar tudo isso em uma declaração única de posicionamento.`
+            : 'Todos os blocos preenchidos. Leve isso para a sessão — seu mentor vai transformar essas peças na declaração da sua Zona de Genialidade.'}
+        </p>
+      </div>
+    </motion.div>
+  )
 }
 
 function PosicionamentoPage() {
@@ -151,7 +275,7 @@ function PosicionamentoPage() {
   }
 
   function updateReflexao(field: PilarField, value: string) {
-    const wasEmpty = !pilares[field].reflexao.trim()
+    const wasEmpty   = !pilares[field].reflexao.trim()
     const isNowFilled = value.trim().length > 0
 
     if (wasEmpty && isNowFilled && !toastedFields.has(field)) {
@@ -180,7 +304,7 @@ function PosicionamentoPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Quem Você É no Mercado</h1>
+        <h1 className="text-xl font-semibold text-gray-900">Minha Identidade de Marca</h1>
         <p className="text-gray-500 mt-1 text-sm">
           Preencha sua percepção inicial em cada bloco. Na sessão com seu mentor, vocês analisam juntos e constroem seu perfil de autoridade.
         </p>
@@ -190,7 +314,7 @@ function PosicionamentoPage() {
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"
         className="rounded-2xl border border-[#7B2FBE]/15 bg-[#7B2FBE]/[0.03] p-5"
       >
-        <p className="text-[10px] font-bold text-[#7B2FBE] uppercase tracking-widest mb-3">Como funciona</p>
+        <p className="text-[10px] font-medium text-[#7B2FBE] uppercase tracking-wide mb-3">Como funciona</p>
         <div className="grid sm:grid-cols-3 gap-4">
           {[
             { num: '1', text: 'Antes da sessão, preencha sua percepção inicial em cada bloco abaixo' },
@@ -199,7 +323,7 @@ function PosicionamentoPage() {
           ].map(step => (
             <div key={step.num} className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#7B2FBE] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-[10px] font-black text-white">{step.num}</span>
+                <span className="text-[10px] font-semibold text-white">{step.num}</span>
               </div>
               <p className="text-xs text-gray-600 leading-relaxed">{step.text}</p>
             </div>
@@ -234,7 +358,10 @@ function PosicionamentoPage() {
         )}
       </motion.div>
 
-      {/* Cartão de Identidade de Marca — monta em tempo real */}
+      {/* Zona de Genialidade — aparece a partir de 2 blocos preenchidos */}
+      <ZonaDeGenialidade pilares={pilares} diferenciais={diferenciais} />
+
+      {/* Cartão de Identidade de Marca */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"
         className={cn(
           'rounded-2xl border p-5 transition-all',
@@ -245,7 +372,7 @@ function PosicionamentoPage() {
       >
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-[10px] font-bold text-[#7B2FBE] uppercase tracking-widest">
+            <p className="text-[10px] font-medium text-[#7B2FBE] uppercase tracking-wide">
               Cartão de Identidade de Marca
             </p>
             <p className="text-xs text-gray-400 mt-0.5">
@@ -253,19 +380,18 @@ function PosicionamentoPage() {
             </p>
           </div>
           {comReflexao === total && (
-            <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full">
+            <span className="flex items-center gap-1.5 text-[10px] font-medium text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full">
               <CheckCircle2 size={11} />
               Pronto para a sessão
             </span>
           )}
         </div>
 
-        {/* Cabeçalho do cartão */}
         <div className="rounded-xl border border-[#7B2FBE]/20 overflow-hidden">
           <div className="bg-[#7B2FBE] px-5 py-3 flex items-center justify-between">
             <div>
-              <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Arquitetura de Relevância</p>
-              <p className="text-sm font-black text-white mt-0.5">{user?.full_name ?? 'Seu Nome'}</p>
+              <p className="text-[10px] font-medium text-white/60 uppercase tracking-wide">Arquitetura de Relevância</p>
+              <p className="text-sm font-semibold text-white mt-0.5">{user?.full_name ?? 'Seu Nome'}</p>
             </div>
             <Download size={14} className="text-white/40" />
           </div>
@@ -277,7 +403,7 @@ function PosicionamentoPage() {
                 <div key={pilar.id} className="px-5 py-3.5 flex items-start gap-3">
                   <span className="text-[10px] font-medium text-[#7B2FBE] mt-0.5 w-5 flex-shrink-0">{pilar.num}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">{pilar.label}</p>
+                    <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-0.5">{pilar.label}</p>
                     {texto ? (
                       <p className="text-sm text-gray-800 leading-relaxed">{texto}</p>
                     ) : (
@@ -294,11 +420,10 @@ function PosicionamentoPage() {
               )
             })}
 
-            {/* Diferenciais no cartão */}
             <div className="px-5 py-3.5 flex items-start gap-3">
               <span className="text-[10px] font-medium text-[#7B2FBE] mt-0.5 w-5 flex-shrink-0">05</span>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">Diferenciais</p>
+                <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">Diferenciais</p>
                 {diferenciais.some(d => d.trim()) ? (
                   <div className="space-y-1">
                     {diferenciais.filter(d => d.trim()).map((d, i) => (
@@ -317,7 +442,7 @@ function PosicionamentoPage() {
         </div>
 
         {comReflexao === total && (
-          <p className="text-xs text-center text-[#7B2FBE] font-semibold mt-3">
+          <p className="text-xs text-center text-[#7B2FBE] font-medium mt-3">
             Leve este cartão para a sessão com seu mentor. Ele será o ponto de partida da construção.
           </p>
         )}
@@ -325,7 +450,7 @@ function PosicionamentoPage() {
 
       {/* Os 4 Pilares */}
       <div>
-        <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
+        <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-4">
           Os 4 Pilares da Sua Marca
         </h2>
         <motion.div
@@ -337,6 +462,8 @@ function PosicionamentoPage() {
           {PILARES.map((pilar) => {
             const state   = pilares[pilar.id]
             const sConfig = statusConfig[state.status]
+            const temTexto = state.reflexao.trim().length > 40
+            const caminhos = PILAR_CAMINHOS[pilar.id]
 
             return (
               <motion.div
@@ -348,26 +475,26 @@ function PosicionamentoPage() {
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-lg bg-[#7B2FBE]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-[11px] font-black text-[#7B2FBE]">{pilar.num}</span>
+                      <span className="text-[11px] font-semibold text-[#7B2FBE]">{pilar.num}</span>
                     </div>
                     <div>
-                      <p className="text-base font-bold text-gray-900 mb-0.5">{pilar.label}</p>
+                      <p className="text-base font-semibold text-gray-900 mb-0.5">{pilar.label}</p>
                       <p className="text-xs text-gray-400 leading-relaxed">{pilar.desc}</p>
                     </div>
                   </div>
                   <span
-                    className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap flex-shrink-0 mt-1"
+                    className="text-[10px] font-medium px-2.5 py-0.5 rounded-full whitespace-nowrap flex-shrink-0 mt-1"
                     style={{ color: sConfig.color, background: sConfig.bg }}
                   >
                     {sConfig.label}
                   </span>
                 </div>
 
-                {/* Reflexão do mentorado */}
+                {/* Reflexão */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <PenLine size={13} className="text-gray-400" />
-                    <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Sua percepção inicial</p>
+                    <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Sua percepção inicial</p>
                   </div>
                   <p className="text-xs text-gray-500 italic pl-0.5">{pilar.pergunta}</p>
                   <textarea
@@ -382,19 +509,38 @@ function PosicionamentoPage() {
                       {pilar.dica}
                     </p>
                   )}
+
+                  {/* Caminhos sugeridos — aparecem quando há texto suficiente */}
+                  {temTexto && (
+                    <div className="rounded-xl border border-[#7B2FBE]/15 bg-[#7B2FBE]/[0.03] p-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Sparkles size={12} className="text-[#7B2FBE]" />
+                        <p className="text-[10px] font-medium text-[#7B2FBE] uppercase tracking-wide">Caminhos que emergem desta reflexão</p>
+                      </div>
+                      {caminhos.map((c, i) => (
+                        <div key={i} className="flex items-start gap-2.5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#7B2FBE]/50 flex-shrink-0 mt-1.5" />
+                          <div>
+                            <p className="text-[11px] font-semibold text-gray-700 mb-0.5">{c.titulo}</p>
+                            <p className="text-xs text-gray-500 leading-relaxed">{c.texto}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                {/* Análise construída com o mentor */}
+                {/* Construção com o mentor */}
                 <div className="mt-5 pt-5 border-t border-gray-100">
                   {state.analiseLocked ? (
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <MessageSquare size={13} className="text-gray-400" />
-                        <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Construção com o mentor</p>
+                        <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Construção com o mentor</p>
                       </div>
                       <p className="text-xs text-gray-500 leading-relaxed pl-0.5">{pilar.mentorFoco}</p>
                       <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 space-y-2.5">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">O que será trabalhado na sessão</p>
+                        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-3">O que será trabalhado na sessão</p>
                         {pilar.mentorItens.map((item, i) => (
                           <div key={i} className="flex items-start gap-2.5">
                             <div className="w-1.5 h-1.5 rounded-full bg-[#7B2FBE]/40 flex-shrink-0 mt-1.5" />
@@ -413,7 +559,7 @@ function PosicionamentoPage() {
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <MessageSquare size={13} className="text-[#7B2FBE]" />
-                        <p className="text-[11px] font-bold text-[#7B2FBE] uppercase tracking-wide">Construção com o mentor</p>
+                        <p className="text-[11px] font-medium text-[#7B2FBE] uppercase tracking-wide">Construção com o mentor</p>
                       </div>
                       <div className="rounded-xl bg-[#7B2FBE]/[0.04] border border-[#7B2FBE]/20 px-4 py-3.5">
                         <p className="text-sm text-gray-700 leading-relaxed">{state.analise}</p>
@@ -447,7 +593,7 @@ function PosicionamentoPage() {
           <div>
             <div className="flex items-center gap-2 mb-0.5">
               <span className="text-[10px] font-medium text-[#7B2FBE]">00</span>
-              <p className={cn('text-base font-bold', genLocked ? 'text-gray-400' : 'text-gray-900')}>
+              <p className={cn('text-base font-semibold', genLocked ? 'text-gray-400' : 'text-gray-900')}>
                 Seu Maior Diferencial
               </p>
             </div>
@@ -547,7 +693,7 @@ function PosicionamentoPage() {
                 'w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all',
                 d.trim() ? 'bg-[#7B2FBE]' : 'border-2 border-gray-200'
               )}>
-                {d.trim() && <span className="text-[10px] text-white font-black">✓</span>}
+                {d.trim() && <span className="text-[10px] text-white font-medium">✓</span>}
               </div>
               <input
                 type="text"
@@ -563,6 +709,18 @@ function PosicionamentoPage() {
             </div>
           ))}
         </div>
+
+        {diferenciais.some(d => d.trim()) && (
+          <div className="mt-4 rounded-xl border border-[#7B2FBE]/15 bg-[#7B2FBE]/[0.03] p-3.5">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Sparkles size={11} className="text-[#7B2FBE]" />
+              <p className="text-[10px] font-medium text-[#7B2FBE] uppercase tracking-wide">Próximo passo</p>
+            </div>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              O mentor vai validar se esses diferenciais são percebidos pelo mercado, refiná-los com evidências concretas e integrá-los à sua declaração de Zona de Genialidade.
+            </p>
+          </div>
+        )}
       </motion.div>
 
     </div>

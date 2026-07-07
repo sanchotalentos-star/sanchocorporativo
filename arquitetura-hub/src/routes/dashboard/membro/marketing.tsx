@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
+import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2, ChevronDown, ChevronUp, Sparkles, BookOpen, Star, Users, Lightbulb, Layers } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { getIdentidade } from '@/lib/identidade'
@@ -45,6 +45,140 @@ const canalColors: Record<Canal, string> = {
 const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 
 const initialAcoes: AcaoMarketing[] = []
+
+interface SementeProps {
+  publicoAlvo?: string
+  proposta?: string
+  formatoProduto?: string
+  diferenciais: string[]
+  storytelling?: string
+}
+
+function SementesDeConteudo({ publicoAlvo, proposta, formatoProduto, diferenciais, storytelling }: SementeProps) {
+  const [open, setOpen] = useState(true)
+
+  const diferencialPrincipal = diferenciais[0] ?? ''
+
+  const sementes = [
+    {
+      icon: BookOpen,
+      label: 'Educativo',
+      titulo: 'O que você ensina',
+      descricao: proposta
+        ? `Crie conteúdo que mostre como você entrega "${proposta.slice(0, 60)}...". Explique o método, os passos, os bastidores do processo.`
+        : 'Crie conteúdo que ensina o seu método principal. Quanto mais você explica como pensa, mais autoridade ganha.',
+      cor: '#3B82F6',
+    },
+    {
+      icon: Users,
+      label: 'Para quem',
+      titulo: 'Fale diretamente com seu público',
+      descricao: publicoAlvo
+        ? `Você fala para "${publicoAlvo.slice(0, 60)}...". Crie conteúdos que nomeia essa pessoa, seus desafios e o que ela está deixando de ganhar.`
+        : 'Nomear quem é seu público-alvo em cada post cria identificação imediata e atrai as pessoas certas.',
+      cor: '#7B2FBE',
+    },
+    {
+      icon: Star,
+      label: 'Diferencial',
+      titulo: 'O que só você faz',
+      descricao: diferencialPrincipal
+        ? `Seu diferencial "${diferencialPrincipal.slice(0, 60)}" é o que o mercado precisa ver. Crie posts que mostram esse ângulo único com exemplos reais.`
+        : 'Explore o que torna sua abordagem única. Não o que você faz — mas como e por quê você faz diferente.',
+      cor: '#F59E0B',
+    },
+    {
+      icon: Lightbulb,
+      label: 'Transformação',
+      titulo: 'Mostre o antes e depois',
+      descricao: publicoAlvo
+        ? `Para quem vive o cenário descrito em "${publicoAlvo.slice(0, 50)}...", mostre como é a vida depois de trabalhar com você. Cases, depoimentos, resultados concretos.`
+        : 'Mostre a transformação que você gera. Cases reais, depoimentos e resultados constroem prova social e confiam.',
+      cor: '#10B981',
+    },
+    {
+      icon: Layers,
+      label: 'Formato',
+      titulo: 'Como você chega ao mercado',
+      descricao: formatoProduto
+        ? `Você atua via "${formatoProduto.slice(0, 60)}...". Crie conteúdo que explica esse formato — o que ele é, para quem serve e por que funciona.`
+        : 'Explique como funciona trabalhar com você — o formato, o processo, a jornada do cliente. Isso educa o mercado.',
+      cor: '#EC4899',
+    },
+    ...(storytelling ? [{
+      icon: Sparkles,
+      label: 'História',
+      titulo: 'Sua origem como autoridade',
+      descricao: `Use sua história "${storytelling.slice(0, 60)}..." como âncora. Conte o que te trouxe até aqui e por que isso importa para quem te acompanha.`,
+      cor: '#8B5CF6',
+    }] : []),
+  ]
+
+  return (
+    <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+      className="rounded-2xl border border-[#7B2FBE]/15 bg-white shadow-sm overflow-hidden"
+    >
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50/50 transition-colors text-left"
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded-md bg-[#7B2FBE]/10 flex items-center justify-center flex-shrink-0">
+            <Sparkles size={12} className="text-[#7B2FBE]" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Sementes de Conteúdo</p>
+            <p className="text-xs text-gray-400">Temas gerados a partir da sua identidade de marca</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-medium text-[#7B2FBE] bg-[#7B2FBE]/10 px-2 py-0.5 rounded-full">
+            {sementes.length} temas
+          </span>
+          {open ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
+        </div>
+      </button>
+
+      {open && (
+        <div className="border-t border-gray-100 p-5">
+          <div className="grid sm:grid-cols-2 gap-3">
+            {sementes.map((s) => {
+              const Icon = s.icon
+              return (
+                <div
+                  key={s.label}
+                  className="rounded-xl border border-gray-100 p-4 hover:border-gray-200 transition-all bg-gray-50/50"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0"
+                      style={{ background: `${s.cor}12` }}>
+                      <Icon size={12} style={{ color: s.cor }} />
+                    </div>
+                    <span className="text-[10px] font-medium uppercase tracking-wide" style={{ color: s.cor }}>
+                      {s.label}
+                    </span>
+                  </div>
+                  <p className="text-sm font-semibold text-gray-800 mb-1.5 leading-tight">{s.titulo}</p>
+                  <p className="text-xs text-gray-500 leading-relaxed">{s.descricao}</p>
+                </div>
+              )
+            })}
+          </div>
+          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+            <p className="text-xs text-gray-400">
+              Quanto mais blocos de identidade você preenche, mais específicos ficam os temas
+            </p>
+            <Link to="/dashboard/membro/posicionamento"
+              className="text-xs font-medium text-[#7B2FBE] hover:underline flex-shrink-0 ml-3"
+            >
+              Completar identidade
+            </Link>
+          </div>
+        </div>
+      )}
+    </motion.div>
+  )
+}
 
 function MarketingPage() {
   const [acoes, setAcoes] = useState<AcaoMarketing[]>(initialAcoes)
@@ -153,6 +287,17 @@ function MarketingPage() {
             </div>
           )}
         </motion.div>
+      )}
+
+      {/* Sementes de Conteúdo */}
+      {(publicoAlvo || proposta || formatoProduto || (identidade?.diferenciais?.length ?? 0) > 0) && (
+        <SementesDeConteudo
+          publicoAlvo={publicoAlvo}
+          proposta={proposta}
+          formatoProduto={formatoProduto}
+          diferenciais={identidade?.diferenciais ?? []}
+          storytelling={identidade?.pilares.storytelling?.reflexao?.trim()}
+        />
       )}
 
       {/* Estado vazio */}
