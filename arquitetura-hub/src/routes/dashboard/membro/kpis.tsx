@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { CheckCircle, AlertCircle, XCircle, ChevronRight } from 'lucide-react'
 import { KpiTable } from '@/components/membro/KpiTable'
-import { mockKpis } from '@/lib/mocks/kpis'
 import { getPercent, getStatusColor } from '@/lib/utils'
 import { fadeInUp } from '@/lib/motion'
 import type { KpiEntry } from '@/types'
@@ -14,7 +13,7 @@ export const Route = createFileRoute('/dashboard/membro/kpis')({
 })
 
 function KpisPage() {
-  const [kpis, setKpis] = useState<KpiEntry[]>(mockKpis)
+  const [kpis, setKpis] = useState<KpiEntry[]>([])
 
   const green  = kpis.filter(k => getStatusColor(getPercent(k.atual, k.meta)) === 'green').length
   const yellow = kpis.filter(k => getStatusColor(getPercent(k.atual, k.meta)) === 'yellow').length
@@ -87,7 +86,19 @@ function KpisPage() {
         </div>
       </motion.div>
 
-      <KpiTable kpis={kpis} onUpdateAtual={handleUpdateAtual} />
+      {kpis.length === 0 ? (
+        <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+          className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 text-center"
+        >
+          <CheckCircle size={32} className="text-gray-200 mx-auto mb-3" />
+          <p className="text-sm font-semibold text-gray-500 mb-1">Nenhum indicador cadastrado ainda</p>
+          <p className="text-xs text-gray-400 max-w-xs mx-auto">
+            Os indicadores de resultado são definidos com seu mentor na sessão de OKR. Eles aparecerão aqui após a primeira sessão.
+          </p>
+        </motion.div>
+      ) : (
+        <KpiTable kpis={kpis} onUpdateAtual={handleUpdateAtual} />
+      )}
 
       {/* Alimenta */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Layers } from 'lucide-react'
 import { PilarAccordion } from '@/components/membro/PilarAccordion'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
 import { mockPilares } from '@/lib/mocks/pilares'
@@ -78,21 +78,39 @@ function PilaresPage() {
       </div>
 
       {/* Pilares */}
-      <motion.div
-        variants={staggerContainer}
-        initial="hidden"
-        animate="visible"
-        className="space-y-3"
-      >
-        {pilares.map(pilar => (
-          <PilarAccordion
-            key={pilar.id}
-            pilar={pilar}
-            onToggleAcao={handleToggleAcao}
-            onAddAcao={handleAddAcao}
-          />
-        ))}
-      </motion.div>
+      {pilares.length === 0 ? (
+        <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+          className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 text-center"
+        >
+          <Layers size={32} className="text-gray-200 mx-auto mb-3" />
+          <p className="text-sm font-semibold text-gray-500 mb-1">Pilares ainda não definidos</p>
+          <p className="text-xs text-gray-400 max-w-xs mx-auto">
+            Os pilares da sua marca são construídos com seu mentor a partir da identidade definida na sessão de posicionamento.
+            Complete primeiro a etapa de Identidade.
+          </p>
+          <Link to="/dashboard/membro/posicionamento"
+            className="inline-flex items-center gap-1.5 mt-4 text-xs font-semibold text-[#7B2FBE] hover:underline"
+          >
+            Ir para Minha Identidade <ChevronRight size={12} />
+          </Link>
+        </motion.div>
+      ) : (
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="space-y-3"
+        >
+          {pilares.map(pilar => (
+            <PilarAccordion
+              key={pilar.id}
+              pilar={pilar}
+              onToggleAcao={handleToggleAcao}
+              onAddAcao={handleAddAcao}
+            />
+          ))}
+        </motion.div>
+      )}
 
       {/* Esta construção alimenta */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"
