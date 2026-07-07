@@ -1,8 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, ArrowLeft, Check, Edit3, Save, X } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Lock, Unlock, Edit3, Save, Check, Sparkles } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
+import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/dashboard/membro/posicionamento')({
   component: PosicionamentoPage,
@@ -13,103 +14,123 @@ export const Route = createFileRoute('/dashboard/membro/posicionamento')({
 ───────────────────────────────────────────── */
 interface PosicionamentoData {
   zonaGenialidade: string
-  publicoAlvo: string
-  proposta: string
-  diferenciais: string[]
-  storytelling: string
-  formatoProduto: string
+  publicoAlvo:     string
+  proposta:        string
+  storytelling:    string
+  formatoProduto:  string
+  diferenciais:    string[]
+}
+
+type PilarStatus = 'bloqueado' | 'descobrindo' | 'definido' | 'validado'
+
+interface PilarState {
+  locked:    boolean
+  status:    PilarStatus
 }
 
 /* ─────────────────────────────────────────────
-   ZONA DE GENIALIDADE — dados do diagnóstico
-   (Gay Hendricks, The Big Leap)
+   CONFIG DE STATUS VISUAL
 ───────────────────────────────────────────── */
-const ZONAS = [
-  {
-    id: 'incompetencia',
-    num: '01',
-    label: 'Zona de Incompetência',
-    desc: 'O que outros fazem melhor que você. Atividades que drenam energia e geram resultados mediocres.',
-    placeholder: 'Ex: Gestão financeira detalhada, design gráfico, programação...',
-    cor: '#EF4444',
-  },
-  {
-    id: 'competencia',
-    num: '02',
-    label: 'Zona de Competência',
-    desc: 'O que você faz bem — mas outros também fazem. Não te diferencia no mercado.',
-    placeholder: 'Ex: Criar apresentações, organizar processos, escrever relatórios...',
-    cor: '#F59E0B',
-  },
-  {
-    id: 'excelencia',
-    num: '03',
-    label: 'Zona de Excelência',
-    desc: 'O que você faz excepcionalmente — mas não necessariamente ama. Pode ser uma armadilha.',
-    placeholder: 'Ex: Gerenciar equipes, vender consultoria, estruturar treinamentos...',
-    cor: '#3B82F6',
-  },
-  {
-    id: 'genialidade',
-    num: '04',
-    label: 'Zona de Genialidade',
-    desc: 'Onde talento + paixão + impacto convergem. O que só você faz do jeito que faz.',
-    placeholder: 'Ex: Transformar conceitos complexos em narrativas simples que geram ação...',
-    cor: '#7B2FBE',
-  },
-]
+const statusConfig: Record<PilarStatus, { label: string; color: string; bg: string }> = {
+  bloqueado:   { label: 'Aguardando sessão',   color: '#9CA3AF', bg: '#F3F4F6' },
+  descobrindo: { label: 'Em descoberta',        color: '#D97706', bg: '#FEF3C7' },
+  definido:    { label: 'Definido',             color: '#3B82F6', bg: '#EFF6FF' },
+  validado:    { label: 'Validado pelo mentor', color: '#7B2FBE', bg: '#F3E8FF' },
+}
 
-const CALIBRACAO = [
-  {
-    id: 'q1',
-    pergunta: 'Quando você está na sua Zona de Genialidade, o tempo passa sem você perceber. Descreva a última vez que isso aconteceu.',
-    placeholder: 'Ex: Quando estava mentorando um cliente e vi o momento exato em que algo clicou pra ele...',
-  },
-  {
-    id: 'q2',
-    pergunta: 'Qual problema você resolve que as pessoas ao seu redor simplesmente não conseguem resolver da mesma forma?',
-    placeholder: 'Ex: Consigo ver o padrão que está travando uma pessoa mesmo quando ela não consegue articular o problema...',
-  },
-  {
-    id: 'q3',
-    pergunta: 'O que pessoas próximas costumam pedir que você ajude — mesmo sem você se apresentar como especialista nisso?',
-    placeholder: 'Ex: Sempre me pedem para revisitar estratégias que parecem certas mas não estão funcionando...',
-  },
-]
+/* ─────────────────────────────────────────────
+   OS 4 PILARES
+───────────────────────────────────────────── */
+type PilarField = 'publicoAlvo' | 'proposta' | 'storytelling' | 'formatoProduto'
 
-const PILARES = [
-  { id: 'publico',    num: '01', label: 'Público-Alvo',          desc: 'Para quem você resolve o problema com excelência',            field: 'publicoAlvo'    as keyof PosicionamentoData, placeholder: 'Ex: Profissionais liberais entre 35-55 anos que querem digitalizar seu conhecimento...' },
-  { id: 'proposta',   num: '02', label: 'Proposta de Valor',      desc: 'O resultado transformador que você entrega',                   field: 'proposta'       as keyof PosicionamentoData, placeholder: 'Ex: Em 90 dias, produto digital estruturado e primeira venda realizada...' },
-  { id: 'story',      num: '03', label: 'Story Telling',          desc: 'Sua história de transformação pessoal e profissional',         field: 'storytelling'   as keyof PosicionamentoData, placeholder: 'Ex: Comecei trocando horas por dinheiro até perceber que meu conhecimento valia muito mais...' },
-  { id: 'produto',    num: '04', label: 'Formatação do Produto',  desc: 'Como seu produto/serviço é estruturado e precificado',         field: 'formatoProduto' as keyof PosicionamentoData, placeholder: 'Ex: Mentoria individual de 3 meses — 6 sessões de 1h + canal de WhatsApp + R$ 4.800...' },
+const PILARES: {
+  id:          PilarField
+  num:         string
+  label:       string
+  desc:        string
+  lockDesc:    string
+  dica:        string
+  placeholder: string
+}[] = [
+  {
+    id:          'publicoAlvo',
+    num:         '01',
+    label:       'Para Quem Você Fala',
+    desc:        'A pessoa exata que mais se transforma com o seu trabalho',
+    lockDesc:    'Na sessão de posicionamento, você e seu mentor vão mapear quem é a pessoa ideal que se transforma com o que você faz. Esse bloco é construído juntos.',
+    dica:        'Seja específico: cargo, momento de vida, principal dor, o que ela já tentou antes de te encontrar.',
+    placeholder: 'Ex: Profissionais liberais entre 35–50 anos que têm expertise consolidada mas ainda trocam horas por dinheiro e querem criar um produto de alto valor...',
+  },
+  {
+    id:          'proposta',
+    num:         '02',
+    label:       'O Que Você Entrega de Diferente',
+    desc:        'O resultado transformador que só você entrega do seu jeito',
+    lockDesc:    'Sua proposta de valor nasce do cruzamento entre o que você faz de melhor e o que seu público mais precisa. Isso é trabalhado com seu mentor na sessão de posicionamento.',
+    dica:        'Foque no RESULTADO da transformação, não no processo. O que a pessoa tem depois de trabalhar com você que não tinha antes?',
+    placeholder: 'Ex: Em 90 dias, profissionais de saúde saem de uma agenda lotada para um produto digital estruturado e a primeira venda realizada...',
+  },
+  {
+    id:          'storytelling',
+    num:         '03',
+    label:       'Sua História que Conecta',
+    desc:        'O momento de virada que explica por que você faz o que faz',
+    lockDesc:    'Toda autoridade tem uma história de transformação. Na sessão de storytelling, vocês vão construir a narrativa que conecta quem você era ao que você entrega hoje.',
+    dica:        'Boa história tem: o antes (dor/limitação), o momento de virada, e o depois (o que você conquistou e como isso te capacita a ajudar outros).',
+    placeholder: 'Ex: Por 8 anos fui consultor trocando horas por dinheiro. Quando criei meu primeiro produto, percebi que meu conhecimento valia muito mais do que meu tempo disponível...',
+  },
+  {
+    id:          'formatoProduto',
+    num:         '04',
+    label:       'Como Você Chega ao Mercado',
+    desc:        'O formato, a estrutura e o preço do que você oferece',
+    lockDesc:    'A formatação do seu produto é definida com base no seu público, no seu diferencial e no modelo de negócio que faz sentido para você. Isso é trabalhado na fase de MVP.',
+    dica:        'Descreva: formato (mentoria, grupo, curso, consultoria), duração, frequência de encontros, canais e faixa de preço.',
+    placeholder: 'Ex: Mentoria individual de 3 meses — 6 sessões de 1h via Google Meet + canal de suporte no WhatsApp. Investimento: R$ 4.800 à vista ou 3× R$ 1.700...',
+  },
 ]
 
 /* ─────────────────────────────────────────────
    ESTADO INICIAL
+   Todos os blocos começam BLOQUEADOS para um
+   novo mentorado. O mentor desbloqueia no admin.
 ───────────────────────────────────────────── */
 const initialData: PosicionamentoData = {
   zonaGenialidade: '',
-  publicoAlvo: '',
-  proposta: '',
-  diferenciais: ['', '', ''],
-  storytelling: '',
-  formatoProduto: '',
+  publicoAlvo:     '',
+  proposta:        '',
+  storytelling:    '',
+  formatoProduto:  '',
+  diferenciais:    ['', '', ''],
 }
 
-type DiagStep = 'idle' | 'zonas' | 'calibracao' | 'declaracao'
+const initialPilarStates: Record<PilarField, PilarState> = {
+  publicoAlvo:    { locked: true, status: 'bloqueado' },
+  proposta:       { locked: true, status: 'bloqueado' },
+  storytelling:   { locked: true, status: 'bloqueado' },
+  formatoProduto: { locked: true, status: 'bloqueado' },
+}
 
 /* ─────────────────────────────────────────────
    COMPONENTE PRINCIPAL
 ───────────────────────────────────────────── */
 function PosicionamentoPage() {
-  const [data, setData]         = useState<PosicionamentoData>(initialData)
-  const [editing, setEditing]   = useState<string | null>(null)
-  const [saved, setSaved]       = useState(false)
+  const [data, setData]               = useState<PosicionamentoData>(initialData)
+  const [editing, setEditing]         = useState<string | null>(null)
+  const [saved, setSaved]             = useState(false)
+  const [genLocked, setGenLocked]     = useState(true)
+  const [pilarStates, setPilarStates] = useState(initialPilarStates)
 
-  // Diagnóstico de Zona de Genialidade
-  const [diagStep, setDiagStep] = useState<DiagStep>('idle')
-  const [zonas, setZonas]       = useState<Record<string, string>>({ incompetencia:'', competencia:'', excelencia:'', genialidade:'' })
-  const [calib, setCalib]       = useState<Record<string, string>>({ q1:'', q2:'', q3:'' })
+  function updateField(field: PilarField, value: string) {
+    setData(prev => ({ ...prev, [field]: value }))
+    setPilarStates(prev => ({
+      ...prev,
+      [field]: {
+        ...prev[field],
+        status: value.trim().length > 0 ? 'definido' : 'descobrindo',
+      },
+    }))
+  }
 
   function handleSave() {
     setSaved(true)
@@ -117,356 +138,303 @@ function PosicionamentoPage() {
     setTimeout(() => setSaved(false), 2000)
   }
 
-  function updateField(field: keyof PosicionamentoData, value: string) {
-    setData(prev => ({ ...prev, [field]: value }))
-  }
+  const totalBlocos = PILARES.length + 1
+  const preenchidos = PILARES.filter(p => data[p.id].trim().length > 0).length
+                    + (data.zonaGenialidade.trim() ? 1 : 0)
+  const desbloqueados = PILARES.filter(p => !pilarStates[p.id].locked).length
+                      + (genLocked ? 0 : 1)
+  const completionPct = desbloqueados === 0
+    ? 0
+    : Math.round((preenchidos / totalBlocos) * 100)
 
-  function updateDiferencial(index: number, value: string) {
-    setData(prev => {
-      const d = [...prev.diferenciais]
-      d[index] = value
-      return { ...prev, diferenciais: d }
-    })
-  }
-
-  function finalizarDiagnostico() {
-    const decl = zonas.genialidade.trim()
-      ? `${zonas.genialidade.trim()}${calib.q1.trim() ? ` — especialmente quando ${calib.q1.split(' ').slice(0,8).join(' ')}...` : ''}`
-      : ''
-    if (decl) updateField('zonaGenialidade', decl)
-    setDiagStep('idle')
-  }
-
-  const filledCount = [data.zonaGenialidade, data.publicoAlvo, data.proposta, data.storytelling, data.formatoProduto, ...data.diferenciais].filter(v => v.trim().length > 0).length
-  const completionPct = Math.round((filledCount / (5 + data.diferenciais.length)) * 100)
-
-  /* ── DIAGNÓSTICO MODAL ─────────────────── */
-  if (diagStep !== 'idle') {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Header do diagnóstico */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-black text-[#7B2FBE] uppercase tracking-widest mb-0.5">
-              {diagStep === 'zonas' ? 'Passo 1 de 3' : diagStep === 'calibracao' ? 'Passo 2 de 3' : 'Passo 3 de 3'}
-            </p>
-            <h2 className="text-base font-black text-gray-900 uppercase tracking-tight">
-              {diagStep === 'zonas' ? 'Mapeando suas Zonas' : diagStep === 'calibracao' ? 'Calibração' : 'Sua Declaração'}
-            </h2>
-          </div>
-          <button onClick={() => setDiagStep('idle')} className="text-gray-300 hover:text-gray-600 transition-colors">
-            <X size={20} />
-          </button>
-        </div>
-
-        <div className="flex-1 max-w-2xl mx-auto w-full px-6 py-8 space-y-5">
-
-          {/* ── PASSO 1: 4 zonas ─────────── */}
-          {diagStep === 'zonas' && (
-            <AnimatePresence>
-              <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-4">
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  Mapeie suas atividades em cada zona. Seja honesto — o objetivo é identificar onde você opera no modo genialidade.
-                </p>
-                {ZONAS.map((z) => (
-                  <motion.div key={z.id} variants={fadeInUp} className="bg-white rounded-2xl border border-gray-200 p-5">
-                    <div className="flex items-baseline gap-3 mb-3">
-                      <span className="text-[11px] font-black tracking-widest" style={{ color: z.cor }}>{z.num}</span>
-                      <div>
-                        <p className="text-sm font-black text-gray-900 uppercase tracking-tight">{z.label}</p>
-                        <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{z.desc}</p>
-                      </div>
-                    </div>
-                    <textarea
-                      value={zonas[z.id]}
-                      onChange={e => setZonas(prev => ({ ...prev, [z.id]: e.target.value }))}
-                      placeholder={z.placeholder}
-                      rows={3}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 resize-none transition-all"
-                      style={{ '--tw-ring-color': `${z.cor}30` } as React.CSSProperties}
-                      onFocus={e => (e.target.style.borderColor = z.cor)}
-                      onBlur={e => (e.target.style.borderColor = '')}
-                    />
-                  </motion.div>
-                ))}
-                <button
-                  onClick={() => setDiagStep('calibracao')}
-                  disabled={!zonas.genialidade.trim()}
-                  className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-40 disabled:cursor-not-allowed text-white font-black py-3.5 rounded-xl transition-colors text-sm uppercase tracking-wide"
-                >
-                  Próximo — Calibração <ArrowRight size={15} />
-                </button>
-              </motion.div>
-            </AnimatePresence>
-          )}
-
-          {/* ── PASSO 2: calibração ───────── */}
-          {diagStep === 'calibracao' && (
-            <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-4">
-              <p className="text-sm text-gray-500 leading-relaxed">
-                3 perguntas para refinar seu diagnóstico. Responda com exemplos reais — não com o que você acha que deveria responder.
-              </p>
-              {CALIBRACAO.map((q, i) => (
-                <motion.div key={q.id} variants={fadeInUp} className="bg-white rounded-2xl border border-gray-200 p-5">
-                  <p className="text-xs font-black text-[#7B2FBE] uppercase tracking-widest mb-2">Pergunta {i + 1}</p>
-                  <p className="text-sm font-semibold text-gray-900 leading-relaxed mb-3">{q.pergunta}</p>
-                  <textarea
-                    value={calib[q.id]}
-                    onChange={e => setCalib(prev => ({ ...prev, [q.id]: e.target.value }))}
-                    placeholder={q.placeholder}
-                    rows={3}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 resize-none"
-                  />
-                </motion.div>
-              ))}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setDiagStep('zonas')}
-                  className="flex items-center gap-1.5 px-4 py-3 border border-gray-200 rounded-xl text-sm font-bold text-gray-500 hover:text-gray-900 hover:border-gray-300 transition-colors"
-                >
-                  <ArrowLeft size={14} /> Voltar
-                </button>
-                <button
-                  onClick={() => setDiagStep('declaracao')}
-                  disabled={!calib.q1.trim() || !calib.q2.trim() || !calib.q3.trim()}
-                  className="flex-1 flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-40 disabled:cursor-not-allowed text-white font-black py-3 rounded-xl transition-colors text-sm uppercase tracking-wide"
-                >
-                  Gerar Declaração <ArrowRight size={15} />
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ── PASSO 3: declaração ──────── */}
-          {diagStep === 'declaracao' && (
-            <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-5">
-              <motion.div variants={fadeInUp} className="bg-[#7B2FBE]/5 border border-[#7B2FBE]/20 rounded-2xl p-6">
-                <p className="text-[10px] font-black text-[#7B2FBE] uppercase tracking-widest mb-3">Zona de Genialidade identificada</p>
-                <p className="text-sm font-semibold text-gray-700 leading-relaxed mb-4">
-                  Com base no seu mapeamento e nas suas respostas de calibração, sua Zona de Genialidade aponta para:
-                </p>
-                <div className="bg-white rounded-xl border border-[#7B2FBE]/20 p-4">
-                  <p className="text-sm text-gray-900 leading-relaxed italic">"{zonas.genialidade}"</p>
-                </div>
-                <p className="text-xs text-gray-400 mt-3 leading-relaxed">
-                  Esta é sua declaração preliminar. Edite abaixo para refinar a linguagem antes de salvar.
-                </p>
-              </motion.div>
-
-              <motion.div variants={fadeInUp} className="bg-white rounded-2xl border border-gray-200 p-5">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Refinar declaração</p>
-                <textarea
-                  value={zonas.genialidade}
-                  onChange={e => setZonas(prev => ({ ...prev, genialidade: e.target.value }))}
-                  rows={4}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 resize-none"
-                />
-              </motion.div>
-
-              {/* síntese das zonas */}
-              <motion.div variants={fadeInUp} className="bg-white rounded-2xl border border-gray-200 p-5">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Seu mapa completo</p>
-                <div className="space-y-3">
-                  {ZONAS.map(z => zonas[z.id] ? (
-                    <div key={z.id} className="flex items-start gap-3">
-                      <span className="text-[10px] font-black tracking-widest mt-0.5 w-5 flex-shrink-0" style={{ color: z.cor }}>{z.num}</span>
-                      <div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{z.label}</p>
-                        <p className="text-xs text-gray-700 leading-relaxed mt-0.5">{zonas[z.id]}</p>
-                      </div>
-                    </div>
-                  ) : null)}
-                </div>
-              </motion.div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setDiagStep('calibracao')}
-                  className="flex items-center gap-1.5 px-4 py-3 border border-gray-200 rounded-xl text-sm font-bold text-gray-500 hover:text-gray-900 hover:border-gray-300 transition-colors"
-                >
-                  <ArrowLeft size={14} /> Voltar
-                </button>
-                <button
-                  onClick={finalizarDiagnostico}
-                  className="flex-1 flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white font-black py-3 rounded-xl transition-colors text-sm uppercase tracking-wide"
-                >
-                  <Check size={15} /> Salvar Declaração
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-        </div>
-      </div>
-    )
-  }
-
-  /* ── VISTA PRINCIPAL ───────────────────── */
   return (
     <div className="space-y-6">
 
-      {/* Header */}
+      {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Posicionamento & Autoridade</h1>
-          <p className="text-gray-400 mt-1 text-sm">Defina sua Zona de Genialidade e posicionamento de mercado</p>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Quem Você É no Mercado</h1>
+          <p className="text-gray-500 mt-1 text-sm">
+            Construído sessão a sessão com seu mentor — cada bloco desbloqueado é um passo da sua jornada
+          </p>
         </div>
         <button
           onClick={handleSave}
-          className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-black px-4 py-2.5 rounded-xl transition-colors uppercase tracking-wide"
+          className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6D28D9] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all"
         >
           <Save size={15} />
           {saved ? 'Salvo!' : 'Salvar'}
         </button>
       </div>
 
-      {/* Progresso */}
+      {/* ── Progresso ── */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5"
+        className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
       >
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-black text-gray-900 uppercase tracking-tight">Perfil de Autoridade</p>
-          <span className="text-sm font-black text-[#7B2FBE]">{completionPct}%</span>
+          <div>
+            <p className="text-sm font-semibold text-gray-800">Seu Perfil de Autoridade</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {desbloqueados} de {totalBlocos} blocos desbloqueados pelo mentor
+            </p>
+          </div>
+          <span className="text-xl font-bold text-[#7B2FBE]">{completionPct}%</span>
         </div>
-        <div className="w-full h-1.5 rounded-full bg-gray-100">
+        <div className="w-full h-2 rounded-full bg-gray-100">
           <div
-            className="h-full rounded-full transition-all duration-500"
+            className="h-full rounded-full transition-all duration-700"
             style={{ width: `${completionPct}%`, background: 'linear-gradient(90deg, #7B2FBE, #a855f7)' }}
           />
         </div>
-        <p className="text-xs text-gray-400 mt-2">Quanto mais completo, maior sua clareza de posicionamento</p>
+        {desbloqueados === 0 && (
+          <p className="text-xs text-gray-400 mt-3 text-center">
+            Os blocos serão desbloqueados à medida que você avança nas sessões com seu mentor
+          </p>
+        )}
       </motion.div>
 
-      {/* ── ZONA DE GENIALIDADE (destaque) ── */}
+      {/* ── BLOCO 00 — Seu Maior Diferencial ── */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className={`rounded-2xl border p-5 transition-all ${
-          data.zonaGenialidade
-            ? 'bg-[#7B2FBE]/5 border-[#7B2FBE]/25'
-            : 'bg-white border-gray-200 shadow-sm'
-        }`}
+        className={cn(
+          'rounded-2xl border p-6 transition-all duration-300',
+          genLocked
+            ? 'bg-gray-50 border-gray-100'
+            : data.zonaGenialidade
+              ? 'bg-[#7B2FBE]/5 border-[#7B2FBE]/25'
+              : 'bg-white border-gray-100 shadow-sm'
+        )}
       >
+        {/* Header do bloco */}
         <div className="flex items-start justify-between gap-4 mb-4">
-          <div>
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-[11px] font-black text-[#7B2FBE] tracking-widest">00</span>
-              <p className="text-base font-black text-gray-900 uppercase tracking-tight">Zona de Genialidade</p>
+          <div className="flex items-start gap-3">
+            <div className={cn(
+              'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5',
+              genLocked ? 'bg-gray-200' : 'bg-[#7B2FBE]/10'
+            )}>
+              {genLocked
+                ? <Lock size={15} className="text-gray-400" />
+                : <Sparkles size={15} className="text-[#7B2FBE]" />
+              }
             </div>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              Onde talento + paixão + impacto convergem. Seu diferencial absoluto de mercado.
-            </p>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">00</span>
+                <p className={cn('text-base font-bold', genLocked ? 'text-gray-400' : 'text-gray-900')}>
+                  Seu Maior Diferencial
+                </p>
+                <span
+                  className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full"
+                  style={{
+                    color:      genLocked ? statusConfig.bloqueado.color : data.zonaGenialidade ? statusConfig.validado.color : statusConfig.descobrindo.color,
+                    background: genLocked ? statusConfig.bloqueado.bg   : data.zonaGenialidade ? statusConfig.validado.bg   : statusConfig.descobrindo.bg,
+                  }}
+                >
+                  {genLocked ? 'Aguardando sessão' : data.zonaGenialidade ? 'Definido' : 'Em descoberta'}
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Onde seu talento, sua paixão e o impacto que você gera convergem em algo único
+              </p>
+            </div>
           </div>
-          {data.zonaGenialidade && (
-            <button onClick={() => setEditing(editing === 'zona' ? null : 'zona')} className="text-gray-300 hover:text-gray-600 transition-colors flex-shrink-0">
-              <Edit3 size={15} />
+          {!genLocked && data.zonaGenialidade && (
+            <button
+              onClick={() => setEditing(editing === 'gen' ? null : 'gen')}
+              className="text-gray-300 hover:text-gray-600 transition-colors flex-shrink-0"
+            >
+              <Edit3 size={14} />
             </button>
           )}
         </div>
 
-        {data.zonaGenialidade && editing !== 'zona' ? (
-          <div className="bg-white rounded-xl border border-[#7B2FBE]/15 p-4 mb-4">
-            <p className="text-sm text-gray-800 leading-relaxed italic">"{data.zonaGenialidade}"</p>
+        {/* Conteúdo — bloqueado */}
+        {genLocked ? (
+          <div className="ml-11 space-y-3">
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Seu maior diferencial será revelado ao longo da mentoria. A cada sessão, você vai descobrir mais sobre o que te torna único no mercado.
+            </p>
+            <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-white border border-gray-200">
+              <Lock size={13} className="text-gray-300 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Este bloco é desbloqueado pelo seu mentor quando chega o momento certo na sua jornada — geralmente após as sessões de mapeamento do seu potencial.
+              </p>
+            </div>
           </div>
-        ) : editing === 'zona' ? (
-          <textarea
-            autoFocus
-            value={data.zonaGenialidade}
-            onChange={e => updateField('zonaGenialidade', e.target.value)}
-            rows={3}
-            className="w-full bg-white border border-[#7B2FBE]/30 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 resize-none mb-4"
-          />
-        ) : null}
-
-        <button
-          onClick={() => setDiagStep('zonas')}
-          className={`flex items-center gap-2 text-sm font-black uppercase tracking-wide transition-colors ${
-            data.zonaGenialidade
-              ? 'text-[#7B2FBE] hover:text-[#6a27a5]'
-              : 'w-full justify-center bg-[#7B2FBE] hover:bg-[#6a27a5] text-white py-3 rounded-xl'
-          }`}
-        >
-          {data.zonaGenialidade ? (
-            <><ArrowRight size={14} /> Refazer diagnóstico</>
-          ) : (
-            <><ArrowRight size={15} /> Iniciar diagnóstico guiado</>
-          )}
-        </button>
-      </motion.div>
-
-      {/* ── PILARES ──────────────────────── */}
-      <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid md:grid-cols-2 gap-4">
-        {PILARES.map((p) => {
-          const isEditing = editing === p.id
-          const value = data[p.field] as string
-          return (
-            <motion.div
-              key={p.id}
-              variants={fadeInUp}
-              className={`rounded-2xl border p-5 bg-white transition-all ${
-                isEditing ? 'border-[#7B2FBE]/40 shadow-md shadow-[#7B2FBE]/5' : 'border-gray-200 shadow-sm hover:border-gray-300'
-              }`}
-            >
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div>
-                  <div className="flex items-baseline gap-2 mb-0.5">
-                    <span className="text-[11px] font-black text-[#7B2FBE] tracking-widest">{p.num}</span>
-                    <p className="text-sm font-black text-gray-900 uppercase tracking-tight">{p.label}</p>
-                  </div>
-                  <p className="text-xs text-gray-400 leading-relaxed">{p.desc}</p>
-                </div>
-                <button onClick={() => setEditing(isEditing ? null : p.id)} className="text-gray-300 hover:text-gray-600 transition-colors flex-shrink-0">
-                  <Edit3 size={14} />
-                </button>
-              </div>
-
-              {isEditing ? (
+        ) : (
+          /* Conteúdo — desbloqueado */
+          <div className="ml-11 space-y-3">
+            {editing === 'gen' || !data.zonaGenialidade ? (
+              <>
                 <textarea
-                  autoFocus
-                  value={value}
-                  onChange={e => updateField(p.field, e.target.value)}
-                  placeholder={p.placeholder}
-                  rows={4}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 resize-none"
+                  autoFocus={editing === 'gen'}
+                  value={data.zonaGenialidade}
+                  onChange={e => setData(prev => ({ ...prev, zonaGenialidade: e.target.value }))}
+                  placeholder="Descreva em uma frase o que te torna único — o cruzamento entre o que você faz de melhor e o impacto que isso gera..."
+                  rows={3}
+                  className="w-full bg-white border border-[#7B2FBE]/30 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 resize-none"
                 />
-              ) : (
-                <div
-                  onClick={() => setEditing(p.id)}
-                  className="min-h-[72px] cursor-text rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5"
-                >
-                  {value ? (
-                    <p className="text-sm text-gray-700 leading-relaxed">{value}</p>
-                  ) : (
-                    <p className="text-sm text-gray-300 italic flex items-center gap-1">
-                      <Edit3 size={11} /> Clique para preencher...
-                    </p>
-                  )}
-                </div>
-              )}
-            </motion.div>
-          )
-        })}
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3.5 py-2.5 leading-relaxed">
+                  Dica: seja específico. Não é "sou bom em comunicação" — é "transformo conhecimento técnico em narrativas simples que fazem pessoas decidirem agir".
+                </p>
+              </>
+            ) : (
+              <div className="bg-white rounded-xl border border-[#7B2FBE]/20 px-4 py-3.5">
+                <p className="text-sm text-gray-800 leading-relaxed italic">"{data.zonaGenialidade}"</p>
+              </div>
+            )}
+          </div>
+        )}
       </motion.div>
 
-      {/* ── DIFERENCIAIS ─────────────────── */}
+      {/* ── OS 4 PILARES ── */}
+      <div>
+        <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
+          Os 4 Pilares da Sua Marca
+        </h2>
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="grid md:grid-cols-2 gap-4"
+        >
+          {PILARES.map((pilar) => {
+            const state    = pilarStates[pilar.id]
+            const isLocked = state.locked
+            const status   = state.status
+            const sConfig  = statusConfig[status]
+            const value    = data[pilar.id]
+            const isEditing = editing === pilar.id
+
+            return (
+              <motion.div
+                key={pilar.id}
+                variants={fadeInUp}
+                className={cn(
+                  'rounded-2xl border p-5 transition-all duration-300',
+                  isLocked
+                    ? 'bg-gray-50 border-gray-100'
+                    : isEditing
+                      ? 'bg-white border-[#7B2FBE]/40 shadow-md'
+                      : 'bg-white border-gray-100 shadow-sm hover:border-gray-200 hover:shadow'
+                )}
+              >
+                {/* Pilar header */}
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="flex items-start gap-2.5">
+                    <div className={cn(
+                      'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5',
+                      isLocked ? 'bg-gray-200' : 'bg-[#7B2FBE]/10'
+                    )}>
+                      {isLocked
+                        ? <Lock size={13} className="text-gray-400" />
+                        : <Unlock size={13} className="text-[#7B2FBE]" />
+                      }
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">{pilar.num}</span>
+                        <p className={cn('text-sm font-semibold', isLocked ? 'text-gray-400' : 'text-gray-900')}>
+                          {pilar.label}
+                        </p>
+                      </div>
+                      <p className="text-xs text-gray-400 leading-relaxed">{pilar.desc}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <span
+                      className="text-[10px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap"
+                      style={{ color: sConfig.color, background: sConfig.bg }}
+                    >
+                      {sConfig.label}
+                    </span>
+                    {!isLocked && (
+                      <button
+                        onClick={() => setEditing(isEditing ? null : pilar.id)}
+                        className="text-gray-300 hover:text-gray-600 transition-colors"
+                      >
+                        <Edit3 size={13} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Pilar content */}
+                {isLocked ? (
+                  <div className="ml-9 space-y-3">
+                    <p className="text-xs text-gray-400 leading-relaxed">{pilar.lockDesc}</p>
+                    <div className="flex items-start gap-2 p-3 rounded-xl bg-white border border-gray-200">
+                      <Lock size={11} className="text-gray-300 mt-0.5 flex-shrink-0" />
+                      <p className="text-[11px] text-gray-400 italic">
+                        Desbloqueado pelo mentor na sessão correspondente da sua jornada
+                      </p>
+                    </div>
+                  </div>
+                ) : isEditing ? (
+                  <div className="ml-9 space-y-2.5">
+                    <textarea
+                      autoFocus
+                      value={value}
+                      onChange={e => updateField(pilar.id, e.target.value)}
+                      placeholder={pilar.placeholder}
+                      rows={4}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 resize-none"
+                    />
+                    <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5 leading-relaxed">
+                      {pilar.dica}
+                    </p>
+                  </div>
+                ) : (
+                  <div
+                    className="ml-9 min-h-[64px] cursor-text rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5"
+                    onClick={() => setEditing(pilar.id)}
+                  >
+                    {value.trim() ? (
+                      <p className="text-sm text-gray-700 leading-relaxed">{value}</p>
+                    ) : (
+                      <p className="text-sm text-gray-300 italic flex items-center gap-1.5">
+                        <Edit3 size={11} /> Clique para preencher...
+                      </p>
+                    )}
+                  </div>
+                )}
+              </motion.div>
+            )
+          })}
+        </motion.div>
+      </div>
+
+      {/* ── O QUE TE DESTACA ── */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5"
+        className="rounded-2xl bg-white border border-gray-100 shadow-sm p-5"
       >
         <div className="mb-4">
-          <div className="flex items-baseline gap-2 mb-0.5">
-            <span className="text-[11px] font-black text-[#7B2FBE] tracking-widest">05</span>
-            <p className="text-sm font-black text-gray-900 uppercase tracking-tight">Diferenciais Competitivos</p>
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">05</span>
+            <p className="text-sm font-semibold text-gray-900">O Que Te Destaca da Concorrência</p>
           </div>
-          <p className="text-xs text-gray-400">O que te distingue da concorrência — seja específico</p>
+          <p className="text-xs text-gray-500">
+            Diferenciais concretos descobertos e validados ao longo da sua mentoria
+          </p>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {data.diferenciais.map((d, i) => (
-            <div key={i} className="flex items-center gap-2.5">
-              <span className="text-[11px] font-black text-gray-300 w-4 flex-shrink-0 text-right">{i + 1}</span>
+            <div key={i} className="flex items-center gap-3">
+              <div className={cn(
+                'w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all',
+                d.trim() ? 'bg-[#7B2FBE]' : 'border-2 border-gray-200'
+              )}>
+                {d.trim() && <Check size={11} className="text-white" />}
+              </div>
               <input
                 type="text"
                 value={d}
-                onChange={e => updateDiferencial(i, e.target.value)}
-                placeholder={`Diferencial ${i + 1}...`}
-                className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-1 focus:ring-[#7B2FBE]/20"
+                onChange={e => {
+                  const next = [...data.diferenciais]
+                  next[i] = e.target.value
+                  setData(prev => ({ ...prev, diferenciais: next }))
+                }}
+                placeholder={`Diferencial ${i + 1} — ex: único no Brasil a combinar X com Y para Z`}
+                className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-1 focus:ring-[#7B2FBE]/20"
               />
             </div>
           ))}
