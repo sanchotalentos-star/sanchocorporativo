@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { Users, TrendingUp, Target, Award, ArrowRight, CheckCircle2, Circle, CalendarDays } from 'lucide-react'
+import { Users, TrendingUp, Target, Award, ArrowRight, CheckCircle2, Circle, CalendarDays, ChevronRight } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
@@ -148,6 +148,112 @@ function MembroDashboard() {
             <p className="text-5xl font-black text-white leading-none">{member.score}</p>
             <p className="text-white/50 text-xs mt-1 font-medium">de 100 pts</p>
           </div>
+        </div>
+      </motion.div>
+
+      {/* ── Mapa de Construção ── */}
+      <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="space-y-3">
+        <div>
+          <h2 className="text-sm font-bold text-gray-900">Mapa de Construção da sua Marca</h2>
+          <p className="text-xs text-gray-400 mt-0.5">
+            Cada etapa se apoia na anterior. Comece pela Identidade e avance com seu mentor.
+          </p>
+        </div>
+
+        {/* Cadeia — horizontal em telas grandes, vertical em mobile */}
+        <div className="flex flex-col lg:flex-row gap-1 lg:gap-0 lg:items-stretch">
+
+          {/* 01 Identidade */}
+          <Link to="/dashboard/membro/posicionamento" className="flex-1">
+            <div className="group h-full rounded-2xl lg:rounded-r-none lg:rounded-l-2xl border border-[#7B2FBE]/25 bg-[#7B2FBE]/[0.04] p-4 hover:bg-[#7B2FBE]/[0.07] transition-all cursor-pointer">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">01</span>
+                <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">Em construção</span>
+              </div>
+              <p className="text-sm font-bold text-gray-900 leading-tight">Identidade de Marca</p>
+              <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                Quem você é, para quem fala, o que entrega de diferente e como chega ao mercado
+              </p>
+              <div className="mt-3 pt-3 border-t border-[#7B2FBE]/15 flex items-center gap-1 text-[10px] font-bold text-[#7B2FBE] uppercase tracking-wide">
+                Preencher <ChevronRight size={10} />
+              </div>
+            </div>
+          </Link>
+
+          {/* Seta desktop */}
+          <div className="hidden lg:flex items-center justify-center w-7 flex-shrink-0 bg-gray-50 border-y border-gray-200 z-10">
+            <ArrowRight size={14} className="text-gray-300" />
+          </div>
+          {/* Seta mobile */}
+          <div className="flex lg:hidden items-center justify-center py-0.5">
+            <div className="w-px h-4 bg-gray-200" />
+          </div>
+
+          {/* 02 Pilares */}
+          <Link to="/dashboard/membro/pilares" className="flex-1">
+            <div className="group h-full border border-gray-200 bg-gray-50 p-4 hover:bg-gray-100 transition-all cursor-pointer">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-gray-400 tracking-widest">02</span>
+                <span className="text-[10px] font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Aguarda Identidade</span>
+              </div>
+              <p className="text-sm font-bold text-gray-400 leading-tight">Pilares da Marca</p>
+              <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">
+                As frentes estratégicas de construção de presença definidas a partir da sua identidade
+              </p>
+              <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase tracking-wide group-hover:text-gray-600 transition-colors">
+                Ver pilares <ChevronRight size={10} />
+              </div>
+            </div>
+          </Link>
+
+          <div className="hidden lg:flex items-center justify-center w-7 flex-shrink-0 bg-gray-50 border-y border-gray-200 z-10">
+            <ArrowRight size={14} className="text-gray-300" />
+          </div>
+          <div className="flex lg:hidden items-center justify-center py-0.5">
+            <div className="w-px h-4 bg-gray-200" />
+          </div>
+
+          {/* 03 Marketing */}
+          <Link to="/dashboard/membro/marketing" className="flex-1">
+            <div className="group h-full border border-gray-200 bg-gray-50 p-4 hover:bg-gray-100 transition-all cursor-pointer">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-gray-400 tracking-widest">03</span>
+                <span className="text-[10px] font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Aguarda Pilares</span>
+              </div>
+              <p className="text-sm font-bold text-gray-400 leading-tight">Marketing Anual</p>
+              <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">
+                Calendário de conteúdo e ações baseado nos pilares e no público definidos
+              </p>
+              <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase tracking-wide group-hover:text-gray-600 transition-colors">
+                Ver calendário <ChevronRight size={10} />
+              </div>
+            </div>
+          </Link>
+
+          <div className="hidden lg:flex items-center justify-center w-7 flex-shrink-0 bg-gray-50 border-y border-gray-200 z-10">
+            <ArrowRight size={14} className="text-gray-300" />
+          </div>
+          <div className="flex lg:hidden items-center justify-center py-0.5">
+            <div className="w-px h-4 bg-gray-200" />
+          </div>
+
+          {/* 04 Resultados */}
+          <Link to="/dashboard/membro/kpis" className="flex-1">
+            <div className="group h-full rounded-2xl lg:rounded-l-none lg:rounded-r-2xl border border-gray-200 bg-gray-50 p-4 hover:bg-gray-100 transition-all cursor-pointer">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-gray-400 tracking-widest">04</span>
+                <span className="text-[10px] font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Aguarda Execução</span>
+              </div>
+              <p className="text-sm font-bold text-gray-400 leading-tight">Resultados</p>
+              <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">
+                Indicadores de alcance, autoridade e crescimento ao longo da jornada
+              </p>
+              <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase tracking-wide group-hover:text-gray-600 transition-colors">
+                Ver indicadores <ChevronRight size={10} />
+              </div>
+            </div>
+          </Link>
+
         </div>
       </motion.div>
 

@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Lock, Sparkles, PenLine, MessageSquare, Search, Lightbulb, Target, Layers } from 'lucide-react'
+import { Lock, Sparkles, PenLine, MessageSquare, Search, Lightbulb, Target, Layers, ChevronRight } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
@@ -348,6 +348,55 @@ function PosicionamentoPage() {
               <p className="text-sm text-gray-800 leading-relaxed italic">"{genText}"</p>
             </div>
           )}
+        </div>
+      </motion.div>
+
+      {/* Esta construção alimenta */}
+      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+        className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
+      >
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Esta construção alimenta</p>
+        <div className="grid sm:grid-cols-3 gap-3">
+
+          <Link to="/dashboard/membro/pilares">
+            <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">02</span>
+                <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
+              </div>
+              <p className="text-sm font-bold text-gray-800 leading-tight mb-1.5">Pilares da Marca</p>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Seu público e sua proposta definem as frentes estratégicas de presença que o mentor vai construir com você.
+              </p>
+            </div>
+          </Link>
+
+          <Link to="/dashboard/membro/marketing">
+            <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">03</span>
+                <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
+              </div>
+              <p className="text-sm font-bold text-gray-800 leading-tight mb-1.5">Marketing Anual</p>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Sua história, seu diferencial e seu formato de produto guiam os temas, canais e frequência do calendário.
+              </p>
+            </div>
+          </Link>
+
+          <Link to="/dashboard/membro/kpis">
+            <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest">04</span>
+                <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
+              </div>
+              <p className="text-sm font-bold text-gray-800 leading-tight mb-1.5">Resultados</p>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                A clareza do seu posicionamento determina quais indicadores fazem sentido acompanhar na sua jornada.
+              </p>
+            </div>
+          </Link>
+
         </div>
       </motion.div>
 
