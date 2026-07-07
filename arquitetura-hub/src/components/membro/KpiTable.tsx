@@ -45,7 +45,7 @@ export function KpiTable({ kpis, onUpdateAtual }: KpiTableProps) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-100 bg-gray-50">
-            <th className="text-left px-4 py-3 font-black text-gray-400 text-[10px] uppercase tracking-widest">KPI</th>
+            <th className="text-left px-4 py-3 font-black text-gray-400 text-[10px] uppercase tracking-widest">Indicador</th>
             <th className="text-left px-4 py-3 font-black text-gray-400 text-[10px] uppercase tracking-widest">Categoria</th>
             <th className="text-right px-4 py-3 font-black text-gray-400 text-[10px] uppercase tracking-widest">Atual</th>
             <th className="text-right px-4 py-3 font-black text-gray-400 text-[10px] uppercase tracking-widest">Meta</th>
@@ -121,7 +121,7 @@ export function KpiTable({ kpis, onUpdateAtual }: KpiTableProps) {
                     className="text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wide"
                     style={{ background: `${statusColor}12`, color: statusColor }}
                   >
-                    {status === 'green' ? 'No alvo' : status === 'yellow' ? 'Atenção' : 'Crítico'}
+                    {status === 'green' ? 'No alvo' : status === 'yellow' ? 'Atenção' : 'Abaixo'}
                   </span>
                 </td>
                 <td className="px-4 py-3">

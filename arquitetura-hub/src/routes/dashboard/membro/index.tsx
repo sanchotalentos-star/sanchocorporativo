@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { Users, TrendingUp, Target, Award, ArrowRight, CheckCircle2, Circle, CalendarDays, ChevronRight } from 'lucide-react'
+import { Users, TrendingUp, Target, Award, ArrowRight, CheckCircle2, Circle, CalendarDays, ChevronRight, Star } from 'lucide-react'
+import { toast } from 'sonner'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
@@ -109,11 +110,15 @@ function MembroDashboard() {
     .slice(0, 4)
 
   function toggleAcao(i: number) {
+    const wasDone = concluidas.has(i)
     setConcluidas(prev => {
       const next = new Set(prev)
       next.has(i) ? next.delete(i) : next.add(i)
       return next
     })
+    if (!wasDone) {
+      toast.success('Ação concluída!', { description: acoes[i].texto })
+    }
   }
 
   return (
@@ -409,6 +414,37 @@ function MembroDashboard() {
           </div>
         </motion.div>
       </div>
+
+      {/* Marcos da Jornada */}
+      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+        className="rounded-2xl bg-white border border-gray-100 shadow-sm p-5"
+      >
+        <div className="flex items-center gap-2 mb-4">
+          <Star size={15} className="text-[#7B2FBE]" />
+          <h3 className="text-sm font-bold text-gray-900">Marcos da Jornada</h3>
+        </div>
+        <div className="space-y-3">
+          {[
+            { label: 'Entrou no programa Arquitetura de Relevância',  done: true  },
+            { label: 'Preencheu a primeira reflexão em Minha Identidade', done: false },
+            { label: 'Identidade construída e validada com o mentor',  done: false },
+            { label: 'Pilares da Marca definidos na sessão',            done: false },
+            { label: 'Primeiro ciclo de Marketing Anual em execução',   done: false },
+            { label: 'Primeiro ciclo de resultados revisado com mentor', done: false },
+          ].map((marco, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
+                marco.done ? 'bg-[#7B2FBE]' : 'border-2 border-gray-200'
+              }`}>
+                {marco.done && <span className="text-[10px] text-white font-black">✓</span>}
+              </div>
+              <p className={`text-sm leading-tight ${marco.done ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
+                {marco.label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </motion.div>
 
       {/* Jornada do Programa */}
       <motion.div

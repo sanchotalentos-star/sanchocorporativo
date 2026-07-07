@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { Users, TrendingUp, Target, Award } from 'lucide-react'
+import { Users, TrendingUp, Target, Award, Link as LinkIcon } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { GlobalKpiOverview } from '@/components/admin/GlobalKpiOverview'
 import { Progress } from '@/components/ui/progress'
@@ -21,8 +22,8 @@ function AdminOverview() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Painel Administrativo</h1>
-        <p className="text-gray-400 mt-1 text-sm">Visão geral de todos os participantes do programa</p>
+        <h1 className="text-2xl font-bold text-gray-900">Painel do Mentor</h1>
+        <p className="text-gray-400 mt-1 text-sm">Visão geral de todos os mentorados e evolução do programa</p>
       </div>
 
       <motion.div
@@ -38,12 +39,12 @@ function AdminOverview() {
       </motion.div>
 
       <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5">
-        <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight mb-4">Crescimento Agregado — Últimos 6 Meses</h3>
+        <h3 className="text-sm font-bold text-gray-900 mb-4">Crescimento Agregado nos Últimos 6 Meses</h3>
         <GlobalKpiOverview data={mockAggregateGrowth} />
       </div>
 
       <div>
-        <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Participantes</h2>
+        <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Mentorados</h2>
         <motion.div
           variants={staggerContainer}
           initial="hidden"
@@ -57,7 +58,7 @@ function AdminOverview() {
               <motion.div key={member.id} variants={fadeInUp}>
                 <div className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 p-5 transition-all">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg bg-gray-900 flex items-center justify-center text-white font-black text-sm">
+                    <div className="w-10 h-10 rounded-xl bg-[#7B2FBE] flex items-center justify-center text-white font-black text-sm flex-shrink-0">
                       {member.full_name.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -84,6 +85,11 @@ function AdminOverview() {
                         </p>
                       </div>
                     </div>
+                    <Link to="/dashboard/admin/membros"
+                      className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-[#7B2FBE] hover:underline"
+                    >
+                      Gerenciar jornada
+                    </Link>
                   </div>
                 </div>
               </motion.div>

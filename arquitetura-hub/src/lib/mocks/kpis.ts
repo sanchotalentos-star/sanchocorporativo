@@ -26,7 +26,7 @@ export const mockKpis: KpiEntry[] = [
   {
     id: 'kpi-3',
     user_id: 'member-1',
-    kpi_name: 'Score de Autoridade',
+    kpi_name: 'Pontos de Evolução',
     category: 'Autoridade',
     meta: 100,
     atual: 82,
@@ -37,7 +37,7 @@ export const mockKpis: KpiEntry[] = [
   {
     id: 'kpi-4',
     user_id: 'member-1',
-    kpi_name: 'Menções & Citações',
+    kpi_name: 'Menções e Citações',
     category: 'Mídia',
     meta: 20,
     atual: 14,

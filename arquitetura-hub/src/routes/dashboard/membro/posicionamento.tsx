@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { toast } from 'sonner'
 import { Lock, Sparkles, PenLine, MessageSquare, Search, Lightbulb, Target, Layers, ChevronRight } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
@@ -121,8 +122,26 @@ function PosicionamentoPage() {
   const [genLocked]                     = useState(true)
   const [genText]                       = useState('')
   const [diferenciais, setDiferenciais] = useState(['', '', ''])
+  const toastedFields                   = useState(() => new Set<PilarField>())[0]
+
+  const pilarLabels: Record<PilarField, string> = {
+    publicoAlvo:    'Para Quem Você Fala',
+    proposta:       'O Que Você Entrega de Diferente',
+    storytelling:   'Sua História que Conecta',
+    formatoProduto: 'Como Você Chega ao Mercado',
+  }
 
   function updateReflexao(field: PilarField, value: string) {
+    const wasEmpty = !pilares[field].reflexao.trim()
+    const isNowFilled = value.trim().length > 0
+
+    if (wasEmpty && isNowFilled && !toastedFields.has(field)) {
+      toastedFields.add(field)
+      toast.success(`Reflexão iniciada: ${pilarLabels[field]}`, {
+        description: 'Ótimo! Leve isso para a sessão com seu mentor.',
+      })
+    }
+
     setPilares(prev => {
       const current = prev[field]
       const newStatus: PilarStatus = current.analise
