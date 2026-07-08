@@ -86,9 +86,9 @@ function AuthPage() {
             Programa de Autoridade
           </span>
           <h1 className="text-white font-bold leading-[1.05] mb-6" style={{ fontSize: 'clamp(2.5rem, 4.5vw, 4.5rem)' }}>
-            Construa sua<br />
-            <span className="text-[#7B2FBE]">Autoridade</span><br />
-            de Mercado.
+            Arquitete sua<br />
+            <span className="text-[#7B2FBE]">Relevância</span><br />
+            no Mercado.
           </h1>
           <p className="text-white/45 text-base leading-relaxed max-w-sm font-light">
             Acompanhe sua jornada de posicionamento e evolua com métricas reais de autoridade.
