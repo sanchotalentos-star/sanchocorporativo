@@ -60,7 +60,7 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
       descricao: `Tornar visível a transformação que você gera: "${tag(proposta)}"`,
       acoes: [
         `Documentar 1 caso real de cliente por mês, mostrando o antes e o depois da transformação`,
-        `Criar série de conteúdo explicando o seu método — o "como" por trás do que você entrega`,
+        `Criar série de conteúdo explicando o seu método e o processo por trás do que você entrega`,
         `Pedir depoimento em vídeo de 2 clientes que já viveram a transformação que você propõe`,
         `Produzir 1 conteúdo/mês mostrando os bastidores do seu processo de trabalho`,
       ],
@@ -75,11 +75,15 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
         ? `Construir autoridade ao vivo posicionando: "${tag(diferencial)}" como ponto de vista único`
         : proposta
           ? `Falar publicamente sobre como você entrega: "${tag(proposta)}"`
-          : 'Construir autoridade fora das redes — onde a confiança se consolida mais rápido',
+          : 'Construir autoridade fora das redes, onde a confiança se consolida mais rápido',
       acoes: [
-        `Candidatar-se para falar em 1 evento, summit ou encontro do seu setor por trimestre`,
-        `Propor participação em podcasts e lives do seu mercado como especialista convidado`,
-        `Propor co-criação de conteúdo ao vivo com 2 parceiros estratégicos do seu setor`,
+        publicoAlvo
+          ? `Candidatar-se para falar em 1 evento por trimestre onde "${tag(publicoAlvo, 45)}" está presente`
+          : `Candidatar-se para falar em 1 evento ou summit por trimestre no seu nicho`,
+        `Propor participação em podcasts e lives como especialista convidado`,
+        publicoAlvo
+          ? `Propor co-criação ao vivo com 2 parceiros que atendem o mesmo público que você`
+          : `Propor co-criação ao vivo com 2 parceiros estratégicos complementares`,
         storytelling
           ? `Estruturar sua história de virada como palestra-âncora de 20 minutos`
           : `Desenvolver uma palestra-âncora a partir do ponto de vista único que você tem`,

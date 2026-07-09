@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2, ChevronDown, ChevronUp, ChevronRight, Sparkles, BookOpen, Star, Users, Lightbulb, Layers, X } from 'lucide-react'
+import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2, ChevronDown, ChevronUp, ChevronRight, Sparkles, BookOpen, Star, Users, Lightbulb, Layers, X, Trophy, Globe } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { getIdentidade } from '@/lib/identidade'
@@ -12,8 +12,8 @@ export const Route = createFileRoute('/dashboard/membro/marketing')({
   component: MarketingPage,
 })
 
-type Canal = 'LinkedIn' | 'Instagram' | 'YouTube' | 'Podcast' | 'Email' | 'Blog' | 'Live'
-type Frequencia = 'Semanal' | 'Quinzenal' | 'Mensal' | 'Diário'
+type Canal = 'LinkedIn' | 'Instagram' | 'YouTube' | 'Podcast' | 'Email' | 'Blog' | 'Live' | 'Evento Próprio' | 'Evento Parceiro'
+type Frequencia = 'Diário' | 'Semanal' | 'Quinzenal' | 'Mensal' | 'Trimestral' | 'Anual'
 
 interface AcaoMarketing {
   id: string
@@ -32,6 +32,8 @@ const canalIcons: Record<Canal, React.ElementType> = {
   Email: Mail,
   Blog: FileText,
   Live: Video,
+  'Evento Próprio': Trophy,
+  'Evento Parceiro': Globe,
 }
 
 const canalColors: Record<Canal, string> = {
@@ -42,6 +44,8 @@ const canalColors: Record<Canal, string> = {
   Email: '#10B981',
   Blog: '#6B7280',
   Live: '#EC4899',
+  'Evento Próprio': '#8B5CF6',
+  'Evento Parceiro': '#0EA5E9',
 }
 
 const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
@@ -117,6 +121,24 @@ function SementesDeConteudo({ publicoAlvo, proposta, formatoProduto, diferenciai
       descricao: `Use sua história "${storytelling.slice(0, 60)}..." como âncora. Conte o que te trouxe até aqui e por que isso importa para quem te acompanha.`,
       cor: '#8B5CF6',
     }] : []),
+    {
+      icon: Trophy,
+      label: 'Evento Próprio',
+      titulo: 'Crie o seu espaço de autoridade',
+      descricao: proposta
+        ? `Organize 1 evento no ano posicionado em torno de: "${proposta.slice(0, 55)}...". Pode ser online ou presencial — o que importa é que você seja o anfitrião da conversa.`
+        : 'Organize 1 evento no ano onde você é o anfitrião da conversa. Webinar, workshop, masterclass ou encontro presencial — você define o palco.',
+      cor: '#8B5CF6',
+    },
+    {
+      icon: Globe,
+      label: 'Evento Parceiro',
+      titulo: 'Apareça em palcos de terceiros',
+      descricao: publicoAlvo
+        ? `Mapeie eventos, congressos e encontros onde "${publicoAlvo.slice(0, 50)}..." está presente. Candidate-se como palestrante, painelista ou convidado especial.`
+        : 'Mapeie os principais eventos do seu mercado e candidate-se como palestrante ou convidado. Presença em palcos de terceiros acelera credibilidade.',
+      cor: '#0EA5E9',
+    },
   ]
 
   return (
@@ -332,7 +354,7 @@ function MarketingPage() {
                     onChange={e => setNovaForm(f => ({ ...f, frequencia: e.target.value as Frequencia }))}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-[#7B2FBE] transition-colors bg-white"
                   >
-                    {(['Diário','Semanal','Quinzenal','Mensal'] as Frequencia[]).map(f => <option key={f}>{f}</option>)}
+                    {(['Diário','Semanal','Quinzenal','Mensal','Trimestral','Anual'] as Frequencia[]).map(f => <option key={f}>{f}</option>)}
                   </select>
                 </div>
               </div>
@@ -396,7 +418,7 @@ function MarketingPage() {
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-medium text-[#7B2FBE]">01</span>
               <p className="text-sm font-medium text-gray-800">Base de Identidade</p>
-              <span className="text-xs text-gray-400">— ponto de partida do seu marketing</span>
+              <span className="text-xs text-gray-400">· ponto de partida do seu marketing</span>
             </div>
             {identidadeOpen
               ? <ChevronUp size={14} className="text-gray-400 flex-shrink-0" />
