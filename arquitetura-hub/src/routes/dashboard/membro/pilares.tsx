@@ -29,67 +29,95 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
   const proposta       = identidade?.pilares.proposta?.reflexao?.trim()
   const storytelling   = identidade?.pilares.storytelling?.reflexao?.trim()
   const formatoProduto = identidade?.pilares.formatoProduto?.reflexao?.trim()
-  const diferencial    = identidade?.diferenciais?.find(d => d.trim()) ?? ''
+  const diferenciais   = identidade?.diferenciais?.filter(d => d.trim()) ?? []
+  const diferencial    = diferenciais[0] ?? ''
 
-  // Extrai a primeira frase ou primeiras palavras de um texto longo
-  const curto = (text: string, max = 50) => {
-    const frase = text.split(/[.!?]/)[0].trim()
-    return frase.length <= max ? frase : frase.slice(0, max).trimEnd() + '...'
-  }
+  // Trunca para uso inline, preservando legibilidade
+  const tag = (text: string, max = 55) =>
+    text.length <= max ? text : text.slice(0, max).trimEnd() + '...'
 
   const sugestoes: SugestaoPilar[] = [
+
+    // Pilar 1: Presença Direcionada — quem você alcança e onde
     publicoAlvo ? {
       id: 'presenca',
       cor: '#3B82F6',
       nome: 'Presença Direcionada',
-      descricao: `Visibilidade focada em "${publicoAlvo.slice(0, 65)}${publicoAlvo.length > 65 ? '...' : ''}"`,
+      descricao: `Alcançar "${tag(publicoAlvo)}" nos canais e espaços onde essa pessoa já está`,
       acoes: [
-        `Publicar 2 conteúdos por semana falando diretamente para ${curto(publicoAlvo)}`,
-        `Participar de 1 comunidade ou evento onde ${curto(publicoAlvo)} está presente`,
-        `Produzir 1 conteúdo/mês respondendo as principais dúvidas de ${curto(publicoAlvo)}`,
+        `Mapear os 3 principais canais, comunidades e eventos onde seu público está presente`,
+        `Criar 2 conteúdos/semana que respondam as dúvidas reais de quem você descreveu como público`,
+        `Participar ativamente de 1 grupo ou fórum frequentado pelo seu público-alvo`,
+        `Fazer 3 conexões por semana com perfis que se encaixam no público que você descreveu`,
       ],
     } : null,
+
+    // Pilar 2: Autoridade pela Entrega — provar a transformação
     proposta ? {
       id: 'autoridade',
       cor: '#7B2FBE',
       nome: 'Autoridade pela Entrega',
-      descricao: `Demonstrar como você entrega "${proposta.slice(0, 65)}${proposta.length > 65 ? '...' : ''}"`,
+      descricao: `Tornar visível a transformação que você gera: "${tag(proposta)}"`,
       acoes: [
-        `Publicar 1 case de resultado real mostrando como você entregou: ${curto(proposta)}`,
-        'Criar série de conteúdo explicando seu método e processo de trabalho',
-        `Documentar os bastidores de como você garante "${curto(proposta)}"`,
+        `Documentar 1 caso real de cliente por mês, mostrando o antes e o depois da transformação`,
+        `Criar série de conteúdo explicando o seu método — o "como" por trás do que você entrega`,
+        `Pedir depoimento em vídeo de 2 clientes que já viveram a transformação que você propõe`,
+        `Produzir 1 conteúdo/mês mostrando os bastidores do seu processo de trabalho`,
       ],
     } : null,
-    (storytelling || diferencial) ? {
+
+    // Pilar 3: Palco e Eventos — autoridade ao vivo, fora das redes
+    (storytelling || diferencial || proposta) ? {
+      id: 'eventos',
+      cor: '#EC4899',
+      nome: 'Palco e Eventos',
+      descricao: diferencial
+        ? `Construir autoridade ao vivo posicionando: "${tag(diferencial)}" como ponto de vista único`
+        : proposta
+          ? `Falar publicamente sobre como você entrega: "${tag(proposta)}"`
+          : 'Construir autoridade fora das redes — onde a confiança se consolida mais rápido',
+      acoes: [
+        `Candidatar-se para falar em 1 evento, summit ou encontro do seu setor por trimestre`,
+        `Propor participação em podcasts e lives do seu mercado como especialista convidado`,
+        `Propor co-criação de conteúdo ao vivo com 2 parceiros estratégicos do seu setor`,
+        storytelling
+          ? `Estruturar sua história de virada como palestra-âncora de 20 minutos`
+          : `Desenvolver uma palestra-âncora a partir do ponto de vista único que você tem`,
+      ],
+    } : null,
+
+    // Pilar 4: Diferenciação Visível — o que só você tem
+    diferencial ? {
       id: 'diferenciacao',
       cor: '#F59E0B',
-      nome: 'Diferenciação e História',
-      descricao: diferencial
-        ? `Posicionar "${diferencial.slice(0, 65)}${diferencial.length > 65 ? '...' : ''}" como vantagem única`
-        : 'Usar sua história como âncora de credibilidade e identificação',
+      nome: 'Diferenciação Visível',
+      descricao: `Tornar evidente para o mercado: "${tag(diferencial)}"`,
       acoes: [
-        storytelling
-          ? `Publicar como "${curto(storytelling)}" te capacita a ajudar quem você ajuda hoje`
-          : 'Publicar sua história de origem e por que você faz o que faz',
+        `Criar série de conteúdo mostrando sua abordagem versus o que o mercado costuma fazer`,
         diferencial
-          ? `Criar conteúdo mostrando sua vantagem única: "${curto(diferencial)}" vs. o mercado`
-          : 'Criar conteúdo mostrando sua abordagem única em comparação ao mercado',
-        'Coletar e compartilhar depoimentos que reforçam seu diferencial',
+          ? `Publicar seu ponto de vista sobre "${tag(diferencial)}" — o que você faz diferente e por quê`
+          : 'Publicar sua visão sobre o mercado e onde a maioria erra',
+        `Coletar e publicar provas concretas que validem seu diferencial (dados, resultados, depoimentos)`,
+        `Criar 1 conteúdo/mês de "comparativo" mostrando como sua forma de trabalhar gera mais resultado`,
       ],
     } : null,
+
+    // Pilar 5: Pipeline de Clientes — caminho da atração à venda
     formatoProduto ? {
       id: 'pipeline',
       cor: '#10B981',
       nome: 'Pipeline de Clientes',
-      descricao: `Criar caminho de atração para "${formatoProduto.slice(0, 65)}${formatoProduto.length > 65 ? '...' : ''}"`,
+      descricao: `Criar o caminho de atração e conversão para: "${tag(formatoProduto)}"`,
       acoes: [
-        `Criar conteúdo gratuito que leva naturalmente para: ${curto(formatoProduto)}`,
+        `Desenvolver 1 conteúdo gratuito de alto valor que naturalmente leva à sua oferta principal`,
         publicoAlvo
-          ? `Construir lista de ${curto(publicoAlvo)} para abordagem direta`
-          : 'Construir lista de potenciais clientes para abordagem direta',
-        `Produzir 1 conteúdo/mês demonstrando como funciona: ${curto(formatoProduto)}`,
+          ? `Construir lista de contatos do seu público-alvo para abordagem consultiva direta`
+          : 'Construir lista de potenciais clientes para abordagem consultiva direta',
+        `Identificar 3 parceiros estratégicos que atendem o mesmo público e podem indicar clientes`,
+        `Criar sequência de acompanhamento para quem demonstra interesse mas ainda não comprou`,
       ],
     } : null,
+
   ].filter(Boolean) as SugestaoPilar[]
 
   if (sugestoes.length === 0) return null
