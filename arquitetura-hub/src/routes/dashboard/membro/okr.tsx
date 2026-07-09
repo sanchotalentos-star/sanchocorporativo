@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, ChevronDown, ChevronUp, CheckCircle2, Circle, XCircle, AlertCircle, Target, TrendingUp, Crosshair, Rocket, ChevronRight } from 'lucide-react'
+import { Plus, ChevronDown, ChevronUp, CheckCircle2, Circle, XCircle, AlertCircle, Target, TrendingUp, Crosshair, Rocket, ChevronRight, Sparkles } from 'lucide-react'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
+import { getIdentidade } from '@/lib/identidade'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/dashboard/membro/okr')({
@@ -106,6 +107,182 @@ const statusIcon = {
 
 const statusLabel: Record<AcaoStatus, string> = {
   feito: 'Feito', nao_feito: 'Não feito', bloqueado: 'Bloqueado', pendente: 'Pendente',
+}
+
+/* ─────────────────────────────────────────────
+   SUGESTÕES DE OKR
+───────────────────────────────────────────── */
+interface SugestaoOkr {
+  id: string
+  titulo: string
+  categoria: string
+  krs: { descricao: string; meta: number; unit: string }[]
+}
+
+function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
+  const identidade = getIdentidade()
+  const [open, setOpen] = useState(true)
+  const [adicionados, setAdicionados] = useState<Set<string>>(new Set())
+
+  const publicoAlvo    = identidade?.pilares.publicoAlvo?.reflexao?.trim()
+  const proposta       = identidade?.pilares.proposta?.reflexao?.trim()
+  const formatoProduto = identidade?.pilares.formatoProduto?.reflexao?.trim()
+  const diferencial    = identidade?.diferenciais?.[0] ?? ''
+
+  const sugestoes: SugestaoOkr[] = [
+    {
+      id: 'autoridade',
+      titulo: 'Construir autoridade reconhecida no mercado',
+      categoria: 'Autoridade',
+      krs: [
+        { descricao: 'Publicar peças de conteúdo de alta qualidade no trimestre', meta: 12, unit: 'conteúdos' },
+        { descricao: 'Crescer seguidores ou conexões qualificadas', meta: 20, unit: '%' },
+        { descricao: 'Receber indicações ou convites de forma orgânica', meta: 5, unit: 'indicações' },
+      ],
+    },
+    (publicoAlvo || proposta) ? {
+      id: 'conversao',
+      titulo: proposta
+        ? `Validar e converter: ${proposta.slice(0, 50)}${proposta.length > 50 ? '...' : ''}`
+        : 'Gerar conversões e receita com consistência',
+      categoria: 'Receita',
+      krs: [
+        {
+          descricao: publicoAlvo
+            ? `Realizar conversas qualificadas com ${publicoAlvo.slice(0, 45)}${publicoAlvo.length > 45 ? '...' : ''}`
+            : 'Realizar conversas qualificadas com potenciais clientes',
+          meta: 10,
+          unit: 'conversas',
+        },
+        { descricao: 'Fechar clientes ou projetos no trimestre', meta: 3, unit: 'clientes' },
+        { descricao: 'Atingir meta de receita ou horas faturadas', meta: 0, unit: 'R$' },
+      ],
+    } : null,
+    diferencial ? {
+      id: 'diferencial',
+      titulo: `Ser referência por: ${diferencial.slice(0, 55)}${diferencial.length > 55 ? '...' : ''}`,
+      categoria: 'Autoridade',
+      krs: [
+        { descricao: 'Menções ou compartilhamentos de conteúdo no trimestre', meta: 20, unit: 'menções' },
+        { descricao: 'Depoimentos de clientes coletados e publicados', meta: 3, unit: 'depoimentos' },
+        { descricao: 'Aparições em mídias externas (podcast, entrevista, artigo)', meta: 2, unit: 'aparições' },
+      ],
+    } : null,
+    formatoProduto ? {
+      id: 'produto',
+      titulo: `Escalar: ${formatoProduto.slice(0, 55)}${formatoProduto.length > 55 ? '...' : ''}`,
+      categoria: 'Produto',
+      krs: [
+        { descricao: 'Pessoas que conheceram seu formato de produto/serviço', meta: 50, unit: 'pessoas' },
+        { descricao: 'Taxa de conversão de interessados em clientes', meta: 20, unit: '%' },
+        { descricao: 'Ciclo médio de vendas reduzido para', meta: 14, unit: 'dias' },
+      ],
+    } : null,
+  ].filter(Boolean) as SugestaoOkr[]
+
+  if (sugestoes.length === 0) return null
+
+  function usar(s: SugestaoOkr) {
+    const novoObj: Objective = {
+      id: `sug-${s.id}-${Date.now()}`,
+      titulo: s.titulo,
+      categoria: s.categoria,
+      trimestre: 'Q3 2026',
+      expanded: true,
+      pdcaTab: 'okr',
+      pdca: defaultPdca(1),
+      keyResults: s.krs.map((kr, i) => ({
+        id: `kr-${Date.now()}-${i}`,
+        descricao: kr.descricao,
+        meta: kr.meta,
+        atual: 0,
+        unit: kr.unit,
+      })),
+    }
+    onAddOkr(novoObj)
+    setAdicionados(prev => new Set([...prev, s.id]))
+  }
+
+  return (
+    <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+      className="rounded-2xl border border-[#7B2FBE]/15 bg-white shadow-sm overflow-hidden"
+    >
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50/50 transition-colors text-left"
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded-md bg-[#7B2FBE]/10 flex items-center justify-center flex-shrink-0">
+            <Sparkles size={12} className="text-[#7B2FBE]" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Sugestões de OKRs</p>
+            <p className="text-xs text-gray-400">Objetivos gerados a partir da sua identidade de marca</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-medium text-[#7B2FBE] bg-[#7B2FBE]/10 px-2 py-0.5 rounded-full">
+            {sugestoes.length} objetivos
+          </span>
+          {open ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
+        </div>
+      </button>
+
+      {open && (
+        <div className="border-t border-gray-100 p-5 space-y-3">
+          {sugestoes.map(s => {
+            const adicionado = adicionados.has(s.id)
+            const cor = catColor[s.categoria] ?? '#7B2FBE'
+            return (
+              <div key={s.id} className="rounded-xl border border-gray-100 p-4 bg-gray-50/30 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full"
+                        style={{ background: `${cor}15`, color: cor }}>
+                        {s.categoria}
+                      </span>
+                    </div>
+                    <p className="text-sm font-semibold text-gray-800 leading-snug">{s.titulo}</p>
+                  </div>
+                  <button
+                    onClick={() => !adicionado && usar(s)}
+                    disabled={adicionado}
+                    className="flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg transition-all whitespace-nowrap"
+                    style={adicionado
+                      ? { background: '#f3f4f6', color: '#9ca3af' }
+                      : { background: `${cor}15`, color: cor }
+                    }
+                  >
+                    {adicionado ? 'Adicionado ✓' : 'Usar objetivo'}
+                  </button>
+                </div>
+                <div className="space-y-2 pl-1">
+                  <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-1">Key Results sugeridos</p>
+                  {s.krs.map((kr, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <Target size={11} className="text-gray-300 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-gray-500 leading-relaxed">
+                        {kr.descricao}
+                        {kr.meta > 0 && (
+                          <span className="ml-1 font-medium" style={{ color: cor }}>
+                            → meta: {kr.meta} {kr.unit}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+          <p className="text-xs text-gray-400 pt-1 border-t border-gray-100">
+            Ajuste os valores das metas com seu mentor — eles conhecem seu contexto e ritmo real.
+          </p>
+        </div>
+      )}
+    </motion.div>
+  )
 }
 
 /* ─────────────────────────────────────────────
@@ -284,14 +461,14 @@ function OkrPage() {
         <motion.div variants={fadeInUp} className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1">
             <Target size={14} className="text-gray-300" />
-            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Objetivos</p>
+            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Objetivos</p>
           </div>
-          <p className="text-2xl font-black text-gray-900">{okrs.length}</p>
+          <p className="text-2xl font-semibold text-gray-900">{okrs.length}</p>
         </motion.div>
         <motion.div variants={fadeInUp} className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1">
             <Crosshair size={14} className="text-gray-300" />
-            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Key Results</p>
+            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Key Results</p>
           </div>
           <p className="text-2xl font-black text-gray-900">{doneKrs}<span className="text-gray-400 text-sm font-normal">/{totalKrs}</span></p>
         </motion.div>
@@ -303,6 +480,9 @@ function OkrPage() {
           <p className="text-2xl font-black text-[#7B2FBE]">{overallProgress}%</p>
         </motion.div>
       </motion.div>
+
+      {/* Sugestões baseadas na identidade */}
+      <SugestoesDeOkr onAddOkr={(obj) => setOkrs(prev => [...prev, obj])} />
 
       {/* Empty state — nenhuma meta definida ainda */}
       {okrs.length === 0 && (
