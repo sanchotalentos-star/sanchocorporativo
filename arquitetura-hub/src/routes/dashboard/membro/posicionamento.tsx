@@ -573,6 +573,56 @@ function PosicionamentoPage() {
         </motion.div>
       </div>
 
+      {/* O Que Te Destaca da Concorrência */}
+      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+        className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6"
+      >
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-medium text-[#7B2FBE]">05</span>
+            <p className="text-sm font-semibold text-gray-900">O Que Te Destaca da Concorrência</p>
+          </div>
+          <p className="text-xs text-gray-500">
+            Liste os diferenciais que você já percebe em você. O mentor vai refinar e validar cada um na sessão.
+          </p>
+        </div>
+        <div className="space-y-2.5">
+          {diferenciais.map((d, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className={cn(
+                'w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all',
+                d.trim() ? 'bg-[#7B2FBE]' : 'border-2 border-gray-200'
+              )}>
+                {d.trim() && <span className="text-[10px] text-white font-medium">✓</span>}
+              </div>
+              <input
+                type="text"
+                value={d}
+                onChange={e => {
+                  const next = [...diferenciais]
+                  next[i] = e.target.value
+                  setDiferenciais(next)
+                }}
+                placeholder={`Diferencial ${i + 1}. Ex: único a combinar X com Y para Z`}
+                className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-1 focus:ring-[#7B2FBE]/20"
+              />
+            </div>
+          ))}
+        </div>
+
+        {diferenciais.some(d => d.trim()) && (
+          <div className="mt-4 rounded-xl border border-[#7B2FBE]/15 bg-[#7B2FBE]/[0.03] p-3.5">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Sparkles size={11} className="text-[#7B2FBE]" />
+              <p className="text-[10px] font-medium text-[#7B2FBE] uppercase tracking-wide">Próximo passo</p>
+            </div>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              O mentor vai validar se esses diferenciais são percebidos pelo mercado, refiná-los com evidências concretas e integrá-los à sua declaração de Zona de Genialidade.
+            </p>
+          </div>
+        )}
+      </motion.div>
+
       {/* Bloco 00: Seu Maior Diferencial */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"
         className={cn(
@@ -673,55 +723,6 @@ function PosicionamentoPage() {
         </div>
       </motion.div>
 
-      {/* O Que Te Destaca da Concorrência */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6"
-      >
-        <div className="mb-4">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-medium text-[#7B2FBE]">05</span>
-            <p className="text-sm font-semibold text-gray-900">O Que Te Destaca da Concorrência</p>
-          </div>
-          <p className="text-xs text-gray-500">
-            Liste os diferenciais que você já percebe em você. O mentor vai refinar e validar cada um na sessão.
-          </p>
-        </div>
-        <div className="space-y-2.5">
-          {diferenciais.map((d, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <div className={cn(
-                'w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all',
-                d.trim() ? 'bg-[#7B2FBE]' : 'border-2 border-gray-200'
-              )}>
-                {d.trim() && <span className="text-[10px] text-white font-medium">✓</span>}
-              </div>
-              <input
-                type="text"
-                value={d}
-                onChange={e => {
-                  const next = [...diferenciais]
-                  next[i] = e.target.value
-                  setDiferenciais(next)
-                }}
-                placeholder={`Diferencial ${i + 1}. Ex: único a combinar X com Y para Z`}
-                className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-1 focus:ring-[#7B2FBE]/20"
-              />
-            </div>
-          ))}
-        </div>
-
-        {diferenciais.some(d => d.trim()) && (
-          <div className="mt-4 rounded-xl border border-[#7B2FBE]/15 bg-[#7B2FBE]/[0.03] p-3.5">
-            <div className="flex items-center gap-2 mb-1.5">
-              <Sparkles size={11} className="text-[#7B2FBE]" />
-              <p className="text-[10px] font-medium text-[#7B2FBE] uppercase tracking-wide">Próximo passo</p>
-            </div>
-            <p className="text-xs text-gray-600 leading-relaxed">
-              O mentor vai validar se esses diferenciais são percebidos pelo mercado, refiná-los com evidências concretas e integrá-los à sua declaração de Zona de Genialidade.
-            </p>
-          </div>
-        )}
-      </motion.div>
 
     </div>
   )
