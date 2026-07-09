@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2, ChevronDown, ChevronUp, ChevronRight, Sparkles, BookOpen, Star, Users, Lightbulb, Layers } from 'lucide-react'
+import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2, ChevronDown, ChevronUp, ChevronRight, Sparkles, BookOpen, Star, Users, Lightbulb, Layers, X } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { getIdentidade } from '@/lib/identidade'
+
+const MARKETING_KEY = 'marketing_store_v1'
 
 export const Route = createFileRoute('/dashboard/membro/marketing')({
   component: MarketingPage,
@@ -44,7 +46,10 @@ const canalColors: Record<Canal, string> = {
 
 const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 
-const initialAcoes: AcaoMarketing[] = []
+function loadAcoes(): AcaoMarketing[] {
+  try { return JSON.parse(localStorage.getItem(MARKETING_KEY) ?? 'null') ?? [] }
+  catch { return [] }
+}
 
 interface SementeProps {
   publicoAlvo?: string
@@ -181,14 +186,40 @@ function SementesDeConteudo({ publicoAlvo, proposta, formatoProduto, diferenciai
 }
 
 function MarketingPage() {
-  const [acoes, setAcoes] = useState<AcaoMarketing[]>(initialAcoes)
+  const [acoes, setAcoes] = useState<AcaoMarketing[]>(loadAcoes)
   const [mesFiltro, setMesFiltro] = useState<number | null>(null)
   const [canalFiltro, setCanalFiltro] = useState<Canal | null>(null)
   const [identidadeOpen, setIdentidadeOpen] = useState(false)
+  const [showNovaAcao, setShowNovaAcao] = useState(false)
+  const [novaForm, setNovaForm] = useState({
+    titulo: '',
+    canal: 'LinkedIn' as Canal,
+    frequencia: 'Mensal' as Frequencia,
+    mes: new Date().getMonth() + 1,
+  })
   const identidade = getIdentidade()
   const publicoAlvo    = identidade?.pilares.publicoAlvo?.reflexao?.trim()
   const proposta       = identidade?.pilares.proposta?.reflexao?.trim()
   const formatoProduto = identidade?.pilares.formatoProduto?.reflexao?.trim()
+
+  useEffect(() => {
+    localStorage.setItem(MARKETING_KEY, JSON.stringify(acoes))
+  }, [acoes])
+
+  function addAcao() {
+    if (!novaForm.titulo.trim()) return
+    const nova: AcaoMarketing = {
+      id: Date.now().toString(),
+      titulo: novaForm.titulo.trim(),
+      canal: novaForm.canal,
+      frequencia: novaForm.frequencia,
+      mes: novaForm.mes,
+      concluida: false,
+    }
+    setAcoes(prev => [...prev, nova])
+    setNovaForm({ titulo: '', canal: 'LinkedIn', frequencia: 'Mensal', mes: new Date().getMonth() + 1 })
+    setShowNovaAcao(false)
+  }
 
   function toggleConcluida(id: string) {
     setAcoes(prev => prev.map(a => a.id === id ? { ...a, concluida: !a.concluida } : a))
@@ -240,12 +271,102 @@ function MarketingPage() {
             <h1 className="text-xl font-semibold text-gray-900">Agenda de Marketing Anual</h1>
             <p className="text-gray-400 mt-1 text-sm">Planeje suas ações de conteúdo e distribuição ao longo do ano</p>
           </div>
-          <button className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm shadow-[#7B2FBE]/20 flex-shrink-0">
+          <button
+            onClick={() => setShowNovaAcao(true)}
+            className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm shadow-[#7B2FBE]/20 flex-shrink-0"
+          >
             <Plus size={16} />
             Nova Ação
           </button>
         </div>
       </div>
+
+      {/* Modal Nova Ação */}
+      {showNovaAcao && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="w-full max-w-md rounded-2xl bg-white border border-gray-200 shadow-xl p-6 space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-gray-900">Nova Ação de Marketing</h2>
+              <button onClick={() => setShowNovaAcao(false)} className="text-gray-400 hover:text-gray-600">
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-[11px] font-medium text-gray-500 block mb-1">Título da Ação</label>
+                <input
+                  autoFocus
+                  type="text"
+                  value={novaForm.titulo}
+                  onChange={e => setNovaForm(f => ({ ...f, titulo: e.target.value }))}
+                  onKeyDown={e => e.key === 'Enter' && addAcao()}
+                  placeholder={
+                    proposta
+                      ? `Ex: Post sobre ${proposta.slice(0, 40)}...`
+                      : 'Ex: Post de autoridade sobre meu método'
+                  }
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-[#7B2FBE] transition-colors"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] font-medium text-gray-500 block mb-1">Canal</label>
+                  <select
+                    value={novaForm.canal}
+                    onChange={e => setNovaForm(f => ({ ...f, canal: e.target.value as Canal }))}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-[#7B2FBE] transition-colors bg-white"
+                  >
+                    {(Object.keys(canalColors) as Canal[]).map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[11px] font-medium text-gray-500 block mb-1">Frequência</label>
+                  <select
+                    value={novaForm.frequencia}
+                    onChange={e => setNovaForm(f => ({ ...f, frequencia: e.target.value as Frequencia }))}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-[#7B2FBE] transition-colors bg-white"
+                  >
+                    {(['Diário','Semanal','Quinzenal','Mensal'] as Frequencia[]).map(f => <option key={f}>{f}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[11px] font-medium text-gray-500 block mb-1">Mês</label>
+                <select
+                  value={novaForm.mes}
+                  onChange={e => setNovaForm(f => ({ ...f, mes: Number(e.target.value) }))}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-[#7B2FBE] transition-colors bg-white"
+                >
+                  {meses.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={() => setShowNovaAcao(false)}
+                className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={addAcao}
+                disabled={!novaForm.titulo.trim()}
+                className="flex-1 bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-40 text-white text-sm font-medium py-2.5 rounded-xl transition-colors"
+              >
+                Adicionar
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Progress bar */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"

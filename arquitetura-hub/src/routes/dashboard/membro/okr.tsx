@@ -1,7 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, ChevronDown, ChevronUp, CheckCircle2, Circle, XCircle, AlertCircle, Target, TrendingUp, Crosshair, Rocket, ChevronRight, Sparkles } from 'lucide-react'
+import {
+  Plus, ChevronDown, ChevronUp, CheckCircle2, Circle, XCircle, AlertCircle,
+  Target, TrendingUp, Crosshair, Rocket, ChevronRight, Sparkles,
+  Pencil, Trash2, X, Check, Calendar,
+} from 'lucide-react'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
 import { getIdentidade } from '@/lib/identidade'
 import { cn } from '@/lib/utils'
@@ -26,24 +30,22 @@ type AcaoStatus = 'pendente' | 'feito' | 'nao_feito' | 'bloqueado'
 interface PdcaAcao {
   id: string
   descricao: string
-  semana: number   // 1–4
+  dataLimite: string
+  semana: number
   status: AcaoStatus
   obs: string
 }
 
-interface PdcaAjuste {
+interface PlanoAcao {
   id: string
-  texto: string
-  status: 'pendente' | 'aprovado' | 'rejeitado'
+  entrega: string
+  dataLimite: string
 }
 
 interface PdcaCiclo {
-  diagnostico: string
-  metaEspecifica: string
-  riscos: string
-  semanaAtual: number  // 1–4
+  semanaAtual: number
   acoes: PdcaAcao[]
-  ajustes: PdcaAjuste[]
+  plano: PlanoAcao[]
 }
 
 interface Objective {
@@ -53,7 +55,7 @@ interface Objective {
   trimestre: string
   keyResults: KeyResult[]
   expanded: boolean
-  pdcaTab: 'okr' | 'p' | 'd' | 'c' | 'a'
+  pdcaTab: 'okr' | 'p' | 'd' | 'a'
   pdca: PdcaCiclo
 }
 
@@ -68,34 +70,15 @@ const catColor: Record<string, string> = {
 }
 
 /* ─────────────────────────────────────────────
-   DADOS INICIAIS
-───────────────────────────────────────────── */
-function defaultPdca(semana = 1): PdcaCiclo {
-  return {
-    diagnostico:    '',
-    metaEspecifica: '',
-    riscos:         '',
-    semanaAtual:    semana,
-    acoes: [],
-    ajustes: [],
-  }
-}
-
-const initialOkrs: Objective[] = []
-
-/* ─────────────────────────────────────────────
    HELPERS
 ───────────────────────────────────────────── */
+function defaultPdca(): PdcaCiclo {
+  return { semanaAtual: 1, acoes: [], plano: [] }
+}
+
 function getProgress(atual: number, meta: number) {
   if (meta === 0) return 0
   return Math.min(100, Math.round((atual / meta) * 100))
-}
-
-function ritmo(acoes: PdcaAcao[], semanaAtual: number) {
-  const passadas = acoes.filter(a => a.semana < semanaAtual)
-  if (passadas.length === 0) return null
-  const feitas = passadas.filter(a => a.status === 'feito').length
-  return Math.round((feitas / passadas.length) * 100)
 }
 
 const statusIcon = {
@@ -108,6 +91,8 @@ const statusIcon = {
 const statusLabel: Record<AcaoStatus, string> = {
   feito: 'Feito', nao_feito: 'Não feito', bloqueado: 'Bloqueado', pendente: 'Pendente',
 }
+
+const OKR_KEY = 'okr_store_v1'
 
 /* ─────────────────────────────────────────────
    SUGESTÕES DE OKR
@@ -132,10 +117,18 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
   const sugestoes: SugestaoOkr[] = [
     {
       id: 'autoridade',
-      titulo: 'Construir autoridade reconhecida no mercado',
+      titulo: proposta
+        ? `Ser reconhecido por: ${proposta.slice(0, 55)}${proposta.length > 55 ? '...' : ''}`
+        : 'Construir autoridade reconhecida no mercado',
       categoria: 'Autoridade',
       krs: [
-        { descricao: 'Publicar peças de conteúdo de alta qualidade no trimestre', meta: 12, unit: 'conteúdos' },
+        {
+          descricao: publicoAlvo
+            ? `Publicar conteúdo de alta qualidade direcionado a ${publicoAlvo.slice(0, 50)}${publicoAlvo.length > 50 ? '...' : ''}`
+            : 'Publicar peças de conteúdo de alta qualidade no trimestre',
+          meta: 12,
+          unit: 'conteúdos',
+        },
         { descricao: 'Crescer seguidores ou conexões qualificadas', meta: 20, unit: '%' },
         { descricao: 'Receber indicações ou convites de forma orgânica', meta: 5, unit: 'indicações' },
       ],
@@ -143,19 +136,19 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
     (publicoAlvo || proposta) ? {
       id: 'conversao',
       titulo: proposta
-        ? `Validar e converter: ${proposta.slice(0, 50)}${proposta.length > 50 ? '...' : ''}`
+        ? `Converter: ${proposta.slice(0, 55)}${proposta.length > 55 ? '...' : ''}`
         : 'Gerar conversões e receita com consistência',
       categoria: 'Receita',
       krs: [
         {
           descricao: publicoAlvo
-            ? `Realizar conversas qualificadas com ${publicoAlvo.slice(0, 45)}${publicoAlvo.length > 45 ? '...' : ''}`
+            ? `Realizar conversas qualificadas com ${publicoAlvo.slice(0, 40)}${publicoAlvo.length > 40 ? '...' : ''}`
             : 'Realizar conversas qualificadas com potenciais clientes',
           meta: 10,
           unit: 'conversas',
         },
         { descricao: 'Fechar clientes ou projetos no trimestre', meta: 3, unit: 'clientes' },
-        { descricao: 'Atingir meta de receita ou horas faturadas', meta: 0, unit: 'R$' },
+        { descricao: 'Atingir meta de receita faturada', meta: 0, unit: 'R$' },
       ],
     } : null,
     diferencial ? {
@@ -190,7 +183,7 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
       trimestre: 'Q3 2026',
       expanded: true,
       pdcaTab: 'okr',
-      pdca: defaultPdca(1),
+      pdca: defaultPdca(),
       keyResults: s.krs.map((kr, i) => ({
         id: `kr-${Date.now()}-${i}`,
         descricao: kr.descricao,
@@ -286,12 +279,148 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
 }
 
 /* ─────────────────────────────────────────────
+   KR ITEM — inline editável
+───────────────────────────────────────────── */
+function KrItem({
+  kr, color, objId,
+  onUpdate, onDelete, onUpdateAtual,
+}: {
+  kr: KeyResult
+  color: string
+  objId: string
+  onUpdate: (objId: string, krId: string, patch: Partial<KeyResult>) => void
+  onDelete: (objId: string, krId: string) => void
+  onUpdateAtual: (objId: string, krId: string, atual: number) => void
+}) {
+  const [editDesc, setEditDesc] = useState(false)
+  const [descVal, setDescVal] = useState(kr.descricao)
+  const [editMeta, setEditMeta] = useState(false)
+  const [metaVal, setMetaVal] = useState(String(kr.meta))
+  const [unitVal, setUnitVal] = useState(kr.unit)
+  const descRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => { if (editDesc) descRef.current?.focus() }, [editDesc])
+
+  const pct  = getProgress(kr.atual, kr.meta)
+  const done = pct >= 100
+
+  function commitDesc() {
+    const v = descVal.trim()
+    if (v) onUpdate(objId, kr.id, { descricao: v })
+    else setDescVal(kr.descricao)
+    setEditDesc(false)
+  }
+
+  function commitMeta() {
+    const m = parseFloat(metaVal)
+    const u = unitVal.trim()
+    if (!isNaN(m) && m >= 0) onUpdate(objId, kr.id, { meta: m, unit: u || kr.unit })
+    else { setMetaVal(String(kr.meta)); setUnitVal(kr.unit) }
+    setEditMeta(false)
+  }
+
+  return (
+    <div className="group px-5 py-4 flex items-start gap-3 border-b border-gray-100 last:border-0">
+      <button className="flex-shrink-0 mt-0.5">
+        {done
+          ? <CheckCircle2 size={15} className="text-emerald-500" />
+          : <Circle size={15} className="text-gray-300" />
+        }
+      </button>
+      <div className="flex-1 min-w-0">
+        {/* Descrição editável */}
+        {editDesc ? (
+          <input
+            ref={descRef}
+            value={descVal}
+            onChange={e => setDescVal(e.target.value)}
+            onBlur={commitDesc}
+            onKeyDown={e => { if (e.key === 'Enter') commitDesc(); if (e.key === 'Escape') { setDescVal(kr.descricao); setEditDesc(false) } }}
+            className="w-full text-sm text-gray-700 bg-transparent border-b border-[#7B2FBE] focus:outline-none pb-0.5 mb-2"
+          />
+        ) : (
+          <p
+            className={cn('text-sm leading-relaxed cursor-pointer hover:text-[#7B2FBE] transition-colors', done ? 'text-gray-400 line-through' : 'text-gray-700')}
+            onClick={() => setEditDesc(true)}
+          >
+            {kr.descricao}
+          </p>
+        )}
+
+        {/* Meta editável */}
+        {editMeta ? (
+          <div className="flex items-center gap-2 mt-1.5">
+            <span className="text-xs text-gray-400">Meta:</span>
+            <input
+              autoFocus
+              type="number"
+              value={metaVal}
+              onChange={e => setMetaVal(e.target.value)}
+              className="w-20 text-xs border border-gray-200 rounded px-2 py-0.5 text-gray-800 focus:outline-none focus:border-[#7B2FBE]"
+            />
+            <input
+              value={unitVal}
+              onChange={e => setUnitVal(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') commitMeta(); if (e.key === 'Escape') { setMetaVal(String(kr.meta)); setUnitVal(kr.unit); setEditMeta(false) } }}
+              className="w-24 text-xs border border-gray-200 rounded px-2 py-0.5 text-gray-800 focus:outline-none focus:border-[#7B2FBE]"
+              placeholder="unidade"
+            />
+            <button onClick={commitMeta} className="text-[#7B2FBE]"><Check size={13} /></button>
+            <button onClick={() => { setMetaVal(String(kr.meta)); setUnitVal(kr.unit); setEditMeta(false) }} className="text-gray-300"><X size={13} /></button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setEditMeta(true)}
+            className="flex items-center gap-1.5 mt-2 group/meta"
+          >
+            <div className="flex-1 h-1 rounded-full bg-gray-100 w-32 sm:w-48">
+              <div className="h-full rounded-full transition-all"
+                style={{ width: `${pct}%`, background: done ? '#10B981' : color }} />
+            </div>
+            <span className="text-xs text-gray-400 whitespace-nowrap group-hover/meta:text-[#7B2FBE] transition-colors">
+              {kr.atual}/{kr.meta} {kr.unit}
+            </span>
+          </button>
+        )}
+      </div>
+
+      {/* Atual + ações */}
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <input
+          type="number" value={kr.atual} min={0}
+          onChange={e => onUpdateAtual(objId, kr.id, Number(e.target.value))}
+          className="w-16 text-sm text-right bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-gray-900 focus:outline-none focus:border-[#7B2FBE] focus:ring-1 focus:ring-[#7B2FBE]/20"
+        />
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+          <button onClick={() => setEditDesc(true)} className="p-1.5 rounded text-gray-300 hover:text-[#7B2FBE] transition-colors">
+            <Pencil size={11} />
+          </button>
+          <button
+            onClick={() => { if (confirm('Excluir este Key Result?')) onDelete(objId, kr.id) }}
+            className="p-1.5 rounded text-gray-300 hover:text-red-400 transition-colors"
+          >
+            <Trash2 size={11} />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────────
    COMPONENTE PRINCIPAL
 ───────────────────────────────────────────── */
 function OkrPage() {
-  const [okrs, setOkrs] = useState<Objective[]>(initialOkrs)
+  const [okrs, setOkrs] = useState<Objective[]>(() => {
+    try { return JSON.parse(localStorage.getItem(OKR_KEY) ?? 'null') ?? [] }
+    catch { return [] }
+  })
   const [showNovoObj, setShowNovoObj] = useState(false)
-  const [novoForm, setNovoForm] = useState({ titulo: '', categoria: 'Autoridade', trimestre: 'Q1 2026' })
+  const [novoForm, setNovoForm] = useState({ titulo: '', categoria: 'Autoridade', trimestre: 'Q3 2026' })
+
+  useEffect(() => {
+    localStorage.setItem(OKR_KEY, JSON.stringify(okrs))
+  }, [okrs])
 
   function addObjective() {
     if (!novoForm.titulo.trim()) return
@@ -303,25 +432,41 @@ function OkrPage() {
       expanded: true,
       pdcaTab: 'okr',
       keyResults: [],
-      pdca: defaultPdca(1),
+      pdca: defaultPdca(),
     }
     setOkrs(prev => [...prev, novo])
-    setNovoForm({ titulo: '', categoria: 'Autoridade', trimestre: 'Q1 2026' })
+    setNovoForm({ titulo: '', categoria: 'Autoridade', trimestre: 'Q3 2026' })
     setShowNovoObj(false)
   }
 
-  /* ── atualizadores genéricos ── */
+  /* ── atualizadores ── */
   function setObj(id: string, patch: Partial<Objective>) {
     setOkrs(prev => prev.map(o => o.id === id ? { ...o, ...patch } : o))
   }
   function setPdca(id: string, patch: Partial<PdcaCiclo>) {
     setOkrs(prev => prev.map(o => o.id === id ? { ...o, pdca: { ...o.pdca, ...patch } } : o))
   }
-  function updateKr(objId: string, krId: string, atual: number) {
+  function updateKr(objId: string, krId: string, patch: Partial<KeyResult>) {
     setOkrs(prev => prev.map(o => {
       if (o.id !== objId) return o
-      return { ...o, keyResults: o.keyResults.map(kr => kr.id === krId ? { ...kr, atual } : kr) }
+      return { ...o, keyResults: o.keyResults.map(kr => kr.id === krId ? { ...kr, ...patch } : kr) }
     }))
+  }
+  function updateKrAtual(objId: string, krId: string, atual: number) {
+    updateKr(objId, krId, { atual })
+  }
+  function deleteKr(objId: string, krId: string) {
+    setOkrs(prev => prev.map(o => {
+      if (o.id !== objId) return o
+      return { ...o, keyResults: o.keyResults.filter(kr => kr.id !== krId) }
+    }))
+  }
+  function addKr(objId: string) {
+    const kr: KeyResult = { id: `kr-${Date.now()}`, descricao: '', meta: 0, atual: 0, unit: '' }
+    setOkrs(prev => prev.map(o => o.id !== objId ? o : { ...o, keyResults: [...o.keyResults, kr] }))
+  }
+  function deleteObjective(objId: string) {
+    setOkrs(prev => prev.filter(o => o.id !== objId))
   }
   function updateAcao(objId: string, acaoId: string, patch: Partial<PdcaAcao>) {
     setOkrs(prev => prev.map(o => {
@@ -329,14 +474,30 @@ function OkrPage() {
       return { ...o, pdca: { ...o.pdca, acoes: o.pdca.acoes.map(a => a.id === acaoId ? { ...a, ...patch } : a) } }
     }))
   }
-  function addAcao(objId: string, semana: number) {
-    const nova: PdcaAcao = { id: Date.now().toString(), descricao: '', semana, status: 'pendente', obs: '' }
-    setOkrs(prev => prev.map(o => o.id !== objId ? o : { ...o, pdca: { ...o.pdca, acoes: [...o.pdca.acoes, nova] } }))
-  }
-  function updateAjuste(objId: string, ajId: string, status: PdcaAjuste['status']) {
+  function deleteAcao(objId: string, acaoId: string) {
     setOkrs(prev => prev.map(o => {
       if (o.id !== objId) return o
-      return { ...o, pdca: { ...o.pdca, ajustes: o.pdca.ajustes.map(aj => aj.id === ajId ? { ...aj, status } : aj) } }
+      return { ...o, pdca: { ...o.pdca, acoes: o.pdca.acoes.filter(a => a.id !== acaoId) } }
+    }))
+  }
+  function addAcao(objId: string, semana: number) {
+    const nova: PdcaAcao = { id: Date.now().toString(), descricao: '', dataLimite: '', semana, status: 'pendente', obs: '' }
+    setOkrs(prev => prev.map(o => o.id !== objId ? o : { ...o, pdca: { ...o.pdca, acoes: [...o.pdca.acoes, nova] } }))
+  }
+  function addPlanoAcao(objId: string) {
+    const nova: PlanoAcao = { id: Date.now().toString(), entrega: '', dataLimite: '' }
+    setOkrs(prev => prev.map(o => o.id !== objId ? o : { ...o, pdca: { ...o.pdca, plano: [...(o.pdca.plano ?? []), nova] } }))
+  }
+  function updatePlanoAcao(objId: string, acaoId: string, patch: Partial<PlanoAcao>) {
+    setOkrs(prev => prev.map(o => {
+      if (o.id !== objId) return o
+      return { ...o, pdca: { ...o.pdca, plano: (o.pdca.plano ?? []).map(a => a.id === acaoId ? { ...a, ...patch } : a) } }
+    }))
+  }
+  function deletePlanoAcao(objId: string, acaoId: string) {
+    setOkrs(prev => prev.map(o => {
+      if (o.id !== objId) return o
+      return { ...o, pdca: { ...o.pdca, plano: (o.pdca.plano ?? []).filter(a => a.id !== acaoId) } }
     }))
   }
 
@@ -350,7 +511,6 @@ function OkrPage() {
 
       {/* Header */}
       <div className="space-y-2">
-        {/* Mini cadeia */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <Link to="/dashboard/membro/posicionamento">
             <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">01 Identidade</span>
@@ -396,13 +556,15 @@ function OkrPage() {
             className="w-full max-w-md rounded-2xl bg-white border border-gray-200 shadow-xl p-6 space-y-4"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-black text-gray-900 uppercase tracking-tight">Novo Objetivo</h2>
-              <button onClick={() => setShowNovoObj(false)} className="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+              <h2 className="text-sm font-semibold text-gray-900">Novo Objetivo</h2>
+              <button onClick={() => setShowNovoObj(false)} className="text-gray-400 hover:text-gray-600">
+                <X size={16} />
+              </button>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Título do Objetivo</label>
+                <label className="text-[11px] font-medium text-gray-500 block mb-1">Título do Objetivo</label>
                 <input
                   type="text"
                   value={novoForm.titulo}
@@ -415,7 +577,7 @@ function OkrPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Categoria</label>
+                  <label className="text-[11px] font-medium text-gray-500 block mb-1">Categoria</label>
                   <select
                     value={novoForm.categoria}
                     onChange={e => setNovoForm(f => ({ ...f, categoria: e.target.value }))}
@@ -425,7 +587,7 @@ function OkrPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Trimestre</label>
+                  <label className="text-[11px] font-medium text-gray-500 block mb-1">Trimestre</label>
                   <select
                     value={novoForm.trimestre}
                     onChange={e => setNovoForm(f => ({ ...f, trimestre: e.target.value }))}
@@ -440,14 +602,14 @@ function OkrPage() {
             <div className="flex gap-2 pt-1">
               <button
                 onClick={() => setShowNovoObj(false)}
-                className="flex-1 border border-gray-200 text-gray-600 text-sm font-black py-2.5 rounded-xl hover:bg-gray-50 transition-colors uppercase tracking-wide"
+                className="flex-1 border border-gray-200 text-gray-600 text-sm font-medium py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={addObjective}
                 disabled={!novoForm.titulo.trim()}
-                className="flex-1 bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-40 text-white text-sm font-black py-2.5 rounded-xl transition-colors uppercase tracking-wide"
+                className="flex-1 bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-40 text-white text-sm font-medium py-2.5 rounded-xl transition-colors"
               >
                 Criar Objetivo
               </button>
@@ -470,21 +632,21 @@ function OkrPage() {
             <Crosshair size={14} className="text-gray-300" />
             <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Key Results</p>
           </div>
-          <p className="text-2xl font-black text-gray-900">{doneKrs}<span className="text-gray-400 text-sm font-normal">/{totalKrs}</span></p>
+          <p className="text-2xl font-semibold text-gray-900">{doneKrs}<span className="text-gray-400 text-sm font-normal">/{totalKrs}</span></p>
         </motion.div>
         <motion.div variants={fadeInUp} className="rounded-2xl bg-white border border-[#7B2FBE]/25 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1">
             <TrendingUp size={14} className="text-[#7B2FBE]" />
-            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Progresso</p>
+            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Progresso</p>
           </div>
-          <p className="text-2xl font-black text-[#7B2FBE]">{overallProgress}%</p>
+          <p className="text-2xl font-semibold text-[#7B2FBE]">{overallProgress}%</p>
         </motion.div>
       </motion.div>
 
       {/* Sugestões baseadas na identidade */}
       <SugestoesDeOkr onAddOkr={(obj) => setOkrs(prev => [...prev, obj])} />
 
-      {/* Empty state — nenhuma meta definida ainda */}
+      {/* Empty state */}
       {okrs.length === 0 && (
         <motion.div
           variants={fadeInUp} initial="hidden" animate="visible"
@@ -494,16 +656,11 @@ function OkrPage() {
             <Rocket size={28} className="text-[#7B2FBE]" />
           </div>
           <h2 className="text-lg font-semibold text-gray-800 mb-2">Suas metas ainda estão sendo desenhadas</h2>
-          <p className="text-sm text-gray-500 max-w-sm leading-relaxed mb-1">
+          <p className="text-sm text-gray-500 max-w-sm leading-relaxed mb-6">
             Na próxima sessão com seu mentor, vocês vão definir juntos o que você quer conquistar nos próximos 3 meses.
           </p>
-          <p className="text-xs text-gray-400 max-w-xs leading-relaxed mb-8">
-            Cada meta nasce de uma conversa real — não de um template. O seu mentor vai guiar esse processo.
-          </p>
-
-          {/* Jornada do programa — o que vem em cada fase */}
-          <div className="w-full max-w-lg border-t border-gray-100 pt-8">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-5">O que acontece em cada fase</p>
+          <div className="w-full max-w-lg border-t border-gray-100 pt-6">
+            <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-4">O que acontece em cada fase</p>
             <div className="grid grid-cols-2 gap-3 text-left">
               {[
                 { fase: '01', nome: 'OKR & MVP',          desc: 'Suas metas de impacto + formatação do produto' },
@@ -512,386 +669,44 @@ function OkrPage() {
                 { fase: '04', nome: 'Escala',             desc: 'Segundo ciclo de execução + autoridade de mercado' },
               ].map(f => (
                 <div key={f.fase} className="rounded-xl bg-gray-50 border border-gray-100 p-4">
-                  <span className="text-[10px] font-black text-[#7B2FBE] tracking-widest block mb-1">Fase {f.fase}</span>
+                  <span className="text-[10px] font-medium text-[#7B2FBE] tracking-widest block mb-1">Fase {f.fase}</span>
                   <p className="text-xs font-semibold text-gray-800 mb-1">{f.nome}</p>
                   <p className="text-[11px] text-gray-400 leading-relaxed">{f.desc}</p>
                 </div>
               ))}
             </div>
           </div>
-
-          <p className="text-xs text-gray-300 mt-6 italic">
-            Você pode adicionar uma meta manualmente se já tiver clareza — mas o ideal é fazer isso com o mentor.
-          </p>
         </motion.div>
       )}
 
       {/* Cards de OKR */}
       <div className="space-y-3">
         {okrs.map((obj) => {
-          const color      = catColor[obj.categoria] ?? '#6B7280'
-          const objPct     = obj.keyResults.length > 0
+          const color  = catColor[obj.categoria] ?? '#6B7280'
+          const objPct = obj.keyResults.length > 0
             ? Math.round(obj.keyResults.reduce((s, kr) => s + getProgress(kr.atual, kr.meta), 0) / obj.keyResults.length)
             : 0
-          const r          = ritmo(obj.pdca.acoes, obj.pdca.semanaAtual)
-          const cicloFim   = obj.pdca.semanaAtual > 4
 
           return (
-            <motion.div key={obj.id} variants={fadeInUp} initial="hidden" animate="visible"
-              className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden"
-            >
-              {/* ── cabeçalho ── */}
-              <button onClick={() => setObj(obj.id, { expanded: !obj.expanded })}
-                className="w-full flex items-center gap-4 p-5 text-left hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-widest"
-                      style={{ background: `${color}15`, color }}>
-                      {obj.categoria}
-                    </span>
-                    <span className="text-[10px] text-gray-400 font-medium">{obj.trimestre}</span>
-                  </div>
-                  <p className="text-sm font-bold text-gray-900 leading-tight">{obj.titulo}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="flex-1 h-1.5 rounded-full bg-gray-100">
-                      <div className="h-full rounded-full transition-all" style={{ width: `${objPct}%`, background: color }} />
-                    </div>
-                    <span className="text-xs font-black flex-shrink-0" style={{ color }}>{objPct}%</span>
-                  </div>
-                </div>
-                {obj.expanded ? <ChevronUp size={16} className="text-gray-400 flex-shrink-0" /> : <ChevronDown size={16} className="text-gray-400 flex-shrink-0" />}
-              </button>
-
-              {obj.expanded && (
-                <>
-                  {/* ── tabs OKR | P | D | C | A ── */}
-                  <div className="border-t border-gray-100 flex">
-                    {(['okr', 'p', 'd', 'c', 'a'] as const).map((tab) => {
-                      const labels = { okr: 'Como Vou Medir', p: 'O Que Fazer', d: 'Minha Semana', c: 'Como Estou', a: 'O Que Melhorar' }
-                      const active = obj.pdcaTab === tab
-                      return (
-                        <button key={tab} onClick={() => setObj(obj.id, { pdcaTab: tab })}
-                          className={cn(
-                            'flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest transition-colors border-b-2',
-                            active
-                              ? 'border-[#7B2FBE] text-[#7B2FBE]'
-                              : 'border-transparent text-gray-400 hover:text-gray-700'
-                          )}
-                        >
-                          {labels[tab]}
-                        </button>
-                      )
-                    })}
-                  </div>
-
-                  {/* ── KEY RESULTS ── */}
-                  {obj.pdcaTab === 'okr' && (
-                    <div className="divide-y divide-gray-100">
-                      {obj.keyResults.map((kr) => {
-                        const pct  = getProgress(kr.atual, kr.meta)
-                        const done = pct >= 100
-                        return (
-                          <div key={kr.id} className="px-5 py-4 flex items-start gap-3">
-                            {done
-                              ? <CheckCircle2 size={15} className="text-emerald-500 flex-shrink-0 mt-0.5" />
-                              : <Circle size={15} className="text-gray-300 flex-shrink-0 mt-0.5" />
-                            }
-                            <div className="flex-1 min-w-0">
-                              <p className={cn('text-sm leading-relaxed', done ? 'text-gray-400 line-through' : 'text-gray-700')}>{kr.descricao}</p>
-                              <div className="flex items-center gap-2 mt-2">
-                                <div className="flex-1 h-1 rounded-full bg-gray-100">
-                                  <div className="h-full rounded-full transition-all"
-                                    style={{ width: `${pct}%`, background: done ? '#10B981' : color }} />
-                                </div>
-                                <span className="text-xs text-gray-400 flex-shrink-0 whitespace-nowrap">
-                                  {kr.atual}/{kr.meta} {kr.unit}
-                                </span>
-                              </div>
-                            </div>
-                            <input
-                              type="number" value={kr.atual} min={0} max={kr.meta * 2}
-                              onChange={e => updateKr(obj.id, kr.id, Number(e.target.value))}
-                              className="w-20 text-sm text-right bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-gray-900 focus:outline-none focus:border-[#7B2FBE] focus:ring-1 focus:ring-[#7B2FBE]/20 flex-shrink-0"
-                            />
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-
-                  {/* ── PLAN ── */}
-                  {obj.pdcaTab === 'p' && (
-                    <div className="p-5 space-y-4">
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Diagnóstico atual — onde estou</p>
-                      <textarea
-                        value={obj.pdca.diagnostico}
-                        onChange={e => setPdca(obj.id, { diagnostico: e.target.value })}
-                        placeholder="Descreva honestamente onde você está hoje em relação a este objetivo..."
-                        rows={3}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 resize-none"
-                      />
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Meta específica — onde quero chegar e quando</p>
-                      <textarea
-                        value={obj.pdca.metaEspecifica}
-                        onChange={e => setPdca(obj.id, { metaEspecifica: e.target.value })}
-                        placeholder="Ex: Atingir 500 seguidores até o dia 31/03, com pelo menos 3 posts publicados..."
-                        rows={2}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 resize-none"
-                      />
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Riscos mapeados + plano de contingência</p>
-                      <textarea
-                        value={obj.pdca.riscos}
-                        onChange={e => setPdca(obj.id, { riscos: e.target.value })}
-                        placeholder="Ex: Falta de tempo na semana de pico → preparar conteúdo com antecedência na semana anterior..."
-                        rows={2}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 resize-none"
-                      />
-                      <div className="flex items-center justify-between pt-1">
-                        <p className="text-xs text-gray-400">Semana atual do ciclo</p>
-                        <div className="flex items-center gap-1">
-                          {[1,2,3,4].map(s => (
-                            <button key={s} onClick={() => setPdca(obj.id, { semanaAtual: s })}
-                              className={cn(
-                                'w-8 h-8 rounded-lg text-xs font-black transition-colors',
-                                obj.pdca.semanaAtual === s
-                                  ? 'bg-[#7B2FBE] text-white'
-                                  : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                              )}>
-                              {s}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ── DO ── */}
-                  {obj.pdcaTab === 'd' && (
-                    <div className="p-5 space-y-5">
-                      {[1,2,3,4].map(semana => {
-                        const acoesSem = obj.pdca.acoes.filter(a => a.semana === semana)
-                        const isCurrent = semana === obj.pdca.semanaAtual
-                        const isPast = semana < obj.pdca.semanaAtual
-                        return (
-                          <div key={semana}>
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-2">
-                                <span className={cn(
-                                  'text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded',
-                                  isCurrent ? 'bg-[#7B2FBE]/10 text-[#7B2FBE]' : 'text-gray-400'
-                                )}>
-                                  Semana {semana} {isCurrent ? '— atual' : isPast ? '— concluída' : ''}
-                                </span>
-                              </div>
-                              <button onClick={() => addAcao(obj.id, semana)}
-                                className="text-[10px] font-black text-[#7B2FBE] hover:text-[#6a27a5] uppercase tracking-widest flex items-center gap-1"
-                              >
-                                <Plus size={10} /> Ação
-                              </button>
-                            </div>
-                            {acoesSem.length === 0 ? (
-                              <p className="text-xs text-gray-300 italic py-2 pl-1">Nenhuma ação adicionada</p>
-                            ) : (
-                              <div className="space-y-2">
-                                {acoesSem.map(acao => (
-                                  <div key={acao.id} className={cn(
-                                    'rounded-xl border p-3 space-y-2 transition-colors',
-                                    acao.status === 'feito'     ? 'border-emerald-100 bg-emerald-50/50' :
-                                    acao.status === 'bloqueado' ? 'border-amber-100 bg-amber-50/50' :
-                                    acao.status === 'nao_feito' ? 'border-red-100 bg-red-50/50' :
-                                    'border-gray-100 bg-gray-50'
-                                  )}>
-                                    <div className="flex items-start gap-2">
-                                      {statusIcon[acao.status]}
-                                      <input
-                                        type="text" value={acao.descricao}
-                                        onChange={e => updateAcao(obj.id, acao.id, { descricao: e.target.value })}
-                                        placeholder="Descreva a ação..."
-                                        className="flex-1 bg-transparent text-sm text-gray-800 placeholder:text-gray-300 focus:outline-none"
-                                      />
-                                    </div>
-                                    <div className="flex items-center gap-2 pl-6">
-                                      {(['feito','nao_feito','bloqueado','pendente'] as AcaoStatus[]).map(s => (
-                                        <button key={s} onClick={() => updateAcao(obj.id, acao.id, { status: s })}
-                                          className={cn(
-                                            'text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded transition-colors',
-                                            acao.status === s
-                                              ? s === 'feito'     ? 'bg-emerald-100 text-emerald-700'
-                                              : s === 'bloqueado' ? 'bg-amber-100 text-amber-700'
-                                              : s === 'nao_feito' ? 'bg-red-100 text-red-600'
-                                              :                     'bg-gray-200 text-gray-600'
-                                              : 'text-gray-300 hover:text-gray-500'
-                                          )}>
-                                          {statusLabel[s]}
-                                        </button>
-                                      ))}
-                                    </div>
-                                    {(acao.status === 'nao_feito' || acao.status === 'bloqueado') && (
-                                      <input
-                                        type="text" value={acao.obs}
-                                        onChange={e => updateAcao(obj.id, acao.id, { obs: e.target.value })}
-                                        placeholder="O que aconteceu? (opcional)"
-                                        className="w-full pl-6 bg-transparent text-xs text-gray-500 placeholder:text-gray-300 focus:outline-none border-t border-gray-200 pt-2"
-                                      />
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-
-                  {/* ── CHECK ── */}
-                  {obj.pdcaTab === 'c' && (
-                    <div className="p-5 space-y-4">
-                      {/* Ritmo de execução */}
-                      {r !== null ? (
-                        <>
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ritmo de execução</p>
-                              <span className={cn('text-sm font-black', r >= 80 ? 'text-emerald-500' : r >= 50 ? 'text-amber-500' : 'text-red-500')}>
-                                {r}%
-                              </span>
-                            </div>
-                            <div className="w-full h-2 rounded-full bg-gray-100">
-                              <div className="h-full rounded-full transition-all duration-500"
-                                style={{ width: `${r}%`, background: r >= 80 ? '#10B981' : r >= 50 ? '#F59E0B' : '#EF4444' }} />
-                            </div>
-                            <p className="text-xs text-gray-400 mt-2">
-                              {r >= 80 ? '✓ No ritmo certo para atingir o objetivo no prazo.'
-                               : r >= 50 ? '⚠ Ritmo abaixo do ideal — atenção às próximas semanas.'
-                               : '✗ Risco real de não atingir o KR. Acione o plano de contingência.'}
-                            </p>
-                          </div>
-
-                          {/* Breakdown por semana */}
-                          <div className="space-y-2">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Semana a semana</p>
-                            {[1,2,3,4].map(s => {
-                              const acs   = obj.pdca.acoes.filter(a => a.semana === s)
-                              const feitas = acs.filter(a => a.status === 'feito').length
-                              const total  = acs.length
-                              const pPast  = s < obj.pdca.semanaAtual
-                              const pct    = total > 0 ? Math.round((feitas / total) * 100) : 0
-                              return (
-                                <div key={s} className="flex items-center gap-3">
-                                  <span className="text-xs text-gray-400 w-18 flex-shrink-0">Semana {s}</span>
-                                  <div className="flex-1 h-1.5 rounded-full bg-gray-100">
-                                    {pPast && total > 0 && (
-                                      <div className="h-full rounded-full"
-                                        style={{ width: `${pct}%`, background: pct >= 80 ? '#10B981' : pct >= 50 ? '#F59E0B' : '#EF4444' }} />
-                                    )}
-                                  </div>
-                                  <span className="text-xs text-gray-400 w-16 text-right flex-shrink-0">
-                                    {pPast && total > 0 ? `${feitas}/${total} feitas` : total > 0 ? `${total} ações` : '—'}
-                                  </span>
-                                </div>
-                              )
-                            })}
-                          </div>
-
-                          {/* KR progress */}
-                          <div>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Progresso dos Key Results</p>
-                            {obj.keyResults.map(kr => {
-                              const pct = getProgress(kr.atual, kr.meta)
-                              return (
-                                <div key={kr.id} className="mb-3">
-                                  <div className="flex justify-between mb-1">
-                                    <p className="text-xs text-gray-600 leading-relaxed">{kr.descricao}</p>
-                                    <span className="text-xs font-black text-gray-900 ml-2 flex-shrink-0">{pct}%</span>
-                                  </div>
-                                  <div className="w-full h-1.5 rounded-full bg-gray-100">
-                                    <div className="h-full rounded-full transition-all"
-                                      style={{ width: `${pct}%`, background: color }} />
-                                  </div>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        </>
-                      ) : (
-                        <div className="py-8 text-center">
-                          <p className="text-sm text-gray-400">Nenhuma semana concluída ainda.</p>
-                          <p className="text-xs text-gray-300 mt-1">Registre ações na aba <strong>Do</strong> e avance a semana no <strong>Plan</strong>.</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* ── ACT ── */}
-                  {obj.pdcaTab === 'a' && (
-                    <div className="p-5 space-y-4">
-                      {obj.pdca.ajustes.length === 0 ? (
-                        <div className="py-8 text-center">
-                          <p className="text-sm text-gray-400">Os ajustes aparecem aqui ao final do ciclo de 4 semanas.</p>
-                          <p className="text-xs text-gray-300 mt-1">Complete as ações nas abas <strong>Do</strong> e <strong>Check</strong> primeiro.</p>
-                        </div>
-                      ) : (
-                        <>
-                          <p className="text-xs text-gray-500 leading-relaxed">
-                            Com base nos dados de execução do ciclo, estes são os 3 ajustes recomendados para o próximo ciclo. Aprove, rejeite ou modifique cada um.
-                          </p>
-                          <div className="space-y-3">
-                            {obj.pdca.ajustes.map((aj, i) => (
-                              <div key={aj.id} className={cn(
-                                'rounded-xl border p-4 transition-colors',
-                                aj.status === 'aprovado'  ? 'border-emerald-200 bg-emerald-50/60' :
-                                aj.status === 'rejeitado' ? 'border-red-100 bg-red-50/40 opacity-60' :
-                                'border-gray-200 bg-white'
-                              )}>
-                                <div className="flex items-start gap-3">
-                                  <span className="text-[11px] font-black text-[#7B2FBE] tracking-widest mt-0.5 flex-shrink-0">
-                                    0{i + 1}
-                                  </span>
-                                  <p className="text-sm text-gray-800 leading-relaxed flex-1">{aj.texto}</p>
-                                </div>
-                                {aj.status === 'pendente' && (
-                                  <div className="flex gap-2 mt-3 pl-6">
-                                    <button onClick={() => updateAjuste(obj.id, aj.id, 'aprovado')}
-                                      className="flex-1 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-black uppercase tracking-wide hover:bg-emerald-200 transition-colors">
-                                      Aprovar
-                                    </button>
-                                    <button onClick={() => updateAjuste(obj.id, aj.id, 'rejeitado')}
-                                      className="flex-1 py-1.5 bg-red-50 text-red-500 rounded-lg text-xs font-black uppercase tracking-wide hover:bg-red-100 transition-colors">
-                                      Rejeitar
-                                    </button>
-                                  </div>
-                                )}
-                                {aj.status !== 'pendente' && (
-                                  <div className="pl-6 mt-2">
-                                    <span className={cn(
-                                      'text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded',
-                                      aj.status === 'aprovado' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'
-                                    )}>
-                                      {aj.status === 'aprovado' ? 'Incorporado ao próximo ciclo' : 'Rejeitado'}
-                                    </span>
-                                    <button onClick={() => updateAjuste(obj.id, aj.id, 'pendente')}
-                                      className="ml-2 text-[9px] text-gray-400 underline hover:text-gray-700 uppercase tracking-widest">
-                                      Desfazer
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                          <div className="pt-2">
-                            <button className="w-full py-3 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-medium rounded-lg transition-colors">
-                              Iniciar Próximo Ciclo →
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-            </motion.div>
+            <OkrCard
+              key={obj.id}
+              obj={obj}
+              color={color}
+              objPct={objPct}
+              onSetObj={setObj}
+              onUpdateKr={updateKr}
+              onUpdateKrAtual={updateKrAtual}
+              onDeleteKr={deleteKr}
+              onAddKr={addKr}
+              onDeleteObjective={deleteObjective}
+              onSetPdca={setPdca}
+              onUpdateAcao={updateAcao}
+              onDeleteAcao={deleteAcao}
+              onAddAcao={addAcao}
+              onAddPlanoAcao={addPlanoAcao}
+              onUpdatePlanoAcao={updatePlanoAcao}
+              onDeletePlanoAcao={deletePlanoAcao}
+            />
           )
         })}
       </div>
@@ -916,21 +731,503 @@ function OkrPage() {
             </div>
           </Link>
 
-          <Link to="/dashboard/membro/kpis">
+          <Link to="/dashboard/membro/agenda">
             <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-medium text-[#7B2FBE]">05</span>
+                <span className="text-[10px] font-medium text-[#7B2FBE]">Agenda</span>
                 <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
               </div>
-              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Indicadores de Resultado</p>
+              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Agenda Executiva</p>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Os key results dos OKRs viram os indicadores que você acompanha semana a semana para saber se está no ritmo certo.
+                Suas ações do plano aparecem na agenda integrada — semana a semana, saiba exatamente o que executar.
               </p>
             </div>
           </Link>
 
         </div>
       </motion.div>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────────
+   OKR CARD
+───────────────────────────────────────────── */
+interface OkrCardProps {
+  obj: Objective
+  color: string
+  objPct: number
+  onSetObj: (id: string, patch: Partial<Objective>) => void
+  onUpdateKr: (objId: string, krId: string, patch: Partial<KeyResult>) => void
+  onUpdateKrAtual: (objId: string, krId: string, atual: number) => void
+  onDeleteKr: (objId: string, krId: string) => void
+  onAddKr: (objId: string) => void
+  onDeleteObjective: (objId: string) => void
+  onSetPdca: (id: string, patch: Partial<PdcaCiclo>) => void
+  onUpdateAcao: (objId: string, acaoId: string, patch: Partial<PdcaAcao>) => void
+  onDeleteAcao: (objId: string, acaoId: string) => void
+  onAddAcao: (objId: string, semana: number) => void
+  onAddPlanoAcao: (objId: string) => void
+  onUpdatePlanoAcao: (objId: string, acaoId: string, patch: Partial<PlanoAcao>) => void
+  onDeletePlanoAcao: (objId: string, acaoId: string) => void
+}
+
+function OkrCard({
+  obj, color, objPct,
+  onSetObj, onUpdateKr, onUpdateKrAtual, onDeleteKr, onAddKr, onDeleteObjective,
+  onSetPdca, onUpdateAcao, onDeleteAcao, onAddAcao,
+  onAddPlanoAcao, onUpdatePlanoAcao, onDeletePlanoAcao,
+}: OkrCardProps) {
+  const [editTitulo, setEditTitulo] = useState(false)
+  const [tituloVal, setTituloVal] = useState(obj.titulo)
+  const tituloRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => { if (editTitulo) tituloRef.current?.focus() }, [editTitulo])
+
+  function commitTitulo() {
+    const v = tituloVal.trim()
+    if (v) onSetObj(obj.id, { titulo: v })
+    else setTituloVal(obj.titulo)
+    setEditTitulo(false)
+  }
+
+  const identidade = getIdentidade()
+  const tabLabels = { okr: 'Como Vou Medir', p: 'Plano de Ação', d: 'Agenda Executiva', a: 'O Que Melhorar' }
+
+  const plano = obj.pdca.plano ?? []
+
+  return (
+    <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+      className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden"
+    >
+      {/* Cabeçalho */}
+      <div className="flex items-center gap-3 p-5">
+        <div
+          className="flex-1 min-w-0 cursor-pointer"
+          onClick={() => !editTitulo && onSetObj(obj.id, { expanded: !obj.expanded })}
+        >
+          <div className="flex items-center gap-2 mb-1.5">
+            <select
+              value={obj.categoria}
+              onChange={e => { e.stopPropagation(); onSetObj(obj.id, { categoria: e.target.value }) }}
+              onClick={e => e.stopPropagation()}
+              className="text-[10px] font-medium px-2 py-0.5 rounded border-0 focus:outline-none focus:ring-1 focus:ring-[#7B2FBE]/30 cursor-pointer"
+              style={{ background: `${color}15`, color }}
+            >
+              {Object.keys(catColor).map(c => <option key={c}>{c}</option>)}
+            </select>
+            <span className="text-[10px] text-gray-400 font-medium">{obj.trimestre}</span>
+          </div>
+
+          {editTitulo ? (
+            <input
+              ref={tituloRef}
+              value={tituloVal}
+              onChange={e => setTituloVal(e.target.value)}
+              onBlur={commitTitulo}
+              onKeyDown={e => { if (e.key === 'Enter') commitTitulo(); if (e.key === 'Escape') { setTituloVal(obj.titulo); setEditTitulo(false) } }}
+              onClick={e => e.stopPropagation()}
+              className="w-full text-sm font-semibold text-gray-900 bg-transparent border-b border-[#7B2FBE] focus:outline-none pb-0.5"
+            />
+          ) : (
+            <p className="text-sm font-semibold text-gray-900 leading-tight">{obj.titulo}</p>
+          )}
+
+          <div className="flex items-center gap-2 mt-2">
+            <div className="flex-1 h-1.5 rounded-full bg-gray-100">
+              <div className="h-full rounded-full transition-all" style={{ width: `${objPct}%`, background: color }} />
+            </div>
+            <span className="text-xs font-semibold flex-shrink-0" style={{ color }}>{objPct}%</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button
+            onClick={() => { setEditTitulo(true); onSetObj(obj.id, { expanded: true }) }}
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-[#7B2FBE] hover:bg-[#7B2FBE]/5 transition-colors"
+            title="Editar título"
+          >
+            <Pencil size={12} />
+          </button>
+          <button
+            onClick={() => { if (confirm(`Excluir o objetivo "${obj.titulo}"?`)) onDeleteObjective(obj.id) }}
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors"
+            title="Excluir objetivo"
+          >
+            <Trash2 size={12} />
+          </button>
+          <button
+            onClick={() => onSetObj(obj.id, { expanded: !obj.expanded })}
+            className="w-7 h-7 flex items-center justify-center"
+          >
+            {obj.expanded
+              ? <ChevronUp size={15} className="text-gray-300" />
+              : <ChevronDown size={15} className="text-gray-300" />
+            }
+          </button>
+        </div>
+      </div>
+
+      {obj.expanded && (
+        <>
+          {/* Tabs */}
+          <div className="border-t border-gray-100 flex overflow-x-auto">
+            {(['okr', 'p', 'd', 'a'] as const).map((tab) => {
+              const active = obj.pdcaTab === tab
+              return (
+                <button key={tab} onClick={() => onSetObj(obj.id, { pdcaTab: tab })}
+                  className={cn(
+                    'flex-1 py-2.5 text-[10px] font-medium uppercase tracking-wide transition-colors border-b-2 whitespace-nowrap px-2',
+                    active
+                      ? 'border-[#7B2FBE] text-[#7B2FBE]'
+                      : 'border-transparent text-gray-400 hover:text-gray-700'
+                  )}
+                >
+                  {tabLabels[tab]}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* ── COMO VOU MEDIR (Key Results) ── */}
+          {obj.pdcaTab === 'okr' && (
+            <div>
+              {obj.keyResults.length === 0 ? (
+                <div className="px-5 py-6 text-center">
+                  <p className="text-sm text-gray-400 mb-1">Nenhum Key Result definido</p>
+                  <p className="text-xs text-gray-300">Adicione métricas para acompanhar o progresso deste objetivo.</p>
+                </div>
+              ) : (
+                obj.keyResults.map(kr => (
+                  <KrItem
+                    key={kr.id}
+                    kr={kr}
+                    color={color}
+                    objId={obj.id}
+                    onUpdate={onUpdateKr}
+                    onDelete={onDeleteKr}
+                    onUpdateAtual={onUpdateKrAtual}
+                  />
+                ))
+              )}
+              <div className="px-5 py-3 border-t border-gray-100">
+                <button
+                  onClick={() => onAddKr(obj.id)}
+                  className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#7B2FBE] font-medium transition-colors"
+                >
+                  <Plus size={14} />
+                  Adicionar Key Result
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ── PLANO DE AÇÃO ── */}
+          {obj.pdcaTab === 'p' && (
+            <div className="p-5 space-y-3">
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Liste o que precisa ser entregue para atingir este objetivo. Use o formato: <strong>Entregar [o quê]</strong> até <strong>[data]</strong>.
+              </p>
+
+              {plano.length === 0 ? (
+                <div className="py-4 text-center">
+                  <p className="text-sm text-gray-300 italic">Nenhuma entrega planejada ainda</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {plano.map(acao => (
+                    <div key={acao.id} className="group flex items-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5">
+                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
+                      <input
+                        value={acao.entrega}
+                        onChange={e => onUpdatePlanoAcao(obj.id, acao.id, { entrega: e.target.value })}
+                        placeholder="Ex: Publicar 3 posts de autoridade"
+                        className="flex-1 text-sm text-gray-800 bg-transparent focus:outline-none placeholder:text-gray-300"
+                      />
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <Calendar size={12} className="text-gray-300" />
+                        <input
+                          type="date"
+                          value={acao.dataLimite}
+                          onChange={e => onUpdatePlanoAcao(obj.id, acao.id, { dataLimite: e.target.value })}
+                          className="text-xs text-gray-500 bg-transparent focus:outline-none border-0 w-32"
+                        />
+                        <button
+                          onClick={() => onDeletePlanoAcao(obj.id, acao.id)}
+                          className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-300 hover:text-red-400 transition-all"
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={() => onAddPlanoAcao(obj.id)}
+                className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#7B2FBE] font-medium transition-colors mt-1"
+              >
+                <Plus size={14} />
+                Adicionar entrega
+              </button>
+            </div>
+          )}
+
+          {/* ── AGENDA EXECUTIVA ── */}
+          {obj.pdcaTab === 'd' && (
+            <div className="p-5 space-y-5">
+              {/* Semana atual selector */}
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-500">Semana atual do ciclo</p>
+                <div className="flex items-center gap-1">
+                  {[1,2,3,4].map(s => (
+                    <button key={s} onClick={() => onSetPdca(obj.id, { semanaAtual: s })}
+                      className={cn(
+                        'w-8 h-8 rounded-lg text-xs font-medium transition-colors',
+                        obj.pdca.semanaAtual === s
+                          ? 'bg-[#7B2FBE] text-white'
+                          : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                      )}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {[1,2,3,4].map(semana => {
+                const acoesSem = obj.pdca.acoes.filter(a => a.semana === semana)
+                const isCurrent = semana === obj.pdca.semanaAtual
+                const isPast = semana < obj.pdca.semanaAtual
+                return (
+                  <div key={semana}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className={cn(
+                        'text-[11px] font-medium px-2.5 py-0.5 rounded-md',
+                        isCurrent ? 'bg-[#7B2FBE]/10 text-[#7B2FBE]' : 'text-gray-400'
+                      )}>
+                        Semana {semana}{isCurrent ? ' — atual' : isPast ? ' — concluída' : ''}
+                      </span>
+                      <button onClick={() => onAddAcao(obj.id, semana)}
+                        className="text-xs font-medium text-[#7B2FBE] hover:text-[#6a27a5] flex items-center gap-1"
+                      >
+                        <Plus size={11} /> Ação
+                      </button>
+                    </div>
+
+                    {acoesSem.length === 0 ? (
+                      <p className="text-xs text-gray-300 italic py-2 pl-1">Nenhuma ação adicionada</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {acoesSem.map(acao => (
+                          <div key={acao.id} className={cn(
+                            'group rounded-xl border p-3 space-y-2 transition-colors',
+                            acao.status === 'feito'     ? 'border-emerald-100 bg-emerald-50/50' :
+                            acao.status === 'bloqueado' ? 'border-amber-100 bg-amber-50/50' :
+                            acao.status === 'nao_feito' ? 'border-red-100 bg-red-50/50' :
+                            'border-gray-100 bg-gray-50'
+                          )}>
+                            <div className="flex items-start gap-2">
+                              {statusIcon[acao.status]}
+                              <div className="flex-1 min-w-0">
+                                <input
+                                  type="text" value={acao.descricao}
+                                  onChange={e => onUpdateAcao(obj.id, acao.id, { descricao: e.target.value })}
+                                  placeholder="Ex: Publicar 3 posts de autoridade até 15/07"
+                                  className="w-full bg-transparent text-sm text-gray-800 placeholder:text-gray-300 focus:outline-none"
+                                />
+                                {acao.dataLimite && (
+                                  <p className="text-[10px] text-gray-400 mt-0.5">Até {new Date(acao.dataLimite + 'T00:00:00').toLocaleDateString('pt-BR')}</p>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <input
+                                  type="date"
+                                  value={acao.dataLimite}
+                                  onChange={e => onUpdateAcao(obj.id, acao.id, { dataLimite: e.target.value })}
+                                  className="text-[10px] text-gray-400 bg-transparent border-0 focus:outline-none w-28 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  title="Data limite"
+                                />
+                                <button
+                                  onClick={() => onDeleteAcao(obj.id, acao.id)}
+                                  className="p-1 rounded text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                                >
+                                  <Trash2 size={11} />
+                                </button>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1.5 pl-6 flex-wrap">
+                              {(['feito','nao_feito','bloqueado','pendente'] as AcaoStatus[]).map(s => (
+                                <button key={s} onClick={() => onUpdateAcao(obj.id, acao.id, { status: s })}
+                                  className={cn(
+                                    'text-[9px] font-medium px-2 py-1 rounded transition-colors',
+                                    acao.status === s
+                                      ? s === 'feito'     ? 'bg-emerald-100 text-emerald-700'
+                                      : s === 'bloqueado' ? 'bg-amber-100 text-amber-700'
+                                      : s === 'nao_feito' ? 'bg-red-100 text-red-600'
+                                      :                     'bg-gray-200 text-gray-600'
+                                      : 'text-gray-300 hover:text-gray-500'
+                                  )}>
+                                  {statusLabel[s]}
+                                </button>
+                              ))}
+                            </div>
+                            {(acao.status === 'nao_feito' || acao.status === 'bloqueado') && (
+                              <input
+                                type="text" value={acao.obs}
+                                onChange={e => onUpdateAcao(obj.id, acao.id, { obs: e.target.value })}
+                                placeholder="O que aconteceu? (opcional)"
+                                className="w-full pl-6 bg-transparent text-xs text-gray-500 placeholder:text-gray-300 focus:outline-none border-t border-gray-200 pt-2"
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {/* ── O QUE MELHORAR ── */}
+          {obj.pdcaTab === 'a' && (
+            <OQueMelhorar obj={obj} color={color} identidade={identidade} />
+          )}
+        </>
+      )}
+    </motion.div>
+  )
+}
+
+/* ─────────────────────────────────────────────
+   O QUE MELHORAR — contextual
+───────────────────────────────────────────── */
+function OQueMelhorar({
+  obj, color, identidade,
+}: {
+  obj: Objective
+  color: string
+  identidade: ReturnType<typeof getIdentidade>
+}) {
+  const krsAbaixo = obj.keyResults.filter(kr => getProgress(kr.atual, kr.meta) < 50)
+  const acoesPendentes = obj.pdca.acoes.filter(a => a.semana < obj.pdca.semanaAtual && a.status === 'pendente').length
+  const acoesBloqueadas = obj.pdca.acoes.filter(a => a.status === 'bloqueado').length
+  const totalAcoesPast = obj.pdca.acoes.filter(a => a.semana < obj.pdca.semanaAtual).length
+  const acoesFeitasPast = obj.pdca.acoes.filter(a => a.semana < obj.pdca.semanaAtual && a.status === 'feito').length
+  const ritmoExecucao = totalAcoesPast > 0 ? Math.round((acoesFeitasPast / totalAcoesPast) * 100) : null
+
+  const proposta = identidade?.pilares.proposta?.reflexao?.trim()
+  const publicoAlvo = identidade?.pilares.publicoAlvo?.reflexao?.trim()
+  const diferencial = identidade?.diferenciais?.[0]
+
+  const melhorias: { titulo: string; descricao: string; prioridade: 'alta' | 'media' | 'baixa' }[] = []
+
+  if (ritmoExecucao !== null && ritmoExecucao < 60) {
+    melhorias.push({
+      titulo: 'Ritmo de execução abaixo do ideal',
+      descricao: `Apenas ${ritmoExecucao}% das ações passadas foram concluídas. Revise se as ações são realistas para seu tempo disponível ou se há bloqueios não identificados.`,
+      prioridade: ritmoExecucao < 40 ? 'alta' : 'media',
+    })
+  }
+
+  if (acoesBloqueadas > 0) {
+    melhorias.push({
+      titulo: `${acoesBloqueadas} ação${acoesBloqueadas > 1 ? 'ões' : ''} bloqueada${acoesBloqueadas > 1 ? 's' : ''}`,
+      descricao: 'Ações bloqueadas precisam de atenção imediata. Identifique a causa raiz: falta de recurso, dependência externa ou prioridade conflitante?',
+      prioridade: 'alta',
+    })
+  }
+
+  if (krsAbaixo.length > 0) {
+    krsAbaixo.slice(0, 2).forEach(kr => {
+      const pct = getProgress(kr.atual, kr.meta)
+      melhorias.push({
+        titulo: `KR abaixo de 50%: "${kr.descricao.slice(0, 55)}${kr.descricao.length > 55 ? '...' : ''}"`,
+        descricao: pct === 0
+          ? 'Nenhum progresso registrado ainda. Certifique-se de que há ações concretas no Plano de Ação e na Agenda Executiva para este resultado.'
+          : `Progresso em ${pct}%. Adicione mais ações específicas ou reavalie se a meta está calibrada corretamente com seu mentor.`,
+        prioridade: pct === 0 ? 'alta' : 'media',
+      })
+    })
+  }
+
+  if (proposta && krsAbaixo.length > 0) {
+    melhorias.push({
+      titulo: 'Alinhar ações à sua proposta de valor',
+      descricao: `Suas ações estão comunicando "${proposta.slice(0, 80)}${proposta.length > 80 ? '...' : ''}"? Cada entrega semanal deve reforçar o que te diferencia.`,
+      prioridade: 'media',
+    })
+  }
+
+  if (publicoAlvo && acoesPendentes > 0) {
+    melhorias.push({
+      titulo: 'Ações pendentes de semanas anteriores',
+      descricao: `${acoesPendentes} ação${acoesPendentes > 1 ? 'ões' : ''} de semanas passadas ainda pendente${acoesPendentes > 1 ? 's' : ''}. ${publicoAlvo ? `Seu público-alvo (${publicoAlvo.slice(0, 50)}${publicoAlvo.length > 50 ? '...' : ''}) precisa de consistência para te reconhecer.` : 'Consistência é fundamental para construir autoridade.'}`,
+      prioridade: 'media',
+    })
+  }
+
+  if (diferencial && obj.keyResults.length === 0) {
+    melhorias.push({
+      titulo: 'Objetivo sem métricas definidas',
+      descricao: `Sem Key Results, não há como saber se está avançando. Defina indicadores que meçam se "${diferencial.slice(0, 60)}${diferencial.length > 60 ? '...' : ''}" está sendo percebido pelo seu mercado.`,
+      prioridade: 'alta',
+    })
+  }
+
+  if (melhorias.length === 0) {
+    const hasDados = obj.pdca.acoes.filter(a => a.semana < obj.pdca.semanaAtual).length > 0
+
+    return (
+      <div className="p-6 text-center">
+        {hasDados ? (
+          <>
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mx-auto mb-3">
+              <CheckCircle2 size={20} className="text-emerald-500" />
+            </div>
+            <p className="text-sm font-semibold text-gray-700 mb-1">Execução no ritmo certo!</p>
+            <p className="text-xs text-gray-400 max-w-xs mx-auto leading-relaxed">
+              Seus indicadores estão dentro do esperado. Continue executando e volte aqui ao final da semana.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-gray-400 mb-1">Ainda sem dados de execução</p>
+            <p className="text-xs text-gray-300 leading-relaxed max-w-xs mx-auto">
+              Registre ações na <strong>Agenda Executiva</strong> e atualize os resultados em <strong>Como Vou Medir</strong>. Os ajustes aparecem aqui automaticamente.
+            </p>
+          </>
+        )}
+      </div>
+    )
+  }
+
+  const priorColors = { alta: '#EF4444', media: '#F59E0B', baixa: '#10B981' }
+  const priorLabel = { alta: 'Alta', media: 'Média', baixa: 'Baixa' }
+
+  return (
+    <div className="p-5 space-y-3">
+      <p className="text-xs text-gray-500 leading-relaxed">
+        Baseado nos seus dados de execução e no diagnóstico da sua identidade:
+      </p>
+      {melhorias.slice(0, 4).map((m, i) => (
+        <div key={i} className="rounded-xl border border-gray-100 p-4 bg-gray-50/50">
+          <div className="flex items-start gap-3">
+            <span className="text-[11px] font-semibold flex-shrink-0 mt-0.5 px-1.5 py-0.5 rounded"
+              style={{ background: `${priorColors[m.prioridade]}15`, color: priorColors[m.prioridade] }}>
+              {priorLabel[m.prioridade]}
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-gray-800 leading-snug mb-1">{m.titulo}</p>
+              <p className="text-xs text-gray-500 leading-relaxed">{m.descricao}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+      <p className="text-[11px] text-gray-400 pt-1 border-t border-gray-100">
+        Estes ajustes são gerados automaticamente com base na sua execução e identidade de marca.
+      </p>
     </div>
   )
 }

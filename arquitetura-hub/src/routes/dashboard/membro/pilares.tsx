@@ -207,6 +207,28 @@ function PilaresPage() {
     setPilares(prev => [...prev, { ...pilar, ordem: prev.length + 1 }])
   }
 
+  function handleDeleteAcao(pilarId: string, acaoId: string) {
+    setPilares(prev => prev.map(p => {
+      if (p.id !== pilarId) return p
+      return { ...p, acoes: p.acoes.filter(a => a.id !== acaoId) }
+    }))
+  }
+
+  function handleEditAcao(pilarId: string, acaoId: string, texto: string) {
+    setPilares(prev => prev.map(p => {
+      if (p.id !== pilarId) return p
+      return { ...p, acoes: p.acoes.map(a => a.id === acaoId ? { ...a, texto } : a) }
+    }))
+  }
+
+  function handleEditPilar(pilarId: string, patch: Partial<Pick<Pilar, 'nome' | 'descricao'>>) {
+    setPilares(prev => prev.map(p => p.id === pilarId ? { ...p, ...patch } : p))
+  }
+
+  function handleDeletePilar(pilarId: string) {
+    setPilares(prev => prev.filter(p => p.id !== pilarId))
+  }
+
   const totalAcoes = pilares.reduce((s, p) => s + p.acoes.length, 0)
   const doneAcoes  = pilares.reduce((s, p) => s + p.acoes.filter(a => a.concluida).length, 0)
   const overallPct = totalAcoes > 0 ? Math.round((doneAcoes / totalAcoes) * 100) : 0
@@ -375,6 +397,10 @@ function PilaresPage() {
               pilar={pilar}
               onToggleAcao={handleToggleAcao}
               onAddAcao={handleAddAcao}
+              onDeleteAcao={handleDeleteAcao}
+              onEditAcao={handleEditAcao}
+              onEditPilar={handleEditPilar}
+              onDeletePilar={handleDeletePilar}
             />
           ))}
         </motion.div>
