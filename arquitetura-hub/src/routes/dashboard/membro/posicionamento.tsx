@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
-import { Lock, Sparkles, PenLine, MessageSquare, Search, Lightbulb, Target, Layers, ChevronRight, CheckCircle2, Circle, Download, Users } from 'lucide-react'
+import { Lock, Sparkles, PenLine, MessageSquare, Search, Lightbulb, Target, Layers, ChevronRight, CheckCircle2, Circle, Download, Users, Plus, X } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
@@ -588,7 +588,7 @@ function PosicionamentoPage() {
         </div>
         <div className="space-y-2.5">
           {diferenciais.map((d, i) => (
-            <div key={i} className="flex items-center gap-3">
+            <div key={i} className="group flex items-center gap-3">
               <div className={cn(
                 'w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all',
                 d.trim() ? 'bg-[#7B2FBE]' : 'border-2 border-gray-200'
@@ -606,9 +606,25 @@ function PosicionamentoPage() {
                 placeholder={`Diferencial ${i + 1}. Ex: único a combinar X com Y para Z`}
                 className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-1 focus:ring-[#7B2FBE]/20"
               />
+              {diferenciais.length > 1 && (
+                <button
+                  onClick={() => setDiferenciais(prev => prev.filter((_, idx) => idx !== i))}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-400"
+                >
+                  <X size={14} />
+                </button>
+              )}
             </div>
           ))}
         </div>
+
+        <button
+          onClick={() => setDiferenciais(prev => [...prev, ''])}
+          className="mt-3 flex items-center gap-2 text-xs text-[#7B2FBE] hover:text-[#6a1fa8] font-medium transition-colors"
+        >
+          <Plus size={14} />
+          Adicionar diferencial
+        </button>
 
         {diferenciais.some(d => d.trim()) && (
           <div className="mt-4 rounded-xl border border-[#7B2FBE]/15 bg-[#7B2FBE]/[0.03] p-3.5">
