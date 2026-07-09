@@ -29,7 +29,13 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
   const proposta       = identidade?.pilares.proposta?.reflexao?.trim()
   const storytelling   = identidade?.pilares.storytelling?.reflexao?.trim()
   const formatoProduto = identidade?.pilares.formatoProduto?.reflexao?.trim()
-  const diferencial    = identidade?.diferenciais?.[0] ?? ''
+  const diferencial    = identidade?.diferenciais?.find(d => d.trim()) ?? ''
+
+  // Extrai a primeira frase ou primeiras palavras de um texto longo
+  const curto = (text: string, max = 50) => {
+    const frase = text.split(/[.!?]/)[0].trim()
+    return frase.length <= max ? frase : frase.slice(0, max).trimEnd() + '...'
+  }
 
   const sugestoes: SugestaoPilar[] = [
     publicoAlvo ? {
@@ -38,9 +44,9 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
       nome: 'Presença Direcionada',
       descricao: `Visibilidade focada em "${publicoAlvo.slice(0, 65)}${publicoAlvo.length > 65 ? '...' : ''}"`,
       acoes: [
-        'Publicar 2 conteúdos por semana falando diretamente para seu público',
-        'Participar de 1 comunidade ou evento onde seu público-alvo está presente',
-        'Produzir 1 conteúdo/mês respondendo as principais dúvidas do mercado',
+        `Publicar 2 conteúdos por semana falando diretamente para ${curto(publicoAlvo)}`,
+        `Participar de 1 comunidade ou evento onde ${curto(publicoAlvo)} está presente`,
+        `Produzir 1 conteúdo/mês respondendo as principais dúvidas de ${curto(publicoAlvo)}`,
       ],
     } : null,
     proposta ? {
@@ -49,9 +55,9 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
       nome: 'Autoridade pela Entrega',
       descricao: `Demonstrar como você entrega "${proposta.slice(0, 65)}${proposta.length > 65 ? '...' : ''}"`,
       acoes: [
-        'Publicar 1 case de resultado real por mês com dados e aprendizados',
+        `Publicar 1 case de resultado real mostrando como você entregou: ${curto(proposta)}`,
         'Criar série de conteúdo explicando seu método e processo de trabalho',
-        'Documentar os bastidores e compartilhar o "como funciona"',
+        `Documentar os bastidores de como você garante "${curto(proposta)}"`,
       ],
     } : null,
     (storytelling || diferencial) ? {
@@ -62,8 +68,12 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
         ? `Posicionar "${diferencial.slice(0, 65)}${diferencial.length > 65 ? '...' : ''}" como vantagem única`
         : 'Usar sua história como âncora de credibilidade e identificação',
       acoes: [
-        'Publicar sua história de origem e por que você faz o que faz',
-        'Criar conteúdo mostrando sua abordagem única em comparação ao mercado',
+        storytelling
+          ? `Publicar como "${curto(storytelling)}" te capacita a ajudar quem você ajuda hoje`
+          : 'Publicar sua história de origem e por que você faz o que faz',
+        diferencial
+          ? `Criar conteúdo mostrando sua vantagem única: "${curto(diferencial)}" vs. o mercado`
+          : 'Criar conteúdo mostrando sua abordagem única em comparação ao mercado',
         'Coletar e compartilhar depoimentos que reforçam seu diferencial',
       ],
     } : null,
@@ -73,9 +83,11 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
       nome: 'Pipeline de Clientes',
       descricao: `Criar caminho de atração para "${formatoProduto.slice(0, 65)}${formatoProduto.length > 65 ? '...' : ''}"`,
       acoes: [
-        'Criar conteúdo gratuito que leva naturalmente à sua oferta principal',
-        'Construir lista de potenciais clientes para abordagem direta',
-        'Produzir 1 conteúdo/mês demonstrando como funciona seu formato de trabalho',
+        `Criar conteúdo gratuito que leva naturalmente para: ${curto(formatoProduto)}`,
+        publicoAlvo
+          ? `Construir lista de ${curto(publicoAlvo)} para abordagem direta`
+          : 'Construir lista de potenciais clientes para abordagem direta',
+        `Produzir 1 conteúdo/mês demonstrando como funciona: ${curto(formatoProduto)}`,
       ],
     } : null,
   ].filter(Boolean) as SugestaoPilar[]
