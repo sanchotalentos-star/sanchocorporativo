@@ -47,10 +47,10 @@ const phases = [
 ]
 
 const quickLinks = [
-  { num: '01', label: 'Metas de Impacto',  desc: 'Objetivos e resultados-chave da jornada', href: '/dashboard/membro/okr'            },
-  { num: '02', label: 'Minha Identidade',  desc: 'Quem você é e o que você entrega',         href: '/dashboard/membro/posicionamento' },
-  { num: '03', label: 'Marketing Anual',   desc: 'Agenda de conteúdo e presença',             href: '/dashboard/membro/marketing'      },
-  { num: '04', label: 'Pilares da Marca',  desc: 'Ações estratégicas de cada pilar',          href: '/dashboard/membro/pilares'        },
+  { num: '01', label: 'Minha Identidade',  desc: 'Quem você é e o que você entrega',          href: '/dashboard/membro/posicionamento' },
+  { num: '02', label: 'Pilares da Marca',  desc: 'Ações estratégicas de cada pilar',           href: '/dashboard/membro/pilares'        },
+  { num: '03', label: 'Metas de Impacto',  desc: 'OKRs e resultados-chave por trimestre',      href: '/dashboard/membro/okr'            },
+  { num: '04', label: 'Marketing Anual',   desc: 'Agenda de conteúdo e presença',              href: '/dashboard/membro/marketing'      },
 ]
 
 const acoesPorFase: Record<number, { texto: string; href?: string }[]> = {

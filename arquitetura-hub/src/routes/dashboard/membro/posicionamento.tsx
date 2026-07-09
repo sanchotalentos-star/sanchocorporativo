@@ -644,28 +644,28 @@ function PosicionamentoPage() {
             </div>
           </Link>
 
-          <Link to="/dashboard/membro/marketing">
+          <Link to="/dashboard/membro/okr">
             <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-medium text-[#7B2FBE]">03</span>
                 <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
               </div>
-              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Marketing Anual</p>
+              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">OKRs & Metas</p>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Sua história, seu diferencial e seu formato de produto guiam os temas, canais e frequência do calendário.
+                Sua proposta de valor e seu público-alvo são a base para definir metas mensuráveis com seu mentor.
               </p>
             </div>
           </Link>
 
-          <Link to="/dashboard/membro/kpis">
+          <Link to="/dashboard/membro/marketing">
             <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-medium text-[#7B2FBE]">04</span>
                 <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
               </div>
-              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Resultados</p>
+              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Marketing Anual</p>
               <p className="text-xs text-gray-500 leading-relaxed">
-                A clareza do seu posicionamento determina quais indicadores fazem sentido acompanhar na sua jornada.
+                Sua história, seu diferencial e seu formato de produto guiam os temas, canais e frequência do calendário.
               </p>
             </div>
           </Link>

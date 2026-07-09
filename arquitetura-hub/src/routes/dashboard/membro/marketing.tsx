@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2, ChevronDown, ChevronUp, Sparkles, BookOpen, Star, Users, Lightbulb, Layers } from 'lucide-react'
+import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2, ChevronDown, ChevronUp, ChevronRight, Sparkles, BookOpen, Star, Users, Lightbulb, Layers } from 'lucide-react'
 import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { getIdentidade } from '@/lib/identidade'
@@ -211,15 +211,40 @@ function MarketingPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold text-gray-900">Agenda de Marketing Anual</h1>
-          <p className="text-gray-400 mt-1 text-sm">Planeje suas ações de conteúdo e distribuição ao longo do ano</p>
+      <div className="space-y-2">
+        {/* Mini cadeia */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <Link to="/dashboard/membro/posicionamento">
+            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">01 Identidade</span>
+          </Link>
+          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+          <Link to="/dashboard/membro/pilares">
+            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">02 Pilares</span>
+          </Link>
+          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+          <Link to="/dashboard/membro/okr">
+            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">03 OKRs</span>
+          </Link>
+          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+          <span className="text-xs font-bold text-[#7B2FBE] bg-[#7B2FBE]/10 px-2 py-0.5 rounded-md">
+            04 Marketing
+          </span>
+          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+          <Link to="/dashboard/membro/kpis">
+            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">05 Resultados</span>
+          </Link>
         </div>
-        <button className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm shadow-[#7B2FBE]/20">
-          <Plus size={16} />
-          Nova Ação
-        </button>
+
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Agenda de Marketing Anual</h1>
+            <p className="text-gray-400 mt-1 text-sm">Planeje suas ações de conteúdo e distribuição ao longo do ano</p>
+          </div>
+          <button className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm shadow-[#7B2FBE]/20 flex-shrink-0">
+            <Plus size={16} />
+            Nova Ação
+          </button>
+        </div>
       </div>
 
       {/* Progress bar */}
@@ -431,6 +456,25 @@ function MarketingPage() {
           )
         })}
       </div>
+
+      {/* Esta construção alimenta */}
+      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+        className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
+      >
+        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Esta construção alimenta</p>
+        <Link to="/dashboard/membro/kpis">
+          <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-medium text-[#7B2FBE]">05</span>
+              <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
+            </div>
+            <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Indicadores de Resultado</p>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Cada ação executada gera dados — alcance, engajamento, leads, vendas. Esses números são os indicadores que você acompanha para ajustar a rota.
+            </p>
+          </div>
+        </Link>
+      </motion.div>
     </div>
   )
 }

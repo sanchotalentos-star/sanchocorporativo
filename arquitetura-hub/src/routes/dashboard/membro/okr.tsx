@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, ChevronDown, ChevronUp, CheckCircle2, Circle, XCircle, AlertCircle, Target, TrendingUp, Crosshair, Rocket } from 'lucide-react'
+import { Plus, ChevronDown, ChevronUp, CheckCircle2, Circle, XCircle, AlertCircle, Target, TrendingUp, Crosshair, Rocket, ChevronRight } from 'lucide-react'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
@@ -172,17 +172,42 @@ function OkrPage() {
     <div className="space-y-6">
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Metas de Impacto</h1>
-          <p className="text-gray-500 mt-1 text-sm">O que você quer conquistar nos próximos 3 meses — definido com seu mentor, executado por você</p>
+      <div className="space-y-2">
+        {/* Mini cadeia */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <Link to="/dashboard/membro/posicionamento">
+            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">01 Identidade</span>
+          </Link>
+          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+          <Link to="/dashboard/membro/pilares">
+            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">02 Pilares</span>
+          </Link>
+          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+          <span className="text-xs font-bold text-[#7B2FBE] bg-[#7B2FBE]/10 px-2 py-0.5 rounded-md">
+            03 OKRs
+          </span>
+          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+          <Link to="/dashboard/membro/marketing">
+            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">04 Marketing</span>
+          </Link>
+          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+          <Link to="/dashboard/membro/kpis">
+            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">05 Resultados</span>
+          </Link>
         </div>
-        <button
-          onClick={() => setShowNovoObj(true)}
-          className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-black px-4 py-2.5 rounded-xl transition-colors uppercase tracking-wide"
-        >
-          <Plus size={15} /> Novo Objetivo
-        </button>
+
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Metas de Impacto</h1>
+            <p className="text-gray-500 mt-1 text-sm">O que você quer conquistar nos próximos 3 meses — definido com seu mentor, executado por você</p>
+          </div>
+          <button
+            onClick={() => setShowNovoObj(true)}
+            className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm flex-shrink-0"
+          >
+            <Plus size={15} /> Novo Objetivo
+          </button>
+        </div>
       </div>
 
       {/* Modal novo objetivo */}
@@ -676,7 +701,7 @@ function OkrPage() {
                             ))}
                           </div>
                           <div className="pt-2">
-                            <button className="w-full py-3 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-black uppercase tracking-wide rounded-xl transition-colors">
+                            <button className="w-full py-3 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-medium rounded-lg transition-colors">
                               Iniciar Próximo Ciclo →
                             </button>
                           </div>
@@ -690,6 +715,42 @@ function OkrPage() {
           )
         })}
       </div>
+
+      {/* Esta construção alimenta */}
+      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+        className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
+      >
+        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Esta construção alimenta</p>
+        <div className="grid sm:grid-cols-2 gap-3">
+
+          <Link to="/dashboard/membro/marketing">
+            <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-medium text-[#7B2FBE]">04</span>
+                <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
+              </div>
+              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Marketing Anual</p>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                As metas definem as prioridades de conteúdo e presença — o calendário de marketing é construído para executar o que os OKRs exigem.
+              </p>
+            </div>
+          </Link>
+
+          <Link to="/dashboard/membro/kpis">
+            <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-medium text-[#7B2FBE]">05</span>
+                <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
+              </div>
+              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Indicadores de Resultado</p>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Os key results dos OKRs viram os indicadores que você acompanha semana a semana para saber se está no ritmo certo.
+              </p>
+            </div>
+          </Link>
+
+        </div>
+      </motion.div>
     </div>
   )
 }

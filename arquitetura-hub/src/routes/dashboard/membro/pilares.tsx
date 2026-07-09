@@ -60,15 +60,19 @@ function PilaresPage() {
             </Link>
             <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
             <span className="text-xs font-bold text-[#7B2FBE] bg-[#7B2FBE]/10 px-2 py-0.5 rounded-md">
-              02 Pilares da Marca
+              02 Pilares
             </span>
             <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+            <Link to="/dashboard/membro/okr">
+              <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">03 OKRs</span>
+            </Link>
+            <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
             <Link to="/dashboard/membro/marketing">
-              <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">03 Marketing</span>
+              <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">04 Marketing</span>
             </Link>
             <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
             <Link to="/dashboard/membro/kpis">
-              <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">04 Resultados</span>
+              <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">05 Resultados</span>
             </Link>
           </div>
 
@@ -215,28 +219,28 @@ function PilaresPage() {
         <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Esta construção alimenta</p>
         <div className="grid sm:grid-cols-2 gap-3">
 
-          <Link to="/dashboard/membro/marketing">
+          <Link to="/dashboard/membro/okr">
             <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-medium text-[#7B2FBE]">03</span>
                 <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
               </div>
-              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Marketing Anual</p>
+              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">OKRs & Metas</p>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Cada pilar define um eixo de conteúdo e presença. O calendário de marketing é construído sobre essas frentes.
+                Os pilares definem onde você quer ter presença e autoridade — as metas OKR traduzem isso em objetivos mensuráveis por trimestre.
               </p>
             </div>
           </Link>
 
-          <Link to="/dashboard/membro/kpis">
+          <Link to="/dashboard/membro/marketing">
             <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-medium text-[#7B2FBE]">04</span>
                 <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
               </div>
-              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Resultados</p>
+              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Marketing Anual</p>
               <p className="text-xs text-gray-500 leading-relaxed">
-                As ações de cada pilar geram os indicadores de alcance, autoridade e crescimento que você acompanha nos resultados.
+                Cada pilar define um eixo de conteúdo e presença. O calendário de marketing é construído sobre essas frentes.
               </p>
             </div>
           </Link>

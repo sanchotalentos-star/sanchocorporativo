@@ -44,12 +44,16 @@ function KpisPage() {
             <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">02 Pilares</span>
           </Link>
           <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
+          <Link to="/dashboard/membro/okr">
+            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">03 OKRs</span>
+          </Link>
+          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
           <Link to="/dashboard/membro/marketing">
-            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">03 Marketing</span>
+            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">04 Marketing</span>
           </Link>
           <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
           <span className="text-xs font-bold text-[#7B2FBE] bg-[#7B2FBE]/10 px-2 py-0.5 rounded-md">
-            04 Resultados
+            05 Resultados
           </span>
         </div>
 
