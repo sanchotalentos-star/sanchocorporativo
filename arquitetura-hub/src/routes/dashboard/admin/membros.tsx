@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import {
   ChevronDown, ChevronUp, Check, PenLine, MessageSquare,
   Target, Calendar, BarChart2, Sparkles, CheckCircle2,
-  Plus, BookOpen, ClipboardList,
+  Plus, BookOpen, ClipboardList, TrendingUp, Circle,
+  ChevronRight, Award, Zap,
 } from 'lucide-react'
 import { fadeInUp } from '@/lib/motion'
 import { mockMembers } from '@/lib/mocks/members'
@@ -20,19 +21,19 @@ export const Route = createFileRoute('/dashboard/admin/membros')({
 const OKR_KEY       = 'okr_store_v1'
 const MARKETING_KEY = 'marketing_store_v1'
 
-type Fase    = 1 | 2 | 3 | 4
-type TabId   = 'overview' | 'identidade' | 'sessao'
+type Fase     = 1 | 2 | 3 | 4
+type TabId    = 'overview' | 'identidade' | 'sessao'
 type BlocoKey = 'publicoAlvo' | 'proposta' | 'storytelling' | 'formatoProduto' | 'diferencial'
 
 interface BlocoState { construido: boolean; analise: string }
 
 interface MenteeControls {
-  fase:          Fase
-  activeTab:     TabId
-  sessionNotes:  string
-  newStepInput:  string
-  nextSteps:     { id: string; texto: string; done: boolean }[]
-  identidade:    Record<BlocoKey, BlocoState>
+  fase:         Fase
+  activeTab:    TabId
+  sessionNotes: string
+  newStepInput: string
+  nextSteps:    { id: string; texto: string; done: boolean }[]
+  identidade:   Record<BlocoKey, BlocoState>
 }
 
 interface IdentidadeStored {
@@ -45,15 +46,19 @@ interface IdentidadeStored {
   diferenciais?: string[]
 }
 
+interface OkrKr { descricao: string; meta: number; atual: number; unidade: string }
+interface OkrObj { id: string; titulo: string; categoria: string; krs?: OkrKr[] }
+interface MktAcao { id: string; titulo: string; canal: string; frequencia: string; mes: number; concluida: boolean }
+
 function loadIdentidade(): IdentidadeStored | null {
   try { return JSON.parse(localStorage.getItem(IDENTIDADE_KEY) ?? 'null') }
   catch { return null }
 }
-function loadOkrs(): { id: string; titulo: string; categoria: string }[] {
+function loadOkrs(): OkrObj[] {
   try { return JSON.parse(localStorage.getItem(OKR_KEY) ?? 'null') ?? [] }
   catch { return [] }
 }
-function loadMarketing(): { id: string; titulo: string; concluida: boolean }[] {
+function loadMarketing(): MktAcao[] {
   try { return JSON.parse(localStorage.getItem(MARKETING_KEY) ?? 'null') ?? [] }
   catch { return [] }
 }
@@ -64,6 +69,8 @@ const FASES: { num: Fase; label: string; desc: string }[] = [
   { num: 3, label: 'Plano em Ação',      desc: 'Executando com consistência e ajustando o que não funciona' },
   { num: 4, label: 'Escala',             desc: 'Amplificando o que funciona com sistemas e delegação'       },
 ]
+
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 
 const BLOCOS: {
   id:          BlocoKey
@@ -125,6 +132,13 @@ const BLOCOS: {
   },
 ]
 
+const CATEGORIA_COLORS: Record<string, string> = {
+  Autoridade: '#7B2FBE',
+  Receita:    '#10B981',
+  Alcance:    '#3B82F6',
+  Produto:    '#F59E0B',
+}
+
 function makeDefault(): MenteeControls {
   return {
     fase: 1, activeTab: 'overview', sessionNotes: '', newStepInput: '',
@@ -144,7 +158,7 @@ function MiniChart({ data }: { data: { month: string; alcance: number }[] }) {
   const max = Math.max(...values, 1)
   const min = Math.min(...values, 0)
   const range = max - min || 1
-  const w = 300, h = 56, pad = 8
+  const w = 300, h = 60, pad = 8
 
   const pts = values.map((v, i) => ({
     x: pad + (i / Math.max(values.length - 1, 1)) * (w - pad * 2),
@@ -156,21 +170,37 @@ function MiniChart({ data }: { data: { month: string; alcance: number }[] }) {
 
   return (
     <div>
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-14" preserveAspectRatio="none">
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-16" preserveAspectRatio="none">
         <defs>
           <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7B2FBE" stopOpacity="0.2" />
+            <stop offset="0%" stopColor="#7B2FBE" stopOpacity="0.25" />
             <stop offset="100%" stopColor="#7B2FBE" stopOpacity="0" />
           </linearGradient>
         </defs>
         <path d={area} fill="url(#cg)" />
-        <path d={line} fill="none" stroke="#7B2FBE" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        {pts.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#7B2FBE" />)}
+        <path d={line} fill="none" stroke="#7B2FBE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        {pts.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="3" fill="#7B2FBE" />)}
       </svg>
       <div className="flex justify-between mt-1">
-        {data.map(d => (
-          <span key={d.month} className="text-[10px] text-gray-400">{d.month}</span>
-        ))}
+        {data.map(d => <span key={d.month} className="text-[10px] text-gray-400">{d.month}</span>)}
+      </div>
+    </div>
+  )
+}
+
+function KrBar({ kr }: { kr: OkrKr }) {
+  const pct = kr.meta > 0 ? Math.min(Math.round((kr.atual / kr.meta) * 100), 100) : 0
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between">
+        <p className="text-[11px] text-gray-600 leading-snug flex-1 pr-2">{kr.descricao}</p>
+        <span className="text-[10px] font-semibold text-gray-500 flex-shrink-0">{kr.atual}/{kr.meta} {kr.unidade}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="flex-1 h-1.5 bg-gray-100 rounded-full">
+          <div className="h-full rounded-full bg-[#7B2FBE] transition-all" style={{ width: `${pct}%` }} />
+        </div>
+        <span className="text-[10px] font-medium text-[#7B2FBE] w-8 text-right">{pct}%</span>
       </div>
     </div>
   )
@@ -242,18 +272,13 @@ function MembrosPage() {
     if (!texto) return
     upd(memberId, {
       newStepInput: '',
-      nextSteps: [
-        ...controls[memberId].nextSteps,
-        { id: Date.now().toString(), texto, done: false },
-      ],
+      nextSteps: [...controls[memberId].nextSteps, { id: Date.now().toString(), texto, done: false }],
     })
   }
 
   function toggleStep(memberId: string, stepId: string) {
     upd(memberId, {
-      nextSteps: controls[memberId].nextSteps.map(s =>
-        s.id === stepId ? { ...s, done: !s.done } : s
-      ),
+      nextSteps: controls[memberId].nextSteps.map(s => s.id === stepId ? { ...s, done: !s.done } : s),
     })
   }
 
@@ -273,6 +298,7 @@ function MembrosPage() {
           const faseInfo    = FASES.find(f => f.num === ctrl.fase)!
           const okrs        = member.id === 'member-2' ? loadOkrs()      : []
           const marketing   = member.id === 'member-2' ? loadMarketing() : []
+          const mktConcluidas = marketing.filter(a => a.concluida).length
 
           return (
             <motion.div key={member.id} variants={fadeInUp} initial="hidden" animate="visible"
@@ -351,11 +377,11 @@ function MembrosPage() {
                         ))}
                       </div>
 
-                      <div className="p-5 space-y-4 bg-gray-50/30">
+                      <div className="p-5 space-y-5 bg-gray-50/30">
 
                         {/* ════ VISÃO GERAL ════ */}
                         {ctrl.activeTab === 'overview' && (
-                          <div className="space-y-4">
+                          <div className="space-y-5">
 
                             {/* Stats */}
                             <div className="grid grid-cols-3 gap-3">
@@ -366,7 +392,7 @@ function MembrosPage() {
                               ].map(s => (
                                 <div key={s.label} className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-center shadow-sm">
                                   <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-1">{s.label}</p>
-                                  <p className="text-xl font-bold" style={{ color: s.color }}>{s.value}<span className="text-xs font-normal text-gray-400">{s.suffix ?? ''}</span></p>
+                                  <p className="text-2xl font-bold" style={{ color: s.color }}>{s.value}<span className="text-xs font-normal text-gray-400">{s.suffix ?? ''}</span></p>
                                 </div>
                               ))}
                             </div>
@@ -381,7 +407,8 @@ function MembrosPage() {
                                     const isActive = ctrl.fase === fase.num
                                     const isPast   = ctrl.fase > fase.num
                                     return (
-                                      <button key={fase.num} onClick={() => { upd(member.id, { fase: fase.num }); toast.success(`Fase: ${fase.label}`) }}
+                                      <button key={fase.num}
+                                        onClick={() => { upd(member.id, { fase: fase.num }); toast.success(`Fase: ${fase.label}`) }}
                                         className="flex flex-col items-center gap-2"
                                       >
                                         <div className={cn(
@@ -403,68 +430,174 @@ function MembrosPage() {
                               <p className="text-xs text-gray-400 text-center mt-3">{faseInfo.desc}</p>
                             </div>
 
-                            {/* Completude */}
-                            <div className="grid grid-cols-3 gap-3">
-                              {[
-                                { label: 'Identidade', a: filled,    b: 5,               note: constructed > 0 ? `${constructed} construídos` : undefined },
-                                { label: 'OKRs',       a: okrs.length, b: null,           note: okrs.length > 0 ? `${okrs.length} objetivos` : 'Nenhum ainda' },
-                                { label: 'Marketing',  a: marketing.filter((x: any) => x.concluida).length, b: marketing.length || null, note: marketing.length > 0 ? `${marketing.length} ações` : 'Nenhuma ainda' },
-                              ].map(c => (
-                                <div key={c.label} className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
-                                  <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-2">{c.label}</p>
-                                  <p className="text-lg font-bold text-gray-900">{c.a}{c.b !== null ? <span className="text-xs font-normal text-gray-400">/{c.b}</span> : ''}</p>
-                                  {c.note && <p className="text-[10px] text-[#7B2FBE] mt-0.5">{c.note}</p>}
-                                  {c.b !== null && c.b > 0 && (
-                                    <div className="w-full h-1 bg-gray-100 rounded-full mt-2">
-                                      <div className="h-full rounded-full bg-[#7B2FBE] transition-all" style={{ width: `${Math.round((c.a / c.b) * 100)}%` }} />
-                                    </div>
-                                  )}
+                            {/* Identidade em Construção — visão compacta completa */}
+                            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                              <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2">
+                                  <Award size={14} className="text-[#7B2FBE]" />
+                                  <p className="text-sm font-semibold text-gray-900">Identidade de Marca</p>
                                 </div>
-                              ))}
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] font-medium text-[#7B2FBE] bg-[#7B2FBE]/10 px-2 py-0.5 rounded-full">{filled}/5 preenchidos</span>
+                                  <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{constructed} construídos</span>
+                                </div>
+                              </div>
+
+                              <div className="space-y-3">
+                                {BLOCOS.map(bloco => {
+                                  const bs      = ctrl.identidade[bloco.id]
+                                  const content = getBlocoContent(member, bloco)
+                                  const hasCont = content !== null && (Array.isArray(content) ? content.length > 0 : content.length > 0)
+                                  const status  = bs.construido ? 'construido' : hasCont ? 'pronto' : 'aguardando'
+
+                                  const statusCfg = {
+                                    aguardando: { label: 'Aguardando', dot: '#9CA3AF' },
+                                    pronto:     { label: 'Pronto p/ sessão', dot: '#D97706' },
+                                    construido: { label: 'Construído', dot: '#7B2FBE' },
+                                  }[status]
+
+                                  return (
+                                    <div key={bloco.id} className={cn(
+                                      'rounded-xl border p-3 transition-all',
+                                      bs.construido ? 'border-[#7B2FBE]/20 bg-[#7B2FBE]/[0.02]' :
+                                      hasCont       ? 'border-amber-100 bg-amber-50/50' :
+                                                      'border-gray-100 bg-gray-50/50'
+                                    )}>
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0" style={{ background: `${bloco.cor}18` }}>
+                                          <span className="text-[9px] font-bold" style={{ color: bloco.cor }}>{bloco.num}</span>
+                                        </div>
+                                        <p className="text-xs font-semibold text-gray-800 flex-1">{bloco.label}</p>
+                                        <div className="flex items-center gap-1 flex-shrink-0">
+                                          <div className="w-1.5 h-1.5 rounded-full" style={{ background: statusCfg.dot }} />
+                                          <span className="text-[10px] text-gray-500">{statusCfg.label}</span>
+                                        </div>
+                                      </div>
+
+                                      {hasCont ? (
+                                        <div className="space-y-1.5">
+                                          {/* Resposta do mentorado */}
+                                          <div>
+                                            <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1">Resposta do mentorado</p>
+                                            {Array.isArray(content) ? (
+                                              <div className="space-y-1">
+                                                {content.map((d, i) => (
+                                                  <div key={i} className="flex items-start gap-1.5">
+                                                    <span className="w-1 h-1 rounded-full flex-shrink-0 mt-1.5" style={{ background: bloco.cor }} />
+                                                    <p className="text-xs text-gray-700 leading-relaxed">{d}</p>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            ) : (
+                                              <p className="text-xs text-gray-700 leading-relaxed">{content as string}</p>
+                                            )}
+                                          </div>
+                                          {/* Síntese do mentor (se houver) */}
+                                          {bs.analise.trim() && (
+                                            <div className="mt-2 pt-2 border-t border-gray-200">
+                                              <p className="text-[9px] font-medium text-[#7B2FBE] uppercase tracking-wide mb-1">Síntese do mentor</p>
+                                              <p className="text-xs text-[#7B2FBE]/80 leading-relaxed italic">{bs.analise}</p>
+                                            </div>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        <p className="text-xs text-gray-400 italic">Mentorado ainda não preencheu este bloco.</p>
+                                      )}
+                                    </div>
+                                  )
+                                })}
+                              </div>
+
+                              <button
+                                onClick={() => upd(member.id, { activeTab: 'identidade' })}
+                                className="mt-3 flex items-center gap-1.5 text-xs font-medium text-[#7B2FBE] hover:underline"
+                              >
+                                Abrir para análise e construção <ChevronRight size={12} />
+                              </button>
                             </div>
+
+                            {/* OKRs detalhados */}
+                            {okrs.length > 0 && (
+                              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-4">
+                                  <Target size={14} className="text-[#7B2FBE]" />
+                                  <p className="text-sm font-semibold text-gray-900">OKRs Definidos</p>
+                                  <span className="text-[10px] font-medium text-[#7B2FBE] bg-[#7B2FBE]/10 px-2 py-0.5 rounded-full">{okrs.length} objetivo{okrs.length > 1 ? 's' : ''}</span>
+                                </div>
+                                <div className="space-y-4">
+                                  {okrs.map(okr => (
+                                    <div key={okr.id} className="rounded-xl border border-gray-100 bg-gray-50/50 p-3">
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: CATEGORIA_COLORS[okr.categoria] ?? '#7B2FBE' }} />
+                                        <p className="text-xs font-semibold text-gray-800 flex-1">{okr.titulo}</p>
+                                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded flex-shrink-0"
+                                          style={{ background: `${CATEGORIA_COLORS[okr.categoria] ?? '#7B2FBE'}15`, color: CATEGORIA_COLORS[okr.categoria] ?? '#7B2FBE' }}>
+                                          {okr.categoria}
+                                        </span>
+                                      </div>
+                                      {okr.krs && okr.krs.length > 0 && (
+                                        <div className="space-y-2.5 pl-3 border-l-2 border-gray-200">
+                                          {okr.krs.map((kr, i) => <KrBar key={i} kr={kr} />)}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Marketing */}
+                            {marketing.length > 0 && (
+                              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                                <div className="flex items-center gap-2 mb-4">
+                                  <Calendar size={14} className="text-[#7B2FBE]" />
+                                  <p className="text-sm font-semibold text-gray-900">Plano de Marketing Anual</p>
+                                </div>
+                                <div className="flex items-center gap-5 mb-4">
+                                  <div><p className="text-xl font-bold text-gray-900">{marketing.length}</p><p className="text-[10px] text-gray-400">ações planejadas</p></div>
+                                  <div><p className="text-xl font-bold text-[#10B981]">{mktConcluidas}</p><p className="text-[10px] text-gray-400">concluídas</p></div>
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <span className="text-[10px] text-gray-400">Execução</span>
+                                      <span className="text-[10px] font-medium text-[#7B2FBE]">{Math.round((mktConcluidas / marketing.length) * 100)}%</span>
+                                    </div>
+                                    <div className="w-full h-2 bg-gray-100 rounded-full">
+                                      <div className="h-full rounded-full bg-[#10B981] transition-all"
+                                        style={{ width: `${Math.round((mktConcluidas / marketing.length) * 100)}%` }} />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="space-y-1.5">
+                                  {marketing.slice(0, 5).map(a => (
+                                    <div key={a.id} className="flex items-center gap-2 text-xs">
+                                      <div className={cn('w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center flex-shrink-0',
+                                        a.concluida ? 'bg-[#10B981] border-[#10B981]' : 'border-gray-300'
+                                      )}>
+                                        {a.concluida && <Check size={7} className="text-white" />}
+                                      </div>
+                                      <p className={cn('flex-1 truncate', a.concluida ? 'line-through text-gray-400' : 'text-gray-700')}>{a.titulo}</p>
+                                      <span className="text-[10px] text-gray-400 flex-shrink-0">{a.canal} · {MESES[(a.mes ?? 1) - 1]}</span>
+                                    </div>
+                                  ))}
+                                  {marketing.length > 5 && <p className="text-[10px] text-gray-400 pl-5">+ {marketing.length - 5} outras ações</p>}
+                                </div>
+                              </div>
+                            )}
 
                             {/* Growth chart */}
                             {member.growth?.length > 0 && (
                               <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                                <p className="text-xs font-semibold text-gray-700 mb-3">Evolução de Alcance</p>
-                                <MiniChart data={member.growth} />
-                              </div>
-                            )}
-
-                            {/* OKR summary */}
-                            {okrs.length > 0 && (
-                              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                                <p className="text-xs font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                                  <Target size={13} className="text-[#7B2FBE]" /> OKRs Definidos
-                                </p>
-                                <div className="space-y-2">
-                                  {okrs.slice(0, 4).map((okr: any) => (
-                                    <div key={okr.id} className="flex items-center gap-2">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-[#7B2FBE] flex-shrink-0" />
-                                      <p className="text-xs text-gray-700 flex-1 truncate">{okr.titulo}</p>
-                                      <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded flex-shrink-0">{okr.categoria}</span>
-                                    </div>
-                                  ))}
-                                  {okrs.length > 4 && <p className="text-[10px] text-gray-400">+ {okrs.length - 4} outros objetivos</p>}
+                                <div className="flex items-center gap-2 mb-3">
+                                  <TrendingUp size={14} className="text-[#7B2FBE]" />
+                                  <p className="text-sm font-semibold text-gray-900">Evolução de Alcance</p>
                                 </div>
-                              </div>
-                            )}
-
-                            {/* Marketing summary */}
-                            {marketing.length > 0 && (
-                              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                                <p className="text-xs font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                                  <Calendar size={13} className="text-[#7B2FBE]" /> Plano de Marketing
-                                </p>
-                                <div className="flex items-center gap-4">
-                                  <div><p className="text-lg font-bold text-gray-900">{marketing.length}</p><p className="text-[10px] text-gray-400">planejadas</p></div>
-                                  <div><p className="text-lg font-bold text-[#10B981]">{marketing.filter((a: any) => a.concluida).length}</p><p className="text-[10px] text-gray-400">concluídas</p></div>
-                                  <div className="flex-1">
-                                    <div className="w-full h-2 bg-gray-100 rounded-full">
-                                      <div className="h-full rounded-full bg-[#10B981]"
-                                        style={{ width: `${Math.round((marketing.filter((a: any) => a.concluida).length / marketing.length) * 100)}%` }} />
-                                    </div>
-                                  </div>
+                                <MiniChart data={member.growth} />
+                                <div className="flex justify-between mt-2">
+                                  {member.growth.map(g => (
+                                    <span key={g.month} className="text-[10px] font-medium text-gray-500">
+                                      {g.alcance >= 1000 ? `${(g.alcance / 1000).toFixed(1)}k` : g.alcance}
+                                    </span>
+                                  ))}
                                 </div>
                               </div>
                             )}
@@ -475,15 +608,15 @@ function MembrosPage() {
                         {ctrl.activeTab === 'identidade' && (
                           <div className="space-y-3">
                             <div className="flex items-center justify-between">
-                              <p className="text-xs text-gray-500">{filled} de 5 blocos preenchidos pelo mentorado · {constructed} construídos com mentor</p>
+                              <p className="text-xs text-gray-500">{filled} de 5 blocos preenchidos · {constructed} construídos com mentor</p>
                             </div>
 
                             {BLOCOS.map(bloco => {
-                              const bs       = ctrl.identidade[bloco.id]
-                              const content  = getBlocoContent(member, bloco)
-                              const hasCont  = content !== null && (Array.isArray(content) ? content.length > 0 : content.length > 0)
+                              const bs      = ctrl.identidade[bloco.id]
+                              const content = getBlocoContent(member, bloco)
+                              const hasCont = content !== null && (Array.isArray(content) ? content.length > 0 : content.length > 0)
+                              const status  = bs.construido ? 'construido' : hasCont ? 'pronto' : 'aguardando'
 
-                              const status = bs.construido ? 'construido' : hasCont ? 'pronto' : 'aguardando'
                               const statusCfg = {
                                 aguardando: { label: 'Aguardando reflexão', bg: '#F3F4F6', color: '#9CA3AF' },
                                 pronto:     { label: 'Pronto para sessão',  bg: '#FEF3C7', color: '#D97706' },
@@ -492,8 +625,6 @@ function MembrosPage() {
 
                               return (
                                 <div key={bloco.id} className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-
-                                  {/* Bloco header */}
                                   <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
                                     <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: `${bloco.cor}18` }}>
                                       <span className="text-[10px] font-bold" style={{ color: bloco.cor }}>{bloco.num}</span>
@@ -516,7 +647,6 @@ function MembrosPage() {
                                     </button>
                                   </div>
 
-                                  {/* Resposta do mentorado */}
                                   <div className="px-4 py-3 border-b border-gray-100">
                                     {hasCont ? (
                                       <>
@@ -535,7 +665,7 @@ function MembrosPage() {
                                           </div>
                                         ) : (
                                           <div className="rounded-xl bg-[#7B2FBE]/[0.04] border border-[#7B2FBE]/10 px-4 py-3">
-                                            <p className="text-sm text-gray-700 leading-relaxed">{content}</p>
+                                            <p className="text-sm text-gray-700 leading-relaxed">{content as string}</p>
                                           </div>
                                         )}
                                       </>
@@ -544,7 +674,6 @@ function MembrosPage() {
                                     )}
                                   </div>
 
-                                  {/* Síntese do mentor */}
                                   <div className="px-4 py-3">
                                     <div className="flex items-center gap-1.5 mb-2">
                                       <MessageSquare size={11} className="text-gray-400" />
@@ -584,7 +713,7 @@ function MembrosPage() {
                               </div>
                               <div className="space-y-2">
                                 {BLOCOS.filter(b => {
-                                  const c = getBlocoContent(member, b)
+                                  const c   = getBlocoContent(member, b)
                                   const has = c !== null && (Array.isArray(c) ? c.length > 0 : c.length > 0)
                                   return has && !ctrl.identidade[b.id].construido
                                 }).map(bloco => (
@@ -624,6 +753,12 @@ function MembrosPage() {
                                     <p className="text-xs text-emerald-700 font-medium">Todos os blocos de identidade foram construídos.</p>
                                   </div>
                                 )}
+                                {BLOCOS.filter(b => {
+                                  const c = getBlocoContent(member, b)
+                                  return c !== null && (Array.isArray(c) ? c.length > 0 : c.length > 0) && !ctrl.identidade[b.id].construido
+                                }).length === 0 && okrs.length === 0 && marketing.length === 0 && (
+                                  <p className="text-xs text-gray-400 text-center py-2 italic">Nenhum ponto pendente para esta sessão.</p>
+                                )}
                               </div>
                             </div>
 
@@ -638,10 +773,8 @@ function MembrosPage() {
                                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-1 focus:ring-[#7B2FBE]/20 resize-none"
                               />
                               {ctrl.sessionNotes.trim() && (
-                                <button
-                                  onClick={() => toast.success('Notas salvas')}
-                                  className="text-xs font-medium text-[#7B2FBE] hover:underline mt-1"
-                                >
+                                <button onClick={() => toast.success('Notas salvas')}
+                                  className="text-xs font-medium text-[#7B2FBE] hover:underline mt-1">
                                   Salvar notas →
                                 </button>
                               )}
@@ -656,18 +789,13 @@ function MembrosPage() {
                                 )}
                                 {ctrl.nextSteps.map(step => (
                                   <div key={step.id} className="flex items-center gap-3">
-                                    <button
-                                      onClick={() => toggleStep(member.id, step.id)}
-                                      className={cn(
-                                        'w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all',
+                                    <button onClick={() => toggleStep(member.id, step.id)}
+                                      className={cn('w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all',
                                         step.done ? 'bg-[#7B2FBE] border-[#7B2FBE]' : 'border-gray-300'
-                                      )}
-                                    >
+                                      )}>
                                       {step.done && <Check size={9} className="text-white" />}
                                     </button>
-                                    <p className={cn('text-sm flex-1', step.done ? 'line-through text-gray-400' : 'text-gray-700')}>
-                                      {step.texto}
-                                    </p>
+                                    <p className={cn('text-sm flex-1', step.done ? 'line-through text-gray-400' : 'text-gray-700')}>{step.texto}</p>
                                   </div>
                                 ))}
                               </div>
@@ -680,15 +808,12 @@ function MembrosPage() {
                                   placeholder="Adicionar próximo passo..."
                                   className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] transition-colors"
                                 />
-                                <button
-                                  onClick={() => addNextStep(member.id)}
-                                  className="w-9 h-9 bg-[#7B2FBE] rounded-xl flex items-center justify-center text-white hover:bg-[#6a27a5] transition-colors flex-shrink-0"
-                                >
+                                <button onClick={() => addNextStep(member.id)}
+                                  className="w-9 h-9 bg-[#7B2FBE] rounded-xl flex items-center justify-center text-white hover:bg-[#6a27a5] transition-colors flex-shrink-0">
                                   <Plus size={15} />
                                 </button>
                               </div>
                             </div>
-
                           </div>
                         )}
 
