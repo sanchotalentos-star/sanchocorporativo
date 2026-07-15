@@ -24,16 +24,16 @@ function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-b border-[#E2E8F0]">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1B1F2E]/95 backdrop-blur border-b border-white/10">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#1B3A5C] flex items-center justify-center">
-              <Star size={16} className="text-[#D97706]" />
+            <div className="w-8 h-8 rounded-lg bg-[#7B2FBE] flex items-center justify-center">
+              <Star size={16} className="text-white" />
             </div>
-            <span className="font-bold text-[#0F172A]">Arquitetura de Relevância</span>
+            <span className="font-bold text-white">Arquitetura de Relevância</span>
           </div>
           <Link to="/auth">
-            <button className="px-4 py-2 bg-[#1B3A5C] text-white rounded-lg text-sm font-medium hover:bg-[#152E4A] transition-colors">
+            <button className="px-4 py-2 bg-[#7B2FBE] text-white rounded-lg text-sm font-medium hover:bg-[#6a1fa8] transition-colors">
               Entrar
             </button>
           </Link>
@@ -41,23 +41,23 @@ function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="pt-32 pb-20 px-6 bg-gradient-to-br from-[#1B3A5C] to-[#0F172A] text-white">
+      <section className="pt-32 pb-20 px-6 bg-gradient-to-br from-[#1B1F2E] to-[#0F1117] text-white">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <span className="inline-block px-4 py-1.5 rounded-full bg-[#D97706]/20 border border-[#D97706]/30 text-[#F59E0B] text-sm font-medium mb-6">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-[#7B2FBE]/20 border border-[#7B2FBE]/40 text-[#A855F7] text-sm font-medium mb-6">
               Programa de Autoridade com Wladson Sidney
             </span>
             <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-              Construa sua{' '}
-              <span className="text-[#D97706]">Autoridade de Mercado</span>
-              {' '}com Método
+              Arquitete sua{' '}
+              <span className="text-[#7B2FBE]">Relevância</span>
+              {' '}no Mercado.
             </h1>
-            <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-10">
+            <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10">
               Acompanhe seus KPIs de autoridade, gerencie seus pilares estratégicos e execute sua agenda de visibilidade — tudo em um único hub.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth">
-                <button className="px-8 py-4 bg-[#D97706] text-white rounded-xl font-semibold hover:bg-[#B45309] transition-colors flex items-center gap-2">
+                <button className="px-8 py-4 bg-[#7B2FBE] text-white rounded-xl font-semibold hover:bg-[#6a1fa8] transition-colors flex items-center gap-2">
                   Acessar Plataforma
                   <ArrowRight size={18} />
                 </button>
@@ -68,7 +68,7 @@ function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="py-20 px-6 bg-[#F1F5F9]">
+      <section className="py-20 px-6 bg-[#F8F7FF]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-[#0F172A] mb-4">Tudo que você precisa para crescer</h2>
@@ -83,8 +83,8 @@ function LandingPage() {
           >
             {features.map((f) => (
               <motion.div key={f.title} variants={fadeInUp} className="bg-white rounded-xl p-6 border border-[#E2E8F0] shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-[#1B3A5C]/10 flex items-center justify-center mb-4">
-                  <f.icon size={24} className="text-[#1B3A5C]" />
+                <div className="w-12 h-12 rounded-xl bg-[#7B2FBE]/10 flex items-center justify-center mb-4">
+                  <f.icon size={24} className="text-[#7B2FBE]" />
                 </div>
                 <h3 className="font-semibold text-[#0F172A] mb-2">{f.title}</h3>
                 <p className="text-sm text-[#475569] leading-relaxed">{f.desc}</p>
@@ -111,7 +111,7 @@ function LandingPage() {
               <motion.div key={t.name} variants={fadeInUp} className="bg-white rounded-xl p-6 border border-[#E2E8F0] shadow-sm">
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={16} className="fill-[#D97706] text-[#D97706]" />
+                    <Star key={i} size={16} className="fill-[#7B2FBE] text-[#7B2FBE]" />
                   ))}
                 </div>
                 <p className="text-[#475569] text-sm leading-relaxed mb-4">"{t.text}"</p>
@@ -126,17 +126,17 @@ function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-6 bg-[#1B3A5C] text-white">
+      <section className="py-20 px-6 bg-gradient-to-br from-[#1B1F2E] to-[#0F1117] text-white">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Faça parte do programa</h2>
-          <p className="text-white/70 mb-8">Junte-se a profissionais que estão construindo autoridade real e conquistando o mercado com método.</p>
+          <p className="text-white/60 mb-8">Junte-se a profissionais que estão construindo autoridade real e conquistando o mercado com método.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <div className="flex items-center gap-2 text-white/80 text-sm"><CheckCircle size={16} className="text-[#D97706]" /> Dashboard de KPIs em tempo real</div>
-            <div className="flex items-center gap-2 text-white/80 text-sm"><CheckCircle size={16} className="text-[#D97706]" /> Acompanhamento de pilares</div>
-            <div className="flex items-center gap-2 text-white/80 text-sm"><CheckCircle size={16} className="text-[#D97706]" /> Ranking entre participantes</div>
+            <div className="flex items-center gap-2 text-white/70 text-sm"><CheckCircle size={16} className="text-[#7B2FBE]" /> Dashboard de KPIs em tempo real</div>
+            <div className="flex items-center gap-2 text-white/70 text-sm"><CheckCircle size={16} className="text-[#7B2FBE]" /> Acompanhamento de pilares</div>
+            <div className="flex items-center gap-2 text-white/70 text-sm"><CheckCircle size={16} className="text-[#7B2FBE]" /> Ranking entre participantes</div>
           </div>
           <Link to="/auth">
-            <button className="px-8 py-4 bg-[#D97706] text-white rounded-xl font-semibold hover:bg-[#B45309] transition-colors">
+            <button className="px-8 py-4 bg-[#7B2FBE] text-white rounded-xl font-semibold hover:bg-[#6a1fa8] transition-colors">
               Solicitar Acesso
             </button>
           </Link>
@@ -147,7 +147,9 @@ function LandingPage() {
       <footer className="py-8 px-6 border-t border-[#E2E8F0]">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[#94A3B8]">
           <div className="flex items-center gap-2">
-            <Star size={16} className="text-[#D97706]" />
+            <div className="w-5 h-5 rounded bg-[#7B2FBE] flex items-center justify-center">
+              <Star size={11} className="text-white" />
+            </div>
             <span className="font-medium text-[#475569]">Arquitetura de Relevância Hub</span>
           </div>
           <p>© {new Date().getFullYear()} Sancho Gestão de Carreiras. Todos os direitos reservados.</p>
