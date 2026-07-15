@@ -53,7 +53,7 @@ function LandingPage() {
               {' '}no Mercado.
             </h1>
             <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10">
-              Acompanhe seus KPIs de autoridade, gerencie seus pilares estratégicos e execute sua agenda de visibilidade — tudo em um único hub.
+              Acompanhe seus KPIs de autoridade, gerencie seus pilares estratégicos e execute sua agenda de visibilidade, tudo em um único hub.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth">
