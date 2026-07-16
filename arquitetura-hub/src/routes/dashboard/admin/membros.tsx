@@ -48,8 +48,8 @@ interface IdentidadeStored {
   diferenciais?: string[]
 }
 
-interface OkrKr  { descricao: string; meta: number; atual: number; unidade: string }
-interface OkrObj { id: string; titulo: string; categoria: string; krs?: OkrKr[] }
+interface OkrKr  { id: string; descricao: string; meta: number; atual: number; unit: string }
+interface OkrObj { id: string; titulo: string; categoria: string; trimestre?: string; keyResults?: OkrKr[] }
 interface MktAcao { id: string; titulo: string; canal: string; frequencia: string; mes: number; concluida: boolean }
 
 interface SugestaoPilar {
@@ -218,6 +218,71 @@ function buildSugestoes(id: IdentidadeStored | null): SugestaoPilar[] {
   return list.filter(Boolean) as SugestaoPilar[]
 }
 
+interface SugestaoOkr {
+  id: string; titulo: string; categoria: string
+  krs: { descricao: string; meta: number; unit: string }[]
+}
+
+function buildOkrSugestoes(id: IdentidadeStored | null): SugestaoOkr[] {
+  if (!id) return []
+  const publicoAlvo    = id.pilares.publicoAlvo?.reflexao?.trim() ?? ''
+  const proposta       = id.pilares.proposta?.reflexao?.trim() ?? ''
+  const formatoProduto = id.pilares.formatoProduto?.reflexao?.trim() ?? ''
+  const diferencial    = (id.diferenciais ?? [])[0]?.trim() ?? ''
+
+  const t = (s: string, max = 55) => s.length <= max ? s : s.slice(0, max).trimEnd() + '...'
+
+  const list: (SugestaoOkr | null)[] = [
+    {
+      id: 'autoridade',
+      titulo: proposta ? `Ser reconhecido por: ${t(proposta)}` : 'Construir autoridade reconhecida no mercado',
+      categoria: 'Autoridade',
+      krs: [
+        {
+          descricao: publicoAlvo ? `Publicar conteúdo de alta qualidade direcionado a ${t(publicoAlvo, 50)}` : 'Publicar peças de conteúdo de alta qualidade no trimestre',
+          meta: 12, unit: 'conteúdos',
+        },
+        { descricao: 'Crescer seguidores ou conexões qualificadas', meta: 20, unit: '%' },
+        { descricao: 'Receber indicações ou convites de forma orgânica', meta: 5, unit: 'indicações' },
+      ],
+    },
+    (publicoAlvo || proposta) ? {
+      id: 'conversao',
+      titulo: proposta ? `Converter: ${t(proposta)}` : 'Gerar conversões e receita com consistência',
+      categoria: 'Receita',
+      krs: [
+        {
+          descricao: publicoAlvo ? `Realizar conversas qualificadas com ${t(publicoAlvo, 40)}` : 'Realizar conversas qualificadas com potenciais clientes',
+          meta: 10, unit: 'conversas',
+        },
+        { descricao: 'Fechar clientes ou projetos no trimestre', meta: 3, unit: 'clientes' },
+        { descricao: 'Atingir meta de receita faturada', meta: 0, unit: 'R$' },
+      ],
+    } : null,
+    diferencial ? {
+      id: 'diferencial',
+      titulo: `Ser referência por: ${t(diferencial)}`,
+      categoria: 'Autoridade',
+      krs: [
+        { descricao: 'Menções ou compartilhamentos de conteúdo no trimestre', meta: 20, unit: 'menções' },
+        { descricao: 'Depoimentos de clientes coletados e publicados', meta: 3, unit: 'depoimentos' },
+        { descricao: 'Aparições em mídias externas (podcast, entrevista, artigo)', meta: 2, unit: 'aparições' },
+      ],
+    } : null,
+    formatoProduto ? {
+      id: 'produto',
+      titulo: `Escalar: ${t(formatoProduto)}`,
+      categoria: 'Produto',
+      krs: [
+        { descricao: 'Pessoas que conheceram seu formato de produto/serviço', meta: 50, unit: 'pessoas' },
+        { descricao: 'Taxa de conversão de interessados em clientes', meta: 20, unit: '%' },
+        { descricao: 'Ciclo médio de vendas reduzido para', meta: 14, unit: 'dias' },
+      ],
+    } : null,
+  ]
+  return list.filter(Boolean) as SugestaoOkr[]
+}
+
 function makeDefault(): MenteeControls {
   return {
     fase: 1, activeTab: 'overview' as TabId, sessionNotes: '', newStepInput: '',
@@ -265,7 +330,7 @@ function KrBar({ kr }: { kr: OkrKr }) {
     <div className="space-y-1">
       <div className="flex items-center justify-between gap-2">
         <p className="text-[11px] text-gray-600 leading-snug flex-1">{kr.descricao}</p>
-        <span className="text-[10px] font-bold text-gray-400 flex-shrink-0 tabular-nums">{kr.atual}/{kr.meta} {kr.unidade}</span>
+        <span className="text-[10px] font-bold text-gray-400 flex-shrink-0 tabular-nums">{kr.atual}/{kr.meta} {kr.unit}</span>
       </div>
       <div className="flex items-center gap-2">
         <div className="flex-1 h-1 bg-gray-100">
@@ -375,6 +440,30 @@ function MembrosPage() {
     })
   }
 
+  // OKR suggestions: track which were already added
+  const [addedOkrIds, setAddedOkrIds] = useState<Set<string>>(new Set())
+
+  function addOkrFromSugestao(s: SugestaoOkr) {
+    const novoOkr: OkrObj = {
+      id: `sug-${s.id}-${Date.now()}`,
+      titulo: s.titulo,
+      categoria: s.categoria,
+      trimestre: 'Q3 2026',
+      keyResults: s.krs.map((kr, i) => ({
+        id: `kr-${Date.now()}-${i}`,
+        descricao: kr.descricao,
+        meta: kr.meta,
+        atual: 0,
+        unit: kr.unit,
+      })),
+    }
+    const updated = [...liveOkrs, novoOkr]
+    setLiveOkrs(updated)
+    try { localStorage.setItem(OKR_KEY, JSON.stringify(updated)) } catch {}
+    setAddedOkrIds(prev => new Set([...prev, s.id]))
+    toast.success('OKR adicionado à lista do mentorado')
+  }
+
   useEffect(() => {
     try { localStorage.setItem(MENTOR_CONTROLS_KEY, JSON.stringify(controls)) } catch {}
   }, [controls])
@@ -472,7 +561,8 @@ function MembrosPage() {
           const okrs        = member.id === 'member-3' ? liveOkrs       : []
           const marketing   = member.id === 'member-3' ? loadMarketing() : []
           const mktConcluidas = marketing.filter(a => a.concluida).length
-          const sugestoes   = member.id === 'member-3' ? buildSugestoes(identidadeData) : []
+          const sugestoes    = member.id === 'member-3' ? buildSugestoes(identidadeData) : []
+          const okrSugestoes = member.id === 'member-3' ? buildOkrSugestoes(identidadeData) : []
 
           return (
             <motion.div key={member.id} variants={fadeInUp} initial="hidden" animate="visible" className="bg-white">
@@ -678,7 +768,9 @@ function MembrosPage() {
                                   <SectionLabel>OKRs Definidos · {okrs.length} objetivo{okrs.length > 1 ? 's' : ''}</SectionLabel>
                                 </div>
                                 <div className="divide-y divide-gray-100">
-                                  {okrs.map(okr => (
+                                  {okrs.map(okr => {
+                                    const krs = okr.keyResults ?? []
+                                    return (
                                     <div key={okr.id} className="px-4 py-3">
                                       <div className="flex items-center gap-2 mb-2">
                                         <div className="w-2 h-2 flex-shrink-0" style={{ background: CATEGORIA_COLORS[okr.categoria] ?? '#7B2FBE' }} />
@@ -688,13 +780,14 @@ function MembrosPage() {
                                           {okr.categoria}
                                         </span>
                                       </div>
-                                      {okr.krs && okr.krs.length > 0 && (
+                                      {krs.length > 0 && (
                                         <div className="space-y-2 pl-4 border-l-2 border-gray-100 ml-1">
-                                          {okr.krs.map((kr, i) => <KrBar key={i} kr={kr} />)}
+                                          {krs.map((kr, i) => <KrBar key={i} kr={kr} />)}
                                         </div>
                                       )}
                                     </div>
-                                  ))}
+                                    )
+                                  })}
                                 </div>
                               </div>
                             )}
@@ -981,24 +1074,85 @@ function MembrosPage() {
                         {/* ════ OKRs ════ */}
                         {ctrl.activeTab === 'okr' && (
                           <div className="space-y-4">
+
+                            {/* Sugestões de OKR */}
+                            {okrSugestoes.length > 0 && (
+                              <div className="bg-white border border-gray-200 overflow-hidden">
+                                <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
+                                  <Sparkles size={12} className="text-[#7B2FBE]" />
+                                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest flex-1">
+                                    Sugestões de OKR · geradas da identidade do mentorado
+                                  </p>
+                                  <span className="text-[9px] font-bold text-[#7B2FBE] border border-[#7B2FBE]/30 px-2 py-0.5">
+                                    {okrSugestoes.length} objetivos
+                                  </span>
+                                </div>
+                                <div className="divide-y divide-gray-100">
+                                  {okrSugestoes.map(s => {
+                                    const added = addedOkrIds.has(s.id) || liveOkrs.some(o => o.id.startsWith(`sug-${s.id}-`))
+                                    const cor = CATEGORIA_COLORS[s.categoria] ?? '#7B2FBE'
+                                    return (
+                                      <div key={s.id} className="px-4 py-3">
+                                        <div className="flex items-start justify-between gap-3 mb-2">
+                                          <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-1.5 mb-1">
+                                              <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5"
+                                                style={{ background: `${cor}15`, color: cor }}>
+                                                {s.categoria}
+                                              </span>
+                                            </div>
+                                            <p className="text-xs font-bold text-gray-800 leading-snug">{s.titulo}</p>
+                                          </div>
+                                          <button
+                                            onClick={() => !added && addOkrFromSugestao(s)}
+                                            disabled={added}
+                                            className="flex-shrink-0 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 transition-all whitespace-nowrap"
+                                            style={added
+                                              ? { background: '#f3f4f6', color: '#9ca3af' }
+                                              : { background: `${cor}15`, color: cor }
+                                            }
+                                          >
+                                            {added ? 'Adicionado ✓' : '+ Usar objetivo'}
+                                          </button>
+                                        </div>
+                                        <div className="space-y-1 pl-2 border-l-2 border-gray-100">
+                                          {s.krs.map((kr, i) => (
+                                            <div key={i} className="flex items-start gap-1.5">
+                                              <Target size={9} className="text-gray-300 mt-0.5 flex-shrink-0" />
+                                              <p className="text-[10px] text-gray-500 leading-snug">
+                                                {kr.descricao}
+                                                {kr.meta > 0 && <span className="font-bold ml-1" style={{ color: cor }}>→ meta: {kr.meta} {kr.unit}</span>}
+                                              </p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* OKRs definidos */}
                             {okrs.length === 0 ? (
-                              <div className="bg-white border border-gray-200 px-5 py-10 text-center">
+                              <div className="bg-white border border-gray-200 px-5 py-8 text-center">
                                 <Target size={24} className="text-gray-200 mx-auto mb-3" />
                                 <p className="text-sm font-bold text-gray-400">Nenhum OKR definido ainda</p>
-                                <p className="text-xs text-gray-300 mt-1">O mentorado precisa preencher os OKRs para aparecerem aqui.</p>
+                                <p className="text-xs text-gray-300 mt-1">Use as sugestões acima ou peça ao mentorado que preencha os OKRs.</p>
                               </div>
                             ) : (
                               <>
                                 <div className="bg-white border border-gray-200 px-4 py-3">
                                   <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                                    {okrs.length} objetivo{okrs.length > 1 ? 's' : ''} · clique no valor atual para editar
+                                    {okrs.length} objetivo{okrs.length > 1 ? 's' : ''} definido{okrs.length > 1 ? 's' : ''} · clique no valor atual para editar
                                   </p>
                                 </div>
                                 {okrs.map((okr, idx) => {
-                                  const krsCount = okr.krs?.length ?? 0
-                                  const krsDone = okr.krs?.filter(kr => kr.meta > 0 && kr.atual >= kr.meta).length ?? 0
-                                  const avgPct = krsCount > 0
-                                    ? Math.round(okr.krs!.reduce((sum, kr) => sum + (kr.meta > 0 ? Math.min((kr.atual / kr.meta) * 100, 100) : 0), 0) / krsCount)
+                                  const krsArr  = okr.keyResults ?? []
+                                  const krsCount = krsArr.length
+                                  const krsDone  = krsArr.filter(kr => kr.meta > 0 && kr.atual >= kr.meta).length
+                                  const avgPct   = krsCount > 0
+                                    ? Math.round(krsArr.reduce((sum, kr) => sum + (kr.meta > 0 ? Math.min((kr.atual / kr.meta) * 100, 100) : 0), 0) / krsCount)
                                     : 0
                                   const catColor = CATEGORIA_COLORS[okr.categoria] ?? '#7B2FBE'
                                   return (
@@ -1018,9 +1172,9 @@ function MembrosPage() {
                                           </p>
                                         </div>
                                       </div>
-                                      {okr.krs && okr.krs.length > 0 && (
+                                      {krsArr.length > 0 && (
                                         <div className="divide-y divide-gray-100">
-                                          {okr.krs.map((kr, i) => {
+                                          {krsArr.map((kr, i) => {
                                             const isEditingThis = editingKr?.okrId === okr.id && editingKr?.krIdx === i
                                             const pct = kr.meta > 0 ? Math.min(Math.round((kr.atual / kr.meta) * 100), 100) : 0
                                             const barColor = pct >= 70 ? '#10B981' : pct >= 40 ? '#F59E0B' : '#EF4444'
@@ -1039,7 +1193,7 @@ function MembrosPage() {
                                                           onKeyDown={e => { if (e.key === 'Enter') commitKrEdit(); if (e.key === 'Escape') setEditingKr(null) }}
                                                           className="w-16 text-right border border-[#7B2FBE] px-1.5 py-0.5 text-[11px] font-bold bg-white text-gray-900 focus:outline-none"
                                                         />
-                                                        <span className="text-[10px] text-gray-400">{kr.unidade}</span>
+                                                        <span className="text-[10px] text-gray-400">{kr.unit}</span>
                                                         <button onClick={commitKrEdit} className="p-0.5 text-emerald-500 hover:bg-emerald-50">
                                                           <Check size={12} />
                                                         </button>
@@ -1052,7 +1206,7 @@ function MembrosPage() {
                                                         onClick={() => { setEditingKr({ okrId: okr.id, krIdx: i }); setEditKrVal(String(kr.atual)) }}
                                                         className="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-[#7B2FBE] tabular-nums group"
                                                       >
-                                                        <span>{kr.atual}/{kr.meta} {kr.unidade}</span>
+                                                        <span>{kr.atual}/{kr.meta} {kr.unit}</span>
                                                         <Pencil size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                                                       </button>
                                                     )}
