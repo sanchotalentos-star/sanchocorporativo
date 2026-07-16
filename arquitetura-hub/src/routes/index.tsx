@@ -81,9 +81,8 @@ function LandingPage() {
               maxWidth: 820,
               textWrap: 'balance',
             } as React.CSSProperties}>
-              Arquitete sua{' '}
-              <span style={{ color: '#7B2FBE' }}>Relevância</span>{' '}
-              no Mercado.
+              Arquitetura de{' '}
+              <span style={{ color: '#7B2FBE' }}>Relevância</span>
             </h1>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 640 }}>
