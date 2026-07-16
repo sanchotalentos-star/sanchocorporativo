@@ -7,23 +7,26 @@ import {
   Target, Calendar, BarChart2, Sparkles, CheckCircle2,
   Plus, BookOpen, ClipboardList, TrendingUp,
   ChevronRight, Award, Zap, Layers, Pencil, X, Trash2,
+  Megaphone, AlertCircle, XCircle, Circle, Filter,
 } from 'lucide-react'
 import { fadeInUp } from '@/lib/motion'
 import { mockMembers } from '@/lib/mocks/members'
 import { IDENTIDADE_KEY } from '@/lib/identidade'
 import { cn } from '@/lib/utils'
-import type { Member } from '@/types'
+import { KpiTable } from '@/components/membro/KpiTable'
+import type { Member, KpiEntry, KpiCategory } from '@/types'
 
 export const Route = createFileRoute('/dashboard/admin/membros')({
   component: MembrosPage,
 })
 
-const OKR_KEY            = 'okr_store_v1'
-const MARKETING_KEY      = 'marketing_store_v1'
+const OKR_KEY             = 'okr_store_v1'
+const MARKETING_KEY       = 'marketing_store_v1'
+const KPI_KEY             = 'kpis_store_v1'
 const MENTOR_CONTROLS_KEY = 'mentor_controls_v1'
 
 type Fase     = 1 | 2 | 3 | 4
-type TabId    = 'overview' | 'identidade' | 'pilares' | 'okr' | 'sessao'
+type TabId    = 'overview' | 'identidade' | 'pilares' | 'okr' | 'marketing' | 'indicadores' | 'agenda' | 'sessao'
 type BlocoKey = 'publicoAlvo' | 'proposta' | 'storytelling' | 'formatoProduto' | 'diferencial'
 
 interface BlocoState { construido: boolean; analise: string }
@@ -64,6 +67,9 @@ function loadOkrs(): OkrObj[] {
 }
 function loadMarketing(): MktAcao[] {
   try { return JSON.parse(localStorage.getItem(MARKETING_KEY) ?? 'null') ?? [] } catch { return [] }
+}
+function loadKpis(): KpiEntry[] {
+  try { return JSON.parse(localStorage.getItem(KPI_KEY) ?? 'null') ?? [] } catch { return [] }
 }
 
 const FASES: { num: Fase; label: string; desc: string }[] = [
@@ -361,6 +367,84 @@ function MembrosPage() {
   const [editingKr, setEditingKr] = useState<{ okrId: string; krIdx: number } | null>(null)
   const [editKrVal, setEditKrVal] = useState('')
 
+  // Marketing live state
+  const [liveMkt, setLiveMkt] = useState<MktAcao[]>(() => loadMarketing())
+  const [showAddMkt, setShowAddMkt] = useState(false)
+  const [mktNovaForm, setMktNovaForm] = useState({ titulo: '', canal: 'LinkedIn', frequencia: 'Mensal', mes: new Date().getMonth() + 1 })
+  const [mktMesFiltro, setMktMesFiltro] = useState<number | null>(null)
+
+  function addMktAcao() {
+    if (!mktNovaForm.titulo.trim()) return
+    const nova: MktAcao = {
+      id: Date.now().toString(),
+      titulo: mktNovaForm.titulo.trim(),
+      canal: mktNovaForm.canal,
+      frequencia: mktNovaForm.frequencia,
+      mes: mktNovaForm.mes,
+      concluida: false,
+    }
+    const updated = [...liveMkt, nova]
+    setLiveMkt(updated)
+    try { localStorage.setItem(MARKETING_KEY, JSON.stringify(updated)) } catch {}
+    setMktNovaForm({ titulo: '', canal: 'LinkedIn', frequencia: 'Mensal', mes: new Date().getMonth() + 1 })
+    setShowAddMkt(false)
+    toast.success('Ação adicionada')
+  }
+  function toggleMktConcluida(id: string) {
+    const updated = liveMkt.map(a => a.id === id ? { ...a, concluida: !a.concluida } : a)
+    setLiveMkt(updated)
+    try { localStorage.setItem(MARKETING_KEY, JSON.stringify(updated)) } catch {}
+  }
+  function deleteMktAcao(id: string) {
+    const updated = liveMkt.filter(a => a.id !== id)
+    setLiveMkt(updated)
+    try { localStorage.setItem(MARKETING_KEY, JSON.stringify(updated)) } catch {}
+    toast.success('Ação removida')
+  }
+
+  // KPI live state
+  const [liveKpis, setLiveKpis] = useState<KpiEntry[]>(() => loadKpis())
+  const [showAddKpi, setShowAddKpi] = useState(false)
+  const [kpiForm, setKpiForm] = useState({ kpi_name: '', category: 'Conteúdo' as KpiCategory, meta: '', unit: '' })
+
+  function addKpi() {
+    const nome = kpiForm.kpi_name.trim()
+    const meta = parseFloat(kpiForm.meta)
+    if (!nome || isNaN(meta) || meta <= 0) return
+    const entry: KpiEntry = {
+      id: Date.now().toString(),
+      user_id: 'member-3',
+      kpi_name: nome,
+      category: kpiForm.category,
+      meta,
+      atual: 0,
+      unit: kpiForm.unit.trim(),
+      history: [0],
+      updated_at: new Date().toISOString(),
+    }
+    const updated = [...liveKpis, entry]
+    setLiveKpis(updated)
+    try { localStorage.setItem(KPI_KEY, JSON.stringify(updated)) } catch {}
+    setKpiForm({ kpi_name: '', category: 'Conteúdo', meta: '', unit: '' })
+    setShowAddKpi(false)
+    toast.success('Indicador adicionado')
+  }
+  function updateKpiAtual(id: string, value: number) {
+    const updated = liveKpis.map(k => {
+      if (k.id !== id) return k
+      return { ...k, atual: value, history: [...k.history.slice(-5), value] }
+    })
+    setLiveKpis(updated)
+    try { localStorage.setItem(KPI_KEY, JSON.stringify(updated)) } catch {}
+    toast.success('Indicador atualizado')
+  }
+  function deleteKpi(id: string) {
+    const updated = liveKpis.filter(k => k.id !== id)
+    setLiveKpis(updated)
+    try { localStorage.setItem(KPI_KEY, JSON.stringify(updated)) } catch {}
+    toast.success('Indicador removido')
+  }
+
   // Pilar action editing
   const [editingAcao, setEditingAcao] = useState<{ memberId: string; pilarId: string; acaoIdx: number } | null>(null)
   const [editAcaoVal, setEditAcaoVal] = useState('')
@@ -607,8 +691,9 @@ function MembrosPage() {
           const filled      = countFilled(member.id)
           const constructed = Object.values(ctrl.identidade).filter(b => b.construido).length
           const faseInfo    = FASES.find(f => f.num === ctrl.fase)!
-          const okrs        = member.id === 'member-3' ? liveOkrs       : []
-          const marketing   = member.id === 'member-3' ? loadMarketing() : []
+          const okrs        = member.id === 'member-3' ? liveOkrs : []
+          const marketing   = member.id === 'member-3' ? liveMkt  : []
+          const kpis        = member.id === 'member-3' ? liveKpis : []
           const mktConcluidas = marketing.filter(a => a.concluida).length
           const sugestoes    = member.id === 'member-3' ? buildSugestoes(identidadeData) : []
           const okrSugestoes = member.id === 'member-3' ? buildOkrSugestoes(identidadeData) : []
@@ -668,11 +753,14 @@ function MembrosPage() {
                       {/* Tab bar */}
                       <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
                         {([
-                          { id: 'overview'   as TabId, label: 'Visão Geral',      Icon: BarChart2     },
-                          { id: 'identidade' as TabId, label: 'Identidade',        Icon: BookOpen      },
-                          { id: 'pilares'    as TabId, label: 'Pilares Sugeridos', Icon: Layers        },
-                          { id: 'okr'        as TabId, label: 'OKRs',             Icon: Target        },
-                          { id: 'sessao'     as TabId, label: 'Sessão',            Icon: ClipboardList },
+                          { id: 'overview'    as TabId, label: 'Visão Geral',      Icon: BarChart2     },
+                          { id: 'identidade'  as TabId, label: 'Identidade',        Icon: BookOpen      },
+                          { id: 'pilares'     as TabId, label: 'Pilares',           Icon: Layers        },
+                          { id: 'okr'         as TabId, label: 'OKRs',             Icon: Target        },
+                          { id: 'marketing'   as TabId, label: 'Marketing',         Icon: Megaphone     },
+                          { id: 'indicadores' as TabId, label: 'Indicadores',       Icon: TrendingUp    },
+                          { id: 'agenda'      as TabId, label: 'Agenda',            Icon: Calendar      },
+                          { id: 'sessao'      as TabId, label: 'Sessão',            Icon: ClipboardList },
                         ]).map(t => (
                           <button key={t.id}
                             onClick={() => upd(member.id, { activeTab: t.id })}
@@ -1338,6 +1426,388 @@ function MembrosPage() {
                             )}
                           </div>
                         )}
+
+                        {/* ════ MARKETING ════ */}
+                        {ctrl.activeTab === 'marketing' && (
+                          <div className="space-y-4">
+
+                            {/* Header + progresso */}
+                            <div className="bg-white border border-gray-200 px-4 py-3 flex items-center gap-3">
+                              <Megaphone size={14} className="text-[#7B2FBE] flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Agenda de Marketing Anual</p>
+                                {marketing.length > 0 && (
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex-1 h-1.5 bg-gray-100">
+                                      <div className="h-full bg-[#7B2FBE] transition-all"
+                                        style={{ width: `${Math.round((marketing.filter(a => a.concluida).length / marketing.length) * 100)}%` }} />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-[#7B2FBE] tabular-nums flex-shrink-0">
+                                      {marketing.filter(a => a.concluida).length}/{marketing.length} ações
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                              <button
+                                onClick={() => setShowAddMkt(v => !v)}
+                                className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 text-white flex-shrink-0"
+                                style={{ background: '#7B2FBE' }}
+                              >
+                                <Plus size={10} /> Nova Ação
+                              </button>
+                            </div>
+
+                            {/* Add form */}
+                            {showAddMkt && (
+                              <div className="bg-white border border-[#7B2FBE]/30 p-4 space-y-3">
+                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Nova Ação de Marketing</p>
+                                <input
+                                  autoFocus
+                                  type="text"
+                                  value={mktNovaForm.titulo}
+                                  onChange={e => setMktNovaForm(f => ({ ...f, titulo: e.target.value }))}
+                                  onKeyDown={e => e.key === 'Enter' && addMktAcao()}
+                                  placeholder="Título da ação..."
+                                  className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#7B2FBE]"
+                                />
+                                <div className="grid grid-cols-3 gap-2">
+                                  <div>
+                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Canal</p>
+                                    <select
+                                      value={mktNovaForm.canal}
+                                      onChange={e => setMktNovaForm(f => ({ ...f, canal: e.target.value }))}
+                                      className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:border-[#7B2FBE]"
+                                    >
+                                      {['LinkedIn','Instagram','YouTube','Podcast','Email','Blog','Live','Evento Próprio','Evento Parceiro'].map(c => <option key={c}>{c}</option>)}
+                                    </select>
+                                  </div>
+                                  <div>
+                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Frequência</p>
+                                    <select
+                                      value={mktNovaForm.frequencia}
+                                      onChange={e => setMktNovaForm(f => ({ ...f, frequencia: e.target.value }))}
+                                      className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:border-[#7B2FBE]"
+                                    >
+                                      {['Diário','Semanal','Quinzenal','Mensal','Trimestral','Anual'].map(f => <option key={f}>{f}</option>)}
+                                    </select>
+                                  </div>
+                                  <div>
+                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Mês</p>
+                                    <select
+                                      value={mktNovaForm.mes}
+                                      onChange={e => setMktNovaForm(f => ({ ...f, mes: Number(e.target.value) }))}
+                                      className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:border-[#7B2FBE]"
+                                    >
+                                      {['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].map((m, i) => <option key={m} value={i+1}>{m}</option>)}
+                                    </select>
+                                  </div>
+                                </div>
+                                <div className="flex gap-2">
+                                  <button onClick={() => setShowAddMkt(false)}
+                                    className="flex-1 border border-gray-200 text-xs font-bold text-gray-500 py-2 uppercase tracking-wider hover:bg-gray-50">
+                                    Cancelar
+                                  </button>
+                                  <button onClick={addMktAcao} disabled={!mktNovaForm.titulo.trim()}
+                                    className="flex-1 text-xs font-bold text-white py-2 uppercase tracking-wider disabled:opacity-40"
+                                    style={{ background: '#7B2FBE' }}>
+                                    Adicionar
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Filtro meses */}
+                            {marketing.length > 0 && (
+                              <div className="flex gap-1 overflow-x-auto pb-1">
+                                <button onClick={() => setMktMesFiltro(null)}
+                                  className={cn('flex-shrink-0 text-[10px] font-bold px-2.5 py-1 uppercase tracking-wider transition-colors',
+                                    mktMesFiltro === null ? 'bg-[#7B2FBE] text-white' : 'bg-gray-100 text-gray-400 hover:text-gray-700')}>
+                                  Todos
+                                </button>
+                                {['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].map((m, i) => (
+                                  <button key={m} onClick={() => setMktMesFiltro(mktMesFiltro === i+1 ? null : i+1)}
+                                    className={cn('flex-shrink-0 text-[10px] font-bold px-2.5 py-1 uppercase tracking-wider transition-colors',
+                                      mktMesFiltro === i+1 ? 'bg-[#7B2FBE] text-white' : 'bg-gray-100 text-gray-400 hover:text-gray-700')}>
+                                    {m}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Lista de ações */}
+                            {marketing.length === 0 ? (
+                              <div className="bg-white border border-gray-200 px-5 py-8 text-center">
+                                <Megaphone size={24} className="text-gray-200 mx-auto mb-3" />
+                                <p className="text-sm font-bold text-gray-400">Nenhuma ação de marketing cadastrada</p>
+                                <p className="text-xs text-gray-300 mt-1">Clique em "Nova Ação" para adicionar ações ao plano anual do mentorado.</p>
+                              </div>
+                            ) : (
+                              <div className="bg-white border border-gray-200 overflow-hidden">
+                                <div className="divide-y divide-gray-100">
+                                  {marketing
+                                    .filter(a => mktMesFiltro === null || a.mes === mktMesFiltro)
+                                    .map(acao => (
+                                    <div key={acao.id} className="flex items-center gap-3 px-4 py-3 group hover:bg-gray-50 transition-colors">
+                                      <button
+                                        onClick={() => toggleMktConcluida(acao.id)}
+                                        className="w-4 h-4 border-2 flex items-center justify-center flex-shrink-0 transition-all"
+                                        style={{ borderColor: acao.concluida ? '#10B981' : '#7B2FBE', background: acao.concluida ? '#10B981' : 'transparent' }}
+                                      >
+                                        {acao.concluida && <Check size={9} className="text-white" />}
+                                      </button>
+                                      <div className="flex-1 min-w-0">
+                                        <p className={cn('text-sm font-semibold leading-snug', acao.concluida ? 'line-through text-gray-300' : 'text-gray-800')}>
+                                          {acao.titulo}
+                                        </p>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                          <span className="text-[10px] font-bold text-[#7B2FBE] uppercase tracking-wide">{acao.canal}</span>
+                                          <span className="text-[10px] text-gray-300">·</span>
+                                          <span className="text-[10px] text-gray-400">{acao.frequencia}</span>
+                                          <span className="text-[10px] text-gray-300">·</span>
+                                          <span className="text-[10px] text-gray-400">
+                                            {['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][acao.mes - 1]}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <button
+                                        onClick={() => deleteMktAcao(acao.id)}
+                                        className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-400 transition-all flex-shrink-0"
+                                      >
+                                        <Trash2 size={13} />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                          </div>
+                        )}
+
+                        {/* ════ INDICADORES ════ */}
+                        {ctrl.activeTab === 'indicadores' && (
+                          <div className="space-y-4">
+
+                            {/* Resumo status */}
+                            {kpis.length > 0 && (() => {
+                              const { getPercent, getStatusColor } = { getPercent: (a: number, m: number) => m > 0 ? Math.round((a / m) * 100) : 0, getStatusColor: (p: number) => p >= 70 ? 'green' : p >= 40 ? 'yellow' : 'red' }
+                              const green  = kpis.filter(k => getStatusColor(getPercent(k.atual, k.meta)) === 'green').length
+                              const yellow = kpis.filter(k => getStatusColor(getPercent(k.atual, k.meta)) === 'yellow').length
+                              const red    = kpis.filter(k => getStatusColor(getPercent(k.atual, k.meta)) === 'red').length
+                              return (
+                                <div className="grid grid-cols-3 gap-px bg-gray-200">
+                                  <div className="bg-white px-4 py-3 flex items-center gap-2">
+                                    <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />
+                                    <div>
+                                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">No alvo</p>
+                                      <p className="text-xl font-black text-emerald-500 tabular-nums">{green}</p>
+                                    </div>
+                                  </div>
+                                  <div className="bg-white px-4 py-3 flex items-center gap-2">
+                                    <AlertCircle size={14} className="text-amber-500 flex-shrink-0" />
+                                    <div>
+                                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Atenção</p>
+                                      <p className="text-xl font-black text-amber-500 tabular-nums">{yellow}</p>
+                                    </div>
+                                  </div>
+                                  <div className="bg-white px-4 py-3 flex items-center gap-2">
+                                    <XCircle size={14} className="text-red-400 flex-shrink-0" />
+                                    <div>
+                                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Abaixo</p>
+                                      <p className="text-xl font-black text-red-400 tabular-nums">{red}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              )
+                            })()}
+
+                            {/* Botão + form novo indicador */}
+                            <div className="bg-white border border-gray-200 overflow-hidden">
+                              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Indicadores de Resultado</p>
+                                <button
+                                  onClick={() => setShowAddKpi(v => !v)}
+                                  className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 text-white flex-shrink-0"
+                                  style={{ background: '#7B2FBE' }}
+                                >
+                                  <Plus size={10} /> Novo Indicador
+                                </button>
+                              </div>
+                              {showAddKpi && (
+                                <div className="p-4 border-b border-gray-100 bg-[#7B2FBE]/[0.02] space-y-3">
+                                  <input
+                                    autoFocus
+                                    type="text"
+                                    value={kpiForm.kpi_name}
+                                    onChange={e => setKpiForm(f => ({ ...f, kpi_name: e.target.value }))}
+                                    onKeyDown={e => e.key === 'Enter' && addKpi()}
+                                    placeholder="Nome do indicador..."
+                                    className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#7B2FBE]"
+                                  />
+                                  <div className="grid grid-cols-3 gap-2">
+                                    <div>
+                                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Categoria</p>
+                                      <select value={kpiForm.category}
+                                        onChange={e => setKpiForm(f => ({ ...f, category: e.target.value as KpiCategory }))}
+                                        className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:border-[#7B2FBE]">
+                                        {(['Conteúdo','Conversão','Autoridade','Mídia','Rede','Receita'] as KpiCategory[]).map(c => <option key={c}>{c}</option>)}
+                                      </select>
+                                    </div>
+                                    <div>
+                                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Meta</p>
+                                      <input type="number" value={kpiForm.meta}
+                                        onChange={e => setKpiForm(f => ({ ...f, meta: e.target.value }))}
+                                        placeholder="Ex: 12"
+                                        className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-[#7B2FBE]" />
+                                    </div>
+                                    <div>
+                                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Unidade</p>
+                                      <input type="text" value={kpiForm.unit}
+                                        onChange={e => setKpiForm(f => ({ ...f, unit: e.target.value }))}
+                                        placeholder="posts, leads..."
+                                        className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-[#7B2FBE]" />
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <button onClick={() => setShowAddKpi(false)}
+                                      className="flex-1 border border-gray-200 text-xs font-bold text-gray-500 py-2 uppercase tracking-wider hover:bg-gray-50">Cancelar</button>
+                                    <button onClick={addKpi} disabled={!kpiForm.kpi_name.trim() || !kpiForm.meta}
+                                      className="flex-1 text-xs font-bold text-white py-2 uppercase tracking-wider disabled:opacity-40"
+                                      style={{ background: '#7B2FBE' }}>Adicionar</button>
+                                  </div>
+                                </div>
+                              )}
+                              {kpis.length === 0 ? (
+                                <div className="px-5 py-8 text-center">
+                                  <TrendingUp size={24} className="text-gray-200 mx-auto mb-3" />
+                                  <p className="text-sm font-bold text-gray-400">Nenhum indicador cadastrado ainda</p>
+                                  <p className="text-xs text-gray-300 mt-1">Adicione os KPIs que o mentorado deve acompanhar.</p>
+                                </div>
+                              ) : (
+                                <KpiTable kpis={kpis} onUpdateAtual={updateKpiAtual} onDelete={deleteKpi} />
+                              )}
+                            </div>
+
+                          </div>
+                        )}
+
+                        {/* ════ AGENDA ════ */}
+                        {ctrl.activeTab === 'agenda' && (() => {
+                          const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+                          type AgStatus = 'feito' | 'pendente' | 'bloqueado' | 'nao_feito'
+                          interface AgItem { id: string; titulo: string; tipo: 'okr' | 'marketing'; semana?: number; mes?: number; status: AgStatus; canal?: string; objetivo?: string }
+                          const okrItems: AgItem[] = (liveOkrs as Array<OkrObj & { pdca?: { acoes?: Array<{ id: string; descricao: string; semana: number; status: AgStatus; dataLimite?: string }>; plano?: Array<{ id: string; entrega: string; dataLimite: string }> } }>)
+                            .flatMap(obj => [
+                              ...((obj.pdca?.acoes ?? []).map(a => ({ id: `okr-acao-${a.id}`, titulo: a.descricao || '(sem descrição)', tipo: 'okr' as const, semana: a.semana, status: a.status, objetivo: obj.titulo }))),
+                              ...((obj.pdca?.plano ?? []).map(p => ({ id: `okr-plano-${p.id}`, titulo: p.entrega || '(sem descrição)', tipo: 'okr' as const, objetivo: obj.titulo, status: 'pendente' as AgStatus }))),
+                            ])
+                          const mktItems: AgItem[] = liveMkt.map(a => ({ id: `mkt-${a.id}`, titulo: a.titulo, tipo: 'marketing' as const, mes: a.mes, status: a.concluida ? 'feito' : 'pendente', canal: a.canal }))
+                          const itens = [...okrItems, ...mktItems]
+                          const feitos = itens.filter(i => i.status === 'feito').length
+                          const pendentes = itens.filter(i => i.status === 'pendente').length
+
+                          return (
+                            <div className="space-y-4">
+
+                              {/* Stats */}
+                              <div className="grid grid-cols-4 gap-px bg-gray-200">
+                                {[
+                                  { label: 'OKR', value: okrItems.length, icon: Target, color: '#7B2FBE' },
+                                  { label: 'Marketing', value: mktItems.length, icon: Megaphone, color: '#7B2FBE' },
+                                  { label: 'Feito', value: feitos, icon: CheckCircle2, color: '#10B981' },
+                                  { label: 'Pendente', value: pendentes, icon: Circle, color: '#9CA3AF' },
+                                ].map(s => (
+                                  <div key={s.label} className="bg-white px-3 py-3 flex items-center gap-2">
+                                    <s.icon size={13} style={{ color: s.color }} className="flex-shrink-0" />
+                                    <div>
+                                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{s.label}</p>
+                                      <p className="text-xl font-black tabular-nums" style={{ color: s.color }}>{s.value}</p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {itens.length === 0 ? (
+                                <div className="bg-white border border-gray-200 px-5 py-8 text-center">
+                                  <Calendar size={24} className="text-gray-200 mx-auto mb-3" />
+                                  <p className="text-sm font-bold text-gray-400">Agenda ainda vazia</p>
+                                  <p className="text-xs text-gray-300 mt-1">As ações dos OKRs e do Marketing aparecem aqui automaticamente.</p>
+                                </div>
+                              ) : (
+                                <>
+                                  {/* OKRs por semana */}
+                                  {okrItems.length > 0 && [1,2,3,4].map(sem => {
+                                    const semItems = okrItems.filter(i => i.semana === sem)
+                                    if (semItems.length === 0) return null
+                                    return (
+                                      <div key={sem} className="bg-white border border-gray-200 overflow-hidden">
+                                        <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
+                                          <Target size={12} className="text-[#7B2FBE]" />
+                                          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest flex-1">Semana {sem} — OKRs</p>
+                                          <span className="text-[10px] text-gray-400">{semItems.length} ações</span>
+                                        </div>
+                                        <div className="divide-y divide-gray-100">
+                                          {semItems.map(item => (
+                                            <div key={item.id} className="flex items-start gap-3 px-4 py-2.5">
+                                              {item.status === 'feito'     ? <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0 mt-0.5" /> :
+                                               item.status === 'bloqueado' ? <AlertCircle  size={13} className="text-amber-400 flex-shrink-0 mt-0.5"   /> :
+                                               item.status === 'nao_feito' ? <XCircle      size={13} className="text-red-400 flex-shrink-0 mt-0.5"      /> :
+                                                                             <Circle       size={13} className="text-gray-300 flex-shrink-0 mt-0.5"     />}
+                                              <div className="flex-1 min-w-0">
+                                                <p className={cn('text-xs leading-snug', item.status === 'feito' ? 'line-through text-gray-300' : 'text-gray-800')}>{item.titulo}</p>
+                                                {item.objetivo && <p className="text-[10px] text-gray-400 mt-0.5 truncate">→ {item.objetivo}</p>}
+                                              </div>
+                                              <span className={cn('text-[9px] font-bold px-1.5 py-0.5 flex-shrink-0 uppercase tracking-wide',
+                                                item.status === 'feito'     ? 'text-emerald-700 bg-emerald-50' :
+                                                item.status === 'bloqueado' ? 'text-amber-700 bg-amber-50'     :
+                                                item.status === 'nao_feito' ? 'text-red-600 bg-red-50'         :
+                                                'text-gray-500 bg-gray-100')}>
+                                                {item.status === 'feito' ? 'Feito' : item.status === 'bloqueado' ? 'Bloqueado' : item.status === 'nao_feito' ? 'Não feito' : 'Pendente'}
+                                              </span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+
+                                  {/* Marketing por mês */}
+                                  {mktItems.length > 0 && meses.map((mes, idx) => {
+                                    const mesItems = mktItems.filter(i => i.mes === idx + 1)
+                                    if (mesItems.length === 0) return null
+                                    return (
+                                      <div key={mes} className="bg-white border border-gray-200 overflow-hidden">
+                                        <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
+                                          <Megaphone size={12} className="text-[#7B2FBE]" />
+                                          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest flex-1">{mes} — Marketing</p>
+                                          <span className="text-[10px] text-gray-400">{mesItems.length} ações</span>
+                                        </div>
+                                        <div className="divide-y divide-gray-100">
+                                          {mesItems.map(item => (
+                                            <div key={item.id} className="flex items-center gap-3 px-4 py-2.5">
+                                              {item.status === 'feito'
+                                                ? <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0" />
+                                                : <Circle       size={13} className="text-gray-300 flex-shrink-0"     />}
+                                              <div className="flex-1 min-w-0">
+                                                <p className={cn('text-xs leading-snug', item.status === 'feito' ? 'line-through text-gray-300' : 'text-gray-800')}>{item.titulo}</p>
+                                                {item.canal && <p className="text-[10px] text-[#7B2FBE] mt-0.5 font-bold">{item.canal}</p>}
+                                              </div>
+                                              <span className={cn('text-[9px] font-bold px-1.5 py-0.5 flex-shrink-0 uppercase tracking-wide',
+                                                item.status === 'feito' ? 'text-emerald-700 bg-emerald-50' : 'text-gray-500 bg-gray-100')}>
+                                                {item.status === 'feito' ? 'Feito' : 'Pendente'}
+                                              </span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+                                </>
+                              )}
+
+                            </div>
+                          )
+                        })()}
 
                         {/* ════ SESSÃO ════ */}
                         {ctrl.activeTab === 'sessao' && (
