@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronRight, Layers, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
 import { PilarAccordion } from '@/components/membro/PilarAccordion'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
 import { mockPilares } from '@/lib/mocks/pilares'
+
+const PILARES_KEY = 'pilares_store_v1'
 import { getIdentidade, PILAR_LABELS } from '@/lib/identidade'
 import type { Pilar } from '@/types'
 
@@ -218,7 +220,14 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
 }
 
 function PilaresPage() {
-  const [pilares, setPilares] = useState<Pilar[]>(mockPilares)
+  const [pilares, setPilares] = useState<Pilar[]>(() => {
+    try { return JSON.parse(localStorage.getItem(PILARES_KEY) ?? 'null') ?? mockPilares }
+    catch { return mockPilares }
+  })
+
+  useEffect(() => {
+    try { localStorage.setItem(PILARES_KEY, JSON.stringify(pilares)) } catch {}
+  }, [pilares])
   const [identidadeOpen, setIdentidadeOpen] = useState(true)
   const identidade = getIdentidade()
   const pilarFields = ['publicoAlvo', 'proposta', 'storytelling', 'formatoProduto'] as const

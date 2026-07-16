@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import {
@@ -18,8 +18,9 @@ export const Route = createFileRoute('/dashboard/admin/membros')({
   component: MembrosPage,
 })
 
-const OKR_KEY       = 'okr_store_v1'
-const MARKETING_KEY = 'marketing_store_v1'
+const OKR_KEY            = 'okr_store_v1'
+const MARKETING_KEY      = 'marketing_store_v1'
+const MENTOR_CONTROLS_KEY = 'mentor_controls_v1'
 
 type Fase     = 1 | 2 | 3 | 4
 type TabId    = 'overview' | 'pilares' | 'identidade' | 'sessao'
@@ -280,10 +281,19 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 function MembrosPage() {
-  const [controls, setControls] = useState<Record<string, MenteeControls>>(
-    () => Object.fromEntries(mockMembers.map(m => [m.id, makeDefault()]))
-  )
+  const [controls, setControls] = useState<Record<string, MenteeControls>>(() => {
+    try {
+      const saved: Record<string, Partial<MenteeControls>> = JSON.parse(localStorage.getItem(MENTOR_CONTROLS_KEY) ?? 'null') ?? {}
+      return Object.fromEntries(mockMembers.map(m => [m.id, { ...makeDefault(), ...saved[m.id] }]))
+    } catch {
+      return Object.fromEntries(mockMembers.map(m => [m.id, makeDefault()]))
+    }
+  })
   const [expanded, setExpanded] = useState<string | null>(null)
+
+  useEffect(() => {
+    try { localStorage.setItem(MENTOR_CONTROLS_KEY, JSON.stringify(controls)) } catch {}
+  }, [controls])
 
   const identidadeData = loadIdentidade()
 
@@ -314,10 +324,41 @@ function MembrosPage() {
       [memberId]: { ...prev[memberId], identidade: { ...prev[memberId].identidade, [blocoId]: { ...prev[memberId].identidade[blocoId], ...patch } } },
     }))
   }
+
+  function saveSintese(memberId: string, blocoId: BlocoKey, analise: string) {
+    if (memberId !== 'member-2' || blocoId === 'diferencial') return
+    try {
+      const raw = localStorage.getItem(IDENTIDADE_KEY)
+      if (!raw) return
+      const stored = JSON.parse(raw)
+      const pilarKey = blocoId as 'publicoAlvo' | 'proposta' | 'storytelling' | 'formatoProduto'
+      stored.pilares[pilarKey] = {
+        ...(stored.pilares[pilarKey] ?? {}),
+        analise,
+        analiseLocked: !analise.trim(),
+        status: analise.trim() ? 'construido' : (stored.pilares[pilarKey]?.status ?? 'aguardando'),
+      }
+      localStorage.setItem(IDENTIDADE_KEY, JSON.stringify(stored))
+    } catch {}
+  }
+
   function toggleConstruido(memberId: string, blocoId: BlocoKey) {
     const current = controls[memberId].identidade[blocoId].construido
     updBloco(memberId, blocoId, { construido: !current })
-    if (!current) toast.success(`Bloco construído: ${BLOCOS.find(x => x.id === blocoId)?.label}`)
+    if (!current) {
+      toast.success(`Bloco construído: ${BLOCOS.find(x => x.id === blocoId)?.label}`)
+      if (memberId === 'member-2' && blocoId !== 'diferencial') {
+        try {
+          const raw = localStorage.getItem(IDENTIDADE_KEY)
+          if (raw) {
+            const stored = JSON.parse(raw)
+            const pilarKey = blocoId as 'publicoAlvo' | 'proposta' | 'storytelling' | 'formatoProduto'
+            stored.pilares[pilarKey] = { ...(stored.pilares[pilarKey] ?? {}), status: 'construido' }
+            localStorage.setItem(IDENTIDADE_KEY, JSON.stringify(stored))
+          }
+        } catch {}
+      }
+    }
   }
   function addNextStep(memberId: string) {
     const texto = controls[memberId].newStepInput.trim()
@@ -734,7 +775,7 @@ function MembrosPage() {
                                     />
                                     {bs.analise.trim() && (
                                       <button
-                                        onClick={() => toast.success('Síntese salva')}
+                                        onClick={() => { saveSintese(member.id, bloco.id, bs.analise); toast.success('Síntese salva e visível ao mentorado') }}
                                         className="text-[10px] font-bold text-[#7B2FBE] uppercase tracking-wider hover:underline mt-1"
                                       >
                                         Salvar síntese →
@@ -824,12 +865,7 @@ function MembrosPage() {
                                   rows={5}
                                   className="w-full bg-gray-50 border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] resize-none"
                                 />
-                                {ctrl.sessionNotes.trim() && (
-                                  <button onClick={() => toast.success('Notas salvas')}
-                                    className="text-[10px] font-bold text-[#7B2FBE] uppercase tracking-wider hover:underline mt-1">
-                                    Salvar notas →
-                                  </button>
-                                )}
+                                <p className="text-[9px] text-gray-400 mt-1">Salvo automaticamente</p>
                               </div>
                             </div>
 

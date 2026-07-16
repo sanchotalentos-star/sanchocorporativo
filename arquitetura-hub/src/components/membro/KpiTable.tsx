@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TrendingUp, TrendingDown, Pencil, Check, X } from 'lucide-react'
+import { TrendingUp, TrendingDown, Pencil, Check, X, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getPercent, getStatusColor } from '@/lib/utils'
 import { SparkLine } from '@/components/shared/SparkLine'
@@ -8,6 +8,7 @@ import type { KpiEntry } from '@/types'
 interface KpiTableProps {
   kpis: KpiEntry[]
   onUpdateAtual?: (id: string, value: number) => void
+  onDelete?: (id: string) => void
 }
 
 const categoryColors: Record<string, string> = {
@@ -19,7 +20,7 @@ const categoryColors: Record<string, string> = {
   'Receita': '#EF4444',
 }
 
-export function KpiTable({ kpis, onUpdateAtual }: KpiTableProps) {
+export function KpiTable({ kpis, onUpdateAtual, onDelete }: KpiTableProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editValue, setEditValue] = useState('')
 
@@ -135,12 +136,22 @@ export function KpiTable({ kpis, onUpdateAtual }: KpiTableProps) {
                       </button>
                     </div>
                   ) : (
-                    <button
-                      onClick={() => startEdit(kpi)}
-                      className="p-1.5 text-gray-300 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      <Pencil size={13} />
-                    </button>
+                    <div className="flex items-center gap-0.5">
+                      <button
+                        onClick={() => startEdit(kpi)}
+                        className="p-1.5 text-gray-300 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <Pencil size={13} />
+                      </button>
+                      {onDelete && (
+                        <button
+                          onClick={() => { if (confirm(`Excluir "${kpi.kpi_name}"?`)) onDelete(kpi.id) }}
+                          className="p-1.5 text-gray-300 hover:text-red-400 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      )}
+                    </div>
                   )}
                 </td>
               </tr>
