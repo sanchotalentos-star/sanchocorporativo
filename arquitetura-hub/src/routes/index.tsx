@@ -20,11 +20,6 @@ const modules = [
   { id: '04', title: 'Relatórios de Evolução', desc: 'Análise da sua trajetória com comparativos mensais e visão do seu posicionamento no programa.' },
 ]
 
-const testimonials = [
-  { text: 'Em 3 meses aumentei meu alcance orgânico de 1.200 para 4.800 pessoas. O método funciona.', name: 'Ana Lima', role: 'Consultora de Marketing' },
-  { text: 'O dashboard me ajudou a ver onde estava perdendo oportunidades. Meus leads triplicaram.', name: 'João Santos', role: 'Advogado Empresarial' },
-  { text: 'Sou referência no meu nicho agora. O programa estruturou o que eu já sabia fazer, mas não divulgava.', name: 'Maria Oliveira', role: 'Médica Especialista' },
-]
 
 const serif: React.CSSProperties = { fontFamily: "Georgia, 'Times New Roman', serif" }
 const sans: React.CSSProperties  = { fontFamily: "system-ui, -apple-system, sans-serif" }
@@ -183,33 +178,6 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* ── Depoimentos ── */}
-      <section style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 40px' }}>
-          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 56 }}>Resultados dos participantes</p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48 }}>
-            {testimonials.map((t, i) => (
-              <motion.div
-                key={t.name}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: i * 0.1 }}
-                style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
-              >
-                <p style={{ ...serif, fontSize: 17, lineHeight: 1.7, color: 'rgba(255,255,255,0.75)', fontStyle: 'italic' }}>
-                  "{t.text}"
-                </p>
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 16 }}>
-                  <p style={{ fontWeight: 700, fontSize: 13 }}>{t.name}</p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{t.role}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── CTA ── */}
       <section>
