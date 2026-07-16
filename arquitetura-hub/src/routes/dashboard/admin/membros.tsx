@@ -298,11 +298,11 @@ function MembrosPage() {
   const identidadeData = loadIdentidade()
 
   function getReflexao(memberId: string, key?: keyof IdentidadeStored['pilares']): string {
-    if (memberId !== 'member-2' || !key || !identidadeData) return ''
+    if (memberId !== 'member-3' || !key || !identidadeData) return ''
     return identidadeData.pilares?.[key]?.reflexao?.trim() ?? ''
   }
   function getDiferenciais(memberId: string): string[] {
-    if (memberId !== 'member-2' || !identidadeData) return []
+    if (memberId !== 'member-3' || !identidadeData) return []
     return (identidadeData.diferenciais ?? []).filter(d => d.trim())
   }
   function getBlocoContent(member: Member, bloco: typeof BLOCOS[0]): string | string[] | null {
@@ -326,7 +326,7 @@ function MembrosPage() {
   }
 
   function saveSintese(memberId: string, blocoId: BlocoKey, analise: string) {
-    if (memberId !== 'member-2' || blocoId === 'diferencial') return
+    if (memberId !== 'member-3' || blocoId === 'diferencial') return
     try {
       const raw = localStorage.getItem(IDENTIDADE_KEY)
       if (!raw) return
@@ -347,7 +347,7 @@ function MembrosPage() {
     updBloco(memberId, blocoId, { construido: !current })
     if (!current) {
       toast.success(`Bloco construído: ${BLOCOS.find(x => x.id === blocoId)?.label}`)
-      if (memberId === 'member-2' && blocoId !== 'diferencial') {
+      if (memberId === 'member-3' && blocoId !== 'diferencial') {
         try {
           const raw = localStorage.getItem(IDENTIDADE_KEY)
           if (raw) {
@@ -385,10 +385,10 @@ function MembrosPage() {
           const filled      = countFilled(member.id)
           const constructed = Object.values(ctrl.identidade).filter(b => b.construido).length
           const faseInfo    = FASES.find(f => f.num === ctrl.fase)!
-          const okrs        = member.id === 'member-2' ? loadOkrs()      : []
-          const marketing   = member.id === 'member-2' ? loadMarketing() : []
+          const okrs        = member.id === 'member-3' ? loadOkrs()      : []
+          const marketing   = member.id === 'member-3' ? loadMarketing() : []
           const mktConcluidas = marketing.filter(a => a.concluida).length
-          const sugestoes   = member.id === 'member-2' ? buildSugestoes(identidadeData) : []
+          const sugestoes   = member.id === 'member-3' ? buildSugestoes(identidadeData) : []
 
           return (
             <motion.div key={member.id} variants={fadeInUp} initial="hidden" animate="visible" className="bg-white">
