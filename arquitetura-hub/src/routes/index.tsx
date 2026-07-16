@@ -68,7 +68,7 @@ function LandingPage() {
 
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <p style={{ ...sans, fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 32 }}>
-              Programa de Autoridade · Wladson Sidney
+              Arquitetura de Relevância
             </p>
 
             <h1 style={{
