@@ -44,7 +44,7 @@ function LandingPage() {
             <div style={{ width: 28, height: 28, backgroundColor: '#7B2FBE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{ color: 'white', fontSize: 11, fontWeight: 900, letterSpacing: '0.05em' }}>AR</span>
             </div>
-            <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '0.04em', color: 'white', textTransform: 'uppercase' }}>Arquitetura de Relevância</span>
+            <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '0.01em', color: 'white' }}>Arquitetura de Relevância</span>
           </div>
           <Link to="/auth">
             <button style={{
