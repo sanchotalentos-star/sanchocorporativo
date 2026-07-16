@@ -4,10 +4,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/context/AuthContext'
-import { fadeInUp } from '@/lib/motion'
 
 export const Route = createFileRoute('/auth')({
   component: AuthPage,
@@ -27,15 +26,9 @@ const requestSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>
 type RequestForm = z.infer<typeof requestSchema>
 
-const features = [
-  { num: '01', label: 'OKRs & Metas',       desc: 'Objetivos e resultados-chave por trimestre' },
-  { num: '02', label: 'Posicionamento',      desc: 'Zona de Genialidade e proposta de valor'    },
-  { num: '03', label: 'Marketing Anual',     desc: 'Agenda de conteúdo e distribuição'          },
-  { num: '04', label: 'Score de Autoridade', desc: 'Acompanhe sua evolução semana a semana'     },
-]
-
 function AuthPage() {
   const [tab, setTab] = useState<'login' | 'request'>('login')
+  const [showPassword, setShowPassword] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
 
@@ -50,7 +43,7 @@ function AuthPage() {
       void navigate({ to: role === 'admin' ? '/dashboard/admin' : '/dashboard/membro' })
       toast.success('Bem-vindo(a) de volta!')
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao fazer login')
+      toast.error(err instanceof Error ? err.message : 'Credenciais inválidas')
     }
   }
 
@@ -61,193 +54,201 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="min-h-screen flex">
 
-      {/* LEFT — brand panel */}
-      <div className="hidden lg:flex lg:w-[52%] flex-col justify-between bg-[#1B1F2E] p-12">
+      {/* ── LEFT — brand ── */}
+      <div className="hidden lg:flex lg:w-[45%] flex-col justify-between relative overflow-hidden"
+        style={{ background: 'linear-gradient(145deg, #5B1F9E 0%, #7B2FBE 50%, #9B4FDE 100%)' }}>
 
-        {/* Top bar */}
-        <div className="flex items-center justify-between">
+        {/* Decorative circle */}
+        <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full opacity-10"
+          style={{ background: 'white' }} />
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-5"
+          style={{ background: 'white', transform: 'translate(40%, -40%)' }} />
+
+        {/* Logo */}
+        <div className="relative z-10 p-10">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 bg-[#7B2FBE] flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
               <span className="text-[10px] font-black text-white tracking-widest">AR</span>
             </div>
             <div>
-              <p className="text-[12px] font-bold text-white leading-tight tracking-wide">Arquitetura</p>
-              <p className="text-[10px] text-[#7B2FBE] font-semibold tracking-wider uppercase">de Relevância</p>
+              <p className="text-[13px] font-bold text-white leading-tight">Arquitetura de Relevância</p>
+              <p className="text-[10px] text-white/50 font-medium tracking-wider">Wladson Sidney</p>
             </div>
           </div>
-          <span className="text-white/25 text-[10px] font-bold uppercase tracking-widest">Wladson Sidney</span>
         </div>
 
-        {/* Main headline */}
-        <div>
-          <p className="text-[10px] font-bold text-[#7B2FBE] uppercase tracking-widest mb-5">Programa de Autoridade</p>
-          <h1 className="text-white font-black leading-[1.02] mb-6" style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 'clamp(2.5rem, 4.5vw, 4.5rem)' }}>
-            Arquitete sua<br />
-            <span className="text-[#7B2FBE]">Relevância</span><br />
-            no Mercado.
+        {/* Main content */}
+        <div className="relative z-10 px-10 pb-16">
+          <p className="text-white/50 text-[10px] font-bold uppercase tracking-[0.2em] mb-5">
+            Programa de Autoridade
+          </p>
+          <h1 className="text-white font-black leading-[1.05] mb-6"
+            style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 'clamp(2rem, 3.5vw, 3.5rem)' }}>
+            Construa sua<br />
+            autoridade com<br />
+            <span style={{ color: 'rgba(255,255,255,0.5)' }}>método e clareza.</span>
           </h1>
-          <p className="text-white/40 text-base leading-relaxed max-w-sm">
-            Acompanhe sua jornada de posicionamento e evolua com métricas reais de autoridade.
+          <p className="text-white/40 text-sm leading-relaxed max-w-xs">
+            Identidade, pilares, metas e marketing — tudo num só lugar, acompanhado de perto pelo seu mentor.
           </p>
         </div>
-
-        {/* Feature list */}
-        <div>
-          <div className="border-t border-white/10 mb-6" />
-          <div className="grid grid-cols-2 gap-x-8 gap-y-5">
-            {features.map((f) => (
-              <div key={f.num}>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[#7B2FBE] text-[10px] font-medium">{f.num}</span>
-                  <span className="text-white text-sm font-medium">{f.label}</span>
-                </div>
-                <p className="text-white/30 text-xs leading-relaxed pl-5">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
-      {/* RIGHT — form panel */}
-      <div className="flex-1 flex items-center justify-center px-8 py-16 bg-white">
-        <motion.div
-          variants={fadeInUp}
-          initial="hidden"
-          animate="visible"
-          className="w-full max-w-[380px]"
-        >
-          {/* Mobile logo */}
-          <div className="flex items-center gap-3 mb-10 lg:hidden">
+      {/* ── RIGHT — form ── */}
+      <div className="flex-1 flex flex-col bg-white">
+
+        {/* Top bar mobile logo */}
+        <div className="flex items-center justify-between px-8 py-5 lg:px-12 lg:py-7 border-b border-gray-100 lg:border-0">
+          <div className="flex items-center gap-2 lg:hidden">
             <div className="w-7 h-7 bg-[#7B2FBE] flex items-center justify-center flex-shrink-0">
               <span className="text-[10px] font-black text-white tracking-widest">AR</span>
             </div>
-            <div>
-              <p className="text-[12px] font-bold text-gray-900 leading-tight tracking-wide">Arquitetura</p>
-              <p className="text-[10px] text-[#7B2FBE] font-semibold tracking-wider uppercase">de Relevância</p>
-            </div>
+            <p className="text-sm font-bold text-gray-900">Arquitetura de Relevância</p>
           </div>
-
-          {/* Heading */}
-          <div className="mb-7">
-            <h2 className="text-xl font-semibold text-gray-900 leading-tight mb-1">
-              {tab === 'login' ? 'Entre na plataforma' : 'Solicite seu acesso'}
-            </h2>
-            <p className="text-sm text-gray-400">
-              {tab === 'login'
-                ? 'Use suas credenciais para acessar o hub.'
-                : 'Preencha o formulário e entraremos em contato.'}
-            </p>
-          </div>
-
-          {/* Tab toggle */}
-          <div className="flex gap-6 mb-7 border-b border-gray-100 pb-0">
-            <button
-              onClick={() => setTab('login')}
-              className={`pb-3 text-sm font-medium transition-all border-b-2 -mb-px ${
-                tab === 'login'
-                  ? 'border-[#7B2FBE] text-gray-900'
-                  : 'border-transparent text-gray-400 hover:text-gray-600'
-              }`}
-            >
-              Entrar
-            </button>
+          <div className="hidden lg:block" />
+          {tab === 'login' && (
             <button
               onClick={() => setTab('request')}
-              className={`pb-3 text-sm font-medium transition-all border-b-2 -mb-px ${
-                tab === 'request'
-                  ? 'border-[#7B2FBE] text-gray-900'
-                  : 'border-transparent text-gray-400 hover:text-gray-600'
-              }`}
+              className="text-sm text-gray-400 hover:text-[#7B2FBE] transition-colors"
             >
-              Solicitar Acesso
+              Solicitar acesso
             </button>
-          </div>
-
-          {tab === 'login' ? (
-            <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
-              <div>
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Email</label>
-                <input
-                  type="email"
-                  placeholder="seu@email.com"
-                  className="w-full bg-gray-50 border border-gray-200 px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
-                  {...loginForm.register('email')}
-                />
-                {loginForm.formState.errors.email && (
-                  <p className="text-xs text-red-500 mt-1">{loginForm.formState.errors.email.message}</p>
-                )}
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Senha</label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  className="w-full bg-gray-50 border border-gray-200 px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
-                  {...loginForm.register('password')}
-                />
-                {loginForm.formState.errors.password && (
-                  <p className="text-xs text-red-500 mt-1">{loginForm.formState.errors.password.message}</p>
-                )}
-              </div>
-              <button
-                type="submit"
-                disabled={loginForm.formState.isSubmitting}
-                className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-50 text-white font-medium py-3 transition-colors text-sm mt-2"
-              >
-                {loginForm.formState.isSubmitting ? 'Entrando...' : (
-                  <>Entrar no Hub <ArrowRight size={15} /></>
-                )}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={requestForm.handleSubmit(onRequest)} className="space-y-4">
-              <div>
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Nome completo</label>
-                <input
-                  placeholder="Seu nome"
-                  className="w-full bg-gray-50 border border-gray-200 px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
-                  {...requestForm.register('full_name')}
-                />
-                {requestForm.formState.errors.full_name && (
-                  <p className="text-xs text-red-500 mt-1">{requestForm.formState.errors.full_name.message}</p>
-                )}
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Email</label>
-                <input
-                  type="email"
-                  placeholder="seu@email.com"
-                  className="w-full bg-gray-50 border border-gray-200 px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
-                  {...requestForm.register('email')}
-                />
-                {requestForm.formState.errors.email && (
-                  <p className="text-xs text-red-500 mt-1">{requestForm.formState.errors.email.message}</p>
-                )}
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Por que quer participar?</label>
-                <textarea
-                  placeholder="Conte sobre você e seus objetivos..."
-                  rows={4}
-                  className="w-full bg-gray-50 border border-gray-200 px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors resize-none"
-                  {...requestForm.register('mensagem')}
-                />
-                {requestForm.formState.errors.mensagem && (
-                  <p className="text-xs text-red-500 mt-1">{requestForm.formState.errors.mensagem.message}</p>
-                )}
-              </div>
-              <button
-                type="submit"
-                className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white font-medium py-3 transition-colors text-sm"
-              >
-                Enviar Solicitação <ArrowUpRight size={15} />
-              </button>
-            </form>
           )}
-        </motion.div>
+          {tab === 'request' && (
+            <button
+              onClick={() => setTab('login')}
+              className="text-sm text-gray-400 hover:text-[#7B2FBE] transition-colors"
+            >
+              Já tenho acesso
+            </button>
+          )}
+        </div>
+
+        {/* Form area */}
+        <div className="flex-1 flex items-center justify-center px-8 py-12 lg:px-16">
+          <motion.div
+            key={tab}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="w-full max-w-[400px]"
+          >
+            {tab === 'login' ? (
+              <>
+                <h2 className="text-3xl font-bold text-gray-900 mb-1"
+                  style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                  Olá!
+                </h2>
+                <p className="text-sm text-gray-400 mb-8">
+                  Entre com suas credenciais para acessar o hub.
+                </p>
+
+                <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                    <input
+                      type="email"
+                      placeholder="seu@email.com"
+                      className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 transition-all"
+                      {...loginForm.register('email')}
+                    />
+                    {loginForm.formState.errors.email && (
+                      <p className="text-xs text-red-500 mt-1">{loginForm.formState.errors.email.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Senha</label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        className="w-full border border-gray-200 rounded-lg px-4 py-3 pr-11 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 transition-all"
+                        {...loginForm.register('password')}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(v => !v)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors"
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                    {loginForm.formState.errors.password && (
+                      <p className="text-xs text-red-500 mt-1">{loginForm.formState.errors.password.message}</p>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loginForm.formState.isSubmitting}
+                    className="w-full bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition-colors text-sm mt-2"
+                  >
+                    {loginForm.formState.isSubmitting ? 'Entrando...' : 'Avançar'}
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <h2 className="text-3xl font-bold text-gray-900 mb-1"
+                  style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                  Solicitar acesso
+                </h2>
+                <p className="text-sm text-gray-400 mb-8">
+                  Preencha o formulário e entraremos em contato em breve.
+                </p>
+
+                <form onSubmit={requestForm.handleSubmit(onRequest)} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Nome completo</label>
+                    <input
+                      placeholder="Seu nome"
+                      className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 transition-all"
+                      {...requestForm.register('full_name')}
+                    />
+                    {requestForm.formState.errors.full_name && (
+                      <p className="text-xs text-red-500 mt-1">{requestForm.formState.errors.full_name.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                    <input
+                      type="email"
+                      placeholder="seu@email.com"
+                      className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 transition-all"
+                      {...requestForm.register('email')}
+                    />
+                    {requestForm.formState.errors.email && (
+                      <p className="text-xs text-red-500 mt-1">{requestForm.formState.errors.email.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Por que quer participar?</label>
+                    <textarea
+                      placeholder="Conte sobre você e seus objetivos..."
+                      rows={4}
+                      className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 transition-all resize-none"
+                      {...requestForm.register('mensagem')}
+                    />
+                    {requestForm.formState.errors.mensagem && (
+                      <p className="text-xs text-red-500 mt-1">{requestForm.formState.errors.mensagem.message}</p>
+                    )}
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full bg-[#7B2FBE] hover:bg-[#6a27a5] text-white font-semibold py-3 rounded-lg transition-colors text-sm"
+                  >
+                    Enviar solicitação
+                  </button>
+                </form>
+              </>
+            )}
+          </motion.div>
+        </div>
       </div>
+
     </div>
   )
 }
