@@ -1,160 +1,258 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { BarChart3, Target, Calendar, FileText, Star, ArrowRight, CheckCircle } from 'lucide-react'
-import { staggerContainer, fadeInUp } from '@/lib/motion'
+import { ArrowRight } from 'lucide-react'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
 })
 
-const features = [
-  { icon: BarChart3, title: 'Dashboard de KPIs', desc: 'Acompanhe seus indicadores de autoridade em tempo real com gráficos e tendências.' },
-  { icon: Target, title: 'Pilares Estratégicos', desc: 'Gerencie as 4 dimensões da sua arquitetura de relevância com ações práticas.' },
-  { icon: Calendar, title: 'Agenda Editorial', desc: 'Planeje seu conteúdo, eventos e atividades de mídia em um calendário visual.' },
-  { icon: FileText, title: 'Relatórios', desc: 'Analise sua evolução mensal com relatórios detalhados e comparativos de ranking.' },
+const stats = [
+  { value: '4', label: 'Pilares estratégicos' },
+  { value: '12', label: 'Semanas de programa' },
+  { value: '360°', label: 'Visão de autoridade' },
+  { value: 'Real', label: 'Dados de crescimento' },
+]
+
+const modules = [
+  { id: '01', title: 'Dashboard de KPIs', desc: 'Indicadores de autoridade em tempo real — alcance, leads e conversões acompanhados semana a semana.' },
+  { id: '02', title: 'Pilares Estratégicos', desc: 'As dimensões da sua arquitetura de relevância com ações práticas e mensuráveis para cada fase.' },
+  { id: '03', title: 'Agenda Editorial', desc: 'Planejamento de conteúdo, eventos e atividades de mídia em um calendário visual integrado.' },
+  { id: '04', title: 'Relatórios de Evolução', desc: 'Análise da sua trajetória com comparativos mensais e visão do seu posicionamento no programa.' },
 ]
 
 const testimonials = [
-  { name: 'Ana Lima', role: 'Consultora de Marketing', text: 'Em 3 meses aumentei meu alcance orgânico de 1.200 para 4.800 pessoas. O método funciona!' },
-  { name: 'João Santos', role: 'Advogado Empresarial', text: 'O dashboard me ajudou a ver onde eu estava perdendo oportunidades. Meus leads triplicaram.' },
-  { name: 'Maria Oliveira', role: 'Médica Especialista', text: 'Sou referência no meu nicho agora. O programa estruturou o que eu já sabia fazer, mas não divulgava.' },
+  { text: 'Em 3 meses aumentei meu alcance orgânico de 1.200 para 4.800 pessoas. O método funciona.', name: 'Ana Lima', role: 'Consultora de Marketing' },
+  { text: 'O dashboard me ajudou a ver onde estava perdendo oportunidades. Meus leads triplicaram.', name: 'João Santos', role: 'Advogado Empresarial' },
+  { text: 'Sou referência no meu nicho agora. O programa estruturou o que eu já sabia fazer, mas não divulgava.', name: 'Maria Oliveira', role: 'Médica Especialista' },
 ]
+
+const serif: React.CSSProperties = { fontFamily: "Georgia, 'Times New Roman', serif" }
+const sans: React.CSSProperties  = { fontFamily: "system-ui, -apple-system, sans-serif" }
 
 function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1B1F2E]/95 backdrop-blur border-b border-white/10">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#7B2FBE] flex items-center justify-center">
-              <Star size={16} className="text-white" />
+    <div style={{ ...sans, backgroundColor: '#0F1117', color: '#ffffff', minHeight: '100vh' }}>
+
+      {/* ── Navbar ── */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+        backgroundColor: 'rgba(15,17,23,0.96)', backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 28, height: 28, backgroundColor: '#7B2FBE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: 'white', fontSize: 11, fontWeight: 900, letterSpacing: '0.05em' }}>AR</span>
             </div>
-            <span className="font-bold text-white">Arquitetura de Relevância</span>
+            <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '0.04em', color: 'white', textTransform: 'uppercase' }}>Arquitetura de Relevância</span>
           </div>
           <Link to="/auth">
-            <button className="px-4 py-2 bg-[#7B2FBE] text-white rounded-lg text-sm font-medium hover:bg-[#6a1fa8] transition-colors">
+            <button style={{
+              padding: '9px 22px', backgroundColor: '#7B2FBE', color: 'white',
+              border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700,
+              letterSpacing: '0.08em', textTransform: 'uppercase',
+              transition: 'background 0.2s',
+            }}
+            onMouseOver={e => (e.currentTarget.style.backgroundColor = '#6a1fa8')}
+            onMouseOut={e => (e.currentTarget.style.backgroundColor = '#7B2FBE')}
+            >
               Entrar
             </button>
           </Link>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="pt-32 pb-20 px-6 bg-gradient-to-br from-[#1B1F2E] to-[#0F1117] text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <span className="inline-block px-4 py-1.5 rounded-full bg-[#7B2FBE]/20 border border-[#7B2FBE]/40 text-[#A855F7] text-sm font-medium mb-6">
-              Programa de Autoridade com Wladson Sidney
-            </span>
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-              Arquitete sua{' '}
-              <span className="text-[#7B2FBE]">Relevância</span>
-              {' '}no Mercado.
-            </h1>
-            <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10">
-              Acompanhe seus KPIs de autoridade, gerencie seus pilares estratégicos e execute sua agenda de visibilidade, tudo em um único hub.
+      {/* ── Hero ── */}
+      <section style={{ paddingTop: 160, paddingBottom: 100, borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px' }}>
+
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <p style={{ ...sans, fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 32 }}>
+              Programa de Autoridade · Wladson Sidney
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+            <h1 style={{
+              ...serif,
+              fontSize: 'clamp(52px, 8vw, 96px)',
+              fontWeight: 700,
+              lineHeight: 1.05,
+              letterSpacing: '-0.02em',
+              marginBottom: 40,
+              maxWidth: 820,
+              textWrap: 'balance',
+            } as React.CSSProperties}>
+              Arquitete sua{' '}
+              <span style={{ color: '#7B2FBE' }}>Relevância</span>{' '}
+              no Mercado.
+            </h1>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 640 }}>
+              <p style={{ fontSize: 17, lineHeight: 1.7, color: 'rgba(255,255,255,0.55)', maxWidth: 520 }}>
+                Acompanhe seus KPIs de autoridade, gerencie seus pilares estratégicos e execute sua agenda de visibilidade, tudo em um único hub.
+              </p>
+              <div>
+                <Link to="/auth">
+                  <button style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 10,
+                    padding: '14px 32px', backgroundColor: '#7B2FBE', color: 'white',
+                    border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700,
+                    letterSpacing: '0.06em', textTransform: 'uppercase',
+                    transition: 'background 0.2s',
+                  }}
+                  onMouseOver={e => (e.currentTarget.style.backgroundColor = '#6a1fa8')}
+                  onMouseOut={e => (e.currentTarget.style.backgroundColor = '#7B2FBE')}
+                  >
+                    Acessar a Plataforma <ArrowRight size={15} />
+                  </button>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Stats strip */}
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+            marginTop: 80,
+          }}>
+            {stats.map((s, i) => (
+              <motion.div
+                key={s.label}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 + i * 0.08 }}
+                style={{
+                  padding: '28px 0',
+                  borderRight: i < 3 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                  paddingRight: 32,
+                  paddingLeft: i === 0 ? 0 : 32,
+                }}
+              >
+                <p style={{ ...serif, fontSize: 36, fontWeight: 700, color: '#ffffff', lineHeight: 1, marginBottom: 6 }}>{s.value}</p>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{s.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── O Programa ── */}
+      <section style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, padding: '80px 0' }}>
+
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 20 }}>O Programa</p>
+              <h2 style={{ ...serif, fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em', marginBottom: 24, textWrap: 'balance' } as React.CSSProperties}>
+                Uma metodologia para construir autoridade com consistência.
+              </h2>
+              <p style={{ fontSize: 15, lineHeight: 1.75, color: 'rgba(255,255,255,0.5)', marginBottom: 32 }}>
+                O programa de Arquitetura de Relevância combina diagnóstico de posicionamento, execução estruturada e acompanhamento com dados reais. Cada participante evolui dentro de um hub individual, com visão clara da sua construção semana a semana.
+              </p>
               <Link to="/auth">
-                <button className="px-8 py-4 bg-[#7B2FBE] text-white rounded-xl font-semibold hover:bg-[#6a1fa8] transition-colors flex items-center gap-2">
-                  Acessar Plataforma
-                  <ArrowRight size={18} />
-                </button>
+                <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#7B2FBE', cursor: 'pointer', borderBottom: '1px solid #7B2FBE', paddingBottom: 2 }}>
+                  Solicitar acesso
+                </span>
               </Link>
             </div>
-          </motion.div>
-        </div>
-      </section>
 
-      {/* Features */}
-      <section className="py-20 px-6 bg-[#F8F7FF]">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#0F172A] mb-4">Tudo que você precisa para crescer</h2>
-            <p className="text-[#475569] max-w-2xl mx-auto">Uma plataforma completa para estruturar, executar e medir sua estratégia de autoridade.</p>
-          </div>
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {features.map((f) => (
-              <motion.div key={f.title} variants={fadeInUp} className="bg-white rounded-xl p-6 border border-[#E2E8F0] shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-[#7B2FBE]/10 flex items-center justify-center mb-4">
-                  <f.icon size={24} className="text-[#7B2FBE]" />
-                </div>
-                <h3 className="font-semibold text-[#0F172A] mb-2">{f.title}</h3>
-                <p className="text-sm text-[#475569] leading-relaxed">{f.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#0F172A] mb-4">Resultados reais de participantes</h2>
-          </div>
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-6"
-          >
-            {testimonials.map((t) => (
-              <motion.div key={t.name} variants={fadeInUp} className="bg-white rounded-xl p-6 border border-[#E2E8F0] shadow-sm">
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={16} className="fill-[#7B2FBE] text-[#7B2FBE]" />
-                  ))}
-                </div>
-                <p className="text-[#475569] text-sm leading-relaxed mb-4">"{t.text}"</p>
-                <div>
-                  <p className="font-semibold text-[#0F172A]">{t.name}</p>
-                  <p className="text-xs text-[#94A3B8]">{t.role}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 px-6 bg-gradient-to-br from-[#1B1F2E] to-[#0F1117] text-white">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Faça parte do programa</h2>
-          <p className="text-white/60 mb-8">Junte-se a profissionais que estão construindo autoridade real e conquistando o mercado com método.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <div className="flex items-center gap-2 text-white/70 text-sm"><CheckCircle size={16} className="text-[#7B2FBE]" /> Dashboard de KPIs em tempo real</div>
-            <div className="flex items-center gap-2 text-white/70 text-sm"><CheckCircle size={16} className="text-[#7B2FBE]" /> Acompanhamento de pilares</div>
-            <div className="flex items-center gap-2 text-white/70 text-sm"><CheckCircle size={16} className="text-[#7B2FBE]" /> Ranking entre participantes</div>
-          </div>
-          <Link to="/auth">
-            <button className="px-8 py-4 bg-[#7B2FBE] text-white rounded-xl font-semibold hover:bg-[#6a1fa8] transition-colors">
-              Solicitar Acesso
-            </button>
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-8 px-6 border-t border-[#E2E8F0]">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[#94A3B8]">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-[#7B2FBE] flex items-center justify-center">
-              <Star size={11} className="text-white" />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {modules.map((m, i) => (
+                <motion.div
+                  key={m.id}
+                  initial={{ opacity: 0, x: 16 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.07 }}
+                  style={{
+                    display: 'flex', gap: 24,
+                    padding: '24px 0',
+                    borderTop: i === 0 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                    borderBottom: '1px solid rgba(255,255,255,0.08)',
+                  }}
+                >
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#7B2FBE', letterSpacing: '0.05em', flexShrink: 0, paddingTop: 2 }}>{m.id}</span>
+                  <div>
+                    <p style={{ fontWeight: 700, fontSize: 14, marginBottom: 6, letterSpacing: '0.01em' }}>{m.title}</p>
+                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.65 }}>{m.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
-            <span className="font-medium text-[#475569]">Arquitetura de Relevância Hub</span>
+
           </div>
-          <p>© {new Date().getFullYear()} Sancho Gestão de Carreiras. Todos os direitos reservados.</p>
+        </div>
+      </section>
+
+      {/* ── Depoimentos ── */}
+      <section style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 40px' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 56 }}>Resultados dos participantes</p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48 }}>
+            {testimonials.map((t, i) => (
+              <motion.div
+                key={t.name}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: i * 0.1 }}
+                style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
+              >
+                <p style={{ ...serif, fontSize: 17, lineHeight: 1.7, color: 'rgba(255,255,255,0.75)', fontStyle: 'italic' }}>
+                  "{t.text}"
+                </p>
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 16 }}>
+                  <p style={{ fontWeight: 700, fontSize: 13 }}>{t.name}</p>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{t.role}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
+      <section>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 40px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 48, flexWrap: 'wrap' }}>
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 20 }}>Faça parte</p>
+              <h2 style={{ ...serif, fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em', maxWidth: 560, textWrap: 'balance' } as React.CSSProperties}>
+                Construa autoridade real com método e dados.
+              </h2>
+            </div>
+            <Link to="/auth">
+              <button style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '16px 36px', backgroundColor: '#7B2FBE', color: 'white',
+                border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700,
+                letterSpacing: '0.06em', textTransform: 'uppercase', flexShrink: 0,
+                transition: 'background 0.2s',
+              }}
+              onMouseOver={e => (e.currentTarget.style.backgroundColor = '#6a1fa8')}
+              onMouseOut={e => (e.currentTarget.style.backgroundColor = '#7B2FBE')}
+              >
+                Solicitar Acesso <ArrowRight size={15} />
+              </button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: '28px 40px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 20, height: 20, backgroundColor: '#7B2FBE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: 'white', fontSize: 8, fontWeight: 900 }}>AR</span>
+            </div>
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Arquitetura de Relevância Hub</span>
+          </div>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>© {new Date().getFullYear()} Sancho Gestão de Carreiras</p>
         </div>
       </footer>
+
     </div>
   )
 }
