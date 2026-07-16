@@ -23,7 +23,7 @@ const MARKETING_KEY      = 'marketing_store_v1'
 const MENTOR_CONTROLS_KEY = 'mentor_controls_v1'
 
 type Fase     = 1 | 2 | 3 | 4
-type TabId    = 'overview' | 'pilares' | 'identidade' | 'sessao'
+type TabId    = 'overview' | 'identidade' | 'pilares' | 'okr' | 'sessao'
 type BlocoKey = 'publicoAlvo' | 'proposta' | 'storytelling' | 'formatoProduto' | 'diferencial'
 
 interface BlocoState { construido: boolean; analise: string }
@@ -219,7 +219,7 @@ function buildSugestoes(id: IdentidadeStored | null): SugestaoPilar[] {
 
 function makeDefault(): MenteeControls {
   return {
-    fase: 1, activeTab: 'overview', sessionNotes: '', newStepInput: '',
+    fase: 1, activeTab: 'overview' as TabId, sessionNotes: '', newStepInput: '',
     nextSteps: [],
     identidade: {
       publicoAlvo:    { construido: false, analise: '' },
@@ -443,11 +443,12 @@ function MembrosPage() {
                     <div className="border-t border-gray-100">
 
                       {/* Tab bar */}
-                      <div className="flex border-b border-gray-200 bg-gray-50">
+                      <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
                         {([
                           { id: 'overview'   as TabId, label: 'Visão Geral',      Icon: BarChart2     },
-                          { id: 'pilares'    as TabId, label: 'Pilares Sugeridos', Icon: Layers        },
                           { id: 'identidade' as TabId, label: 'Identidade',        Icon: BookOpen      },
+                          { id: 'pilares'    as TabId, label: 'Pilares Sugeridos', Icon: Layers        },
+                          { id: 'okr'        as TabId, label: 'OKRs',             Icon: Target        },
                           { id: 'sessao'     as TabId, label: 'Sessão',            Icon: ClipboardList },
                         ]).map(t => (
                           <button key={t.id}
@@ -798,6 +799,83 @@ function MembrosPage() {
                                 </div>
                               )
                             })}
+                          </div>
+                        )}
+
+                        {/* ════ OKRs ════ */}
+                        {ctrl.activeTab === 'okr' && (
+                          <div className="space-y-4">
+                            {okrs.length === 0 ? (
+                              <div className="bg-white border border-gray-200 px-5 py-10 text-center">
+                                <Target size={24} className="text-gray-200 mx-auto mb-3" />
+                                <p className="text-sm font-bold text-gray-400">Nenhum OKR definido ainda</p>
+                                <p className="text-xs text-gray-300 mt-1">O mentorado precisa preencher os OKRs para aparecerem aqui.</p>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="bg-white border border-gray-200 px-4 py-3">
+                                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                                    {okrs.length} objetivo{okrs.length > 1 ? 's' : ''} definido{okrs.length > 1 ? 's' : ''} pelo mentorado
+                                  </p>
+                                </div>
+                                {okrs.map((okr, idx) => {
+                                  const krsCount = okr.krs?.length ?? 0
+                                  const krsDone = okr.krs?.filter(kr => kr.meta > 0 && kr.atual >= kr.meta).length ?? 0
+                                  const avgPct = krsCount > 0
+                                    ? Math.round(okr.krs!.reduce((sum, kr) => sum + (kr.meta > 0 ? Math.min((kr.atual / kr.meta) * 100, 100) : 0), 0) / krsCount)
+                                    : 0
+                                  const catColor = CATEGORIA_COLORS[okr.categoria] ?? '#7B2FBE'
+                                  return (
+                                    <div key={okr.id} className="bg-white border border-gray-200 overflow-hidden">
+                                      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100" style={{ borderLeftWidth: 3, borderLeftColor: catColor }}>
+                                        <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: catColor }}>
+                                          {String(idx + 1).padStart(2, '0')}
+                                        </span>
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-sm font-black text-gray-900">{okr.titulo}</p>
+                                          <p className="text-[10px] font-bold mt-0.5" style={{ color: catColor }}>{okr.categoria}</p>
+                                        </div>
+                                        <div className="text-right flex-shrink-0">
+                                          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Progresso</p>
+                                          <p className="text-sm font-black tabular-nums" style={{ color: avgPct >= 70 ? '#10B981' : avgPct >= 40 ? '#F59E0B' : '#EF4444' }}>
+                                            {avgPct}%
+                                          </p>
+                                        </div>
+                                      </div>
+                                      {okr.krs && okr.krs.length > 0 && (
+                                        <div className="divide-y divide-gray-100">
+                                          {okr.krs.map((kr, i) => {
+                                            const pct = kr.meta > 0 ? Math.min(Math.round((kr.atual / kr.meta) * 100), 100) : 0
+                                            const barColor = pct >= 70 ? '#10B981' : pct >= 40 ? '#F59E0B' : '#EF4444'
+                                            return (
+                                              <div key={i} className="px-4 py-3 space-y-1.5">
+                                                <div className="flex items-start justify-between gap-2">
+                                                  <p className="text-xs text-gray-700 leading-snug flex-1">{kr.descricao}</p>
+                                                  <span className="text-[10px] font-bold text-gray-400 flex-shrink-0 tabular-nums">{kr.atual}/{kr.meta} {kr.unidade}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                  <div className="flex-1 h-1 bg-gray-100">
+                                                    <div className="h-full transition-all" style={{ width: `${pct}%`, background: barColor }} />
+                                                  </div>
+                                                  <span className="text-[10px] font-black w-8 text-right tabular-nums" style={{ color: barColor }}>{pct}%</span>
+                                                </div>
+                                              </div>
+                                            )
+                                          })}
+                                        </div>
+                                      )}
+                                      {krsCount > 0 && (
+                                        <div className="px-4 py-2 border-t border-gray-100 bg-gray-50">
+                                          <p className="text-[10px] text-gray-400">
+                                            <span className="font-bold text-emerald-600">{krsDone}</span> de <span className="font-bold">{krsCount}</span> resultados-chave atingidos
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )
+                                })}
+                              </>
+                            )}
                           </div>
                         )}
 
