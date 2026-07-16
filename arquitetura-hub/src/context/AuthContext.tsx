@@ -26,7 +26,7 @@ const MOCK_USERS: Record<string, { password: string; user: User }> = {
   },
   'vitorlvbraga@gmail.com': {
     password: '12345678',
-    user: { id: 'mentor-1', email: 'vitorlvbraga@gmail.com', full_name: 'Vitor Braga', role: 'admin' },
+    user: { id: 'member-3', email: 'vitorlvbraga@gmail.com', full_name: 'Vitor Braga', role: 'membro' },
   },
 }
 
