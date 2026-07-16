@@ -139,12 +139,11 @@ function tag(text: string, max = 55) {
 }
 
 function buildSugestoes(id: IdentidadeStored | null): SugestaoPilar[] {
-  if (!id) return []
-  const publicoAlvo    = id.pilares.publicoAlvo?.reflexao?.trim() ?? ''
-  const proposta       = id.pilares.proposta?.reflexao?.trim() ?? ''
-  const storytelling   = id.pilares.storytelling?.reflexao?.trim() ?? ''
-  const formatoProduto = id.pilares.formatoProduto?.reflexao?.trim() ?? ''
-  const diferenciais   = (id.diferenciais ?? []).filter(d => d.trim())
+  const publicoAlvo    = id?.pilares.publicoAlvo?.reflexao?.trim() ?? ''
+  const proposta       = id?.pilares.proposta?.reflexao?.trim() ?? ''
+  const storytelling   = id?.pilares.storytelling?.reflexao?.trim() ?? ''
+  const formatoProduto = id?.pilares.formatoProduto?.reflexao?.trim() ?? ''
+  const diferenciais   = (id?.diferenciais ?? []).filter(d => d.trim())
   const diferencial    = diferenciais[0] ?? ''
 
   const list: (SugestaoPilar | null)[] = [
@@ -224,11 +223,10 @@ interface SugestaoOkr {
 }
 
 function buildOkrSugestoes(id: IdentidadeStored | null): SugestaoOkr[] {
-  if (!id) return []
-  const publicoAlvo    = id.pilares.publicoAlvo?.reflexao?.trim() ?? ''
-  const proposta       = id.pilares.proposta?.reflexao?.trim() ?? ''
-  const formatoProduto = id.pilares.formatoProduto?.reflexao?.trim() ?? ''
-  const diferencial    = (id.diferenciais ?? [])[0]?.trim() ?? ''
+  const publicoAlvo    = id?.pilares.publicoAlvo?.reflexao?.trim() ?? ''
+  const proposta       = id?.pilares.proposta?.reflexao?.trim() ?? ''
+  const formatoProduto = id?.pilares.formatoProduto?.reflexao?.trim() ?? ''
+  const diferencial    = (id?.diferenciais ?? [])[0]?.trim() ?? ''
 
   const t = (s: string, max = 55) => s.length <= max ? s : s.slice(0, max).trimEnd() + '...'
 
@@ -462,6 +460,57 @@ function MembrosPage() {
     try { localStorage.setItem(OKR_KEY, JSON.stringify(updated)) } catch {}
     setAddedOkrIds(prev => new Set([...prev, s.id]))
     toast.success('OKR adicionado à lista do mentorado')
+  }
+
+  function addKrToOkr(okrId: string) {
+    const novoKr: OkrKr = {
+      id: `kr-${Date.now()}`,
+      descricao: '',
+      meta: 0,
+      atual: 0,
+      unit: '',
+    }
+    const updated = liveOkrs.map(o =>
+      o.id !== okrId ? o : { ...o, keyResults: [...(o.keyResults ?? []), novoKr] }
+    )
+    setLiveOkrs(updated)
+    try { localStorage.setItem(OKR_KEY, JSON.stringify(updated)) } catch {}
+  }
+
+  const [editingKrDesc, setEditingKrDesc] = useState<{ okrId: string; krIdx: number } | null>(null)
+  const [editKrDescVal, setEditKrDescVal] = useState('')
+  const [editingKrMeta, setEditingKrMeta] = useState<{ okrId: string; krIdx: number } | null>(null)
+  const [editKrMetaVal, setEditKrMetaVal] = useState('')
+  const [editKrUnitVal, setEditKrUnitVal] = useState('')
+
+  function commitKrDescEdit() {
+    if (!editingKrDesc) return
+    const updated = liveOkrs.map(o => {
+      if (o.id !== editingKrDesc.okrId) return o
+      const krs = (o.keyResults ?? []).map((kr, i) =>
+        i === editingKrDesc.krIdx ? { ...kr, descricao: editKrDescVal } : kr
+      )
+      return { ...o, keyResults: krs }
+    })
+    setLiveOkrs(updated)
+    try { localStorage.setItem(OKR_KEY, JSON.stringify(updated)) } catch {}
+    setEditingKrDesc(null)
+  }
+
+  function commitKrMetaEdit() {
+    if (!editingKrMeta) return
+    const meta = parseFloat(editKrMetaVal)
+    if (isNaN(meta) || meta < 0) { setEditingKrMeta(null); return }
+    const updated = liveOkrs.map(o => {
+      if (o.id !== editingKrMeta.okrId) return o
+      const krs = (o.keyResults ?? []).map((kr, i) =>
+        i === editingKrMeta.krIdx ? { ...kr, meta, unit: editKrUnitVal || kr.unit } : kr
+      )
+      return { ...o, keyResults: krs }
+    })
+    setLiveOkrs(updated)
+    try { localStorage.setItem(OKR_KEY, JSON.stringify(updated)) } catch {}
+    setEditingKrMeta(null)
   }
 
   useEffect(() => {
@@ -1172,18 +1221,38 @@ function MembrosPage() {
                                           </p>
                                         </div>
                                       </div>
-                                      {krsArr.length > 0 && (
-                                        <div className="divide-y divide-gray-100">
+                                      <div className="divide-y divide-gray-100">
                                           {krsArr.map((kr, i) => {
-                                            const isEditingThis = editingKr?.okrId === okr.id && editingKr?.krIdx === i
+                                            const isEditingAtual = editingKr?.okrId === okr.id && editingKr?.krIdx === i
+                                            const isEditingDesc  = editingKrDesc?.okrId === okr.id && editingKrDesc?.krIdx === i
+                                            const isEditingMeta  = editingKrMeta?.okrId === okr.id && editingKrMeta?.krIdx === i
                                             const pct = kr.meta > 0 ? Math.min(Math.round((kr.atual / kr.meta) * 100), 100) : 0
                                             const barColor = pct >= 70 ? '#10B981' : pct >= 40 ? '#F59E0B' : '#EF4444'
                                             return (
-                                              <div key={i} className="px-4 py-3 space-y-1.5">
-                                                <div className="flex items-start justify-between gap-2">
-                                                  <p className="text-xs text-gray-700 leading-snug flex-1">{kr.descricao}</p>
-                                                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                                                    {isEditingThis ? (
+                                              <div key={i} className="px-4 py-3 space-y-1.5 group">
+                                                <div className="flex items-start gap-2">
+                                                  {/* Descrição editável */}
+                                                  {isEditingDesc ? (
+                                                    <input
+                                                      autoFocus
+                                                      value={editKrDescVal}
+                                                      onChange={e => setEditKrDescVal(e.target.value)}
+                                                      onBlur={commitKrDescEdit}
+                                                      onKeyDown={e => { if (e.key === 'Enter') commitKrDescEdit(); if (e.key === 'Escape') setEditingKrDesc(null) }}
+                                                      className="flex-1 text-xs text-gray-700 bg-[#7B2FBE]/5 border border-[#7B2FBE]/30 px-2 py-1 focus:outline-none"
+                                                      placeholder="Descrição do Key Result..."
+                                                    />
+                                                  ) : (
+                                                    <p
+                                                      className="flex-1 text-xs text-gray-700 leading-snug cursor-text hover:text-gray-900"
+                                                      onClick={() => { setEditingKrDesc({ okrId: okr.id, krIdx: i }); setEditKrDescVal(kr.descricao) }}
+                                                    >
+                                                      {kr.descricao || <span className="text-gray-300 italic">Clique para descrever...</span>}
+                                                    </p>
+                                                  )}
+                                                  {/* Valor atual editável */}
+                                                  <div className="flex items-center gap-1 flex-shrink-0">
+                                                    {isEditingAtual ? (
                                                       <>
                                                         <input
                                                           autoFocus
@@ -1191,45 +1260,77 @@ function MembrosPage() {
                                                           value={editKrVal}
                                                           onChange={e => setEditKrVal(e.target.value)}
                                                           onKeyDown={e => { if (e.key === 'Enter') commitKrEdit(); if (e.key === 'Escape') setEditingKr(null) }}
-                                                          className="w-16 text-right border border-[#7B2FBE] px-1.5 py-0.5 text-[11px] font-bold bg-white text-gray-900 focus:outline-none"
+                                                          className="w-14 text-right border border-[#7B2FBE] px-1.5 py-0.5 text-[11px] font-bold bg-white text-gray-900 focus:outline-none"
                                                         />
-                                                        <span className="text-[10px] text-gray-400">{kr.unit}</span>
-                                                        <button onClick={commitKrEdit} className="p-0.5 text-emerald-500 hover:bg-emerald-50">
-                                                          <Check size={12} />
-                                                        </button>
-                                                        <button onClick={() => setEditingKr(null)} className="p-0.5 text-red-400 hover:bg-red-50">
-                                                          <X size={12} />
-                                                        </button>
+                                                        <button onClick={commitKrEdit} className="p-0.5 text-emerald-500"><Check size={11} /></button>
+                                                        <button onClick={() => setEditingKr(null)} className="p-0.5 text-red-400"><X size={11} /></button>
                                                       </>
                                                     ) : (
                                                       <button
                                                         onClick={() => { setEditingKr({ okrId: okr.id, krIdx: i }); setEditKrVal(String(kr.atual)) }}
-                                                        className="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-[#7B2FBE] tabular-nums group"
+                                                        className="flex items-center gap-0.5 text-[10px] font-bold text-gray-400 hover:text-[#7B2FBE] tabular-nums"
                                                       >
-                                                        <span>{kr.atual}/{kr.meta} {kr.unit}</span>
-                                                        <Pencil size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                        <span>{kr.atual}/{kr.meta}{kr.unit ? ` ${kr.unit}` : ''}</span>
+                                                        <Pencil size={9} className="opacity-0 group-hover:opacity-100 transition-opacity ml-0.5" />
                                                       </button>
                                                     )}
                                                   </div>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                  <div className="flex-1 h-1 bg-gray-100">
-                                                    <div className="h-full transition-all" style={{ width: `${pct}%`, background: barColor }} />
+                                                {/* Meta editável */}
+                                                {isEditingMeta ? (
+                                                  <div className="flex items-center gap-1.5 pl-0">
+                                                    <span className="text-[10px] text-gray-400">Meta:</span>
+                                                    <input
+                                                      autoFocus
+                                                      type="number"
+                                                      value={editKrMetaVal}
+                                                      onChange={e => setEditKrMetaVal(e.target.value)}
+                                                      className="w-16 text-xs border border-gray-200 px-1.5 py-0.5 text-gray-800 focus:outline-none focus:border-[#7B2FBE]"
+                                                    />
+                                                    <input
+                                                      value={editKrUnitVal}
+                                                      onChange={e => setEditKrUnitVal(e.target.value)}
+                                                      onKeyDown={e => { if (e.key === 'Enter') commitKrMetaEdit(); if (e.key === 'Escape') setEditingKrMeta(null) }}
+                                                      placeholder="unidade"
+                                                      className="w-20 text-xs border border-gray-200 px-1.5 py-0.5 text-gray-800 focus:outline-none focus:border-[#7B2FBE]"
+                                                    />
+                                                    <button onClick={commitKrMetaEdit} className="text-emerald-500"><Check size={12} /></button>
+                                                    <button onClick={() => setEditingKrMeta(null)} className="text-gray-300"><X size={12} /></button>
                                                   </div>
-                                                  <span className="text-[10px] font-black w-8 text-right tabular-nums" style={{ color: barColor }}>{pct}%</span>
-                                                </div>
+                                                ) : (
+                                                  <div className="flex items-center gap-2">
+                                                    <div className="flex-1 h-1 bg-gray-100">
+                                                      <div className="h-full transition-all" style={{ width: `${pct}%`, background: barColor }} />
+                                                    </div>
+                                                    <span className="text-[10px] font-black w-8 text-right tabular-nums" style={{ color: barColor }}>{pct}%</span>
+                                                    <button
+                                                      onClick={() => { setEditingKrMeta({ okrId: okr.id, krIdx: i }); setEditKrMetaVal(String(kr.meta)); setEditKrUnitVal(kr.unit) }}
+                                                      className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 text-gray-300 hover:text-gray-500"
+                                                      title="Editar meta"
+                                                    >
+                                                      <Pencil size={9} />
+                                                    </button>
+                                                  </div>
+                                                )}
                                               </div>
                                             )
                                           })}
                                         </div>
-                                      )}
-                                      {krsCount > 0 && (
-                                        <div className="px-4 py-2 border-t border-gray-100 bg-gray-50">
-                                          <p className="text-[10px] text-gray-400">
-                                            <span className="font-bold text-emerald-600">{krsDone}</span> de <span className="font-bold">{krsCount}</span> resultados-chave atingidos
-                                          </p>
+                                      <div className="px-4 py-2 border-t border-gray-100 flex items-center justify-between">
+                                          {krsCount > 0 ? (
+                                            <p className="text-[10px] text-gray-400">
+                                              <span className="font-bold text-emerald-600">{krsDone}</span> de <span className="font-bold">{krsCount}</span> KRs atingidos
+                                            </p>
+                                          ) : (
+                                            <span />
+                                          )}
+                                          <button
+                                            onClick={() => addKrToOkr(okr.id)}
+                                            className="flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider hover:text-[#7B2FBE] transition-colors"
+                                          >
+                                            <Plus size={10} /> Adicionar KR
+                                          </button>
                                         </div>
-                                      )}
                                     </div>
                                   )
                                 })}
