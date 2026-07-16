@@ -373,8 +373,8 @@ function MembrosPage() {
     if (isNaN(val) || val < 0) { setEditingKr(null); return }
     const updated = liveOkrs.map(o => {
       if (o.id !== editingKr.okrId) return o
-      const krs = (o.krs ?? []).map((kr, i) => i === editingKr.krIdx ? { ...kr, atual: val } : kr)
-      return { ...o, krs }
+      const keyResults = (o.keyResults ?? []).map((kr, i) => i === editingKr.krIdx ? { ...kr, atual: val } : kr)
+      return { ...o, keyResults }
     })
     setLiveOkrs(updated)
     try { localStorage.setItem(OKR_KEY, JSON.stringify(updated)) } catch {}
