@@ -59,17 +59,23 @@ interface SugestaoPilar {
   id: string; cor: string; nome: string; descricao: string; acoes: string[]
 }
 
-function loadIdentidade(): IdentidadeStored | null {
-  try { return JSON.parse(localStorage.getItem(IDENTIDADE_KEY) ?? 'null') } catch { return null }
+// Storage keys — member-3 (Vitor) keeps legacy generic keys for backward compat
+function okrKeyFor(id: string)  { return id === 'member-3' ? OKR_KEY       : `${OKR_KEY}_${id}` }
+function mktKeyFor(id: string)  { return id === 'member-3' ? MARKETING_KEY  : `${MARKETING_KEY}_${id}` }
+function kpiKeyFor(id: string)  { return id === 'member-3' ? KPI_KEY        : `${KPI_KEY}_${id}` }
+function idKeyFor(id: string)   { return id === 'member-3' ? IDENTIDADE_KEY : `${IDENTIDADE_KEY}_${id}` }
+
+function loadIdentidadeFor(id: string): IdentidadeStored | null {
+  try { return JSON.parse(localStorage.getItem(idKeyFor(id)) ?? 'null') } catch { return null }
 }
-function loadOkrs(): OkrObj[] {
-  try { return JSON.parse(localStorage.getItem(OKR_KEY) ?? 'null') ?? [] } catch { return [] }
+function loadOkrsFor(id: string): OkrObj[] {
+  try { return JSON.parse(localStorage.getItem(okrKeyFor(id)) ?? 'null') ?? [] } catch { return [] }
 }
-function loadMarketing(): MktAcao[] {
-  try { return JSON.parse(localStorage.getItem(MARKETING_KEY) ?? 'null') ?? [] } catch { return [] }
+function loadMktFor(id: string): MktAcao[] {
+  try { return JSON.parse(localStorage.getItem(mktKeyFor(id)) ?? 'null') ?? [] } catch { return [] }
 }
-function loadKpis(): KpiEntry[] {
-  try { return JSON.parse(localStorage.getItem(KPI_KEY) ?? 'null') ?? [] } catch { return [] }
+function loadKpisFor(id: string): KpiEntry[] {
+  try { return JSON.parse(localStorage.getItem(kpiKeyFor(id)) ?? 'null') ?? [] } catch { return [] }
 }
 
 const FASES: { num: Fase; label: string; desc: string }[] = [
@@ -362,86 +368,75 @@ function MembrosPage() {
   })
   const [expanded, setExpanded] = useState<string | null>(null)
 
-  // OKR live state (mentor can update KR atual values)
-  const [liveOkrs, setLiveOkrs] = useState<OkrObj[]>(() => loadOkrs())
-  const [editingKr, setEditingKr] = useState<{ okrId: string; krIdx: number } | null>(null)
+  // Per-member data maps (each member has isolated localStorage)
+  const [okrMap, setOkrMap] = useState<Record<string, OkrObj[]>>(() =>
+    Object.fromEntries(mockMembers.map(m => [m.id, loadOkrsFor(m.id)]))
+  )
+  const [mktMap, setMktMap] = useState<Record<string, MktAcao[]>>(() =>
+    Object.fromEntries(mockMembers.map(m => [m.id, loadMktFor(m.id)]))
+  )
+  const [kpiMap, setKpiMap] = useState<Record<string, KpiEntry[]>>(() =>
+    Object.fromEntries(mockMembers.map(m => [m.id, loadKpisFor(m.id)]))
+  )
+
+  function saveOkrs(mid: string, data: OkrObj[]) {
+    setOkrMap(prev => ({ ...prev, [mid]: data }))
+    try { localStorage.setItem(okrKeyFor(mid), JSON.stringify(data)) } catch {}
+  }
+  function saveMkt(mid: string, data: MktAcao[]) {
+    setMktMap(prev => ({ ...prev, [mid]: data }))
+    try { localStorage.setItem(mktKeyFor(mid), JSON.stringify(data)) } catch {}
+  }
+  function saveKpis(mid: string, data: KpiEntry[]) {
+    setKpiMap(prev => ({ ...prev, [mid]: data }))
+    try { localStorage.setItem(kpiKeyFor(mid), JSON.stringify(data)) } catch {}
+  }
+
+  // OKR KR editing state (includes memberId for multi-member support)
+  const [editingKr, setEditingKr] = useState<{ memberId: string; okrId: string; krIdx: number } | null>(null)
   const [editKrVal, setEditKrVal] = useState('')
 
-  // Marketing live state
-  const [liveMkt, setLiveMkt] = useState<MktAcao[]>(() => loadMarketing())
+  // Marketing state
   const [showAddMkt, setShowAddMkt] = useState(false)
   const [mktNovaForm, setMktNovaForm] = useState({ titulo: '', canal: 'LinkedIn', frequencia: 'Mensal', mes: new Date().getMonth() + 1 })
   const [mktMesFiltro, setMktMesFiltro] = useState<number | null>(null)
 
-  function addMktAcao() {
+  function addMktAcao(mid: string) {
     if (!mktNovaForm.titulo.trim()) return
-    const nova: MktAcao = {
-      id: Date.now().toString(),
-      titulo: mktNovaForm.titulo.trim(),
-      canal: mktNovaForm.canal,
-      frequencia: mktNovaForm.frequencia,
-      mes: mktNovaForm.mes,
-      concluida: false,
-    }
-    const updated = [...liveMkt, nova]
-    setLiveMkt(updated)
-    try { localStorage.setItem(MARKETING_KEY, JSON.stringify(updated)) } catch {}
+    const nova: MktAcao = { id: Date.now().toString(), titulo: mktNovaForm.titulo.trim(), canal: mktNovaForm.canal, frequencia: mktNovaForm.frequencia, mes: mktNovaForm.mes, concluida: false }
+    saveMkt(mid, [...(mktMap[mid] ?? []), nova])
     setMktNovaForm({ titulo: '', canal: 'LinkedIn', frequencia: 'Mensal', mes: new Date().getMonth() + 1 })
     setShowAddMkt(false)
     toast.success('Ação adicionada')
   }
-  function toggleMktConcluida(id: string) {
-    const updated = liveMkt.map(a => a.id === id ? { ...a, concluida: !a.concluida } : a)
-    setLiveMkt(updated)
-    try { localStorage.setItem(MARKETING_KEY, JSON.stringify(updated)) } catch {}
+  function toggleMktConcluida(mid: string, id: string) {
+    saveMkt(mid, (mktMap[mid] ?? []).map(a => a.id === id ? { ...a, concluida: !a.concluida } : a))
   }
-  function deleteMktAcao(id: string) {
-    const updated = liveMkt.filter(a => a.id !== id)
-    setLiveMkt(updated)
-    try { localStorage.setItem(MARKETING_KEY, JSON.stringify(updated)) } catch {}
+  function deleteMktAcao(mid: string, id: string) {
+    saveMkt(mid, (mktMap[mid] ?? []).filter(a => a.id !== id))
     toast.success('Ação removida')
   }
 
-  // KPI live state
-  const [liveKpis, setLiveKpis] = useState<KpiEntry[]>(() => loadKpis())
+  // KPI state
   const [showAddKpi, setShowAddKpi] = useState(false)
   const [kpiForm, setKpiForm] = useState({ kpi_name: '', category: 'Conteúdo' as KpiCategory, meta: '', unit: '' })
 
-  function addKpi() {
+  function addKpi(mid: string) {
     const nome = kpiForm.kpi_name.trim()
     const meta = parseFloat(kpiForm.meta)
     if (!nome || isNaN(meta) || meta <= 0) return
-    const entry: KpiEntry = {
-      id: Date.now().toString(),
-      user_id: 'member-3',
-      kpi_name: nome,
-      category: kpiForm.category,
-      meta,
-      atual: 0,
-      unit: kpiForm.unit.trim(),
-      history: [0],
-      updated_at: new Date().toISOString(),
-    }
-    const updated = [...liveKpis, entry]
-    setLiveKpis(updated)
-    try { localStorage.setItem(KPI_KEY, JSON.stringify(updated)) } catch {}
+    const entry: KpiEntry = { id: Date.now().toString(), user_id: mid, kpi_name: nome, category: kpiForm.category, meta, atual: 0, unit: kpiForm.unit.trim(), history: [0], updated_at: new Date().toISOString() }
+    saveKpis(mid, [...(kpiMap[mid] ?? []), entry])
     setKpiForm({ kpi_name: '', category: 'Conteúdo', meta: '', unit: '' })
     setShowAddKpi(false)
     toast.success('Indicador adicionado')
   }
-  function updateKpiAtual(id: string, value: number) {
-    const updated = liveKpis.map(k => {
-      if (k.id !== id) return k
-      return { ...k, atual: value, history: [...k.history.slice(-5), value] }
-    })
-    setLiveKpis(updated)
-    try { localStorage.setItem(KPI_KEY, JSON.stringify(updated)) } catch {}
+  function updateKpiAtual(mid: string, id: string, value: number) {
+    saveKpis(mid, (kpiMap[mid] ?? []).map(k => k.id !== id ? k : { ...k, atual: value, history: [...k.history.slice(-5), value] }))
     toast.success('Indicador atualizado')
   }
-  function deleteKpi(id: string) {
-    const updated = liveKpis.filter(k => k.id !== id)
-    setLiveKpis(updated)
-    try { localStorage.setItem(KPI_KEY, JSON.stringify(updated)) } catch {}
+  function deleteKpi(mid: string, id: string) {
+    saveKpis(mid, (kpiMap[mid] ?? []).filter(k => k.id !== id))
     toast.success('Indicador removido')
   }
 
@@ -450,21 +445,6 @@ function MembrosPage() {
   const [editAcaoVal, setEditAcaoVal] = useState('')
   const [editingPilarField, setEditingPilarField] = useState<{ memberId: string; pilarId: string; field: 'nome' | 'descricao' } | null>(null)
   const [editPilarFieldVal, setEditPilarFieldVal] = useState('')
-
-  function commitKrEdit() {
-    if (!editingKr) return
-    const val = parseFloat(editKrVal)
-    if (isNaN(val) || val < 0) { setEditingKr(null); return }
-    const updated = liveOkrs.map(o => {
-      if (o.id !== editingKr.okrId) return o
-      const keyResults = (o.keyResults ?? []).map((kr, i) => i === editingKr.krIdx ? { ...kr, atual: val } : kr)
-      return { ...o, keyResults }
-    })
-    setLiveOkrs(updated)
-    try { localStorage.setItem(OKR_KEY, JSON.stringify(updated)) } catch {}
-    setEditingKr(null)
-    toast.success('KR atualizado')
-  }
 
   function getActivePilares(memberId: string, sugestoes: SugestaoPilar[]): SugestaoPilar[] {
     const custom = controls[memberId]?.pilaresCustom
@@ -522,78 +502,66 @@ function MembrosPage() {
     })
   }
 
-  // OKR suggestions: track which were already added
-  const [addedOkrIds, setAddedOkrIds] = useState<Set<string>>(new Set())
+  // OKR suggestions: track which were already added (per member)
+  const [addedOkrIds, setAddedOkrIds] = useState<Record<string, Set<string>>>({})
 
-  function addOkrFromSugestao(s: SugestaoOkr) {
+  function addOkrFromSugestao(mid: string, s: SugestaoOkr) {
     const novoOkr: OkrObj = {
       id: `sug-${s.id}-${Date.now()}`,
       titulo: s.titulo,
       categoria: s.categoria,
       trimestre: 'Q3 2026',
-      keyResults: s.krs.map((kr, i) => ({
-        id: `kr-${Date.now()}-${i}`,
-        descricao: kr.descricao,
-        meta: kr.meta,
-        atual: 0,
-        unit: kr.unit,
-      })),
+      keyResults: s.krs.map((kr, i) => ({ id: `kr-${Date.now()}-${i}`, descricao: kr.descricao, meta: kr.meta, atual: 0, unit: kr.unit })),
     }
-    const updated = [...liveOkrs, novoOkr]
-    setLiveOkrs(updated)
-    try { localStorage.setItem(OKR_KEY, JSON.stringify(updated)) } catch {}
-    setAddedOkrIds(prev => new Set([...prev, s.id]))
+    saveOkrs(mid, [...(okrMap[mid] ?? []), novoOkr])
+    setAddedOkrIds(prev => ({ ...prev, [mid]: new Set([...(prev[mid] ?? []), s.id]) }))
     toast.success('OKR adicionado à lista do mentorado')
   }
 
-  function addKrToOkr(okrId: string) {
-    const novoKr: OkrKr = {
-      id: `kr-${Date.now()}`,
-      descricao: '',
-      meta: 0,
-      atual: 0,
-      unit: '',
-    }
-    const updated = liveOkrs.map(o =>
-      o.id !== okrId ? o : { ...o, keyResults: [...(o.keyResults ?? []), novoKr] }
-    )
-    setLiveOkrs(updated)
-    try { localStorage.setItem(OKR_KEY, JSON.stringify(updated)) } catch {}
+  function addKrToOkr(mid: string, okrId: string) {
+    const novoKr: OkrKr = { id: `kr-${Date.now()}`, descricao: '', meta: 0, atual: 0, unit: '' }
+    saveOkrs(mid, (okrMap[mid] ?? []).map(o => o.id !== okrId ? o : { ...o, keyResults: [...(o.keyResults ?? []), novoKr] }))
   }
 
-  const [editingKrDesc, setEditingKrDesc] = useState<{ okrId: string; krIdx: number } | null>(null)
+  const [editingKrDesc, setEditingKrDesc] = useState<{ memberId: string; okrId: string; krIdx: number } | null>(null)
   const [editKrDescVal, setEditKrDescVal] = useState('')
-  const [editingKrMeta, setEditingKrMeta] = useState<{ okrId: string; krIdx: number } | null>(null)
+  const [editingKrMeta, setEditingKrMeta] = useState<{ memberId: string; okrId: string; krIdx: number } | null>(null)
   const [editKrMetaVal, setEditKrMetaVal] = useState('')
   const [editKrUnitVal, setEditKrUnitVal] = useState('')
 
+  function commitKrEdit() {
+    if (!editingKr) return
+    const { memberId } = editingKr
+    const val = parseFloat(editKrVal)
+    if (isNaN(val) || val < 0) { setEditingKr(null); return }
+    saveOkrs(memberId, (okrMap[memberId] ?? []).map(o => {
+      if (o.id !== editingKr.okrId) return o
+      const keyResults = (o.keyResults ?? []).map((kr, i) => i === editingKr.krIdx ? { ...kr, atual: val } : kr)
+      return { ...o, keyResults }
+    }))
+    setEditingKr(null)
+    toast.success('KR atualizado')
+  }
+
   function commitKrDescEdit() {
     if (!editingKrDesc) return
-    const updated = liveOkrs.map(o => {
+    const { memberId } = editingKrDesc
+    saveOkrs(memberId, (okrMap[memberId] ?? []).map(o => {
       if (o.id !== editingKrDesc.okrId) return o
-      const krs = (o.keyResults ?? []).map((kr, i) =>
-        i === editingKrDesc.krIdx ? { ...kr, descricao: editKrDescVal } : kr
-      )
-      return { ...o, keyResults: krs }
-    })
-    setLiveOkrs(updated)
-    try { localStorage.setItem(OKR_KEY, JSON.stringify(updated)) } catch {}
+      return { ...o, keyResults: (o.keyResults ?? []).map((kr, i) => i === editingKrDesc.krIdx ? { ...kr, descricao: editKrDescVal } : kr) }
+    }))
     setEditingKrDesc(null)
   }
 
   function commitKrMetaEdit() {
     if (!editingKrMeta) return
+    const { memberId } = editingKrMeta
     const meta = parseFloat(editKrMetaVal)
     if (isNaN(meta) || meta < 0) { setEditingKrMeta(null); return }
-    const updated = liveOkrs.map(o => {
+    saveOkrs(memberId, (okrMap[memberId] ?? []).map(o => {
       if (o.id !== editingKrMeta.okrId) return o
-      const krs = (o.keyResults ?? []).map((kr, i) =>
-        i === editingKrMeta.krIdx ? { ...kr, meta, unit: editKrUnitVal || kr.unit } : kr
-      )
-      return { ...o, keyResults: krs }
-    })
-    setLiveOkrs(updated)
-    try { localStorage.setItem(OKR_KEY, JSON.stringify(updated)) } catch {}
+      return { ...o, keyResults: (o.keyResults ?? []).map((kr, i) => i === editingKrMeta.krIdx ? { ...kr, meta, unit: editKrUnitVal || kr.unit } : kr) }
+    }))
     setEditingKrMeta(null)
   }
 
@@ -601,15 +569,15 @@ function MembrosPage() {
     try { localStorage.setItem(MENTOR_CONTROLS_KEY, JSON.stringify(controls)) } catch {}
   }, [controls])
 
-  const identidadeData = loadIdentidade()
-
+  function getIdentidade(memberId: string): IdentidadeStored | null {
+    return loadIdentidadeFor(memberId)
+  }
   function getReflexao(memberId: string, key?: keyof IdentidadeStored['pilares']): string {
-    if (memberId !== 'member-3' || !key || !identidadeData) return ''
-    return identidadeData.pilares?.[key]?.reflexao?.trim() ?? ''
+    if (!key) return ''
+    return getIdentidade(memberId)?.pilares?.[key]?.reflexao?.trim() ?? ''
   }
   function getDiferenciais(memberId: string): string[] {
-    if (memberId !== 'member-3' || !identidadeData) return []
-    return (identidadeData.diferenciais ?? []).filter(d => d.trim())
+    return (getIdentidade(memberId)?.diferenciais ?? []).filter(d => d.trim())
   }
   function getBlocoContent(member: Member, bloco: typeof BLOCOS[0]): string | string[] | null {
     if (bloco.id === 'diferencial') { const d = getDiferenciais(member.id); return d.length > 0 ? d : null }
@@ -691,12 +659,13 @@ function MembrosPage() {
           const filled      = countFilled(member.id)
           const constructed = Object.values(ctrl.identidade).filter(b => b.construido).length
           const faseInfo    = FASES.find(f => f.num === ctrl.fase)!
-          const okrs        = member.id === 'member-3' ? liveOkrs : []
-          const marketing   = member.id === 'member-3' ? liveMkt  : []
-          const kpis        = member.id === 'member-3' ? liveKpis : []
+          const okrs        = okrMap[member.id] ?? []
+          const marketing   = mktMap[member.id] ?? []
+          const kpis        = kpiMap[member.id] ?? []
+          const identidadeData = getIdentidade(member.id)
           const mktConcluidas = marketing.filter(a => a.concluida).length
-          const sugestoes    = member.id === 'member-3' ? buildSugestoes(identidadeData) : []
-          const okrSugestoes = member.id === 'member-3' ? buildOkrSugestoes(identidadeData) : []
+          const sugestoes    = buildSugestoes(identidadeData)
+          const okrSugestoes = buildOkrSugestoes(identidadeData)
 
           return (
             <motion.div key={member.id} variants={fadeInUp} initial="hidden" animate="visible" className="bg-white">
@@ -1226,7 +1195,7 @@ function MembrosPage() {
                                 </div>
                                 <div className="divide-y divide-gray-100">
                                   {okrSugestoes.map(s => {
-                                    const added = addedOkrIds.has(s.id) || liveOkrs.some(o => o.id.startsWith(`sug-${s.id}-`))
+                                    const added = (addedOkrIds[member.id] ?? new Set()).has(s.id) || okrs.some(o => o.id.startsWith(`sug-${s.id}-`))
                                     const cor = CATEGORIA_COLORS[s.categoria] ?? '#7B2FBE'
                                     return (
                                       <div key={s.id} className="px-4 py-3">
@@ -1241,7 +1210,7 @@ function MembrosPage() {
                                             <p className="text-xs font-bold text-gray-800 leading-snug">{s.titulo}</p>
                                           </div>
                                           <button
-                                            onClick={() => !added && addOkrFromSugestao(s)}
+                                            onClick={() => !added && addOkrFromSugestao(member.id, s)}
                                             disabled={added}
                                             className="flex-shrink-0 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 transition-all whitespace-nowrap"
                                             style={added
@@ -1333,7 +1302,7 @@ function MembrosPage() {
                                                   ) : (
                                                     <p
                                                       className="flex-1 text-xs text-gray-700 leading-snug cursor-text hover:text-gray-900"
-                                                      onClick={() => { setEditingKrDesc({ okrId: okr.id, krIdx: i }); setEditKrDescVal(kr.descricao) }}
+                                                      onClick={() => { setEditingKrDesc({ memberId: member.id, okrId: okr.id, krIdx: i }); setEditKrDescVal(kr.descricao) }}
                                                     >
                                                       {kr.descricao || <span className="text-gray-300 italic">Clique para descrever...</span>}
                                                     </p>
@@ -1355,7 +1324,7 @@ function MembrosPage() {
                                                       </>
                                                     ) : (
                                                       <button
-                                                        onClick={() => { setEditingKr({ okrId: okr.id, krIdx: i }); setEditKrVal(String(kr.atual)) }}
+                                                        onClick={() => { setEditingKr({ memberId: member.id, okrId: okr.id, krIdx: i }); setEditKrVal(String(kr.atual)) }}
                                                         className="flex items-center gap-0.5 text-[10px] font-bold text-gray-400 hover:text-[#7B2FBE] tabular-nums"
                                                       >
                                                         <span>{kr.atual}/{kr.meta}{kr.unit ? ` ${kr.unit}` : ''}</span>
@@ -1392,7 +1361,7 @@ function MembrosPage() {
                                                     </div>
                                                     <span className="text-[10px] font-black w-8 text-right tabular-nums" style={{ color: barColor }}>{pct}%</span>
                                                     <button
-                                                      onClick={() => { setEditingKrMeta({ okrId: okr.id, krIdx: i }); setEditKrMetaVal(String(kr.meta)); setEditKrUnitVal(kr.unit) }}
+                                                      onClick={() => { setEditingKrMeta({ memberId: member.id, okrId: okr.id, krIdx: i }); setEditKrMetaVal(String(kr.meta)); setEditKrUnitVal(kr.unit) }}
                                                       className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 text-gray-300 hover:text-gray-500"
                                                       title="Editar meta"
                                                     >
@@ -1413,7 +1382,7 @@ function MembrosPage() {
                                             <span />
                                           )}
                                           <button
-                                            onClick={() => addKrToOkr(okr.id)}
+                                            onClick={() => addKrToOkr(member.id, okr.id)}
                                             className="flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider hover:text-[#7B2FBE] transition-colors"
                                           >
                                             <Plus size={10} /> Adicionar KR
@@ -1466,7 +1435,7 @@ function MembrosPage() {
                                   type="text"
                                   value={mktNovaForm.titulo}
                                   onChange={e => setMktNovaForm(f => ({ ...f, titulo: e.target.value }))}
-                                  onKeyDown={e => e.key === 'Enter' && addMktAcao()}
+                                  onKeyDown={e => e.key === 'Enter' && addMktAcao(member.id)}
                                   placeholder="Título da ação..."
                                   className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#7B2FBE]"
                                 />
@@ -1507,7 +1476,7 @@ function MembrosPage() {
                                     className="flex-1 border border-gray-200 text-xs font-bold text-gray-500 py-2 uppercase tracking-wider hover:bg-gray-50">
                                     Cancelar
                                   </button>
-                                  <button onClick={addMktAcao} disabled={!mktNovaForm.titulo.trim()}
+                                  <button onClick={() => addMktAcao(member.id)} disabled={!mktNovaForm.titulo.trim()}
                                     className="flex-1 text-xs font-bold text-white py-2 uppercase tracking-wider disabled:opacity-40"
                                     style={{ background: '#7B2FBE' }}>
                                     Adicionar
@@ -1549,7 +1518,7 @@ function MembrosPage() {
                                     .map(acao => (
                                     <div key={acao.id} className="flex items-center gap-3 px-4 py-3 group hover:bg-gray-50 transition-colors">
                                       <button
-                                        onClick={() => toggleMktConcluida(acao.id)}
+                                        onClick={() => toggleMktConcluida(member.id, acao.id)}
                                         className="w-4 h-4 border-2 flex items-center justify-center flex-shrink-0 transition-all"
                                         style={{ borderColor: acao.concluida ? '#10B981' : '#7B2FBE', background: acao.concluida ? '#10B981' : 'transparent' }}
                                       >
@@ -1570,7 +1539,7 @@ function MembrosPage() {
                                         </div>
                                       </div>
                                       <button
-                                        onClick={() => deleteMktAcao(acao.id)}
+                                        onClick={() => deleteMktAcao(member.id, acao.id)}
                                         className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-400 transition-all flex-shrink-0"
                                       >
                                         <Trash2 size={13} />
@@ -1640,7 +1609,7 @@ function MembrosPage() {
                                     type="text"
                                     value={kpiForm.kpi_name}
                                     onChange={e => setKpiForm(f => ({ ...f, kpi_name: e.target.value }))}
-                                    onKeyDown={e => e.key === 'Enter' && addKpi()}
+                                    onKeyDown={e => e.key === 'Enter' && addKpi(member.id)}
                                     placeholder="Nome do indicador..."
                                     className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#7B2FBE]"
                                   />
@@ -1671,7 +1640,7 @@ function MembrosPage() {
                                   <div className="flex gap-2">
                                     <button onClick={() => setShowAddKpi(false)}
                                       className="flex-1 border border-gray-200 text-xs font-bold text-gray-500 py-2 uppercase tracking-wider hover:bg-gray-50">Cancelar</button>
-                                    <button onClick={addKpi} disabled={!kpiForm.kpi_name.trim() || !kpiForm.meta}
+                                    <button onClick={() => addKpi(member.id)} disabled={!kpiForm.kpi_name.trim() || !kpiForm.meta}
                                       className="flex-1 text-xs font-bold text-white py-2 uppercase tracking-wider disabled:opacity-40"
                                       style={{ background: '#7B2FBE' }}>Adicionar</button>
                                   </div>
@@ -1684,7 +1653,7 @@ function MembrosPage() {
                                   <p className="text-xs text-gray-300 mt-1">Adicione os KPIs que o mentorado deve acompanhar.</p>
                                 </div>
                               ) : (
-                                <KpiTable kpis={kpis} onUpdateAtual={updateKpiAtual} onDelete={deleteKpi} />
+                                <KpiTable kpis={kpis} onUpdateAtual={(id, val) => updateKpiAtual(member.id, id, val)} onDelete={(id) => deleteKpi(member.id, id)} />
                               )}
                             </div>
 
@@ -1696,12 +1665,12 @@ function MembrosPage() {
                           const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
                           type AgStatus = 'feito' | 'pendente' | 'bloqueado' | 'nao_feito'
                           interface AgItem { id: string; titulo: string; tipo: 'okr' | 'marketing'; semana?: number; mes?: number; status: AgStatus; canal?: string; objetivo?: string }
-                          const okrItems: AgItem[] = (liveOkrs as Array<OkrObj & { pdca?: { acoes?: Array<{ id: string; descricao: string; semana: number; status: AgStatus; dataLimite?: string }>; plano?: Array<{ id: string; entrega: string; dataLimite: string }> } }>)
+                          const okrItems: AgItem[] = (okrs as Array<OkrObj & { pdca?: { acoes?: Array<{ id: string; descricao: string; semana: number; status: AgStatus; dataLimite?: string }>; plano?: Array<{ id: string; entrega: string; dataLimite: string }> } }>)
                             .flatMap(obj => [
                               ...((obj.pdca?.acoes ?? []).map(a => ({ id: `okr-acao-${a.id}`, titulo: a.descricao || '(sem descrição)', tipo: 'okr' as const, semana: a.semana, status: a.status, objetivo: obj.titulo }))),
                               ...((obj.pdca?.plano ?? []).map(p => ({ id: `okr-plano-${p.id}`, titulo: p.entrega || '(sem descrição)', tipo: 'okr' as const, objetivo: obj.titulo, status: 'pendente' as AgStatus }))),
                             ])
-                          const mktItems: AgItem[] = liveMkt.map(a => ({ id: `mkt-${a.id}`, titulo: a.titulo, tipo: 'marketing' as const, mes: a.mes, status: a.concluida ? 'feito' : 'pendente', canal: a.canal }))
+                          const mktItems: AgItem[] = marketing.map(a => ({ id: `mkt-${a.id}`, titulo: a.titulo, tipo: 'marketing' as const, mes: a.mes, status: a.concluida ? 'feito' : 'pendente', canal: a.canal }))
                           const itens = [...okrItems, ...mktItems]
                           const feitos = itens.filter(i => i.status === 'feito').length
                           const pendentes = itens.filter(i => i.status === 'pendente').length
