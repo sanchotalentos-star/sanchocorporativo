@@ -6,7 +6,7 @@ import {
   ChevronDown, ChevronUp, Check, PenLine, MessageSquare,
   Target, Calendar, BarChart2, Sparkles, CheckCircle2,
   Plus, BookOpen, ClipboardList, TrendingUp,
-  ChevronRight, Award, Zap, Layers,
+  ChevronRight, Award, Zap, Layers, Pencil, X, Trash2,
 } from 'lucide-react'
 import { fadeInUp } from '@/lib/motion'
 import { mockMembers } from '@/lib/mocks/members'
@@ -29,12 +29,13 @@ type BlocoKey = 'publicoAlvo' | 'proposta' | 'storytelling' | 'formatoProduto' |
 interface BlocoState { construido: boolean; analise: string }
 
 interface MenteeControls {
-  fase:         Fase
-  activeTab:    TabId
-  sessionNotes: string
-  newStepInput: string
-  nextSteps:    { id: string; texto: string; done: boolean }[]
-  identidade:   Record<BlocoKey, BlocoState>
+  fase:          Fase
+  activeTab:     TabId
+  sessionNotes:  string
+  newStepInput:  string
+  nextSteps:     { id: string; texto: string; done: boolean }[]
+  identidade:    Record<BlocoKey, BlocoState>
+  pilaresCustom: SugestaoPilar[] | null
 }
 
 interface IdentidadeStored {
@@ -228,6 +229,7 @@ function makeDefault(): MenteeControls {
       formatoProduto: { construido: false, analise: '' },
       diferencial:    { construido: false, analise: '' },
     },
+    pilaresCustom: null,
   }
 }
 
@@ -290,6 +292,88 @@ function MembrosPage() {
     }
   })
   const [expanded, setExpanded] = useState<string | null>(null)
+
+  // OKR live state (mentor can update KR atual values)
+  const [liveOkrs, setLiveOkrs] = useState<OkrObj[]>(() => loadOkrs())
+  const [editingKr, setEditingKr] = useState<{ okrId: string; krIdx: number } | null>(null)
+  const [editKrVal, setEditKrVal] = useState('')
+
+  // Pilar action editing
+  const [editingAcao, setEditingAcao] = useState<{ memberId: string; pilarId: string; acaoIdx: number } | null>(null)
+  const [editAcaoVal, setEditAcaoVal] = useState('')
+  const [editingPilarField, setEditingPilarField] = useState<{ memberId: string; pilarId: string; field: 'nome' | 'descricao' } | null>(null)
+  const [editPilarFieldVal, setEditPilarFieldVal] = useState('')
+
+  function commitKrEdit() {
+    if (!editingKr) return
+    const val = parseFloat(editKrVal)
+    if (isNaN(val) || val < 0) { setEditingKr(null); return }
+    const updated = liveOkrs.map(o => {
+      if (o.id !== editingKr.okrId) return o
+      const krs = (o.krs ?? []).map((kr, i) => i === editingKr.krIdx ? { ...kr, atual: val } : kr)
+      return { ...o, krs }
+    })
+    setLiveOkrs(updated)
+    try { localStorage.setItem(OKR_KEY, JSON.stringify(updated)) } catch {}
+    setEditingKr(null)
+    toast.success('KR atualizado')
+  }
+
+  function getActivePilares(memberId: string, sugestoes: SugestaoPilar[]): SugestaoPilar[] {
+    const custom = controls[memberId]?.pilaresCustom
+    return custom !== null && custom !== undefined ? custom : sugestoes
+  }
+
+  function initPilaresCustom(memberId: string, sugestoes: SugestaoPilar[]) {
+    if (!controls[memberId]) return
+    if (controls[memberId].pilaresCustom !== null) return
+    setControls(prev => ({ ...prev, [memberId]: { ...prev[memberId], pilaresCustom: sugestoes.map(s => ({ ...s, acoes: [...s.acoes] })) } }))
+  }
+
+  function updPilarAcao(memberId: string, pilarId: string, acaoIdx: number, value: string) {
+    setControls(prev => {
+      const pilares = (prev[memberId].pilaresCustom ?? []).map(p =>
+        p.id !== pilarId ? p : { ...p, acoes: p.acoes.map((a, i) => i === acaoIdx ? value : a) }
+      )
+      return { ...prev, [memberId]: { ...prev[memberId], pilaresCustom: pilares } }
+    })
+  }
+
+  function addPilarAcao(memberId: string, pilarId: string) {
+    setControls(prev => {
+      const pilares = (prev[memberId].pilaresCustom ?? []).map(p =>
+        p.id !== pilarId ? p : { ...p, acoes: [...p.acoes, ''] }
+      )
+      return { ...prev, [memberId]: { ...prev[memberId], pilaresCustom: pilares } }
+    })
+    // auto-focus new item after state update
+    setTimeout(() => {
+      const custom = controls[memberId]?.pilaresCustom
+      const pilar = custom?.find(p => p.id === pilarId)
+      if (pilar) {
+        setEditingAcao({ memberId, pilarId, acaoIdx: pilar.acoes.length })
+        setEditAcaoVal('')
+      }
+    }, 10)
+  }
+
+  function deletePilarAcao(memberId: string, pilarId: string, acaoIdx: number) {
+    setControls(prev => {
+      const pilares = (prev[memberId].pilaresCustom ?? []).map(p =>
+        p.id !== pilarId ? p : { ...p, acoes: p.acoes.filter((_, i) => i !== acaoIdx) }
+      )
+      return { ...prev, [memberId]: { ...prev[memberId], pilaresCustom: pilares } }
+    })
+  }
+
+  function updPilarField(memberId: string, pilarId: string, field: 'nome' | 'descricao', value: string) {
+    setControls(prev => {
+      const pilares = (prev[memberId].pilaresCustom ?? []).map(p =>
+        p.id !== pilarId ? p : { ...p, [field]: value }
+      )
+      return { ...prev, [memberId]: { ...prev[memberId], pilaresCustom: pilares } }
+    })
+  }
 
   useEffect(() => {
     try { localStorage.setItem(MENTOR_CONTROLS_KEY, JSON.stringify(controls)) } catch {}
@@ -385,7 +469,7 @@ function MembrosPage() {
           const filled      = countFilled(member.id)
           const constructed = Object.values(ctrl.identidade).filter(b => b.construido).length
           const faseInfo    = FASES.find(f => f.num === ctrl.fase)!
-          const okrs        = member.id === 'member-3' ? loadOkrs()      : []
+          const okrs        = member.id === 'member-3' ? liveOkrs       : []
           const marketing   = member.id === 'member-3' ? loadMarketing() : []
           const mktConcluidas = marketing.filter(a => a.concluida).length
           const sugestoes   = member.id === 'member-3' ? buildSugestoes(identidadeData) : []
@@ -679,36 +763,128 @@ function MembrosPage() {
                                 <p className="text-sm font-bold text-gray-400">Nenhuma sugestão disponível</p>
                                 <p className="text-xs text-gray-300 mt-1">O mentorado precisa preencher sua identidade para as sugestões aparecerem.</p>
                               </div>
-                            ) : (
-                              <>
-                                <div className="bg-white border border-gray-200 px-4 py-3">
-                                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                                    {sugestoes.length} pilares gerados a partir das respostas do mentorado
-                                  </p>
-                                </div>
-                                {sugestoes.map((s, idx) => (
-                                  <div key={s.id} className="bg-white border border-gray-200 overflow-hidden">
-                                    <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100" style={{ borderLeftWidth: 3, borderLeftColor: s.cor }}>
-                                      <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: s.cor }}>
-                                        {String(idx + 1).padStart(2, '0')}
-                                      </span>
-                                      <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-black text-gray-900">{s.nome}</p>
-                                        <p className="text-[11px] text-gray-500 leading-snug mt-0.5">{s.descricao}</p>
-                                      </div>
-                                    </div>
-                                    <div className="divide-y divide-gray-100">
-                                      {s.acoes.map((acao, i) => (
-                                        <div key={i} className="flex items-start gap-3 px-4 py-2.5">
-                                          <span className="text-[9px] font-black text-gray-300 mt-0.5 flex-shrink-0 tabular-nums">{String(i + 1).padStart(2, '0')}</span>
-                                          <p className="text-xs text-gray-700 leading-relaxed">{acao}</p>
-                                        </div>
-                                      ))}
-                                    </div>
+                            ) : (() => {
+                              // initialize custom pilares from auto-generated on first edit
+                              const activePilares = getActivePilares(member.id, sugestoes)
+                              return (
+                                <>
+                                  <div className="bg-white border border-gray-200 px-4 py-3 flex items-center justify-between">
+                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                                      {activePilares.length} pilares · clique em qualquer texto para editar
+                                    </p>
+                                    {ctrl.pilaresCustom !== null && (
+                                      <button
+                                        onClick={() => { setControls(prev => ({ ...prev, [member.id]: { ...prev[member.id], pilaresCustom: null } })); toast.success('Pilares restaurados') }}
+                                        className="text-[9px] font-bold text-gray-400 uppercase tracking-wider hover:text-red-400 transition-colors"
+                                      >
+                                        Restaurar original
+                                      </button>
+                                    )}
                                   </div>
-                                ))}
-                              </>
-                            )}
+                                  {activePilares.map((s, idx) => {
+                                    const isEditingNome = editingPilarField?.memberId === member.id && editingPilarField?.pilarId === s.id && editingPilarField?.field === 'nome'
+                                    const isEditingDesc = editingPilarField?.memberId === member.id && editingPilarField?.pilarId === s.id && editingPilarField?.field === 'descricao'
+                                    return (
+                                      <div key={s.id} className="bg-white border border-gray-200 overflow-hidden">
+                                        <div className="flex items-start gap-3 px-4 py-3 border-b border-gray-100" style={{ borderLeftWidth: 3, borderLeftColor: s.cor }}>
+                                          <span className="text-[9px] font-black uppercase tracking-widest mt-0.5 flex-shrink-0" style={{ color: s.cor }}>
+                                            {String(idx + 1).padStart(2, '0')}
+                                          </span>
+                                          <div className="flex-1 min-w-0 space-y-1">
+                                            {isEditingNome ? (
+                                              <input
+                                                autoFocus
+                                                value={editPilarFieldVal}
+                                                onChange={e => setEditPilarFieldVal(e.target.value)}
+                                                onBlur={() => { initPilaresCustom(member.id, sugestoes); updPilarField(member.id, s.id, 'nome', editPilarFieldVal); setEditingPilarField(null) }}
+                                                onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') { initPilaresCustom(member.id, sugestoes); updPilarField(member.id, s.id, 'nome', editPilarFieldVal); setEditingPilarField(null) } }}
+                                                className="w-full text-sm font-black text-gray-900 bg-[#7B2FBE]/5 border border-[#7B2FBE]/30 px-2 py-0.5 focus:outline-none"
+                                              />
+                                            ) : (
+                                              <p
+                                                className="text-sm font-black text-gray-900 cursor-text hover:bg-gray-50 px-1 -mx-1 transition-colors"
+                                                onClick={() => { setEditingPilarField({ memberId: member.id, pilarId: s.id, field: 'nome' }); setEditPilarFieldVal(s.nome) }}
+                                              >
+                                                {s.nome}
+                                              </p>
+                                            )}
+                                            {isEditingDesc ? (
+                                              <input
+                                                autoFocus
+                                                value={editPilarFieldVal}
+                                                onChange={e => setEditPilarFieldVal(e.target.value)}
+                                                onBlur={() => { initPilaresCustom(member.id, sugestoes); updPilarField(member.id, s.id, 'descricao', editPilarFieldVal); setEditingPilarField(null) }}
+                                                onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') { initPilaresCustom(member.id, sugestoes); updPilarField(member.id, s.id, 'descricao', editPilarFieldVal); setEditingPilarField(null) } }}
+                                                className="w-full text-[11px] text-gray-500 bg-[#7B2FBE]/5 border border-[#7B2FBE]/30 px-2 py-0.5 focus:outline-none"
+                                              />
+                                            ) : (
+                                              <p
+                                                className="text-[11px] text-gray-500 leading-snug cursor-text hover:bg-gray-50 px-1 -mx-1 transition-colors"
+                                                onClick={() => { setEditingPilarField({ memberId: member.id, pilarId: s.id, field: 'descricao' }); setEditPilarFieldVal(s.descricao) }}
+                                              >
+                                                {s.descricao}
+                                              </p>
+                                            )}
+                                          </div>
+                                        </div>
+                                        <div className="divide-y divide-gray-100">
+                                          {s.acoes.map((acao, i) => {
+                                            const isEditingThis = editingAcao?.memberId === member.id && editingAcao?.pilarId === s.id && editingAcao?.acaoIdx === i
+                                            return (
+                                              <div key={i} className="flex items-start gap-3 px-4 py-2.5 group">
+                                                <span className="text-[9px] font-black text-gray-300 mt-0.5 flex-shrink-0 tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+                                                {isEditingThis ? (
+                                                  <div className="flex-1 flex items-start gap-1">
+                                                    <textarea
+                                                      autoFocus
+                                                      value={editAcaoVal}
+                                                      rows={2}
+                                                      onChange={e => setEditAcaoVal(e.target.value)}
+                                                      onBlur={() => { initPilaresCustom(member.id, sugestoes); updPilarAcao(member.id, s.id, i, editAcaoVal); setEditingAcao(null) }}
+                                                      onKeyDown={e => { if (e.key === 'Escape') { initPilaresCustom(member.id, sugestoes); updPilarAcao(member.id, s.id, i, editAcaoVal); setEditingAcao(null) } }}
+                                                      className="flex-1 text-xs text-gray-700 bg-[#7B2FBE]/5 border border-[#7B2FBE]/30 px-2 py-1 focus:outline-none resize-none"
+                                                    />
+                                                    <button onClick={() => { initPilaresCustom(member.id, sugestoes); updPilarAcao(member.id, s.id, i, editAcaoVal); setEditingAcao(null) }} className="p-0.5 text-emerald-500 mt-0.5 flex-shrink-0">
+                                                      <Check size={12} />
+                                                    </button>
+                                                    <button onClick={() => { deletePilarAcao(member.id, s.id, i); setEditingAcao(null) }} className="p-0.5 text-red-400 mt-0.5 flex-shrink-0">
+                                                      <Trash2 size={12} />
+                                                    </button>
+                                                  </div>
+                                                ) : (
+                                                  <>
+                                                    <p
+                                                      className="text-xs text-gray-700 leading-relaxed flex-1 cursor-text hover:text-gray-900"
+                                                      onClick={() => { setEditingAcao({ memberId: member.id, pilarId: s.id, acaoIdx: i }); setEditAcaoVal(acao) }}
+                                                    >
+                                                      {acao || <span className="text-gray-300 italic">Clique para editar...</span>}
+                                                    </p>
+                                                    <button
+                                                      onClick={() => { setEditingAcao({ memberId: member.id, pilarId: s.id, acaoIdx: i }); setEditAcaoVal(acao) }}
+                                                      className="p-1 text-gray-200 hover:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                                                    >
+                                                      <Pencil size={10} />
+                                                    </button>
+                                                  </>
+                                                )}
+                                              </div>
+                                            )
+                                          })}
+                                        </div>
+                                        <div className="px-4 py-2 border-t border-gray-100">
+                                          <button
+                                            onClick={() => { initPilaresCustom(member.id, sugestoes); addPilarAcao(member.id, s.id) }}
+                                            className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider hover:text-[#7B2FBE] transition-colors"
+                                          >
+                                            <Plus size={10} /> Adicionar ação
+                                          </button>
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+                                </>
+                              )
+                            })()}
                           </div>
                         )}
 
@@ -815,7 +991,7 @@ function MembrosPage() {
                               <>
                                 <div className="bg-white border border-gray-200 px-4 py-3">
                                   <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                                    {okrs.length} objetivo{okrs.length > 1 ? 's' : ''} definido{okrs.length > 1 ? 's' : ''} pelo mentorado
+                                    {okrs.length} objetivo{okrs.length > 1 ? 's' : ''} · clique no valor atual para editar
                                   </p>
                                 </div>
                                 {okrs.map((okr, idx) => {
@@ -845,13 +1021,42 @@ function MembrosPage() {
                                       {okr.krs && okr.krs.length > 0 && (
                                         <div className="divide-y divide-gray-100">
                                           {okr.krs.map((kr, i) => {
+                                            const isEditingThis = editingKr?.okrId === okr.id && editingKr?.krIdx === i
                                             const pct = kr.meta > 0 ? Math.min(Math.round((kr.atual / kr.meta) * 100), 100) : 0
                                             const barColor = pct >= 70 ? '#10B981' : pct >= 40 ? '#F59E0B' : '#EF4444'
                                             return (
                                               <div key={i} className="px-4 py-3 space-y-1.5">
                                                 <div className="flex items-start justify-between gap-2">
                                                   <p className="text-xs text-gray-700 leading-snug flex-1">{kr.descricao}</p>
-                                                  <span className="text-[10px] font-bold text-gray-400 flex-shrink-0 tabular-nums">{kr.atual}/{kr.meta} {kr.unidade}</span>
+                                                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                                                    {isEditingThis ? (
+                                                      <>
+                                                        <input
+                                                          autoFocus
+                                                          type="number"
+                                                          value={editKrVal}
+                                                          onChange={e => setEditKrVal(e.target.value)}
+                                                          onKeyDown={e => { if (e.key === 'Enter') commitKrEdit(); if (e.key === 'Escape') setEditingKr(null) }}
+                                                          className="w-16 text-right border border-[#7B2FBE] px-1.5 py-0.5 text-[11px] font-bold bg-white text-gray-900 focus:outline-none"
+                                                        />
+                                                        <span className="text-[10px] text-gray-400">{kr.unidade}</span>
+                                                        <button onClick={commitKrEdit} className="p-0.5 text-emerald-500 hover:bg-emerald-50">
+                                                          <Check size={12} />
+                                                        </button>
+                                                        <button onClick={() => setEditingKr(null)} className="p-0.5 text-red-400 hover:bg-red-50">
+                                                          <X size={12} />
+                                                        </button>
+                                                      </>
+                                                    ) : (
+                                                      <button
+                                                        onClick={() => { setEditingKr({ okrId: okr.id, krIdx: i }); setEditKrVal(String(kr.atual)) }}
+                                                        className="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-[#7B2FBE] tabular-nums group"
+                                                      >
+                                                        <span>{kr.atual}/{kr.meta} {kr.unidade}</span>
+                                                        <Pencil size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                      </button>
+                                                    )}
+                                                  </div>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                   <div className="flex-1 h-1 bg-gray-100">
