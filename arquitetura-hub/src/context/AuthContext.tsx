@@ -28,6 +28,10 @@ const MOCK_USERS: Record<string, { password: string; user: User }> = {
     password: '12345678',
     user: { id: 'member-3', email: 'vitorlvbraga@gmail.com', full_name: 'Vitor Braga', role: 'membro' },
   },
+  'rodrigocunhapro@gmail.com': {
+    password: '12345678',
+    user: { id: 'member-4', email: 'rodrigocunhapro@gmail.com', full_name: 'Rodrigo Cunha', role: 'membro' },
+  },
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
