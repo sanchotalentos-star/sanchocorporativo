@@ -12,7 +12,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex min-h-screen bg-[#FAFAFA]">
+    <div className="flex min-h-screen bg-[#F7F6FA]">
 
       {/* Mobile overlay */}
       {sidebarOpen && (

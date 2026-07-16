@@ -68,29 +68,27 @@ function AuthPage() {
 
         {/* Top bar */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-md bg-[#7B2FBE] flex items-center justify-center flex-shrink-0">
-              <span className="text-[11px] font-bold text-white tracking-wide">AR</span>
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 bg-[#7B2FBE] flex items-center justify-center flex-shrink-0">
+              <span className="text-[10px] font-black text-white tracking-widest">AR</span>
             </div>
             <div>
-              <p className="text-[12px] font-semibold text-white leading-tight">Arquitetura</p>
-              <p className="text-[10px] text-[#7B2FBE] font-medium">de Relevância</p>
+              <p className="text-[12px] font-bold text-white leading-tight tracking-wide">Arquitetura</p>
+              <p className="text-[10px] text-[#7B2FBE] font-semibold tracking-wider uppercase">de Relevância</p>
             </div>
           </div>
-          <span className="text-white/30 text-[11px] font-medium">Wladson Sidney</span>
+          <span className="text-white/25 text-[10px] font-bold uppercase tracking-widest">Wladson Sidney</span>
         </div>
 
         {/* Main headline */}
         <div>
-          <span className="inline-block text-[#7B2FBE] text-xs font-medium tracking-widest uppercase mb-5 border border-[#7B2FBE]/30 bg-[#7B2FBE]/10 px-3 py-1 rounded-full">
-            Programa de Autoridade
-          </span>
-          <h1 className="text-white font-bold leading-[1.05] mb-6" style={{ fontSize: 'clamp(2.5rem, 4.5vw, 4.5rem)' }}>
+          <p className="text-[10px] font-bold text-[#7B2FBE] uppercase tracking-widest mb-5">Programa de Autoridade</p>
+          <h1 className="text-white font-black leading-[1.02] mb-6" style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 'clamp(2.5rem, 4.5vw, 4.5rem)' }}>
             Arquitete sua<br />
             <span className="text-[#7B2FBE]">Relevância</span><br />
             no Mercado.
           </h1>
-          <p className="text-white/45 text-base leading-relaxed max-w-sm font-light">
+          <p className="text-white/40 text-base leading-relaxed max-w-sm">
             Acompanhe sua jornada de posicionamento e evolua com métricas reais de autoridade.
           </p>
         </div>
@@ -121,13 +119,13 @@ function AuthPage() {
           className="w-full max-w-[380px]"
         >
           {/* Mobile logo */}
-          <div className="flex items-center gap-2.5 mb-10 lg:hidden">
-            <div className="w-7 h-7 rounded-md bg-[#7B2FBE] flex items-center justify-center flex-shrink-0">
-              <span className="text-[11px] font-bold text-white tracking-wide">AR</span>
+          <div className="flex items-center gap-3 mb-10 lg:hidden">
+            <div className="w-7 h-7 bg-[#7B2FBE] flex items-center justify-center flex-shrink-0">
+              <span className="text-[10px] font-black text-white tracking-widest">AR</span>
             </div>
             <div>
-              <p className="text-[12px] font-semibold text-gray-900 leading-tight">Arquitetura</p>
-              <p className="text-[10px] text-[#7B2FBE] font-medium">de Relevância</p>
+              <p className="text-[12px] font-bold text-gray-900 leading-tight tracking-wide">Arquitetura</p>
+              <p className="text-[10px] text-[#7B2FBE] font-semibold tracking-wider uppercase">de Relevância</p>
             </div>
           </div>
 
@@ -174,7 +172,7 @@ function AuthPage() {
                 <input
                   type="email"
                   placeholder="seu@email.com"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
                   {...loginForm.register('email')}
                 />
                 {loginForm.formState.errors.email && (
@@ -186,7 +184,7 @@ function AuthPage() {
                 <input
                   type="password"
                   placeholder="••••••••"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
                   {...loginForm.register('password')}
                 />
                 {loginForm.formState.errors.password && (
@@ -196,7 +194,7 @@ function AuthPage() {
               <button
                 type="submit"
                 disabled={loginForm.formState.isSubmitting}
-                className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-50 text-white font-medium py-3 rounded-lg transition-colors text-sm mt-2"
+                className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] disabled:opacity-50 text-white font-medium py-3 transition-colors text-sm mt-2"
               >
                 {loginForm.formState.isSubmitting ? 'Entrando...' : (
                   <>Entrar no Hub <ArrowRight size={15} /></>
@@ -209,7 +207,7 @@ function AuthPage() {
                 <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Nome completo</label>
                 <input
                   placeholder="Seu nome"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
                   {...requestForm.register('full_name')}
                 />
                 {requestForm.formState.errors.full_name && (
@@ -221,7 +219,7 @@ function AuthPage() {
                 <input
                   type="email"
                   placeholder="seu@email.com"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
+                  className="w-full bg-gray-50 border border-gray-200 px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors"
                   {...requestForm.register('email')}
                 />
                 {requestForm.formState.errors.email && (
@@ -233,7 +231,7 @@ function AuthPage() {
                 <textarea
                   placeholder="Conte sobre você e seus objetivos..."
                   rows={4}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors resize-none"
+                  className="w-full bg-gray-50 border border-gray-200 px-4 py-2.5 text-gray-900 text-sm placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:bg-white transition-colors resize-none"
                   {...requestForm.register('mensagem')}
                 />
                 {requestForm.formState.errors.mensagem && (
@@ -242,7 +240,7 @@ function AuthPage() {
               </div>
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white font-medium py-3 rounded-lg transition-colors text-sm"
+                className="w-full flex items-center justify-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white font-medium py-3 transition-colors text-sm"
               >
                 Enviar Solicitação <ArrowUpRight size={15} />
               </button>
