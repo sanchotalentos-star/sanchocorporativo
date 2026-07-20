@@ -1692,7 +1692,7 @@ function syncAreaSlides() {
   });
 
   // Limita às top 4 áreas com mais participantes
-  var MAX_AREA_SLIDES = 4;
+  var MAX_AREA_SLIDES = 3;
   var sortedKeys = Object.keys(areaGroups).sort(function(a, b) {
     return areaGroups[b].participants.length - areaGroups[a].participants.length;
   }).slice(0, MAX_AREA_SLIDES);
@@ -1807,7 +1807,9 @@ function showSlide(idx) {
   currentSlideIdx = idx;
   currentFrag = -1;
 
-  s.querySelectorAll('.fragment').forEach(function(f) { f.classList.remove('visible'); });
+  var frags = s.querySelectorAll('.fragment');
+  frags.forEach(function(f) { f.classList.add('visible'); });
+  currentFrag = frags.length - 1;
 
   if (s.id === 'slide-qr') {
     renderQR();
