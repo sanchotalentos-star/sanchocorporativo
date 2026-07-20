@@ -2027,8 +2027,14 @@ function showSuccess() {
 document.addEventListener('keydown', function(e) {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   var key = e.key;
-  if (key === 'ArrowRight' || key === ' ') { e.preventDefault(); next(); }
-  if (key === 'ArrowLeft')  { e.preventDefault(); prev(); }
+  // Avanço: seta direita, espaço, PageDown, seta baixo, Enter
+  if (key === 'ArrowRight' || key === ' ' || key === 'PageDown' || key === 'ArrowDown' || key === 'Enter') {
+    e.preventDefault(); next();
+  }
+  // Voltar: seta esquerda, PageUp, seta cima
+  if (key === 'ArrowLeft' || key === 'PageUp' || key === 'ArrowUp') {
+    e.preventDefault(); prev();
+  }
   if (key === 'f' || key === 'F') toggleFullscreen();
   if (key === 'd' || key === 'D') injectDemo();
 });
