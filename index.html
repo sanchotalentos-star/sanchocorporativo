@@ -1691,8 +1691,23 @@ function syncAreaSlides() {
     }
   });
 
+  // Limita às top 4 áreas com mais participantes
+  var MAX_AREA_SLIDES = 4;
+  var sortedKeys = Object.keys(areaGroups).sort(function(a, b) {
+    return areaGroups[b].participants.length - areaGroups[a].participants.length;
+  }).slice(0, MAX_AREA_SLIDES);
+
+  // Remove slides de áreas que não estão no top 4
+  Object.keys(areaSlideMap).forEach(function(key) {
+    if (sortedKeys.indexOf(key) === -1) {
+      var el = areaSlideMap[key];
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+      delete areaSlideMap[key];
+    }
+  });
+
   var anchor = document.getElementById('slide-wpp-se-amostramento');
-  Object.keys(areaGroups).forEach(function(key) {
+  sortedKeys.forEach(function(key) {
     var group = areaGroups[key];
     if (!areaSlideMap[key]) {
       var el = buildAreaSlide(key, group);
