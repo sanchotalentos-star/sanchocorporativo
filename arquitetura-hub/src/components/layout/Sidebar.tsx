@@ -3,7 +3,7 @@ import type { LucideIcon } from 'lucide-react'
 import {
   Home, Rocket, Layers, Compass, Megaphone, CalendarDays,
   BarChart2, FileBarChart, Trophy, LogOut,
-  LayoutDashboard, Users, FileText,
+  LayoutDashboard, Users, FileText, CheckSquare,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
@@ -26,6 +26,7 @@ const membroNav: NavItem[] = [
   { label: 'Minha Identidade',  href: '/dashboard/membro/posicionamento', icon: Compass     },
   { label: 'Pilares da Marca',  href: '/dashboard/membro/pilares',        icon: Layers      },
   { label: 'Metas de Impacto',  href: '/dashboard/membro/okr',            icon: Rocket      },
+  { label: 'Tarefas',           href: '/dashboard/membro/tarefas',        icon: CheckSquare },
   { label: 'Marketing Anual',   href: '/dashboard/membro/marketing',      icon: Megaphone   },
   { label: 'Indicadores',       href: '/dashboard/membro/kpis',           icon: BarChart2   },
   { label: 'Agenda',            href: '/dashboard/membro/agenda',         icon: CalendarDays },
@@ -51,14 +52,8 @@ export function Sidebar() {
     <aside className="flex flex-col w-60 min-h-screen bg-[#1B1F2E] border-r border-white/5">
 
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-white/5">
-        <div className="w-7 h-7 rounded-md bg-[#7B2FBE] flex items-center justify-center flex-shrink-0">
-          <span className="text-[11px] font-bold text-white tracking-wide">AR</span>
-        </div>
-        <div>
-          <p className="text-[12px] font-semibold text-white leading-tight">Arquitetura</p>
-          <p className="text-[10px] text-[#7B2FBE] font-medium">de Relevância</p>
-        </div>
+      <div className="px-5 py-5 border-b border-white/5">
+        <p className="text-[13px] font-bold text-white tracking-wide leading-snug">Arquitetura de Relevância</p>
       </div>
 
       {/* User info */}
