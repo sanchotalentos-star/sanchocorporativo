@@ -1,39 +1,43 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
-import { BarChart3, Target, Calendar, FileText, Star, ArrowRight, CheckCircle } from 'lucide-react'
-import { staggerContainer, fadeInUp } from '@/lib/motion'
+import { ArrowRight } from 'lucide-react'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
 })
 
-const features = [
-  { icon: BarChart3, title: 'Dashboard de KPIs', desc: 'Acompanhe seus indicadores de autoridade em tempo real com gráficos e tendências.' },
-  { icon: Target, title: 'Pilares Estratégicos', desc: 'Gerencie as 4 dimensões da sua arquitetura de relevância com ações práticas.' },
-  { icon: Calendar, title: 'Agenda Editorial', desc: 'Planeje seu conteúdo, eventos e atividades de mídia em um calendário visual.' },
-  { icon: FileText, title: 'Relatórios', desc: 'Analise sua evolução mensal com relatórios detalhados e comparativos de ranking.' },
-]
-
-const testimonials = [
-  { name: 'Ana Lima', role: 'Consultora de Marketing', text: 'Em 3 meses aumentei meu alcance orgânico de 1.200 para 4.800 pessoas. O método funciona!' },
-  { name: 'João Santos', role: 'Advogado Empresarial', text: 'O dashboard me ajudou a ver onde eu estava perdendo oportunidades. Meus leads triplicaram.' },
-  { name: 'Maria Oliveira', role: 'Médica Especialista', text: 'Sou referência no meu nicho agora. O programa estruturou o que eu já sabia fazer, mas não divulgava.' },
-]
+const serif: React.CSSProperties = { fontFamily: "Georgia, 'Times New Roman', serif" }
 
 function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-b border-[#E2E8F0]">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#1B3A5C] flex items-center justify-center">
-              <Star size={16} className="text-[#D97706]" />
-            </div>
-            <span className="font-bold text-[#0F172A]">Arquitetura de Relevância</span>
-          </div>
+    <div style={{ backgroundColor: '#0D0D0D', color: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+
+      {/* Nav */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        backgroundColor: 'rgba(13,13,13,0.96)',
+        backdropFilter: 'blur(12px)',
+      }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.01em', color: 'rgba(255,255,255,0.9)' }}>
+            Arquitetura de Relevância
+          </span>
           <Link to="/auth">
-            <button className="px-4 py-2 bg-[#1B3A5C] text-white rounded-lg text-sm font-medium hover:bg-[#152E4A] transition-colors">
+            <button
+              style={{
+                padding: '7px 18px',
+                background: 'transparent',
+                color: 'rgba(255,255,255,0.6)',
+                border: '1px solid rgba(255,255,255,0.14)',
+                cursor: 'pointer',
+                fontSize: 12,
+                fontWeight: 500,
+                letterSpacing: '0.03em',
+                transition: 'all 0.15s',
+              }}
+              onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'; e.currentTarget.style.color = '#fff' }}
+              onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)' }}
+            >
               Entrar
             </button>
           </Link>
@@ -41,116 +45,166 @@ function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="pt-32 pb-20 px-6 bg-gradient-to-br from-[#1B3A5C] to-[#0F172A] text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <span className="inline-block px-4 py-1.5 rounded-full bg-[#D97706]/20 border border-[#D97706]/30 text-[#F59E0B] text-sm font-medium mb-6">
-              Programa de Autoridade com Wladson Sidney
-            </span>
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-              Construa sua{' '}
-              <span className="text-[#D97706]">Autoridade de Mercado</span>
-              {' '}com Método
-            </h1>
-            <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-10">
-              Acompanhe seus KPIs de autoridade, gerencie seus pilares estratégicos e execute sua agenda de visibilidade — tudo em um único hub.
+      <section style={{ paddingTop: 156, paddingBottom: 112, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px' }}>
+          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 40 }}>
+            Programa de Mentoria
+          </p>
+          <h1 style={{
+            ...serif,
+            fontSize: 'clamp(46px, 7vw, 84px)',
+            fontWeight: 700,
+            lineHeight: 1.06,
+            letterSpacing: '-0.025em',
+            marginBottom: 32,
+            maxWidth: 720,
+          }}>
+            Arquitetura de{' '}
+            <span style={{ color: '#7B2FBE' }}>Relevância</span>
+          </h1>
+          <p style={{ fontSize: 16, lineHeight: 1.8, color: 'rgba(255,255,255,0.42)', maxWidth: 460, marginBottom: 44 }}>
+            Um programa de mentoria para profissionais que querem construir autoridade real, com método, dados e acompanhamento próximo.
+          </p>
+          <Link to="/auth">
+            <button
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '13px 28px',
+                background: '#7B2FBE',
+                color: '#fff',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 13,
+                fontWeight: 600,
+                letterSpacing: '0.03em',
+                transition: 'background 0.15s',
+              }}
+              onMouseOver={e => e.currentTarget.style.background = '#6823a8'}
+              onMouseOut={e => e.currentTarget.style.background = '#7B2FBE'}
+            >
+              Acessar a plataforma <ArrowRight size={14} />
+            </button>
+          </Link>
+        </div>
+      </section>
+
+      {/* O Programa */}
+      <section style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{
+          maxWidth: 1100, margin: '0 auto', padding: '88px 32px',
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'start',
+        }}>
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 20 }}>O Programa</p>
+            <h2 style={{
+              ...serif,
+              fontSize: 'clamp(24px, 3vw, 38px)',
+              fontWeight: 700,
+              lineHeight: 1.2,
+              letterSpacing: '-0.02em',
+              marginBottom: 24,
+            }}>
+              Uma metodologia para construir autoridade com consistência.
+            </h2>
+            <p style={{ fontSize: 15, lineHeight: 1.8, color: 'rgba(255,255,255,0.42)', marginBottom: 24 }}>
+              Cada participante evolui dentro de um hub individual, com visão clara do que construir semana a semana: identidade, pilares, metas, execução e dados reais.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/auth">
-                <button className="px-8 py-4 bg-[#D97706] text-white rounded-xl font-semibold hover:bg-[#B45309] transition-colors flex items-center gap-2">
-                  Acessar Plataforma
-                  <ArrowRight size={18} />
-                </button>
-              </Link>
-            </div>
-          </motion.div>
+            <p style={{ fontSize: 15, lineHeight: 1.8, color: 'rgba(255,255,255,0.42)', marginBottom: 36 }}>
+              O acompanhamento é próximo. Cada sessão tem entregáveis claros, e o hub mantém tudo organizado em um único lugar.
+            </p>
+            <Link to="/auth">
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#7B2FBE', cursor: 'pointer', letterSpacing: '0.03em', borderBottom: '1px solid #7B2FBE', paddingBottom: 2 }}>
+                Solicitar acesso
+              </span>
+            </Link>
+          </div>
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            {[
+              { label: 'Identidade de Marca', desc: 'Quem você é, para quem fala, o que entrega de diferente. O ponto de partida de toda a jornada.' },
+              { label: 'Pilares Estratégicos', desc: 'As frentes de construção de presença: conteúdo, relacionamento, produto e visibilidade.' },
+              { label: 'Metas de Impacto', desc: 'OKRs e Key Results por trimestre, com plano de ação e ciclo de revisão contínua.' },
+              { label: 'Execução e Indicadores', desc: 'Agenda editorial, KPIs de autoridade e relatórios de evolução ao longo do programa.' },
+            ].map((item, i) => (
+              <div key={i} style={{ padding: '26px 0', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.85)', marginBottom: 8 }}>{item.label}</p>
+                <p style={{ fontSize: 13, lineHeight: 1.7, color: 'rgba(255,255,255,0.35)' }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-20 px-6 bg-[#F1F5F9]">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#0F172A] mb-4">Tudo que você precisa para crescer</h2>
-            <p className="text-[#475569] max-w-2xl mx-auto">Uma plataforma completa para estruturar, executar e medir sua estratégia de autoridade.</p>
-          </div>
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {features.map((f) => (
-              <motion.div key={f.title} variants={fadeInUp} className="bg-white rounded-xl p-6 border border-[#E2E8F0] shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-[#1B3A5C]/10 flex items-center justify-center mb-4">
-                  <f.icon size={24} className="text-[#1B3A5C]" />
-                </div>
-                <h3 className="font-semibold text-[#0F172A] mb-2">{f.title}</h3>
-                <p className="text-sm text-[#475569] leading-relaxed">{f.desc}</p>
-              </motion.div>
+      {/* Para quem */}
+      <section style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '88px 32px' }}>
+          <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 20 }}>Para quem é</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            {[
+              { perfil: 'Especialistas e consultores', desc: 'Que querem ser reconhecidos pelo que sabem e atrair clientes de forma orgânica.' },
+              { perfil: 'Profissionais em transição', desc: 'Que estão reposicionando a carreira e precisam construir autoridade no novo nicho.' },
+              { perfil: 'Líderes e executivos', desc: 'Que querem consolidar sua presença no mercado e ampliar seu círculo de influência.' },
+            ].map((item, i) => (
+              <div key={i} style={{
+                padding: '40px 28px',
+                borderRight: i < 2 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+              }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.82)', marginBottom: 12 }}>{item.perfil}</p>
+                <p style={{ fontSize: 13, lineHeight: 1.7, color: 'rgba(255,255,255,0.35)' }}>{item.desc}</p>
+              </div>
             ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#0F172A] mb-4">Resultados reais de participantes</h2>
           </div>
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-6"
-          >
-            {testimonials.map((t) => (
-              <motion.div key={t.name} variants={fadeInUp} className="bg-white rounded-xl p-6 border border-[#E2E8F0] shadow-sm">
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={16} className="fill-[#D97706] text-[#D97706]" />
-                  ))}
-                </div>
-                <p className="text-[#475569] text-sm leading-relaxed mb-4">"{t.text}"</p>
-                <div>
-                  <p className="font-semibold text-[#0F172A]">{t.name}</p>
-                  <p className="text-xs text-[#94A3B8]">{t.role}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-6 bg-[#1B3A5C] text-white">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Faça parte do programa</h2>
-          <p className="text-white/70 mb-8">Junte-se a profissionais que estão construindo autoridade real e conquistando o mercado com método.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <div className="flex items-center gap-2 text-white/80 text-sm"><CheckCircle size={16} className="text-[#D97706]" /> Dashboard de KPIs em tempo real</div>
-            <div className="flex items-center gap-2 text-white/80 text-sm"><CheckCircle size={16} className="text-[#D97706]" /> Acompanhamento de pilares</div>
-            <div className="flex items-center gap-2 text-white/80 text-sm"><CheckCircle size={16} className="text-[#D97706]" /> Ranking entre participantes</div>
+      <section>
+        <div style={{
+          maxWidth: 1100, margin: '0 auto', padding: '88px 32px',
+          display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 48, flexWrap: 'wrap',
+        }}>
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 20 }}>Faça parte</p>
+            <h2 style={{
+              ...serif,
+              fontSize: 'clamp(26px, 4vw, 48px)',
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: '-0.02em',
+              maxWidth: 500,
+            }}>
+              Construa autoridade real com método e dados.
+            </h2>
           </div>
           <Link to="/auth">
-            <button className="px-8 py-4 bg-[#D97706] text-white rounded-xl font-semibold hover:bg-[#B45309] transition-colors">
-              Solicitar Acesso
+            <button
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '13px 28px',
+                background: '#7B2FBE',
+                color: '#fff',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 13,
+                fontWeight: 600,
+                letterSpacing: '0.03em',
+                flexShrink: 0,
+                transition: 'background 0.15s',
+              }}
+              onMouseOver={e => e.currentTarget.style.background = '#6823a8'}
+              onMouseOut={e => e.currentTarget.style.background = '#7B2FBE'}
+            >
+              Solicitar acesso <ArrowRight size={14} />
             </button>
           </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 border-t border-[#E2E8F0]">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[#94A3B8]">
-          <div className="flex items-center gap-2">
-            <Star size={16} className="text-[#D97706]" />
-            <span className="font-medium text-[#475569]">Arquitetura de Relevância Hub</span>
-          </div>
-          <p>© {new Date().getFullYear()} Sancho Gestão de Carreiras. Todos os direitos reservados.</p>
+      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 32px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.22)' }}>Arquitetura de Relevância</span>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.16)' }}>© {new Date().getFullYear()} Sancho Gestão de Carreiras</p>
         </div>
       </footer>
     </div>

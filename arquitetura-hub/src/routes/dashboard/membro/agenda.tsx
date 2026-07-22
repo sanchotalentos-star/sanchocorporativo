@@ -1,8 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useMemo } from 'react'
-import { motion } from 'framer-motion'
 import { Calendar, CheckCircle2, Circle, XCircle, AlertCircle, Target, Megaphone, ChevronRight, Filter } from 'lucide-react'
-import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/dashboard/membro/agenda')({
@@ -140,52 +138,52 @@ function AgendaPage() {
       </div>
 
       {/* Sumário */}
-      <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <motion.div variants={fadeInUp} className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1">
             <Target size={13} className="text-[#7B2FBE]" />
             <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">OKR</p>
           </div>
           <p className="text-2xl font-semibold text-gray-900">{totalOkr}</p>
           <p className="text-[10px] text-gray-400 mt-0.5">ações do plano</p>
-        </motion.div>
-        <motion.div variants={fadeInUp} className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
+        </div>
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1">
             <Megaphone size={13} className="text-[#7B2FBE]" />
             <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Marketing</p>
           </div>
           <p className="text-2xl font-semibold text-gray-900">{totalMkt}</p>
           <p className="text-[10px] text-gray-400 mt-0.5">ações de conteúdo</p>
-        </motion.div>
-        <motion.div variants={fadeInUp} className="rounded-2xl bg-emerald-50 border border-emerald-100 shadow-sm p-4">
+        </div>
+        <div className="rounded-2xl bg-emerald-50 border border-emerald-100 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1">
             <CheckCircle2 size={13} className="text-emerald-500" />
             <p className="text-[10px] text-emerald-600 font-medium uppercase tracking-wide">Feito</p>
           </div>
           <p className="text-2xl font-semibold text-emerald-700">{feitos}</p>
-        </motion.div>
+        </div>
         {bloqueados > 0 ? (
-          <motion.div variants={fadeInUp} className="rounded-2xl bg-amber-50 border border-amber-100 shadow-sm p-4">
+          <div className="rounded-2xl bg-amber-50 border border-amber-100 shadow-sm p-4">
             <div className="flex items-center gap-2 mb-1">
               <AlertCircle size={13} className="text-amber-500" />
               <p className="text-[10px] text-amber-600 font-medium uppercase tracking-wide">Bloqueado</p>
             </div>
             <p className="text-2xl font-semibold text-amber-700">{bloqueados}</p>
-          </motion.div>
+          </div>
         ) : (
-          <motion.div variants={fadeInUp} className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
+          <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
             <div className="flex items-center gap-2 mb-1">
               <Circle size={13} className="text-gray-300" />
               <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Pendente</p>
             </div>
             <p className="text-2xl font-semibold text-gray-900">{pendentes}</p>
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
 
       {/* Estado vazio */}
       {itens.length === 0 && (
-        <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+        <div
           className="rounded-2xl bg-white border border-gray-100 shadow-sm p-10 text-center"
         >
           <Calendar size={32} className="text-gray-200 mx-auto mb-3" />
@@ -205,7 +203,7 @@ function AgendaPage() {
               <Megaphone size={12} /> Ir para Marketing <ChevronRight size={11} />
             </Link>
           </div>
-        </motion.div>
+        </div>
       )}
 
       {itens.length > 0 && (
@@ -271,7 +269,7 @@ function AgendaPage() {
                 if (semana === 1 && acoesSem.length === 0 && semPlano.length === 0 && filtro === 'todos') return null
 
                 return (
-                  <motion.div key={semana} variants={fadeInUp} initial="hidden" animate="visible"
+                  <div key={semana}
                     className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden"
                   >
                     <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
@@ -317,7 +315,7 @@ function AgendaPage() {
                         ))}
                       </div>
                     )}
-                  </motion.div>
+                  </div>
                 )
               })}
 
@@ -326,7 +324,7 @@ function AgendaPage() {
                 const planoItems = filtered.filter(i => i.tipo === 'okr' && !i.semana && i.titulo !== '(sem descrição)')
                 if (planoItems.length === 0) return null
                 return (
-                  <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+                  <div
                     className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden"
                   >
                     <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
@@ -354,7 +352,7 @@ function AgendaPage() {
                         </div>
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
                 )
               })()}
             </div>
@@ -367,7 +365,7 @@ function AgendaPage() {
                 const acoesMes = filtered.filter(i => i.tipo === 'marketing' && i.mes === idx + 1)
                 if (acoesMes.length === 0) return null
                 return (
-                  <motion.div key={mes} variants={fadeInUp} initial="hidden" animate="visible"
+                  <div key={mes}
                     className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden"
                   >
                     <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
@@ -401,7 +399,7 @@ function AgendaPage() {
                         </div>
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
                 )
               })}
             </div>
@@ -416,7 +414,7 @@ function AgendaPage() {
       )}
 
       {/* Integração futura */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+      <div
         className="rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 p-5 text-center"
       >
         <Calendar size={20} className="text-gray-300 mx-auto mb-2" />
@@ -424,7 +422,7 @@ function AgendaPage() {
         <p className="text-xs text-gray-400">
           Em breve, suas ações serão sincronizadas automaticamente com o Google Agenda.
         </p>
-      </motion.div>
+      </div>
     </div>
   )
 }

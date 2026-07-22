@@ -1,9 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { Lock, Sparkles, PenLine, MessageSquare, Search, Lightbulb, Target, Layers, ChevronRight, CheckCircle2, Circle, Download, Users } from 'lucide-react'
-import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
 import { IDENTIDADE_KEY } from '@/lib/identidade'
@@ -166,8 +164,8 @@ function ZonaDeGenialidade({ pilares, diferenciais }: { pilares: PilarStates; di
   const short = (text: string, max = 130) => text.length > max ? text.slice(0, max).trimEnd() + '…' : text
 
   return (
-    <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-      className="rounded-2xl border border-[#7B2FBE]/25 bg-[#7B2FBE]/[0.03] p-5"
+    <div
+      className="rounded-xl border border-[#7B2FBE]/25 bg-[#7B2FBE]/[0.03] p-5"
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -248,7 +246,7 @@ function ZonaDeGenialidade({ pilares, diferenciais }: { pilares: PilarStates; di
             : 'Todos os blocos preenchidos. Leve isso para a sessão — seu mentor vai transformar essas peças na declaração da sua Zona de Genialidade.'}
         </p>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -311,8 +309,8 @@ function PosicionamentoPage() {
       </div>
 
       {/* Como funciona */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl border border-[#7B2FBE]/15 bg-[#7B2FBE]/[0.03] p-5"
+      <div
+        className="rounded-xl border border-[#7B2FBE]/15 bg-[#7B2FBE]/[0.03] p-5"
       >
         <p className="text-[10px] font-medium text-[#7B2FBE] uppercase tracking-wide mb-3">Como funciona</p>
         <div className="grid sm:grid-cols-3 gap-4">
@@ -329,11 +327,11 @@ function PosicionamentoPage() {
             </div>
           ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* Progresso */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
+      <div
+        className="rounded-xl border border-gray-100 bg-white shadow-sm p-5"
       >
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -356,15 +354,15 @@ function PosicionamentoPage() {
             Comece preenchendo sua percepção inicial em cada bloco. Leva menos de 10 minutos.
           </p>
         )}
-      </motion.div>
+      </div>
 
       {/* Zona de Genialidade — aparece a partir de 2 blocos preenchidos */}
       <ZonaDeGenialidade pilares={pilares} diferenciais={diferenciais} />
 
       {/* Cartão de Identidade de Marca */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+      <div
         className={cn(
-          'rounded-2xl border p-5 transition-all',
+          'rounded-xl border p-5 transition-all',
           comReflexao === total
             ? 'border-[#7B2FBE]/30 bg-[#7B2FBE]/[0.03]'
             : 'border-gray-200 bg-white shadow-sm'
@@ -446,17 +444,14 @@ function PosicionamentoPage() {
             Leve este cartão para a sessão com seu mentor. Ele será o ponto de partida da construção.
           </p>
         )}
-      </motion.div>
+      </div>
 
       {/* Os 4 Pilares */}
       <div>
         <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-4">
           Os 4 Pilares da Sua Marca
         </h2>
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
+        <div
           className="space-y-4"
         >
           {PILARES.map((pilar) => {
@@ -466,10 +461,9 @@ function PosicionamentoPage() {
             const caminhos = PILAR_CAMINHOS[pilar.id]
 
             return (
-              <motion.div
+              <div
                 key={pilar.id}
-                variants={fadeInUp}
-                className="rounded-2xl border border-gray-100 bg-white shadow-sm p-6"
+                className="rounded-xl border border-gray-100 bg-white shadow-sm p-6"
               >
                 {/* Cabeçalho */}
                 <div className="flex items-start justify-between gap-4 mb-5">
@@ -567,16 +561,16 @@ function PosicionamentoPage() {
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </div>
             )
           })}
-        </motion.div>
+        </div>
       </div>
 
       {/* Bloco 00: Seu Maior Diferencial */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+      <div
         className={cn(
-          'rounded-2xl border p-6 transition-all',
+          'rounded-xl border p-6 transition-all',
           genLocked ? 'bg-gray-50 border-gray-100' : 'bg-[#7B2FBE]/[0.04] border-[#7B2FBE]/20'
         )}
       >
@@ -622,11 +616,11 @@ function PosicionamentoPage() {
             </div>
           )}
         </div>
-      </motion.div>
+      </div>
 
       {/* Esta construção alimenta */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
+      <div
+        className="rounded-xl border border-gray-100 bg-white shadow-sm p-5"
       >
         <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Esta construção alimenta</p>
         <div className="grid sm:grid-cols-3 gap-3">
@@ -671,11 +665,11 @@ function PosicionamentoPage() {
           </Link>
 
         </div>
-      </motion.div>
+      </div>
 
       {/* O Que Te Destaca da Concorrência */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6"
+      <div
+        className="rounded-xl bg-white border border-gray-100 shadow-sm p-6"
       >
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-1">
@@ -721,7 +715,7 @@ function PosicionamentoPage() {
             </p>
           </div>
         )}
-      </motion.div>
+      </div>
 
     </div>
   )

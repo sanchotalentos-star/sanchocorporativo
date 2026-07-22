@@ -1,8 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2, ChevronDown, ChevronUp, ChevronRight, Sparkles, BookOpen, Star, Users, Lightbulb, Layers, X } from 'lucide-react'
-import { fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { getIdentidade } from '@/lib/identidade'
 
@@ -120,7 +118,7 @@ function SementesDeConteudo({ publicoAlvo, proposta, formatoProduto, diferenciai
   ]
 
   return (
-    <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+    <div
       className="rounded-2xl border border-[#7B2FBE]/15 bg-white shadow-sm overflow-hidden"
     >
       <button
@@ -181,7 +179,7 @@ function SementesDeConteudo({ publicoAlvo, proposta, formatoProduto, diferenciai
           </div>
         </div>
       )}
-    </motion.div>
+    </div>
   )
 }
 
@@ -284,9 +282,7 @@ function MarketingPage() {
       {/* Modal Nova Ação */}
       {showNovaAcao && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+          <div
             className="w-full max-w-md rounded-2xl bg-white border border-gray-200 shadow-xl p-6 space-y-4"
           >
             <div className="flex items-center justify-between">
@@ -364,12 +360,12 @@ function MarketingPage() {
                 Adicionar
               </button>
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
 
       {/* Progress bar */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+      <div
         className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -382,11 +378,11 @@ function MarketingPage() {
           <div className="h-full rounded-full transition-all duration-500"
             style={{ width: `${progresso}%`, background: 'linear-gradient(90deg, #7B2FBE, #a855f7)' }} />
         </div>
-      </motion.div>
+      </div>
 
       {/* Referência da identidade */}
       {(publicoAlvo || proposta || formatoProduto) && (
-        <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+        <div
           className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden"
         >
           <button
@@ -432,7 +428,7 @@ function MarketingPage() {
               </div>
             </div>
           )}
-        </motion.div>
+        </div>
       )}
 
       {/* Sementes de Conteúdo */}
@@ -448,7 +444,7 @@ function MarketingPage() {
 
       {/* Estado vazio */}
       {acoes.length === 0 && (
-        <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+        <div
           className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 text-center"
         >
           <Megaphone size={32} className="text-gray-200 mx-auto mb-3" />
@@ -457,14 +453,11 @@ function MarketingPage() {
             As ações do calendário de marketing são definidas com seu mentor a partir dos pilares da sua marca.
             Use o botão "Nova Ação" para adicionar após a sessão.
           </p>
-        </motion.div>
+        </div>
       )}
 
       {/* Canal stats */}
-      {acoes.length > 0 && <motion.div
-        variants={staggerContainer}
-        initial="hidden"
-        animate="visible"
+      {acoes.length > 0 && <div
         className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2"
       >
         {canais.map(canal => {
@@ -473,9 +466,8 @@ function MarketingPage() {
           const count = acoes.filter(a => a.canal === canal).length
           const active = canalFiltro === canal
           return (
-            <motion.button
+            <button
               key={canal}
-              variants={fadeInUp}
               onClick={() => setCanalFiltro(active ? null : canal)}
               className={cn(
                 'rounded-xl p-3 flex flex-col items-center gap-1.5 border transition-all bg-white',
@@ -486,10 +478,10 @@ function MarketingPage() {
               <Icon size={15} style={{ color: active ? color : '#9CA3AF' }} />
               <p className="text-[10px] font-medium uppercase tracking-wide" style={{ color: active ? color : '#9CA3AF' }}>{canal}</p>
               <span className="text-[10px] font-bold text-gray-900">{count}</span>
-            </motion.button>
+            </button>
           )
         })}
-      </motion.div>}
+      </div>}
 
       {/* Mes filter */}
       <div className="flex gap-1.5 overflow-x-auto pb-1">
@@ -527,11 +519,8 @@ function MarketingPage() {
           const Icon = canalIcons[acao.canal]
           const color = canalColors[acao.canal]
           return (
-            <motion.div
+            <div
               key={acao.id}
-              variants={fadeInUp}
-              initial="hidden"
-              animate="visible"
               className={cn(
                 'rounded-xl bg-white border px-4 py-3.5 flex items-center gap-3 group transition-all shadow-sm',
                 acao.concluida ? 'border-gray-100 opacity-60' : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
@@ -573,13 +562,13 @@ function MarketingPage() {
               >
                 <Trash2 size={14} />
               </button>
-            </motion.div>
+            </div>
           )
         })}
       </div>
 
       {/* Esta construção alimenta */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+      <div
         className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
       >
         <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Esta construção alimenta</p>
@@ -595,7 +584,7 @@ function MarketingPage() {
             </p>
           </div>
         </Link>
-      </motion.div>
+      </div>
     </div>
   )
 }

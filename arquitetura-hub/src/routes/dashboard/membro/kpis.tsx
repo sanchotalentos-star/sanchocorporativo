@@ -1,11 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { CheckCircle, AlertCircle, XCircle, ChevronRight } from 'lucide-react'
 import { KpiTable } from '@/components/membro/KpiTable'
 import { getPercent, getStatusColor } from '@/lib/utils'
-import { fadeInUp } from '@/lib/motion'
 import type { KpiEntry } from '@/types'
 
 export const Route = createFileRoute('/dashboard/membro/kpis')({
@@ -64,49 +62,49 @@ function KpisPage() {
       </div>
 
       {/* Resumo de status */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
+      <div
         className="grid grid-cols-3 gap-3"
       >
-        <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4 flex items-center gap-4">
+        <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-4 flex items-center gap-4">
           <CheckCircle size={18} className="text-emerald-500 flex-shrink-0" />
           <div>
             <p className="text-2xl font-semibold text-emerald-500 leading-none">{green}</p>
             <p className="text-xs text-gray-400 font-medium mt-0.5">No alvo</p>
           </div>
         </div>
-        <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4 flex items-center gap-4">
+        <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-4 flex items-center gap-4">
           <AlertCircle size={18} className="text-amber-500 flex-shrink-0" />
           <div>
             <p className="text-2xl font-semibold text-amber-500 leading-none">{yellow}</p>
             <p className="text-xs text-gray-400 font-medium mt-0.5">Atenção</p>
           </div>
         </div>
-        <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-4 flex items-center gap-4">
+        <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-4 flex items-center gap-4">
           <XCircle size={18} className="text-red-400 flex-shrink-0" />
           <div>
             <p className="text-2xl font-semibold text-red-400 leading-none">{red}</p>
             <p className="text-xs text-gray-400 font-medium mt-0.5">Abaixo</p>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {kpis.length === 0 ? (
-        <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-          className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 text-center"
+        <div
+          className="rounded-xl bg-white border border-gray-200 shadow-sm p-8 text-center"
         >
           <CheckCircle size={32} className="text-gray-200 mx-auto mb-3" />
           <p className="text-sm font-semibold text-gray-500 mb-1">Nenhum indicador cadastrado ainda</p>
           <p className="text-xs text-gray-400 max-w-xs mx-auto">
             Os indicadores de resultado são definidos com seu mentor na sessão de OKR. Eles aparecerão aqui após a primeira sessão.
           </p>
-        </motion.div>
+        </div>
       ) : (
         <KpiTable kpis={kpis} onUpdateAtual={handleUpdateAtual} />
       )}
 
       {/* Alimenta */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
+      <div
+        className="rounded-xl border border-gray-100 bg-white shadow-sm p-5"
       >
         <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Os resultados alimentam</p>
         <div className="grid sm:grid-cols-2 gap-3">
@@ -138,7 +136,7 @@ function KpisPage() {
           </Link>
 
         </div>
-      </motion.div>
+      </div>
 
     </div>
   )

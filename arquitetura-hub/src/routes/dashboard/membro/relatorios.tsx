@@ -45,21 +45,21 @@ function RelatoriosPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Relatórios Pessoais</h1>
+        <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">Relatórios Pessoais</h1>
         <p className="text-gray-400 mt-1 text-sm">Análise do seu desempenho nos últimos 6 meses</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {summaryCards.map(item => (
-          <div key={item.label} className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5">
-            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{item.label}</p>
-            <p className="text-2xl font-black text-gray-900 mt-1">{item.value}</p>
+          <div key={item.label} className="rounded-xl bg-white border border-gray-200 shadow-sm p-5">
+            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{item.label}</p>
+            <p className="text-2xl font-semibold text-gray-900 mt-1">{item.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5">
-        <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight mb-4">Evolução de Crescimento</h3>
+      <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-5">
+        <h3 className="text-sm font-semibold text-gray-900 mb-4">Evolução de Crescimento</h3>
         <ResponsiveContainer width="100%" height={260}>
           <AreaChart data={member.growth} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
             <defs>
@@ -86,8 +86,8 @@ function RelatoriosPage() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5">
-          <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight mb-4">Origem dos Leads</h3>
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-5">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">Origem dos Leads</h3>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie data={leadSources} cx="50%" cy="50%" innerRadius={55} outerRadius={85} dataKey="value">
@@ -101,9 +101,9 @@ function RelatoriosPage() {
           </ResponsiveContainer>
         </div>
 
-        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100">
-            <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">Performance Mensal</h3>
+            <h3 className="text-sm font-semibold text-gray-900">Performance Mensal</h3>
           </div>
           <table className="w-full text-sm">
             <thead>

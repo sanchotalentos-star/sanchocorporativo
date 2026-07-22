@@ -1,9 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { ChevronRight, Layers, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
 import { PilarAccordion } from '@/components/membro/PilarAccordion'
-import { staggerContainer, fadeInUp } from '@/lib/motion'
 import { mockPilares } from '@/lib/mocks/pilares'
 import { getIdentidade, PILAR_LABELS } from '@/lib/identidade'
 import type { Pilar } from '@/types'
@@ -103,8 +101,8 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
   }
 
   return (
-    <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-      className="rounded-2xl border border-[#7B2FBE]/15 bg-white shadow-sm overflow-hidden"
+    <div
+      className="rounded-xl border border-[#7B2FBE]/15 bg-white shadow-sm overflow-hidden"
     >
       <button
         onClick={() => setOpen(o => !o)}
@@ -169,7 +167,7 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
           </p>
         </div>
       )}
-    </motion.div>
+    </div>
   )
 }
 
@@ -269,15 +267,15 @@ function PilaresPage() {
           </p>
         </div>
 
-        <div className="text-right bg-white border border-[#7B2FBE]/20 rounded-2xl px-5 py-3 shadow-sm flex-shrink-0">
+        <div className="text-right bg-white border border-[#7B2FBE]/20 rounded-xl px-5 py-3 shadow-sm flex-shrink-0">
           <p className="text-3xl font-semibold text-[#7B2FBE]">{overallPct}%</p>
           <p className="text-xs text-gray-400">{doneAcoes}/{totalAcoes} ações</p>
         </div>
       </div>
 
       {/* Identidade de base — referência para construção dos pilares */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden"
+      <div
+        className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden"
       >
         <button
           onClick={() => setIdentidadeOpen(o => !o)}
@@ -362,15 +360,15 @@ function PilaresPage() {
             )}
           </div>
         )}
-      </motion.div>
+      </div>
 
       {/* Sugestões baseadas na identidade */}
       <SugestoesDePilares onAddPilar={handleAddPilar} />
 
       {/* Pilares */}
       {pilares.length === 0 ? (
-        <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-          className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 text-center"
+        <div
+          className="rounded-xl bg-white border border-gray-200 shadow-sm p-8 text-center"
         >
           <Layers size={32} className="text-gray-200 mx-auto mb-3" />
           <p className="text-sm font-semibold text-gray-500 mb-1">Pilares ainda não definidos</p>
@@ -383,12 +381,9 @@ function PilaresPage() {
           >
             Ir para Minha Identidade <ChevronRight size={12} />
           </Link>
-        </motion.div>
+        </div>
       ) : (
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
+        <div
           className="space-y-3"
         >
           {pilares.map(pilar => (
@@ -403,12 +398,12 @@ function PilaresPage() {
               onDeletePilar={handleDeletePilar}
             />
           ))}
-        </motion.div>
+        </div>
       )}
 
       {/* Esta construção alimenta */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
+      <div
+        className="rounded-xl border border-gray-100 bg-white shadow-sm p-5"
       >
         <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Esta construção alimenta</p>
         <div className="grid sm:grid-cols-2 gap-3">
@@ -440,7 +435,7 @@ function PilaresPage() {
           </Link>
 
         </div>
-      </motion.div>
+      </div>
 
     </div>
   )
