@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, forwardRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -37,38 +37,44 @@ const inputStyle: React.CSSProperties = {
   transition: 'border-color 0.15s',
 }
 
-function AuthInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  const [focused, setFocused] = useState(false)
-  return (
-    <input
-      {...props}
-      style={{
-        ...inputStyle,
-        borderColor: focused ? '#7B2FBE' : 'rgba(255,255,255,0.1)',
-        background: focused ? 'rgba(123,47,190,0.07)' : 'rgba(255,255,255,0.04)',
-      }}
-      onFocus={e => { setFocused(true); props.onFocus?.(e) }}
-      onBlur={e => { setFocused(false); props.onBlur?.(e) }}
-    />
-  )
-}
+const AuthInput = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
+  function AuthInput(props, ref) {
+    const [focused, setFocused] = useState(false)
+    return (
+      <input
+        {...props}
+        ref={ref}
+        style={{
+          ...inputStyle,
+          borderColor: focused ? '#7B2FBE' : 'rgba(255,255,255,0.1)',
+          background: focused ? 'rgba(123,47,190,0.07)' : 'rgba(255,255,255,0.04)',
+        }}
+        onFocus={e => { setFocused(true); props.onFocus?.(e) }}
+        onBlur={e => { setFocused(false); props.onBlur?.(e) }}
+      />
+    )
+  }
+)
 
-function AuthTextarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  const [focused, setFocused] = useState(false)
-  return (
-    <textarea
-      {...props}
-      style={{
-        ...inputStyle,
-        resize: 'none',
-        borderColor: focused ? '#7B2FBE' : 'rgba(255,255,255,0.1)',
-        background: focused ? 'rgba(123,47,190,0.07)' : 'rgba(255,255,255,0.04)',
-      }}
-      onFocus={e => { setFocused(true); props.onFocus?.(e) }}
-      onBlur={e => { setFocused(false); props.onBlur?.(e) }}
-    />
-  )
-}
+const AuthTextarea = forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttributes<HTMLTextAreaElement>>(
+  function AuthTextarea(props, ref) {
+    const [focused, setFocused] = useState(false)
+    return (
+      <textarea
+        {...props}
+        ref={ref}
+        style={{
+          ...inputStyle,
+          resize: 'none',
+          borderColor: focused ? '#7B2FBE' : 'rgba(255,255,255,0.1)',
+          background: focused ? 'rgba(123,47,190,0.07)' : 'rgba(255,255,255,0.04)',
+        }}
+        onFocus={e => { setFocused(true); props.onFocus?.(e) }}
+        onBlur={e => { setFocused(false); props.onBlur?.(e) }}
+      />
+    )
+  }
+)
 
 function AuthPage() {
   const [tab, setTab] = useState<'login' | 'request'>('login')
