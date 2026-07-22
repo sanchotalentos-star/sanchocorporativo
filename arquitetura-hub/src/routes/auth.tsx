@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { Eye, EyeOff } from 'lucide-react'
-import { motion } from 'framer-motion'
 import { useAuth } from '@/context/AuthContext'
 
 export const Route = createFileRoute('/auth')({
@@ -26,12 +25,50 @@ const requestSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>
 type RequestForm = z.infer<typeof requestSchema>
 
-const inputCls = [
-  'w-full px-4 py-3 text-sm text-white rounded-lg transition-all',
-  'bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)]',
-  'placeholder:text-[rgba(255,255,255,0.25)]',
-  'focus:outline-none focus:border-[#7B2FBE] focus:bg-[rgba(123,47,190,0.08)]',
-].join(' ')
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '11px 14px',
+  fontSize: 14,
+  color: '#fff',
+  background: 'rgba(255,255,255,0.05)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  outline: 'none',
+  boxSizing: 'border-box',
+  transition: 'border-color 0.15s',
+}
+
+function AuthInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  const [focused, setFocused] = useState(false)
+  return (
+    <input
+      {...props}
+      style={{
+        ...inputStyle,
+        borderColor: focused ? '#7B2FBE' : 'rgba(255,255,255,0.1)',
+        background: focused ? 'rgba(123,47,190,0.07)' : 'rgba(255,255,255,0.04)',
+      }}
+      onFocus={e => { setFocused(true); props.onFocus?.(e) }}
+      onBlur={e => { setFocused(false); props.onBlur?.(e) }}
+    />
+  )
+}
+
+function AuthTextarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const [focused, setFocused] = useState(false)
+  return (
+    <textarea
+      {...props}
+      style={{
+        ...inputStyle,
+        resize: 'none',
+        borderColor: focused ? '#7B2FBE' : 'rgba(255,255,255,0.1)',
+        background: focused ? 'rgba(123,47,190,0.07)' : 'rgba(255,255,255,0.04)',
+      }}
+      onFocus={e => { setFocused(true); props.onFocus?.(e) }}
+      onBlur={e => { setFocused(false); props.onBlur?.(e) }}
+    />
+  )
+}
 
 function AuthPage() {
   const [tab, setTab] = useState<'login' | 'request'>('login')
@@ -61,169 +98,171 @@ function AuthPage() {
   }
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
-      style={{ background: '#0F1117' }}
-    >
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 16px', background: '#0D0D0D' }}>
+
       {/* Logo */}
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="flex items-center gap-3 mb-10"
-      >
-        <div
-          className="w-9 h-9 flex items-center justify-center flex-shrink-0"
-          style={{ background: '#7B2FBE' }}
-        >
-          <span className="text-[11px] font-black text-white tracking-widest">AR</span>
-        </div>
-        <div>
-          <p className="text-[14px] font-bold text-white leading-tight">Arquitetura de Relevância</p>
-          <p className="text-[10px] font-medium tracking-wider" style={{ color: '#7B2FBE' }}>Wladson Sidney</p>
-        </div>
-      </motion.div>
+      <div style={{ marginBottom: 40 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.02em', textAlign: 'center' }}>
+          Arquitetura de Relevância
+        </p>
+      </div>
 
       {/* Card */}
-      <motion.div
-        key={tab}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="w-full max-w-[420px] rounded-2xl p-8"
-        style={{ background: '#1A1D27', border: '1px solid rgba(255,255,255,0.07)' }}
-      >
+      <div style={{
+        width: '100%',
+        maxWidth: 400,
+        background: '#161616',
+        border: '1px solid rgba(255,255,255,0.08)',
+        padding: '36px 32px',
+      }}>
+        {/* Tabs */}
+        <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 28 }}>
+          {(['login', 'request'] as const).map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              style={{
+                flex: 1,
+                paddingBottom: 12,
+                fontSize: 13,
+                fontWeight: 500,
+                color: tab === t ? '#fff' : 'rgba(255,255,255,0.3)',
+                background: 'none',
+                border: 'none',
+                borderBottom: `2px solid ${tab === t ? '#7B2FBE' : 'transparent'}`,
+                marginBottom: -1,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                letterSpacing: '0.01em',
+              }}
+            >
+              {t === 'login' ? 'Entrar' : 'Solicitar acesso'}
+            </button>
+          ))}
+        </div>
+
         {tab === 'login' ? (
-          <>
-            <h1
-              className="text-white mb-1"
-              style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: '2rem', fontWeight: 700 }}
-            >
-              Olá!
-            </h1>
-            <p className="text-sm mb-7" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              Entre com suas credenciais para acessar o hub.
-            </p>
-
-            <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
-              <div>
-                <input
-                  type="email"
-                  placeholder="Digite seu email"
-                  className={inputCls}
-                  {...loginForm.register('email')}
-                />
-                {loginForm.formState.errors.email && (
-                  <p className="text-xs text-red-400 mt-1">{loginForm.formState.errors.email.message}</p>
-                )}
-              </div>
-
-              <div>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Digite sua senha"
-                    className={inputCls + ' pr-11'}
-                    {...loginForm.register('password')}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
-                    style={{ color: 'rgba(255,255,255,0.3)' }}
-                  >
-                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                  </button>
-                </div>
-                {loginForm.formState.errors.password && (
-                  <p className="text-xs text-red-400 mt-1">{loginForm.formState.errors.password.message}</p>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                disabled={loginForm.formState.isSubmitting}
-                className="w-full py-3 text-sm font-semibold text-white rounded-lg transition-all disabled:opacity-50"
-                style={{ background: '#7B2FBE' }}
-              >
-                {loginForm.formState.isSubmitting ? 'Entrando...' : 'Entrar'}
-              </button>
-            </form>
-
-            <p className="text-center text-xs mt-6" style={{ color: 'rgba(255,255,255,0.25)' }}>
-              Ainda não tem acesso?{' '}
-              <button
-                onClick={() => setTab('request')}
-                className="underline transition-colors"
-                style={{ color: 'rgba(255,255,255,0.5)' }}
-              >
-                Solicitar acesso
-              </button>
-            </p>
-          </>
-        ) : (
-          <>
-            <h1
-              className="text-white mb-1"
-              style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: '1.75rem', fontWeight: 700 }}
-            >
-              Solicitar acesso
-            </h1>
-            <p className="text-sm mb-7" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              Preencha o formulário e entraremos em contato.
-            </p>
-
-            <form onSubmit={requestForm.handleSubmit(onRequest)} className="space-y-4">
-              <input
-                placeholder="Seu nome completo"
-                className={inputCls}
-                {...requestForm.register('full_name')}
-              />
-              {requestForm.formState.errors.full_name && (
-                <p className="text-xs text-red-400 -mt-2">{requestForm.formState.errors.full_name.message}</p>
-              )}
-
-              <input
+          <form onSubmit={loginForm.handleSubmit(onLogin)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+                Email
+              </label>
+              <AuthInput
                 type="email"
-                placeholder="Seu email"
-                className={inputCls}
-                {...requestForm.register('email')}
+                placeholder="seu@email.com"
+                {...loginForm.register('email')}
               />
+              {loginForm.formState.errors.email && (
+                <p style={{ fontSize: 11, color: '#f87171', marginTop: 6 }}>{loginForm.formState.errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+                Senha
+              </label>
+              <div style={{ position: 'relative' }}>
+                <AuthInput
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  style={{ paddingRight: 44 }}
+                  {...loginForm.register('password')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', padding: 2 }}
+                >
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+              {loginForm.formState.errors.password && (
+                <p style={{ fontSize: 11, color: '#f87171', marginTop: 6 }}>{loginForm.formState.errors.password.message}</p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={loginForm.formState.isSubmitting}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: '#7B2FBE',
+                color: '#fff',
+                border: 'none',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: loginForm.formState.isSubmitting ? 'not-allowed' : 'pointer',
+                opacity: loginForm.formState.isSubmitting ? 0.6 : 1,
+                letterSpacing: '0.03em',
+                marginTop: 4,
+                transition: 'background 0.15s',
+              }}
+              onMouseOver={e => { if (!loginForm.formState.isSubmitting) e.currentTarget.style.background = '#6823a8' }}
+              onMouseOut={e => e.currentTarget.style.background = '#7B2FBE'}
+            >
+              {loginForm.formState.isSubmitting ? 'Entrando...' : 'Entrar'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={requestForm.handleSubmit(onRequest)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+                Nome completo
+              </label>
+              <AuthInput placeholder="Seu nome" {...requestForm.register('full_name')} />
+              {requestForm.formState.errors.full_name && (
+                <p style={{ fontSize: 11, color: '#f87171', marginTop: 6 }}>{requestForm.formState.errors.full_name.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+                Email
+              </label>
+              <AuthInput type="email" placeholder="seu@email.com" {...requestForm.register('email')} />
               {requestForm.formState.errors.email && (
-                <p className="text-xs text-red-400 -mt-2">{requestForm.formState.errors.email.message}</p>
+                <p style={{ fontSize: 11, color: '#f87171', marginTop: 6 }}>{requestForm.formState.errors.email.message}</p>
               )}
+            </div>
 
-              <textarea
-                placeholder="Por que quer participar?"
-                rows={4}
-                className={inputCls + ' resize-none'}
-                {...requestForm.register('mensagem')}
-              />
+            <div>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+                Por que quer participar?
+              </label>
+              <AuthTextarea rows={4} placeholder="Conte sobre você e seus objetivos..." {...requestForm.register('mensagem')} />
               {requestForm.formState.errors.mensagem && (
-                <p className="text-xs text-red-400 -mt-2">{requestForm.formState.errors.mensagem.message}</p>
+                <p style={{ fontSize: 11, color: '#f87171', marginTop: 6 }}>{requestForm.formState.errors.mensagem.message}</p>
               )}
+            </div>
 
-              <button
-                type="submit"
-                className="w-full py-3 text-sm font-semibold text-white rounded-lg transition-all"
-                style={{ background: '#7B2FBE' }}
-              >
-                Enviar solicitação
-              </button>
-            </form>
-
-            <p className="text-center text-xs mt-6" style={{ color: 'rgba(255,255,255,0.25)' }}>
-              <button
-                onClick={() => setTab('login')}
-                className="underline transition-colors"
-                style={{ color: 'rgba(255,255,255,0.5)' }}
-              >
-                Voltar para o login
-              </button>
-            </p>
-          </>
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: '#7B2FBE',
+                color: '#fff',
+                border: 'none',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                letterSpacing: '0.03em',
+                marginTop: 4,
+                transition: 'background 0.15s',
+              }}
+              onMouseOver={e => e.currentTarget.style.background = '#6823a8'}
+              onMouseOut={e => e.currentTarget.style.background = '#7B2FBE'}
+            >
+              Enviar solicitação
+            </button>
+          </form>
         )}
-      </motion.div>
+      </div>
+
+      <p style={{ marginTop: 24, fontSize: 11, color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>
+        Arquitetura de Relevância — Wladson Sidney
+      </p>
     </div>
   )
 }

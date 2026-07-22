@@ -15,6 +15,7 @@ import { Route as DashboardMembroRouteImport } from './routes/dashboard/membro'
 import { Route as DashboardAdminRouteImport } from './routes/dashboard/admin'
 import { Route as DashboardMembroIndexRouteImport } from './routes/dashboard/membro/index'
 import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard/admin/index'
+import { Route as DashboardMembroTarefasRouteImport } from './routes/dashboard/membro/tarefas'
 import { Route as DashboardMembroRelatoriosRouteImport } from './routes/dashboard/membro/relatorios'
 import { Route as DashboardMembroRankingRouteImport } from './routes/dashboard/membro/ranking'
 import { Route as DashboardMembroPosicionamentoRouteImport } from './routes/dashboard/membro/posicionamento'
@@ -55,6 +56,11 @@ const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardAdminRoute,
+} as any)
+const DashboardMembroTarefasRoute = DashboardMembroTarefasRouteImport.update({
+  id: '/tarefas',
+  path: '/tarefas',
+  getParentRoute: () => DashboardMembroRoute,
 } as any)
 const DashboardMembroRelatoriosRoute =
   DashboardMembroRelatoriosRouteImport.update({
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/membro/posicionamento': typeof DashboardMembroPosicionamentoRoute
   '/dashboard/membro/ranking': typeof DashboardMembroRankingRoute
   '/dashboard/membro/relatorios': typeof DashboardMembroRelatoriosRoute
+  '/dashboard/membro/tarefas': typeof DashboardMembroTarefasRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/membro/': typeof DashboardMembroIndexRoute
 }
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/dashboard/membro/posicionamento': typeof DashboardMembroPosicionamentoRoute
   '/dashboard/membro/ranking': typeof DashboardMembroRankingRoute
   '/dashboard/membro/relatorios': typeof DashboardMembroRelatoriosRoute
+  '/dashboard/membro/tarefas': typeof DashboardMembroTarefasRoute
   '/dashboard/admin': typeof DashboardAdminIndexRoute
   '/dashboard/membro': typeof DashboardMembroIndexRoute
 }
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/dashboard/membro/posicionamento': typeof DashboardMembroPosicionamentoRoute
   '/dashboard/membro/ranking': typeof DashboardMembroRankingRoute
   '/dashboard/membro/relatorios': typeof DashboardMembroRelatoriosRoute
+  '/dashboard/membro/tarefas': typeof DashboardMembroTarefasRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/membro/': typeof DashboardMembroIndexRoute
 }
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
     | '/dashboard/membro/posicionamento'
     | '/dashboard/membro/ranking'
     | '/dashboard/membro/relatorios'
+    | '/dashboard/membro/tarefas'
     | '/dashboard/admin/'
     | '/dashboard/membro/'
   fileRoutesByTo: FileRoutesByTo
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/dashboard/membro/posicionamento'
     | '/dashboard/membro/ranking'
     | '/dashboard/membro/relatorios'
+    | '/dashboard/membro/tarefas'
     | '/dashboard/admin'
     | '/dashboard/membro'
   id:
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/dashboard/membro/posicionamento'
     | '/dashboard/membro/ranking'
     | '/dashboard/membro/relatorios'
+    | '/dashboard/membro/tarefas'
     | '/dashboard/admin/'
     | '/dashboard/membro/'
   fileRoutesById: FileRoutesById
@@ -269,6 +281,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/admin/'
       preLoaderRoute: typeof DashboardAdminIndexRouteImport
       parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/membro/tarefas': {
+      id: '/dashboard/membro/tarefas'
+      path: '/tarefas'
+      fullPath: '/dashboard/membro/tarefas'
+      preLoaderRoute: typeof DashboardMembroTarefasRouteImport
+      parentRoute: typeof DashboardMembroRoute
     }
     '/dashboard/membro/relatorios': {
       id: '/dashboard/membro/relatorios'
@@ -368,6 +387,7 @@ interface DashboardMembroRouteChildren {
   DashboardMembroPosicionamentoRoute: typeof DashboardMembroPosicionamentoRoute
   DashboardMembroRankingRoute: typeof DashboardMembroRankingRoute
   DashboardMembroRelatoriosRoute: typeof DashboardMembroRelatoriosRoute
+  DashboardMembroTarefasRoute: typeof DashboardMembroTarefasRoute
   DashboardMembroIndexRoute: typeof DashboardMembroIndexRoute
 }
 
@@ -380,6 +400,7 @@ const DashboardMembroRouteChildren: DashboardMembroRouteChildren = {
   DashboardMembroPosicionamentoRoute: DashboardMembroPosicionamentoRoute,
   DashboardMembroRankingRoute: DashboardMembroRankingRoute,
   DashboardMembroRelatoriosRoute: DashboardMembroRelatoriosRoute,
+  DashboardMembroTarefasRoute: DashboardMembroTarefasRoute,
   DashboardMembroIndexRoute: DashboardMembroIndexRoute,
 }
 

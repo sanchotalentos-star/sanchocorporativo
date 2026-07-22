@@ -1,12 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useState } from 'react'
 import { ChevronRight, Layers, ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
 import { PilarAccordion } from '@/components/membro/PilarAccordion'
-import { staggerContainer, fadeInUp } from '@/lib/motion'
 import { mockPilares } from '@/lib/mocks/pilares'
-
-const PILARES_KEY = 'pilares_store_v1'
 import { getIdentidade, PILAR_LABELS } from '@/lib/identidade'
 import type { Pilar } from '@/types'
 
@@ -31,99 +27,55 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
   const proposta       = identidade?.pilares.proposta?.reflexao?.trim()
   const storytelling   = identidade?.pilares.storytelling?.reflexao?.trim()
   const formatoProduto = identidade?.pilares.formatoProduto?.reflexao?.trim()
-  const diferenciais   = identidade?.diferenciais?.filter(d => d.trim()) ?? []
-  const diferencial    = diferenciais[0] ?? ''
-
-  // Trunca para uso inline, preservando legibilidade
-  const tag = (text: string, max = 55) =>
-    text.length <= max ? text : text.slice(0, max).trimEnd() + '...'
+  const diferencial    = identidade?.diferenciais?.[0] ?? ''
 
   const sugestoes: SugestaoPilar[] = [
-
-    // Pilar 1: Presença Direcionada — quem você alcança e onde
     publicoAlvo ? {
       id: 'presenca',
       cor: '#3B82F6',
       nome: 'Presença Direcionada',
-      descricao: `Alcançar "${tag(publicoAlvo)}" nos canais e espaços onde essa pessoa já está`,
+      descricao: `Visibilidade focada em "${publicoAlvo.slice(0, 65)}${publicoAlvo.length > 65 ? '...' : ''}"`,
       acoes: [
-        `Mapear os 3 principais canais, comunidades e eventos onde seu público está presente`,
-        `Criar 2 conteúdos/semana que respondam as dúvidas reais de quem você descreveu como público`,
-        `Participar ativamente de 1 grupo ou fórum frequentado pelo seu público-alvo`,
-        `Fazer 3 conexões por semana com perfis que se encaixam no público que você descreveu`,
+        'Publicar 2 conteúdos por semana falando diretamente para seu público',
+        'Participar de 1 comunidade ou evento onde seu público-alvo está presente',
+        'Produzir 1 conteúdo/mês respondendo as principais dúvidas do mercado',
       ],
     } : null,
-
-    // Pilar 2: Autoridade pela Entrega — provar a transformação
     proposta ? {
       id: 'autoridade',
       cor: '#7B2FBE',
       nome: 'Autoridade pela Entrega',
-      descricao: `Tornar visível a transformação que você gera: "${tag(proposta)}"`,
+      descricao: `Demonstrar como você entrega "${proposta.slice(0, 65)}${proposta.length > 65 ? '...' : ''}"`,
       acoes: [
-        `Documentar 1 caso real de cliente por mês, mostrando o antes e o depois da transformação`,
-        `Criar série de conteúdo explicando o seu método e o processo por trás do que você entrega`,
-        `Pedir depoimento em vídeo de 2 clientes que já viveram a transformação que você propõe`,
-        `Produzir 1 conteúdo/mês mostrando os bastidores do seu processo de trabalho`,
+        'Publicar 1 case de resultado real por mês com dados e aprendizados',
+        'Criar série de conteúdo explicando seu método e processo de trabalho',
+        'Documentar os bastidores e compartilhar o "como funciona"',
       ],
     } : null,
-
-    // Pilar 3: Palco e Eventos — autoridade ao vivo, fora das redes
-    (storytelling || diferencial || proposta) ? {
-      id: 'eventos',
-      cor: '#EC4899',
-      nome: 'Palco e Eventos',
-      descricao: diferencial
-        ? `Construir autoridade ao vivo posicionando: "${tag(diferencial)}" como ponto de vista único`
-        : proposta
-          ? `Falar publicamente sobre como você entrega: "${tag(proposta)}"`
-          : 'Construir autoridade fora das redes, onde a confiança se consolida mais rápido',
-      acoes: [
-        publicoAlvo
-          ? `Candidatar-se para falar em 1 evento por trimestre onde "${tag(publicoAlvo, 45)}" está presente`
-          : `Candidatar-se para falar em 1 evento ou summit por trimestre no seu nicho`,
-        `Propor participação em podcasts e lives como especialista convidado`,
-        publicoAlvo
-          ? `Propor co-criação ao vivo com 2 parceiros que atendem o mesmo público que você`
-          : `Propor co-criação ao vivo com 2 parceiros estratégicos complementares`,
-        storytelling
-          ? `Estruturar sua história de virada como palestra-âncora de 20 minutos`
-          : `Desenvolver uma palestra-âncora a partir do ponto de vista único que você tem`,
-      ],
-    } : null,
-
-    // Pilar 4: Diferenciação Visível — o que só você tem
-    diferencial ? {
+    (storytelling || diferencial) ? {
       id: 'diferenciacao',
       cor: '#F59E0B',
-      nome: 'Diferenciação Visível',
-      descricao: `Tornar evidente para o mercado: "${tag(diferencial)}"`,
+      nome: 'Diferenciação e História',
+      descricao: diferencial
+        ? `Posicionar "${diferencial.slice(0, 65)}${diferencial.length > 65 ? '...' : ''}" como vantagem única`
+        : 'Usar sua história como âncora de credibilidade e identificação',
       acoes: [
-        `Criar série de conteúdo mostrando sua abordagem versus o que o mercado costuma fazer`,
-        diferencial
-          ? `Publicar seu ponto de vista sobre "${tag(diferencial)}" — o que você faz diferente e por quê`
-          : 'Publicar sua visão sobre o mercado e onde a maioria erra',
-        `Coletar e publicar provas concretas que validem seu diferencial (dados, resultados, depoimentos)`,
-        `Criar 1 conteúdo/mês de "comparativo" mostrando como sua forma de trabalhar gera mais resultado`,
+        'Publicar sua história de origem e por que você faz o que faz',
+        'Criar conteúdo mostrando sua abordagem única em comparação ao mercado',
+        'Coletar e compartilhar depoimentos que reforçam seu diferencial',
       ],
     } : null,
-
-    // Pilar 5: Pipeline de Clientes — caminho da atração à venda
     formatoProduto ? {
       id: 'pipeline',
       cor: '#10B981',
       nome: 'Pipeline de Clientes',
-      descricao: `Criar o caminho de atração e conversão para: "${tag(formatoProduto)}"`,
+      descricao: `Criar caminho de atração para "${formatoProduto.slice(0, 65)}${formatoProduto.length > 65 ? '...' : ''}"`,
       acoes: [
-        `Desenvolver 1 conteúdo gratuito de alto valor que naturalmente leva à sua oferta principal`,
-        publicoAlvo
-          ? `Construir lista de contatos do seu público-alvo para abordagem consultiva direta`
-          : 'Construir lista de potenciais clientes para abordagem consultiva direta',
-        `Identificar 3 parceiros estratégicos que atendem o mesmo público e podem indicar clientes`,
-        `Criar sequência de acompanhamento para quem demonstra interesse mas ainda não comprou`,
+        'Criar conteúdo gratuito que leva naturalmente à sua oferta principal',
+        'Construir lista de potenciais clientes para abordagem direta',
+        'Produzir 1 conteúdo/mês demonstrando como funciona seu formato de trabalho',
       ],
     } : null,
-
   ].filter(Boolean) as SugestaoPilar[]
 
   if (sugestoes.length === 0) return null
@@ -149,8 +101,8 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
   }
 
   return (
-    <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-      className="rounded-2xl border border-[#7B2FBE]/15 bg-white shadow-sm overflow-hidden"
+    <div
+      className="rounded-xl border border-[#7B2FBE]/15 bg-white shadow-sm overflow-hidden"
     >
       <button
         onClick={() => setOpen(o => !o)}
@@ -215,19 +167,12 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
           </p>
         </div>
       )}
-    </motion.div>
+    </div>
   )
 }
 
 function PilaresPage() {
-  const [pilares, setPilares] = useState<Pilar[]>(() => {
-    try { return JSON.parse(localStorage.getItem(PILARES_KEY) ?? 'null') ?? mockPilares }
-    catch { return mockPilares }
-  })
-
-  useEffect(() => {
-    try { localStorage.setItem(PILARES_KEY, JSON.stringify(pilares)) } catch {}
-  }, [pilares])
+  const [pilares, setPilares] = useState<Pilar[]>(mockPilares)
   const [identidadeOpen, setIdentidadeOpen] = useState(true)
   const identidade = getIdentidade()
   const pilarFields = ['publicoAlvo', 'proposta', 'storytelling', 'formatoProduto'] as const
@@ -322,15 +267,15 @@ function PilaresPage() {
           </p>
         </div>
 
-        <div className="text-right bg-white border border-[#7B2FBE]/20 rounded-2xl px-5 py-3 shadow-sm flex-shrink-0">
+        <div className="text-right bg-white border border-[#7B2FBE]/20 rounded-xl px-5 py-3 shadow-sm flex-shrink-0">
           <p className="text-3xl font-semibold text-[#7B2FBE]">{overallPct}%</p>
           <p className="text-xs text-gray-400">{doneAcoes}/{totalAcoes} ações</p>
         </div>
       </div>
 
       {/* Identidade de base — referência para construção dos pilares */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden"
+      <div
+        className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden"
       >
         <button
           onClick={() => setIdentidadeOpen(o => !o)}
@@ -415,15 +360,15 @@ function PilaresPage() {
             )}
           </div>
         )}
-      </motion.div>
+      </div>
 
       {/* Sugestões baseadas na identidade */}
       <SugestoesDePilares onAddPilar={handleAddPilar} />
 
       {/* Pilares */}
       {pilares.length === 0 ? (
-        <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-          className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 text-center"
+        <div
+          className="rounded-xl bg-white border border-gray-200 shadow-sm p-8 text-center"
         >
           <Layers size={32} className="text-gray-200 mx-auto mb-3" />
           <p className="text-sm font-semibold text-gray-500 mb-1">Pilares ainda não definidos</p>
@@ -436,12 +381,9 @@ function PilaresPage() {
           >
             Ir para Minha Identidade <ChevronRight size={12} />
           </Link>
-        </motion.div>
+        </div>
       ) : (
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
+        <div
           className="space-y-3"
         >
           {pilares.map(pilar => (
@@ -456,12 +398,12 @@ function PilaresPage() {
               onDeletePilar={handleDeletePilar}
             />
           ))}
-        </motion.div>
+        </div>
       )}
 
       {/* Esta construção alimenta */}
-      <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
+      <div
+        className="rounded-xl border border-gray-100 bg-white shadow-sm p-5"
       >
         <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Esta construção alimenta</p>
         <div className="grid sm:grid-cols-2 gap-3">
@@ -493,7 +435,7 @@ function PilaresPage() {
           </Link>
 
         </div>
-      </motion.div>
+      </div>
 
     </div>
   )

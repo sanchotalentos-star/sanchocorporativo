@@ -129,8 +129,8 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
           meta: 12,
           unit: 'conteúdos',
         },
-        { descricao: 'Crescer seguidores ou conexões qualificadas', meta: 20, unit: '%' },
-        { descricao: 'Receber indicações ou convites de forma orgânica', meta: 5, unit: 'indicações' },
+        { descricao: 'Participar de eventos estratégicos do setor no trimestre', meta: 3, unit: 'eventos' },
+        { descricao: 'Conseguir convites para falar ou aparecer em conteúdos de terceiros', meta: 2, unit: 'convites' },
       ],
     },
     (publicoAlvo || proposta) ? {

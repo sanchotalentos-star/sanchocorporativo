@@ -12,6 +12,7 @@ const pageNames: Record<string, string> = {
   '/dashboard/membro/kpis':           'Indicadores',
   '/dashboard/membro/relatorios':     'Relatórios',
   '/dashboard/membro/ranking':        'Ranking',
+  '/dashboard/membro/tarefas':        'Tarefas',
   '/dashboard/admin':                 'Visão Geral',
   '/dashboard/admin/membros':         'Membros',
   '/dashboard/admin/relatorios':      'Relatórios',

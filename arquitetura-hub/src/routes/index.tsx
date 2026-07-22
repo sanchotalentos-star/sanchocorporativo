@@ -1,55 +1,42 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
 })
 
-const stats = [
-  { value: '4', label: 'Pilares estratégicos' },
-  { value: '12', label: 'Semanas de programa' },
-  { value: '360°', label: 'Visão de autoridade' },
-  { value: 'Real', label: 'Dados de crescimento' },
-]
-
-const modules = [
-  { id: '01', title: 'Dashboard de KPIs', desc: 'Indicadores de autoridade em tempo real — alcance, leads e conversões acompanhados semana a semana.' },
-  { id: '02', title: 'Pilares Estratégicos', desc: 'As dimensões da sua arquitetura de relevância com ações práticas e mensuráveis para cada fase.' },
-  { id: '03', title: 'Agenda Editorial', desc: 'Planejamento de conteúdo, eventos e atividades de mídia em um calendário visual integrado.' },
-  { id: '04', title: 'Relatórios de Evolução', desc: 'Análise da sua trajetória com comparativos mensais e visão do seu posicionamento no programa.' },
-]
-
-
 const serif: React.CSSProperties = { fontFamily: "Georgia, 'Times New Roman', serif" }
-const sans: React.CSSProperties  = { fontFamily: "system-ui, -apple-system, sans-serif" }
 
 function LandingPage() {
   return (
-    <div style={{ ...sans, backgroundColor: '#0F1117', color: '#ffffff', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#0D0D0D', color: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
 
-      {/* ── Navbar ── */}
+      {/* Nav */}
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-        backgroundColor: 'rgba(15,17,23,0.96)', backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        backgroundColor: 'rgba(13,13,13,0.96)',
+        backdropFilter: 'blur(12px)',
       }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 28, height: 28, backgroundColor: '#7B2FBE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: 'white', fontSize: 11, fontWeight: 900, letterSpacing: '0.05em' }}>AR</span>
-            </div>
-            <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '0.01em', color: 'white' }}>Arquitetura de Relevância</span>
-          </div>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.01em', color: 'rgba(255,255,255,0.9)' }}>
+            Arquitetura de Relevância
+          </span>
           <Link to="/auth">
-            <button style={{
-              padding: '9px 22px', backgroundColor: '#7B2FBE', color: 'white',
-              border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700,
-              letterSpacing: '0.08em', textTransform: 'uppercase',
-              transition: 'background 0.2s',
-            }}
-            onMouseOver={e => (e.currentTarget.style.backgroundColor = '#6a1fa8')}
-            onMouseOut={e => (e.currentTarget.style.backgroundColor = '#7B2FBE')}
+            <button
+              style={{
+                padding: '7px 18px',
+                background: 'transparent',
+                color: 'rgba(255,255,255,0.6)',
+                border: '1px solid rgba(255,255,255,0.14)',
+                cursor: 'pointer',
+                fontSize: 12,
+                fontWeight: 500,
+                letterSpacing: '0.03em',
+                transition: 'all 0.15s',
+              }}
+              onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'; e.currentTarget.style.color = '#fff' }}
+              onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)' }}
             >
               Entrar
             </button>
@@ -57,169 +44,169 @@ function LandingPage() {
         </div>
       </nav>
 
-      {/* ── Hero ── */}
-      <section style={{ paddingTop: 160, paddingBottom: 100, borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px' }}>
-
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p style={{ ...sans, fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 32 }}>
-              Arquitetura de Relevância
-            </p>
-
-            <h1 style={{
-              ...serif,
-              fontSize: 'clamp(52px, 8vw, 96px)',
-              fontWeight: 700,
-              lineHeight: 1.05,
-              letterSpacing: '-0.02em',
-              marginBottom: 40,
-              maxWidth: 820,
-              textWrap: 'balance',
-            } as React.CSSProperties}>
-              Arquitetura de{' '}
-              <span style={{ color: '#7B2FBE' }}>Relevância</span>
-            </h1>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 32, maxWidth: 640 }}>
-              <p style={{ fontSize: 17, lineHeight: 1.7, color: 'rgba(255,255,255,0.55)', maxWidth: 520 }}>
-                Acompanhe seus KPIs de autoridade, gerencie seus pilares estratégicos e execute sua agenda de visibilidade, tudo em um único hub.
-              </p>
-              <div>
-                <Link to="/auth">
-                  <button style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 10,
-                    padding: '14px 32px', backgroundColor: '#7B2FBE', color: 'white',
-                    border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700,
-                    letterSpacing: '0.06em', textTransform: 'uppercase',
-                    transition: 'background 0.2s',
-                  }}
-                  onMouseOver={e => (e.currentTarget.style.backgroundColor = '#6a1fa8')}
-                  onMouseOut={e => (e.currentTarget.style.backgroundColor = '#7B2FBE')}
-                  >
-                    Acessar a Plataforma <ArrowRight size={15} />
-                  </button>
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Stats strip */}
-          <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-            borderTop: '1px solid rgba(255,255,255,0.08)',
-            marginTop: 80,
+      {/* Hero */}
+      <section style={{ paddingTop: 156, paddingBottom: 112, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px' }}>
+          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 40 }}>
+            Programa de Mentoria
+          </p>
+          <h1 style={{
+            ...serif,
+            fontSize: 'clamp(46px, 7vw, 84px)',
+            fontWeight: 700,
+            lineHeight: 1.06,
+            letterSpacing: '-0.025em',
+            marginBottom: 32,
+            maxWidth: 720,
           }}>
-            {stats.map((s, i) => (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 + i * 0.08 }}
-                style={{
-                  padding: '28px 0',
-                  borderRight: i < 3 ? '1px solid rgba(255,255,255,0.08)' : 'none',
-                  paddingRight: 32,
-                  paddingLeft: i === 0 ? 0 : 32,
-                }}
-              >
-                <p style={{ ...serif, fontSize: 36, fontWeight: 700, color: '#ffffff', lineHeight: 1, marginBottom: 6 }}>{s.value}</p>
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{s.label}</p>
-              </motion.div>
+            Arquitetura de{' '}
+            <span style={{ color: '#7B2FBE' }}>Relevância</span>
+          </h1>
+          <p style={{ fontSize: 16, lineHeight: 1.8, color: 'rgba(255,255,255,0.42)', maxWidth: 460, marginBottom: 44 }}>
+            Um programa de mentoria para profissionais que querem construir autoridade real, com método, dados e acompanhamento próximo.
+          </p>
+          <Link to="/auth">
+            <button
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '13px 28px',
+                background: '#7B2FBE',
+                color: '#fff',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 13,
+                fontWeight: 600,
+                letterSpacing: '0.03em',
+                transition: 'background 0.15s',
+              }}
+              onMouseOver={e => e.currentTarget.style.background = '#6823a8'}
+              onMouseOut={e => e.currentTarget.style.background = '#7B2FBE'}
+            >
+              Acessar a plataforma <ArrowRight size={14} />
+            </button>
+          </Link>
+        </div>
+      </section>
+
+      {/* O Programa */}
+      <section style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{
+          maxWidth: 1100, margin: '0 auto', padding: '88px 32px',
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'start',
+        }}>
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 20 }}>O Programa</p>
+            <h2 style={{
+              ...serif,
+              fontSize: 'clamp(24px, 3vw, 38px)',
+              fontWeight: 700,
+              lineHeight: 1.2,
+              letterSpacing: '-0.02em',
+              marginBottom: 24,
+            }}>
+              Uma metodologia para construir autoridade com consistência.
+            </h2>
+            <p style={{ fontSize: 15, lineHeight: 1.8, color: 'rgba(255,255,255,0.42)', marginBottom: 24 }}>
+              Cada participante evolui dentro de um hub individual, com visão clara do que construir semana a semana: identidade, pilares, metas, execução e dados reais.
+            </p>
+            <p style={{ fontSize: 15, lineHeight: 1.8, color: 'rgba(255,255,255,0.42)', marginBottom: 36 }}>
+              O acompanhamento é próximo. Cada sessão tem entregáveis claros, e o hub mantém tudo organizado em um único lugar.
+            </p>
+            <Link to="/auth">
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#7B2FBE', cursor: 'pointer', letterSpacing: '0.03em', borderBottom: '1px solid #7B2FBE', paddingBottom: 2 }}>
+                Solicitar acesso
+              </span>
+            </Link>
+          </div>
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            {[
+              { label: 'Identidade de Marca', desc: 'Quem você é, para quem fala, o que entrega de diferente. O ponto de partida de toda a jornada.' },
+              { label: 'Pilares Estratégicos', desc: 'As frentes de construção de presença: conteúdo, relacionamento, produto e visibilidade.' },
+              { label: 'Metas de Impacto', desc: 'OKRs e Key Results por trimestre, com plano de ação e ciclo de revisão contínua.' },
+              { label: 'Execução e Indicadores', desc: 'Agenda editorial, KPIs de autoridade e relatórios de evolução ao longo do programa.' },
+            ].map((item, i) => (
+              <div key={i} style={{ padding: '26px 0', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.85)', marginBottom: 8 }}>{item.label}</p>
+                <p style={{ fontSize: 13, lineHeight: 1.7, color: 'rgba(255,255,255,0.35)' }}>{item.desc}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── O Programa ── */}
-      <section style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, padding: '80px 0' }}>
-
-            <div>
-              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 20 }}>O Programa</p>
-              <h2 style={{ ...serif, fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.02em', marginBottom: 24, textWrap: 'balance' } as React.CSSProperties}>
-                Uma metodologia para construir autoridade com consistência.
-              </h2>
-              <p style={{ fontSize: 15, lineHeight: 1.75, color: 'rgba(255,255,255,0.5)', marginBottom: 32 }}>
-                O programa de Arquitetura de Relevância combina diagnóstico de posicionamento, execução estruturada e acompanhamento com dados reais. Cada participante evolui dentro de um hub individual, com visão clara da sua construção semana a semana.
-              </p>
-              <Link to="/auth">
-                <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#7B2FBE', cursor: 'pointer', borderBottom: '1px solid #7B2FBE', paddingBottom: 2 }}>
-                  Solicitar acesso
-                </span>
-              </Link>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-              {modules.map((m, i) => (
-                <motion.div
-                  key={m.id}
-                  initial={{ opacity: 0, x: 16 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.07 }}
-                  style={{
-                    display: 'flex', gap: 24,
-                    padding: '24px 0',
-                    borderTop: i === 0 ? '1px solid rgba(255,255,255,0.08)' : 'none',
-                    borderBottom: '1px solid rgba(255,255,255,0.08)',
-                  }}
-                >
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#7B2FBE', letterSpacing: '0.05em', flexShrink: 0, paddingTop: 2 }}>{m.id}</span>
-                  <div>
-                    <p style={{ fontWeight: 700, fontSize: 14, marginBottom: 6, letterSpacing: '0.01em' }}>{m.title}</p>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.65 }}>{m.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
+      {/* Para quem */}
+      <section style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '88px 32px' }}>
+          <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 20 }}>Para quem é</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            {[
+              { perfil: 'Especialistas e consultores', desc: 'Que querem ser reconhecidos pelo que sabem e atrair clientes de forma orgânica.' },
+              { perfil: 'Profissionais em transição', desc: 'Que estão reposicionando a carreira e precisam construir autoridade no novo nicho.' },
+              { perfil: 'Líderes e executivos', desc: 'Que querem consolidar sua presença no mercado e ampliar seu círculo de influência.' },
+            ].map((item, i) => (
+              <div key={i} style={{
+                padding: '40px 28px',
+                borderRight: i < 2 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+              }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.82)', marginBottom: 12 }}>{item.perfil}</p>
+                <p style={{ fontSize: 13, lineHeight: 1.7, color: 'rgba(255,255,255,0.35)' }}>{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-
-      {/* ── CTA ── */}
+      {/* CTA */}
       <section>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 40px' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 48, flexWrap: 'wrap' }}>
-            <div>
-              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 20 }}>Faça parte</p>
-              <h2 style={{ ...serif, fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.02em', maxWidth: 560, textWrap: 'balance' } as React.CSSProperties}>
-                Construa autoridade real com método e dados.
-              </h2>
-            </div>
-            <Link to="/auth">
-              <button style={{
-                display: 'inline-flex', alignItems: 'center', gap: 10,
-                padding: '16px 36px', backgroundColor: '#7B2FBE', color: 'white',
-                border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700,
-                letterSpacing: '0.06em', textTransform: 'uppercase', flexShrink: 0,
-                transition: 'background 0.2s',
-              }}
-              onMouseOver={e => (e.currentTarget.style.backgroundColor = '#6a1fa8')}
-              onMouseOut={e => (e.currentTarget.style.backgroundColor = '#7B2FBE')}
-              >
-                Solicitar Acesso <ArrowRight size={15} />
-              </button>
-            </Link>
+        <div style={{
+          maxWidth: 1100, margin: '0 auto', padding: '88px 32px',
+          display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 48, flexWrap: 'wrap',
+        }}>
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FBE', marginBottom: 20 }}>Faça parte</p>
+            <h2 style={{
+              ...serif,
+              fontSize: 'clamp(26px, 4vw, 48px)',
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: '-0.02em',
+              maxWidth: 500,
+            }}>
+              Construa autoridade real com método e dados.
+            </h2>
           </div>
+          <Link to="/auth">
+            <button
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '13px 28px',
+                background: '#7B2FBE',
+                color: '#fff',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 13,
+                fontWeight: 600,
+                letterSpacing: '0.03em',
+                flexShrink: 0,
+                transition: 'background 0.15s',
+              }}
+              onMouseOver={e => e.currentTarget.style.background = '#6823a8'}
+              onMouseOut={e => e.currentTarget.style.background = '#7B2FBE'}
+            >
+              Solicitar acesso <ArrowRight size={14} />
+            </button>
+          </Link>
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: '28px 40px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 20, height: 20, backgroundColor: '#7B2FBE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: 'white', fontSize: 8, fontWeight: 900 }}>AR</span>
-            </div>
-            <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Arquitetura de Relevância Hub</span>
-          </div>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>© {new Date().getFullYear()} Sancho Gestão de Carreiras</p>
+      {/* Footer */}
+      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '28px 32px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.22)' }}>Arquitetura de Relevância</span>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.16)' }}>© {new Date().getFullYear()} Sancho Gestão de Carreiras</p>
         </div>
       </footer>
-
     </div>
   )
 }
