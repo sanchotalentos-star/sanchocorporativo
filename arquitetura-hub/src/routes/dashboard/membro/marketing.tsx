@@ -141,7 +141,7 @@ function SementesDeConteudo({ publicoAlvo, proposta, formatoProduto, diferenciai
 
   return (
     <div
-      className="rounded-2xl border border-[#7B2FBE]/15 bg-white shadow-sm overflow-hidden"
+      className="rounded-xl border border-[#7B2FBE]/15 bg-white shadow-sm overflow-hidden"
     >
       <button
         onClick={() => setOpen(o => !o)}
@@ -388,7 +388,7 @@ function MarketingPage() {
 
       {/* Progress bar */}
       <div
-        className="rounded-2xl bg-white border border-gray-200 shadow-sm p-5">
+        className="rounded-xl bg-white border border-gray-200 shadow-sm p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Megaphone size={16} className="text-[#7B2FBE]" />
@@ -405,7 +405,7 @@ function MarketingPage() {
       {/* Referência da identidade */}
       {(publicoAlvo || proposta || formatoProduto) && (
         <div
-          className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden"
+          className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden"
         >
           <button
             onClick={() => setIdentidadeOpen(o => !o)}
@@ -467,7 +467,7 @@ function MarketingPage() {
       {/* Estado vazio */}
       {acoes.length === 0 && (
         <div
-          className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 text-center"
+          className="rounded-xl bg-white border border-gray-200 shadow-sm p-8 text-center"
         >
           <Megaphone size={32} className="text-gray-200 mx-auto mb-3" />
           <p className="text-sm font-semibold text-gray-500 mb-1">Nenhuma ação cadastrada ainda</p>
@@ -533,7 +533,7 @@ function MarketingPage() {
       {/* Actions list */}
       <div className="space-y-2">
         {filtered.length === 0 ? (
-          <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 text-center">
+          <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-8 text-center">
             <Calendar size={32} className="text-gray-200 mx-auto mb-2" />
             <p className="text-gray-400 text-sm">Nenhuma ação para este filtro</p>
           </div>
@@ -591,7 +591,7 @@ function MarketingPage() {
 
       {/* Esta construção alimenta */}
       <div
-        className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
+        className="rounded-xl border border-gray-100 bg-white shadow-sm p-5"
       >
         <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Esta construção alimenta</p>
         <Link to="/dashboard/membro/kpis">

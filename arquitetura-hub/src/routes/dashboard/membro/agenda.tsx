@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useMemo } from 'react'
-import { Calendar, CheckCircle2, Circle, XCircle, AlertCircle, Target, Megaphone, ChevronRight, Filter } from 'lucide-react'
+import { Calendar, Target, Megaphone, ChevronRight, Filter } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/dashboard/membro/agenda')({
@@ -25,15 +25,33 @@ interface ItemAgenda {
   dataLimite?: string
 }
 
-const statusIcon: Record<AcaoStatus, React.ReactNode> = {
-  feito:     <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />,
-  nao_feito: <XCircle      size={14} className="text-red-400 flex-shrink-0"     />,
-  bloqueado: <AlertCircle  size={14} className="text-amber-400 flex-shrink-0"   />,
-  pendente:  <Circle       size={14} className="text-gray-300 flex-shrink-0"    />,
+const STATUS_CONFIG: Record<AcaoStatus, { label: string; bg: string; text: string; dot: string }> = {
+  feito:     { label: 'Feito',      bg: '#DCFCE7', text: '#166534', dot: '#22C55E' },
+  nao_feito: { label: 'Não feito',  bg: '#FEE2E2', text: '#991B1B', dot: '#EF4444' },
+  bloqueado: { label: 'Bloqueado',  bg: '#FEF3C7', text: '#92400E', dot: '#F59E0B' },
+  pendente:  { label: 'Pendente',   bg: '#F3F4F6', text: '#6B7280', dot: '#9CA3AF' },
 }
 
-const statusLabel: Record<AcaoStatus, string> = {
-  feito: 'Feito', nao_feito: 'Não feito', bloqueado: 'Bloqueado', pendente: 'Pendente',
+function StatusChip({ status }: { status: AcaoStatus }) {
+  const cfg = STATUS_CONFIG[status]
+  return (
+    <span style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 5,
+      padding: '3px 8px',
+      borderRadius: 4,
+      fontSize: 11,
+      fontWeight: 500,
+      background: cfg.bg,
+      color: cfg.text,
+      flexShrink: 0,
+      whiteSpace: 'nowrap',
+    }}>
+      <span style={{ width: 6, height: 6, borderRadius: '50%', background: cfg.dot, flexShrink: 0 }} />
+      {cfg.label}
+    </span>
+  )
 }
 
 function loadFromStorage<T>(key: string): T[] {
@@ -103,15 +121,11 @@ function AgendaPage() {
     return true
   })
 
-  const totalOkr = itens.filter(i => i.tipo === 'okr').length
-  const totalMkt = itens.filter(i => i.tipo === 'marketing').length
-  const feitos   = itens.filter(i => i.status === 'feito').length
-  const pendentes = itens.filter(i => i.status === 'pendente').length
+  const totalOkr   = itens.filter(i => i.tipo === 'okr').length
+  const totalMkt   = itens.filter(i => i.tipo === 'marketing').length
+  const feitos     = itens.filter(i => i.status === 'feito').length
+  const pendentes  = itens.filter(i => i.status === 'pendente').length
   const bloqueados = itens.filter(i => i.status === 'bloqueado').length
-
-  const mesSelecionadoMkt = mesFiltro !== null
-    ? filtered.filter(i => i.tipo === 'marketing')
-    : []
 
   const semanas = [1, 2, 3, 4]
 
@@ -123,7 +137,7 @@ function AgendaPage() {
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Agenda Executiva</h1>
           <p className="text-gray-400 mt-1 text-sm">
-            Visão integrada das suas ações de OKR e Marketing — tudo em um só lugar
+            Visão integrada das suas ações de OKR e Marketing
           </p>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-gray-400 flex-shrink-0">
@@ -137,55 +151,39 @@ function AgendaPage() {
         </div>
       </div>
 
-      {/* Sumário */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <Target size={13} className="text-[#7B2FBE]" />
-            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">OKR</p>
+      {/* Summary strip */}
+      {itens.length > 0 && (
+        <div className="flex items-center gap-3 flex-wrap">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Target size={12} className="text-[#7B2FBE]" />
+            <span className="text-xs text-gray-500">{totalOkr} OKRs</span>
           </div>
-          <p className="text-2xl font-semibold text-gray-900">{totalOkr}</p>
-          <p className="text-[10px] text-gray-400 mt-0.5">ações do plano</p>
-        </div>
-        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <Megaphone size={13} className="text-[#7B2FBE]" />
-            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Marketing</p>
+          <span className="text-gray-200">·</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Megaphone size={12} className="text-[#7B2FBE]" />
+            <span className="text-xs text-gray-500">{totalMkt} Marketing</span>
           </div>
-          <p className="text-2xl font-semibold text-gray-900">{totalMkt}</p>
-          <p className="text-[10px] text-gray-400 mt-0.5">ações de conteúdo</p>
-        </div>
-        <div className="rounded-2xl bg-emerald-50 border border-emerald-100 shadow-sm p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <CheckCircle2 size={13} className="text-emerald-500" />
-            <p className="text-[10px] text-emerald-600 font-medium uppercase tracking-wide">Feito</p>
+          <span className="text-gray-200">·</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22C55E', flexShrink: 0 }} />
+            <span className="text-xs text-gray-500">{feitos} feitos</span>
           </div>
-          <p className="text-2xl font-semibold text-emerald-700">{feitos}</p>
-        </div>
-        {bloqueados > 0 ? (
-          <div className="rounded-2xl bg-amber-50 border border-amber-100 shadow-sm p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <AlertCircle size={13} className="text-amber-500" />
-              <p className="text-[10px] text-amber-600 font-medium uppercase tracking-wide">Bloqueado</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#9CA3AF', flexShrink: 0 }} />
+            <span className="text-xs text-gray-500">{pendentes} pendentes</span>
+          </div>
+          {bloqueados > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#F59E0B', flexShrink: 0 }} />
+              <span className="text-xs text-gray-500">{bloqueados} bloqueados</span>
             </div>
-            <p className="text-2xl font-semibold text-amber-700">{bloqueados}</p>
-          </div>
-        ) : (
-          <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Circle size={13} className="text-gray-300" />
-              <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Pendente</p>
-            </div>
-            <p className="text-2xl font-semibold text-gray-900">{pendentes}</p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
-      {/* Estado vazio */}
+      {/* Empty state */}
       {itens.length === 0 && (
-        <div
-          className="rounded-2xl bg-white border border-gray-100 shadow-sm p-10 text-center"
-        >
+        <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-10 text-center">
           <Calendar size={32} className="text-gray-200 mx-auto mb-3" />
           <p className="text-sm font-semibold text-gray-500 mb-1">Agenda ainda vazia</p>
           <p className="text-xs text-gray-400 max-w-xs mx-auto leading-relaxed mb-5">
@@ -225,7 +223,6 @@ function AgendaPage() {
               ))}
             </div>
 
-            {/* Semana filter — only for OKR */}
             {filtro !== 'marketing' && (
               <div className="flex items-center gap-1">
                 <Filter size={12} className="text-gray-300" />
@@ -242,7 +239,6 @@ function AgendaPage() {
               </div>
             )}
 
-            {/* Mês filter — for marketing */}
             {filtro !== 'okr' && (
               <div className="flex gap-1 overflow-x-auto">
                 {meses.map((m, i) => (
@@ -259,96 +255,111 @@ function AgendaPage() {
             )}
           </div>
 
-          {/* Lista por semana (OKR) */}
+          {/* OKR por semana */}
           {(filtro === 'todos' || filtro === 'okr') && (
             <div className="space-y-4">
               {semanas.map(semana => {
                 const acoesSem = filtered.filter(i => i.tipo === 'okr' && i.semana === semana)
-                const semPlano = filtered.filter(i => i.tipo === 'okr' && !i.semana)
-                if (semana > 1 && acoesSem.length === 0) return null
-                if (semana === 1 && acoesSem.length === 0 && semPlano.length === 0 && filtro === 'todos') return null
+                if (acoesSem.length === 0) return null
 
                 return (
-                  <div key={semana}
-                    className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden"
-                  >
-                    <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+                  <div key={semana} className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+                    {/* Column headers */}
+                    <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gray-50/60">
                       <div className="flex items-center gap-2">
-                        <Target size={13} className="text-[#7B2FBE]" />
-                        <p className="text-sm font-semibold text-gray-900">Semana {semana} — OKRs</p>
+                        <Target size={12} className="text-[#7B2FBE]" />
+                        <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Semana {semana} — OKRs</p>
                       </div>
                       <span className="text-[10px] text-gray-400">{acoesSem.length} ações</span>
                     </div>
-                    {acoesSem.length === 0 ? (
-                      <p className="px-5 py-4 text-sm text-gray-300 italic">Nenhuma ação para esta semana</p>
-                    ) : (
-                      <div className="divide-y divide-gray-100">
-                        {acoesSem.map(item => (
-                          <div key={item.id} className="flex items-start gap-3 px-5 py-3">
-                            {statusIcon[item.status ?? 'pendente']}
-                            <div className="flex-1 min-w-0">
-                              <p className={cn(
-                                'text-sm leading-snug',
-                                item.status === 'feito' ? 'line-through text-gray-400' : 'text-gray-800'
-                              )}>
-                                {item.titulo}
-                              </p>
-                              {item.objetivo && (
-                                <p className="text-[10px] text-gray-400 mt-0.5 truncate">→ {item.objetivo}</p>
-                              )}
-                              {item.dataLimite && (
-                                <p className="text-[10px] text-gray-400">
-                                  Até {new Date(item.dataLimite + 'T00:00:00').toLocaleDateString('pt-BR')}
-                                </p>
-                              )}
-                            </div>
-                            <span className={cn(
-                              'text-[9px] font-medium px-1.5 py-0.5 rounded flex-shrink-0',
-                              item.status === 'feito'     ? 'bg-emerald-100 text-emerald-700' :
-                              item.status === 'bloqueado' ? 'bg-amber-100 text-amber-700' :
-                              item.status === 'nao_feito' ? 'bg-red-100 text-red-600' :
-                              'bg-gray-100 text-gray-500'
-                            )}>
-                              {statusLabel[item.status ?? 'pendente']}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
 
-              {/* Plano de entregas (sem semana) */}
-              {(() => {
-                const planoItems = filtered.filter(i => i.tipo === 'okr' && !i.semana && i.titulo !== '(sem descrição)')
-                if (planoItems.length === 0) return null
-                return (
-                  <div
-                    className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden"
-                  >
-                    <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <Target size={13} className="text-[#7B2FBE]" />
-                        <p className="text-sm font-semibold text-gray-900">Plano de Entregas</p>
-                      </div>
-                      <span className="text-[10px] text-gray-400">{planoItems.length} entregas</span>
+                    {/* Column header row */}
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 110px 100px',
+                      padding: '6px 20px',
+                      borderBottom: '1px solid #F3F4F6',
+                    }}>
+                      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Ação</span>
+                      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Status</span>
+                      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Prazo</span>
                     </div>
-                    <div className="divide-y divide-gray-100">
-                      {planoItems.map(item => (
-                        <div key={item.id} className="flex items-start gap-3 px-5 py-3">
-                          <div className="w-2 h-2 rounded-full bg-[#7B2FBE]/30 flex-shrink-0 mt-1.5" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-gray-800 leading-snug">{item.titulo}</p>
+
+                    <div className="divide-y divide-gray-50">
+                      {acoesSem.map(item => (
+                        <div key={item.id} style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 110px 100px',
+                          padding: '10px 20px',
+                          alignItems: 'center',
+                          gap: 8,
+                        }}>
+                          <div className="min-w-0">
+                            <p className={cn(
+                              'text-sm leading-snug truncate',
+                              item.status === 'feito' ? 'line-through text-gray-400' : 'text-gray-800'
+                            )}>
+                              {item.titulo}
+                            </p>
                             {item.objetivo && (
                               <p className="text-[10px] text-gray-400 mt-0.5 truncate">→ {item.objetivo}</p>
                             )}
                           </div>
-                          {item.dataLimite && (
-                            <span className="text-[10px] text-gray-400 flex-shrink-0 whitespace-nowrap">
-                              até {new Date(item.dataLimite + 'T00:00:00').toLocaleDateString('pt-BR')}
-                            </span>
-                          )}
+                          <StatusChip status={item.status ?? 'pendente'} />
+                          <span className="text-[11px] text-gray-400">
+                            {item.dataLimite
+                              ? new Date(item.dataLimite + 'T00:00:00').toLocaleDateString('pt-BR')
+                              : '—'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+
+              {/* Plano de entregas */}
+              {(() => {
+                const planoItems = filtered.filter(i => i.tipo === 'okr' && !i.semana && i.titulo !== '(sem descrição)')
+                if (planoItems.length === 0) return null
+                return (
+                  <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gray-50/60">
+                      <div className="flex items-center gap-2">
+                        <Target size={12} className="text-[#7B2FBE]" />
+                        <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Plano de Entregas</p>
+                      </div>
+                      <span className="text-[10px] text-gray-400">{planoItems.length} entregas</span>
+                    </div>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 100px',
+                      padding: '6px 20px',
+                      borderBottom: '1px solid #F3F4F6',
+                    }}>
+                      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Entrega</span>
+                      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Prazo</span>
+                    </div>
+                    <div className="divide-y divide-gray-50">
+                      {planoItems.map(item => (
+                        <div key={item.id} style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 100px',
+                          padding: '10px 20px',
+                          alignItems: 'center',
+                          gap: 8,
+                        }}>
+                          <div className="min-w-0">
+                            <p className="text-sm text-gray-800 leading-snug truncate">{item.titulo}</p>
+                            {item.objetivo && (
+                              <p className="text-[10px] text-gray-400 mt-0.5 truncate">→ {item.objetivo}</p>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-gray-400">
+                            {item.dataLimite
+                              ? new Date(item.dataLimite + 'T00:00:00').toLocaleDateString('pt-BR')
+                              : '—'}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -365,37 +376,43 @@ function AgendaPage() {
                 const acoesMes = filtered.filter(i => i.tipo === 'marketing' && i.mes === idx + 1)
                 if (acoesMes.length === 0) return null
                 return (
-                  <div key={mes}
-                    className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden"
-                  >
-                    <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+                  <div key={mes} className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gray-50/60">
                       <div className="flex items-center gap-2">
-                        <Megaphone size={13} className="text-[#7B2FBE]" />
-                        <p className="text-sm font-semibold text-gray-900">{mes} — Marketing</p>
+                        <Megaphone size={12} className="text-[#7B2FBE]" />
+                        <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">{mes} — Marketing</p>
                       </div>
                       <span className="text-[10px] text-gray-400">{acoesMes.length} ações</span>
                     </div>
-                    <div className="divide-y divide-gray-100">
+
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 110px 80px',
+                      padding: '6px 20px',
+                      borderBottom: '1px solid #F3F4F6',
+                    }}>
+                      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Conteúdo</span>
+                      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Status</span>
+                      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Canal</span>
+                    </div>
+
+                    <div className="divide-y divide-gray-50">
                       {acoesMes.map(item => (
-                        <div key={item.id} className="flex items-start gap-3 px-5 py-3">
-                          {statusIcon[item.status ?? 'pendente']}
-                          <div className="flex-1 min-w-0">
-                            <p className={cn(
-                              'text-sm leading-snug',
-                              item.status === 'feito' ? 'line-through text-gray-400' : 'text-gray-800'
-                            )}>
-                              {item.titulo}
-                            </p>
-                            {item.canal && (
-                              <p className="text-[10px] text-gray-400 mt-0.5">{item.canal}</p>
-                            )}
-                          </div>
-                          <span className={cn(
-                            'text-[9px] font-medium px-1.5 py-0.5 rounded flex-shrink-0',
-                            item.status === 'feito' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
+                        <div key={item.id} style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 110px 80px',
+                          padding: '10px 20px',
+                          alignItems: 'center',
+                          gap: 8,
+                        }}>
+                          <p className={cn(
+                            'text-sm leading-snug truncate',
+                            item.status === 'feito' ? 'line-through text-gray-400' : 'text-gray-800'
                           )}>
-                            {item.status === 'feito' ? 'Feito' : 'Pendente'}
-                          </span>
+                            {item.titulo}
+                          </p>
+                          <StatusChip status={item.status ?? 'pendente'} />
+                          <span className="text-[11px] text-gray-400 truncate">{item.canal ?? '—'}</span>
                         </div>
                       ))}
                     </div>
@@ -406,7 +423,7 @@ function AgendaPage() {
           )}
 
           {filtered.length === 0 && (
-            <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-8 text-center">
+            <div className="rounded-xl bg-white border border-gray-100 shadow-sm p-8 text-center">
               <p className="text-sm text-gray-400">Nenhuma ação para este filtro</p>
             </div>
           )}
@@ -414,9 +431,7 @@ function AgendaPage() {
       )}
 
       {/* Integração futura */}
-      <div
-        className="rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 p-5 text-center"
-      >
+      <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50/50 p-5 text-center">
         <Calendar size={20} className="text-gray-300 mx-auto mb-2" />
         <p className="text-xs font-medium text-gray-500 mb-1">Integração com Google Agenda</p>
         <p className="text-xs text-gray-400">

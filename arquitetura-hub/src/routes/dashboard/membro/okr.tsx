@@ -198,7 +198,7 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
 
   return (
     <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-      className="rounded-2xl border border-[#7B2FBE]/15 bg-white shadow-sm overflow-hidden"
+      className="rounded-xl border border-[#7B2FBE]/15 bg-white shadow-sm overflow-hidden"
     >
       <button
         onClick={() => setOpen(o => !o)}
@@ -553,7 +553,7 @@ function OkrPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="w-full max-w-md rounded-2xl bg-white border border-gray-200 shadow-xl p-6 space-y-4"
+            className="w-full max-w-md rounded-xl bg-white border border-gray-200 shadow-xl p-6 space-y-4"
           >
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-semibold text-gray-900">Novo Objetivo</h2>
@@ -620,21 +620,21 @@ function OkrPage() {
 
       {/* Sumário */}
       <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-3 gap-3">
-        <motion.div variants={fadeInUp} className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
+        <motion.div variants={fadeInUp} className="rounded-xl bg-white border border-gray-200 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1">
             <Target size={14} className="text-gray-300" />
             <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Objetivos</p>
           </div>
           <p className="text-2xl font-semibold text-gray-900">{okrs.length}</p>
         </motion.div>
-        <motion.div variants={fadeInUp} className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4">
+        <motion.div variants={fadeInUp} className="rounded-xl bg-white border border-gray-200 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1">
             <Crosshair size={14} className="text-gray-300" />
             <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Key Results</p>
           </div>
           <p className="text-2xl font-semibold text-gray-900">{doneKrs}<span className="text-gray-400 text-sm font-normal">/{totalKrs}</span></p>
         </motion.div>
-        <motion.div variants={fadeInUp} className="rounded-2xl bg-white border border-[#7B2FBE]/25 shadow-sm p-4">
+        <motion.div variants={fadeInUp} className="rounded-xl bg-white border border-[#7B2FBE]/25 shadow-sm p-4">
           <div className="flex items-center gap-2 mb-1">
             <TrendingUp size={14} className="text-[#7B2FBE]" />
             <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Progresso</p>
@@ -650,9 +650,9 @@ function OkrPage() {
       {okrs.length === 0 && (
         <motion.div
           variants={fadeInUp} initial="hidden" animate="visible"
-          className="rounded-2xl border border-gray-100 bg-white shadow-sm p-12 flex flex-col items-center text-center"
+          className="rounded-xl border border-gray-100 bg-white shadow-sm p-12 flex flex-col items-center text-center"
         >
-          <div className="w-16 h-16 rounded-2xl bg-[#7B2FBE]/10 flex items-center justify-center mb-5">
+          <div className="w-16 h-16 rounded-xl bg-[#7B2FBE]/10 flex items-center justify-center mb-5">
             <Rocket size={28} className="text-[#7B2FBE]" />
           </div>
           <h2 className="text-lg font-semibold text-gray-800 mb-2">Suas metas ainda estão sendo desenhadas</h2>
@@ -713,7 +713,7 @@ function OkrPage() {
 
       {/* Esta construção alimenta */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-        className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5"
+        className="rounded-xl border border-gray-100 bg-white shadow-sm p-5"
       >
         <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Esta construção alimenta</p>
         <div className="grid sm:grid-cols-2 gap-3">
@@ -798,7 +798,7 @@ function OkrCard({
 
   return (
     <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-      className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden"
+      className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden"
     >
       {/* Cabeçalho */}
       <div className="flex items-center gap-3 p-5">
