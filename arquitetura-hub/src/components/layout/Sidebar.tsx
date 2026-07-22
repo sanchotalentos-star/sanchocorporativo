@@ -34,86 +34,47 @@ const membroNav: NavItem[] = [
   { label: 'Ranking',           href: '/dashboard/membro/ranking',        icon: Trophy      },
 ]
 
-const journeyStages = [
-  { num: 1, label: 'OKR & MVP',          desc: 'Metas + produto' },
-  { num: 2, label: 'Primeiras Vitórias', desc: 'Posicionamento'  },
-  { num: 3, label: 'Plano em Ação',      desc: 'PDCA ciclo 1'    },
-  { num: 4, label: 'Escala',             desc: 'Autoridade'      },
-]
-
 export function Sidebar() {
   const { user, logout } = useAuth()
   const routerState = useRouterState()
   const pathname = routerState.location.pathname
   const nav = user?.role === 'admin' ? adminNav : membroNav
-  const currentStage = 1
 
   return (
-    <aside className="flex flex-col w-60 min-h-screen bg-[#1B1F2E] border-r border-white/5">
+    <aside style={{ display: 'flex', flexDirection: 'column', width: 224, minHeight: '100vh', background: '#111827', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
 
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-white/5">
-        <p className="text-[13px] font-bold text-white tracking-wide leading-snug">Arquitetura de Relevância</p>
+      <div style={{ padding: '18px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <p style={{ fontSize: 12, fontWeight: 600, color: '#fff', letterSpacing: '0.02em', lineHeight: 1.4 }}>
+          Arquitetura
+        </p>
+        <p style={{ fontSize: 12, fontWeight: 400, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.02em', lineHeight: 1.4 }}>
+          de Relevância
+        </p>
       </div>
 
-      {/* User info */}
-      <div className="px-4 py-3.5 border-b border-white/5">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[#7B2FBE] flex items-center justify-center text-xs font-semibold text-white flex-shrink-0">
-            {user?.full_name?.charAt(0) ?? 'U'}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-medium text-white truncate leading-tight">{user?.full_name}</p>
-            <p className="text-[11px] text-gray-500 mt-0.5">
-              {user?.role === 'admin' ? 'Mentor' : 'Mentorado(a)'}
-            </p>
-          </div>
+      {/* User */}
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: '50%',
+          background: '#7B2FBE',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 11, fontWeight: 600, color: '#fff', flexShrink: 0,
+        }}>
+          {user?.full_name?.charAt(0) ?? 'U'}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 12, fontWeight: 500, color: '#fff', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {user?.full_name}
+          </p>
+          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 1 }}>
+            {user?.role === 'admin' ? 'Mentor' : 'Mentorado'}
+          </p>
         </div>
       </div>
-
-      {/* Journey tracker — only for membros */}
-      {user?.role !== 'admin' && (
-        <div className="px-4 py-4 border-b border-white/5">
-          <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-3">Sua Jornada</p>
-          <div className="space-y-2">
-            {journeyStages.map((stage) => {
-              const isDone    = stage.num < currentStage
-              const isCurrent = stage.num === currentStage
-              return (
-                <div key={stage.num} className="flex items-center gap-2.5">
-                  <div className={cn(
-                    'w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0',
-                    isDone    ? 'bg-[#7B2FBE]'                          : '',
-                    isCurrent ? 'border-2 border-[#7B2FBE] bg-[#1B1F2E]' : '',
-                    !isDone && !isCurrent ? 'border border-white/10 bg-[#1B1F2E]' : '',
-                  )}>
-                    {isDone    && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                    {isCurrent && <div className="w-1.5 h-1.5 rounded-full bg-[#7B2FBE]" />}
-                  </div>
-                  <div className="flex-1 min-w-0 flex items-center justify-between gap-1">
-                    <span className={cn(
-                      'text-[11px] leading-none',
-                      isCurrent ? 'text-white font-medium' :
-                      isDone    ? 'text-gray-600 line-through'    :
-                                  'text-gray-600'
-                    )}>
-                      {stage.label}
-                    </span>
-                    {isCurrent && (
-                      <span className="text-[9px] font-medium bg-[#7B2FBE]/20 text-[#a855f7] px-1.5 py-0.5 rounded">
-                        Atual
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Nav */}
-      <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
+      <nav style={{ flex: 1, padding: '8px 8px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 1 }}>
         {nav.map((item) => {
           const active =
             pathname === item.href || (
@@ -123,19 +84,32 @@ export function Sidebar() {
             )
 
           return (
-            <Link key={item.href} to={item.href}>
-              <div className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-150 cursor-pointer',
-                active
-                  ? 'bg-white/10 text-white'
-                  : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
-              )}>
-                <item.icon size={15} strokeWidth={active ? 2 : 1.75} className="flex-shrink-0" />
-                <span className={cn('flex-1 text-[13px]', active ? 'font-medium text-white' : 'font-normal')}>
+            <Link key={item.href} to={item.href} style={{ textDecoration: 'none' }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '7px 12px',
+                borderRadius: 5,
+                cursor: 'pointer',
+                background: active ? 'rgba(123,47,190,0.18)' : 'transparent',
+                transition: 'background 0.1s',
+              }}
+              onMouseEnter={e => { if (!active) (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.05)' }}
+              onMouseLeave={e => { if (!active) (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
+              >
+                <item.icon
+                  size={14}
+                  strokeWidth={active ? 2 : 1.75}
+                  style={{ flexShrink: 0, color: active ? '#a78bfa' : 'rgba(255,255,255,0.35)' }}
+                />
+                <span style={{
+                  fontSize: 13, flex: 1,
+                  color: active ? '#e5e7eb' : 'rgba(255,255,255,0.45)',
+                  fontWeight: active ? 500 : 400,
+                }}>
                   {item.label}
                 </span>
                 {item.badge && (
-                  <span className="text-[9px] font-medium bg-[#7B2FBE]/20 text-[#a855f7] px-1.5 py-0.5 rounded">
+                  <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(123,47,190,0.25)', color: '#a78bfa', padding: '2px 5px', borderRadius: 3 }}>
                     {item.badge}
                   </span>
                 )}
@@ -146,13 +120,21 @@ export function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <div className="px-2 pb-4 border-t border-white/5 pt-3">
+      <div style={{ padding: '8px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <button
           onClick={() => void logout()}
-          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-normal text-gray-500 hover:text-red-400 hover:bg-white/5 transition-all"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '7px 12px', width: '100%',
+            background: 'none', border: 'none', borderRadius: 5,
+            fontSize: 13, color: 'rgba(255,255,255,0.3)',
+            cursor: 'pointer', transition: 'color 0.1s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#f87171')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
         >
-          <LogOut size={15} />
-          Sair da plataforma
+          <LogOut size={14} />
+          Sair
         </button>
       </div>
     </aside>

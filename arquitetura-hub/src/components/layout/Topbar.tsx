@@ -43,7 +43,7 @@ export function Topbar({ onMenuClick, title }: TopbarProps) {
             <Menu size={18} />
           </button>
         )}
-        <p className="text-[11px] font-bold text-gray-900 uppercase tracking-widest">{pageName}</p>
+        <p className="text-[13px] font-semibold text-gray-800">{pageName}</p>
       </div>
 
       {/* Right */}
@@ -55,7 +55,7 @@ export function Topbar({ onMenuClick, title }: TopbarProps) {
               {user?.role === 'admin' ? 'Mentor' : 'Mentorado'}
             </p>
           </div>
-          <div className="w-7 h-7 bg-[#7B2FBE] flex items-center justify-center text-white text-[11px] font-black flex-shrink-0">
+          <div className="w-7 h-7 bg-[#7B2FBE] rounded-full flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0">
             {user?.full_name?.charAt(0) ?? 'U'}
           </div>
         </div>

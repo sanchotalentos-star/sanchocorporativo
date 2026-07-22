@@ -9,15 +9,10 @@ export const Route = createFileRoute('/dashboard/membro/')({
 })
 
 const phases = [
-  {
-    num: 1,
-    label: 'OKR e MVP',
-    desc: 'Você está definindo as bases da sua jornada. O foco é clareza: o que você quer conquistar e como vai medir isso.',
-    active: true,
-  },
-  { num: 2, label: 'Primeiras Vitórias', desc: '', active: false },
-  { num: 3, label: 'Plano em Ação', desc: '', active: false },
-  { num: 4, label: 'Escala', desc: '', active: false },
+  { num: 1, label: 'OKR e MVP',           active: true  },
+  { num: 2, label: 'Primeiras Vitórias',  active: false },
+  { num: 3, label: 'Plano em Ação',       active: false },
+  { num: 4, label: 'Escala',              active: false },
 ]
 
 const acoesPorFase: Record<number, { texto: string; href?: string }[]> = {
@@ -44,22 +39,15 @@ const acoesPorFase: Record<number, { texto: string; href?: string }[]> = {
   ],
 }
 
-const marcos = [
-  { label: 'Entrou no programa Arquitetura de Relevância', done: true },
-  { label: 'Preencheu a primeira reflexão em Minha Identidade', done: false },
-  { label: 'Identidade construída e validada com o mentor', done: false },
-  { label: 'Pilares da Marca definidos na sessão', done: false },
-  { label: 'Primeiro ciclo de Marketing Anual em execução', done: false },
-  { label: 'Primeiro ciclo de resultados revisado com mentor', done: false },
-]
-
-const menuItens = [
-  { label: 'Minha Identidade', desc: 'Quem você é e o que você entrega', href: '/dashboard/membro/posicionamento' },
-  { label: 'Pilares da Marca', desc: 'Ações estratégicas de cada pilar', href: '/dashboard/membro/pilares' },
-  { label: 'Metas de Impacto', desc: 'OKRs e resultados-chave', href: '/dashboard/membro/okr' },
-  { label: 'Tarefas', desc: 'Ações concretas para avançar', href: '/dashboard/membro/tarefas' },
-  { label: 'Marketing Anual', desc: 'Agenda de conteúdo e presença', href: '/dashboard/membro/marketing' },
-  { label: 'Indicadores', desc: 'KPIs e dados de crescimento', href: '/dashboard/membro/kpis' },
+const ferramentas = [
+  { label: 'Minha Identidade',  desc: 'Posicionamento e proposta de valor',  href: '/dashboard/membro/posicionamento' },
+  { label: 'Pilares da Marca',  desc: 'Ações estratégicas de cada pilar',    href: '/dashboard/membro/pilares'        },
+  { label: 'Metas de Impacto',  desc: 'OKRs e resultados-chave',             href: '/dashboard/membro/okr'            },
+  { label: 'Tarefas',           desc: 'Ações concretas para avançar',        href: '/dashboard/membro/tarefas'        },
+  { label: 'Marketing Anual',   desc: 'Agenda de conteúdo e presença',       href: '/dashboard/membro/marketing'      },
+  { label: 'Indicadores',       desc: 'KPIs e dados de crescimento',         href: '/dashboard/membro/kpis'           },
+  { label: 'Agenda',            desc: 'Ações de OKR e marketing integradas', href: '/dashboard/membro/agenda'         },
+  { label: 'Relatórios',        desc: 'Evolução e histórico de ciclos',      href: '/dashboard/membro/relatorios'     },
 ]
 
 function MembroDashboard() {
@@ -79,118 +67,152 @@ function MembroDashboard() {
     if (!wasDone) toast.success('Ação concluída.')
   }
 
-  return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-8">
+  const pct = Math.round(((faseAtual.num - 1) / 4) * 100)
 
-      {/* Cabeçalho */}
-      <div className="pt-1">
-        <p className="text-xs text-gray-400 mb-0.5">Olá, {firstName}</p>
-        <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">{user?.full_name}</h1>
-        <p className="text-sm text-gray-500 mt-2 leading-relaxed max-w-xl">
-          {faseAtual.desc}
-        </p>
-        <div className="mt-3">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#7B2FBE] border border-[#7B2FBE]/20 bg-[#7B2FBE]/5 px-2.5 py-1 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#7B2FBE] animate-pulse" />
-            Fase {faseAtual.num} de 4 — {faseAtual.label}
+  return (
+    <div style={{ maxWidth: 860, margin: '0 auto', paddingBottom: 48, display: 'flex', flexDirection: 'column', gap: 28 }}>
+
+      {/* Header */}
+      <div style={{ paddingTop: 4 }}>
+        <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 4 }}>Olá, {firstName}</p>
+        <h1 style={{ fontSize: 22, fontWeight: 600, color: '#111827', letterSpacing: '-0.01em', margin: 0 }}>
+          {user?.full_name}
+        </h1>
+
+        {/* Phase progress */}
+        <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 11, fontWeight: 500, color: '#6B7280' }}>
+              Fase {faseAtual.num} de 4 — {faseAtual.label}
+            </span>
+            <span style={{ fontSize: 11, color: '#9CA3AF' }}>{pct}% concluído</span>
+          </div>
+          {/* Progress bar */}
+          <div style={{ height: 4, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+            <div style={{
+              height: '100%',
+              width: `${Math.max(pct, 4)}%`,
+              background: '#7B2FBE',
+              borderRadius: 2,
+              transition: 'width 0.4s ease',
+            }} />
+          </div>
+          {/* Phase labels */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
+            {phases.map(p => (
+              <div key={p.num} style={{
+                fontSize: 10,
+                color: p.active ? '#7B2FBE' : p.num < faseAtual.num ? '#9CA3AF' : '#D1D5DB',
+                fontWeight: p.active ? 600 : 400,
+                letterSpacing: '0.01em',
+              }}>
+                {p.label}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Esta semana */}
+      <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden' }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '12px 20px',
+          borderBottom: '1px solid #F3F4F6',
+          background: '#FAFAFA',
+        }}>
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>Esta semana</p>
+            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>Fase {faseAtual.num}: {faseAtual.label}</p>
+          </div>
+          <span style={{ fontSize: 12, fontWeight: 500, color: concluidas.size === acoes.length ? '#16A34A' : '#7B2FBE' }}>
+            {concluidas.size}/{acoes.length} concluídas
           </span>
         </div>
-      </div>
-
-      {/* Jornada do programa */}
-      <div className="bg-white border border-gray-100 rounded-xl overflow-hidden">
-        <div className="grid grid-cols-4 divide-x divide-gray-100">
-          {phases.map(p => (
-            <div key={p.num} className={`p-4 ${p.active ? 'bg-[#7B2FBE]/[0.03]' : ''}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`text-[10px] font-bold tracking-wider ${p.active ? 'text-[#7B2FBE]' : 'text-gray-300'}`}>
-                  {p.num < 10 ? `0${p.num}` : p.num}
-                </span>
-                {p.active && <span className="text-[9px] font-semibold text-[#7B2FBE] bg-[#7B2FBE]/10 px-1.5 py-0.5 rounded uppercase tracking-wide">Atual</span>}
-              </div>
-              <p className={`text-xs font-medium leading-snug ${p.active ? 'text-gray-800' : 'text-gray-300'}`}>{p.label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* O que fazer esta semana */}
-      <div className="bg-white border border-gray-100 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-semibold text-gray-900">Esta semana</h2>
-            <p className="text-xs text-gray-400 mt-0.5">Fase {faseAtual.num}: {faseAtual.label}</p>
-          </div>
-          <span className="text-xs font-medium text-[#7B2FBE]">{concluidas.size}/{acoes.length}</span>
-        </div>
-        <div>
-          {acoes.map((acao, i) => {
-            const feita = concluidas.has(i)
-            return (
-              <div
-                key={i}
-                onClick={() => toggleAcao(i)}
-                className="flex items-start gap-3 px-5 py-3.5 border-b border-gray-50 last:border-0 cursor-pointer group hover:bg-gray-50/50 transition-colors"
-              >
-                {feita
-                  ? <CheckSquare2 size={15} className="text-[#7B2FBE] flex-shrink-0 mt-0.5" />
-                  : <Square size={15} className="text-gray-300 group-hover:text-gray-400 flex-shrink-0 mt-0.5 transition-colors" />
-                }
-                <div className="flex-1 flex items-start justify-between gap-3">
-                  <p className={`text-sm leading-relaxed ${feita ? 'line-through text-gray-300' : 'text-gray-700'}`}>
-                    {acao.texto}
-                  </p>
-                  {!feita && acao.href && (
-                    <Link to={acao.href} onClick={e => e.stopPropagation()}>
-                      <ChevronRight size={14} className="text-gray-300 group-hover:text-[#7B2FBE] flex-shrink-0 mt-0.5 transition-colors" />
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Ferramentas */}
-      <div>
-        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">Ferramentas do programa</p>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-px border border-gray-100 rounded-xl overflow-hidden bg-gray-100">
-          {menuItens.map((item) => (
-            <Link key={item.href} to={item.href}>
-              <div className="bg-white px-4 py-4 hover:bg-gray-50 transition-colors group h-full flex items-start justify-between gap-2">
-                <div>
-                  <p className="text-[13px] font-medium text-gray-800 group-hover:text-[#7B2FBE] transition-colors leading-snug">{item.label}</p>
-                  <p className="text-[11px] text-gray-400 mt-1 leading-relaxed">{item.desc}</p>
-                </div>
-                <ArrowRight size={13} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors flex-shrink-0 mt-0.5" />
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Marcos */}
-      <div className="bg-white border border-gray-100 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
-          <h2 className="text-sm font-semibold text-gray-900">Marcos da jornada</h2>
-        </div>
-        <div>
-          {marcos.map((marco, i) => (
-            <div key={i} className="flex items-center gap-3 px-5 py-3.5 border-b border-gray-50 last:border-0">
-              <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center ${marco.done ? 'bg-[#7B2FBE]' : 'border border-gray-200'}`}>
-                {marco.done && (
-                  <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
-                    <path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+        {acoes.map((acao, i) => {
+          const feita = concluidas.has(i)
+          return (
+            <div
+              key={i}
+              onClick={() => toggleAcao(i)}
+              style={{
+                display: 'flex', alignItems: 'flex-start', gap: 12,
+                padding: '11px 20px',
+                borderBottom: i < acoes.length - 1 ? '1px solid #F9FAFB' : 'none',
+                cursor: 'pointer',
+                background: feita ? '#FAFAFA' : '#fff',
+                transition: 'background 0.1s',
+              }}
+              onMouseEnter={e => { if (!feita) (e.currentTarget as HTMLDivElement).style.background = '#FAFAFA' }}
+              onMouseLeave={e => { if (!feita) (e.currentTarget as HTMLDivElement).style.background = '#fff' }}
+            >
+              {feita
+                ? <CheckSquare2 size={15} style={{ color: '#7B2FBE', flexShrink: 0, marginTop: 2 }} />
+                : <Square size={15} style={{ color: '#D1D5DB', flexShrink: 0, marginTop: 2 }} />
+              }
+              <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                <p style={{
+                  fontSize: 13, lineHeight: 1.5, margin: 0,
+                  color: feita ? '#9CA3AF' : '#374151',
+                  textDecoration: feita ? 'line-through' : 'none',
+                }}>
+                  {acao.texto}
+                </p>
+                {!feita && acao.href && (
+                  <Link to={acao.href} onClick={e => e.stopPropagation()}>
+                    <ChevronRight size={14} style={{ color: '#D1D5DB', flexShrink: 0, marginTop: 2 }} />
+                  </Link>
                 )}
               </div>
-              <p className={`text-sm leading-snug ${marco.done ? 'text-gray-800 font-medium' : 'text-gray-400'}`}>
-                {marco.label}
-              </p>
             </div>
-          ))}
+          )
+        })}
+      </div>
+
+      {/* Ferramentas — table-style list */}
+      <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden' }}>
+        <div style={{
+          padding: '12px 20px',
+          borderBottom: '1px solid #F3F4F6',
+          background: '#FAFAFA',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>Ferramentas do programa</p>
+          <span style={{ fontSize: 11, color: '#9CA3AF' }}>{ferramentas.length} módulos</span>
         </div>
+
+        {/* Column headers */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr 28px',
+          padding: '6px 20px',
+          borderBottom: '1px solid #F3F4F6',
+        }}>
+          <span style={{ fontSize: 10, fontWeight: 500, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Módulo</span>
+          <span style={{ fontSize: 10, fontWeight: 500, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Descrição</span>
+        </div>
+
+        {ferramentas.map((item, i) => (
+          <Link key={item.href} to={item.href} style={{ textDecoration: 'none' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 28px',
+                alignItems: 'center',
+                padding: '10px 20px',
+                borderBottom: i < ferramentas.length - 1 ? '1px solid #F9FAFB' : 'none',
+                transition: 'background 0.1s',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = '#FAFAFA'}
+              onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = '#fff'}
+            >
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#111827' }}>{item.label}</span>
+              <span style={{ fontSize: 12, color: '#6B7280' }}>{item.desc}</span>
+              <ArrowRight size={13} style={{ color: '#D1D5DB' }} />
+            </div>
+          </Link>
+        ))}
       </div>
 
     </div>
