@@ -1691,8 +1691,23 @@ function syncAreaSlides() {
     }
   });
 
+  // Limita às top 4 áreas com mais participantes
+  var MAX_AREA_SLIDES = 3;
+  var sortedKeys = Object.keys(areaGroups).sort(function(a, b) {
+    return areaGroups[b].participants.length - areaGroups[a].participants.length;
+  }).slice(0, MAX_AREA_SLIDES);
+
+  // Remove slides de áreas que não estão no top 4
+  Object.keys(areaSlideMap).forEach(function(key) {
+    if (sortedKeys.indexOf(key) === -1) {
+      var el = areaSlideMap[key];
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+      delete areaSlideMap[key];
+    }
+  });
+
   var anchor = document.getElementById('slide-wpp-se-amostramento');
-  Object.keys(areaGroups).forEach(function(key) {
+  sortedKeys.forEach(function(key) {
     var group = areaGroups[key];
     if (!areaSlideMap[key]) {
       var el = buildAreaSlide(key, group);
@@ -1792,7 +1807,9 @@ function showSlide(idx) {
   currentSlideIdx = idx;
   currentFrag = -1;
 
-  s.querySelectorAll('.fragment').forEach(function(f) { f.classList.remove('visible'); });
+  var frags = s.querySelectorAll('.fragment');
+  frags.forEach(function(f) { f.classList.add('visible'); });
+  currentFrag = frags.length - 1;
 
   if (s.id === 'slide-qr') {
     renderQR();
@@ -2012,8 +2029,14 @@ function showSuccess() {
 document.addEventListener('keydown', function(e) {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   var key = e.key;
-  if (key === 'ArrowRight' || key === ' ') { e.preventDefault(); next(); }
-  if (key === 'ArrowLeft')  { e.preventDefault(); prev(); }
+  // Avanço: seta direita, espaço, PageDown, seta baixo, Enter
+  if (key === 'ArrowRight' || key === ' ' || key === 'PageDown' || key === 'ArrowDown' || key === 'Enter') {
+    e.preventDefault(); next();
+  }
+  // Voltar: seta esquerda, PageUp, seta cima
+  if (key === 'ArrowLeft' || key === 'PageUp' || key === 'ArrowUp') {
+    e.preventDefault(); prev();
+  }
   if (key === 'f' || key === 'F') toggleFullscreen();
   if (key === 'd' || key === 'D') injectDemo();
 });
