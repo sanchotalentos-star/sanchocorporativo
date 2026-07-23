@@ -291,42 +291,146 @@ function TarefasPage() {
         <p className="text-sm text-gray-400 mt-0.5">Ações concretas para avançar nos seus objetivos.</p>
       </div>
 
-      {/* Resumo estilo Monday */}
-      <div className="bg-white border border-gray-100 rounded-xl p-5">
-        <div className="flex items-center gap-6 mb-4">
-          <div>
-            <p className="text-2xl font-semibold text-gray-900 tabular-nums leading-none">
-              {feitasCount}<span className="text-gray-300 font-normal text-base">/{totalTarefas}</span>
-            </p>
-            <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">Concluídas</p>
-          </div>
-          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-              style={{ width: `${pctGeral}%` }}
-            />
-          </div>
-          <p className="text-sm font-semibold text-gray-900 tabular-nums flex-shrink-0">{pctGeral}%</p>
+      {/* ── Dashboard macro ── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+        {/* Tiles de resumo */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          {([
+            { label: 'Total',         value: totalTarefas, color: '#111827' },
+            { label: 'Feitas',        value: feitasCount,  color: '#16A34A' },
+            { label: 'Em andamento',  value: emAndamento,  color: '#2563EB' },
+            { label: 'Bloqueadas',    value: bloqueadas,   color: bloqueadas > 0 ? '#DC2626' : '#9CA3AF' },
+          ] as const).map(tile => (
+            <div key={tile.label} style={{
+              background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+              padding: '14px 16px',
+            }}>
+              <p style={{ fontSize: 10, fontWeight: 500, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
+                {tile.label}
+              </p>
+              <p style={{ fontSize: 24, fontWeight: 600, color: tile.color, margin: '6px 0 0', fontVariantNumeric: 'tabular-nums' }}>
+                {tile.value}
+              </p>
+            </div>
+          ))}
         </div>
-        <div className="flex items-center gap-4 flex-wrap">
-          {emAndamento > 0 && (
-            <div className="flex items-center gap-1.5 text-xs text-blue-600">
-              <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
-              {emAndamento} em andamento
+
+        {/* Linha 2: OKR breakdown + Prioridade */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 200px', gap: 12 }}>
+
+          {/* Progresso por OKR (barras empilhadas CSS) */}
+          <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden' }}>
+            <div style={{
+              padding: '11px 16px', borderBottom: '1px solid #F3F4F6', background: '#FAFAFA',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: 0 }}>Progresso por OKR</p>
+              <div style={{ display: 'flex', gap: 10 }}>
+                {([
+                  { label: 'Feita',        dot: '#22C55E' },
+                  { label: 'Em andamento', dot: '#3B82F6' },
+                  { label: 'Pendente',     dot: '#D1D5DB' },
+                  { label: 'Bloqueada',    dot: '#EF4444' },
+                ] as const).map(s => (
+                  <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
+                    <span style={{ fontSize: 10, color: '#9CA3AF' }}>{s.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
-          {bloqueadas > 0 && (
-            <div className="flex items-center gap-1.5 text-xs text-red-500">
-              <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
-              {bloqueadas} bloqueadas
+            <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {okrs.map(okr => {
+                const ots   = tarefas.filter(t => t.okrId === okr.id)
+                const total = ots.length
+                if (total === 0) return null
+                const feita  = ots.filter(t => t.status === 'feita').length
+                const emAnd  = ots.filter(t => t.status === 'em_andamento').length
+                const pend   = ots.filter(t => t.status === 'pendente').length
+                const bloq   = ots.filter(t => t.status === 'bloqueada').length
+                const cor    = catColor[okr.categoria] ?? '#7B2FBE'
+                return (
+                  <div key={okr.id}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
+                      <div style={{ width: 3, height: 14, background: cor, borderRadius: 2, flexShrink: 0 }} />
+                      <span style={{
+                        flex: 1, fontSize: 11, color: '#374151',
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>
+                        {okr.titulo.length > 52 ? okr.titulo.slice(0, 52) + '…' : okr.titulo}
+                      </span>
+                      <span style={{ fontSize: 10, color: '#9CA3AF', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                        {feita}/{total}
+                      </span>
+                    </div>
+                    <div style={{ height: 6, display: 'flex', borderRadius: 3, overflow: 'hidden', background: '#F3F4F6' }}>
+                      {feita  > 0 && <div style={{ width: `${(feita/total)*100}%`,  background: '#22C55E', transition: 'width 0.4s' }} />}
+                      {emAnd  > 0 && <div style={{ width: `${(emAnd/total)*100}%`,  background: '#3B82F6', transition: 'width 0.4s' }} />}
+                      {pend   > 0 && <div style={{ width: `${(pend/total)*100}%`,   background: '#E5E7EB', transition: 'width 0.4s' }} />}
+                      {bloq   > 0 && <div style={{ width: `${(bloq/total)*100}%`,   background: '#EF4444', transition: 'width 0.4s' }} />}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
-          )}
-          {feitasCount > 0 && (
-            <div className="flex items-center gap-1.5 text-xs text-emerald-600">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
-              {feitasCount} feitas
+          </div>
+
+          {/* Prioridade */}
+          <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden' }}>
+            <div style={{
+              padding: '11px 16px', borderBottom: '1px solid #F3F4F6', background: '#FAFAFA',
+            }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: 0 }}>Prioridade</p>
             </div>
-          )}
+            <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {([
+                { key: 'alta',  label: 'Alta',  color: '#DC2626', bg: '#FEE2E2' },
+                { key: 'media', label: 'Média', color: '#D97706', bg: '#FEF3C7' },
+                { key: 'baixa', label: 'Baixa', color: '#16A34A', bg: '#DCFCE7' },
+              ] as const).map(p => {
+                const count = tarefas.filter(t => t.prioridade === p.key).length
+                const maxCount = Math.max(
+                  tarefas.filter(t => t.prioridade === 'alta').length,
+                  tarefas.filter(t => t.prioridade === 'media').length,
+                  tarefas.filter(t => t.prioridade === 'baixa').length,
+                  1,
+                )
+                return (
+                  <div key={p.key}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <span style={{ fontSize: 11, color: '#374151' }}>{p.label}</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: p.color, fontVariantNumeric: 'tabular-nums' }}>{count}</span>
+                    </div>
+                    <div style={{ height: 4, background: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{
+                        height: '100%', borderRadius: 2,
+                        width: `${(count / maxCount) * 100}%`,
+                        background: p.color,
+                        transition: 'width 0.4s',
+                      }} />
+                    </div>
+                  </div>
+                )
+              })}
+
+              {/* Conclusão geral */}
+              <div style={{ marginTop: 4, paddingTop: 10, borderTop: '1px solid #F3F4F6' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: 11, color: '#374151' }}>Geral</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#7B2FBE', fontVariantNumeric: 'tabular-nums' }}>{pctGeral}%</span>
+                </div>
+                <div style={{ height: 4, background: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%', borderRadius: 2,
+                    width: `${pctGeral}%`,
+                    background: '#7B2FBE',
+                    transition: 'width 0.4s',
+                  }} />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
