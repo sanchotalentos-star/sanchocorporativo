@@ -97,7 +97,7 @@ function gerarTarefas(kr: KeyResult, okrId: string): Tarefa[] {
     ]
   } else {
     sugestoes = [
-      `Definir os próximos passos para: ${kr.descricao.slice(0, 60)}${kr.descricao.length > 60 ? '...' : ''}`,
+      `Definir os próximos passos para: ${kr.descricao}`,
       'Revisar o progresso com o mentor na próxima sessão',
     ]
   }
@@ -354,7 +354,7 @@ function TarefasPage() {
                       <div className="px-5 py-2.5 bg-gray-50/40 border-b border-gray-50 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 min-w-0">
                           <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cor, opacity: 0.5 }} />
-                          <p className="text-[11px] font-medium text-gray-500 truncate">{kr.descricao}</p>
+                          <p className="text-[11px] font-medium text-gray-500 leading-snug">{kr.descricao}</p>
                         </div>
                         <div className="flex items-center gap-3 flex-shrink-0">
                           {kr.meta > 0 && (

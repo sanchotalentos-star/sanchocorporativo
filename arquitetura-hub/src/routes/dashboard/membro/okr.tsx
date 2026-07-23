@@ -118,13 +118,13 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
     {
       id: 'autoridade',
       titulo: proposta
-        ? `Ser reconhecido por: ${proposta.slice(0, 55)}${proposta.length > 55 ? '...' : ''}`
+        ? `Ser reconhecido por: ${proposta}`
         : 'Construir autoridade reconhecida no mercado',
       categoria: 'Autoridade',
       krs: [
         {
           descricao: publicoAlvo
-            ? `Publicar conteúdo de alta qualidade direcionado a ${publicoAlvo.slice(0, 50)}${publicoAlvo.length > 50 ? '...' : ''}`
+            ? `Publicar conteúdo de alta qualidade direcionado a ${publicoAlvo}`
             : 'Publicar peças de conteúdo de alta qualidade no trimestre',
           meta: 12,
           unit: 'conteúdos',
@@ -136,13 +136,13 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
     (publicoAlvo || proposta) ? {
       id: 'conversao',
       titulo: proposta
-        ? `Converter: ${proposta.slice(0, 55)}${proposta.length > 55 ? '...' : ''}`
+        ? `Converter: ${proposta}`
         : 'Gerar conversões e receita com consistência',
       categoria: 'Receita',
       krs: [
         {
           descricao: publicoAlvo
-            ? `Realizar conversas qualificadas com ${publicoAlvo.slice(0, 40)}${publicoAlvo.length > 40 ? '...' : ''}`
+            ? `Realizar conversas qualificadas com ${publicoAlvo}`
             : 'Realizar conversas qualificadas com potenciais clientes',
           meta: 10,
           unit: 'conversas',
@@ -153,7 +153,7 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
     } : null,
     diferencial ? {
       id: 'diferencial',
-      titulo: `Ser referência por: ${diferencial.slice(0, 55)}${diferencial.length > 55 ? '...' : ''}`,
+      titulo: `Ser referência por: ${diferencial}`,
       categoria: 'Autoridade',
       krs: [
         { descricao: 'Menções ou compartilhamentos de conteúdo no trimestre', meta: 20, unit: 'menções' },
@@ -163,7 +163,7 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
     } : null,
     formatoProduto ? {
       id: 'produto',
-      titulo: `Escalar: ${formatoProduto.slice(0, 55)}${formatoProduto.length > 55 ? '...' : ''}`,
+      titulo: `Escalar: ${formatoProduto}`,
       categoria: 'Produto',
       krs: [
         { descricao: 'Pessoas que conheceram seu formato de produto/serviço', meta: 50, unit: 'pessoas' },
