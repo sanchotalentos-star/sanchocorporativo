@@ -3,14 +3,13 @@ import { useRouterState } from '@tanstack/react-router'
 import { useAuth } from '@/context/AuthContext'
 
 const pageNames: Record<string, string> = {
-  '/dashboard/membro':                'Início',
+  '/dashboard/membro':                'Home',
   '/dashboard/membro/okr':            'Metas de Impacto',
   '/dashboard/membro/posicionamento': 'Minha Identidade',
   '/dashboard/membro/pilares':        'Pilares da Marca',
   '/dashboard/membro/marketing':      'Marketing Anual',
   '/dashboard/membro/agenda':         'Agenda',
   '/dashboard/membro/kpis':           'Indicadores',
-  '/dashboard/membro/relatorios':     'Relatórios',
   '/dashboard/membro/ranking':        'Ranking',
   '/dashboard/membro/tarefas':        'Tarefas',
   '/dashboard/admin':                 'Visão Geral',

@@ -22,7 +22,7 @@ const adminNav: NavItem[] = [
 ]
 
 const membroNav: NavItem[] = [
-  { label: 'Início',            href: '/dashboard/membro',                icon: Home        },
+  { label: 'Home',              href: '/dashboard/membro',                icon: Home        },
   { label: 'Minha Identidade',  href: '/dashboard/membro/posicionamento', icon: Compass     },
   { label: 'Pilares da Marca',  href: '/dashboard/membro/pilares',        icon: Layers      },
   { label: 'Metas de Impacto',  href: '/dashboard/membro/okr',            icon: Rocket      },
@@ -30,7 +30,6 @@ const membroNav: NavItem[] = [
   { label: 'Marketing Anual',   href: '/dashboard/membro/marketing',      icon: Megaphone   },
   { label: 'Indicadores',       href: '/dashboard/membro/kpis',           icon: BarChart2   },
   { label: 'Agenda',            href: '/dashboard/membro/agenda',         icon: CalendarDays },
-  { label: 'Relatórios',        href: '/dashboard/membro/relatorios',     icon: FileBarChart },
   { label: 'Ranking',           href: '/dashboard/membro/ranking',        icon: Trophy      },
 ]
 
