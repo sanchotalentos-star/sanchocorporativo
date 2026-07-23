@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import {
   Plus, X, Trash2, ChevronDown, ChevronUp, ClipboardList,
-  LayoutDashboard, Kanban, LayoutList, ChevronRight,
+  LayoutDashboard, Kanban, LayoutList, ChevronRight, ChevronLeft, Zap,
 } from 'lucide-react'
 import {
   BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer,
@@ -11,46 +11,36 @@ import {
 import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/lib/utils'
 
-export const Route = createFileRoute('/dashboard/membro/')({
-  component: HomePage,
-})
+export const Route = createFileRoute('/dashboard/membro/')({ component: HomePage })
 
-/* ─────────────────────────────────────────────
-   TIPOS
-───────────────────────────────────────────── */
+/* ─── TYPES ─── */
 interface KeyResult { id: string; descricao: string; meta: number; atual: number; unit: string }
 interface Objective { id: string; titulo: string; categoria: string; trimestre: string; keyResults: KeyResult[] }
 type TarefaStatus = 'pendente' | 'em_andamento' | 'feita' | 'bloqueada'
 type Prioridade   = 'alta' | 'media' | 'baixa'
-type ViewMode     = 'dashboard' | 'kanban' | 'lista'
+type ViewMode     = 'dashboard' | 'kanban' | 'lista' | 'fluxos'
+interface Tarefa  { id: string; descricao: string; krId: string; okrId: string; status: TarefaStatus; prioridade: Prioridade; auto: boolean }
+interface WorkflowTask { descricao: string; prioridade: Prioridade; fase: string }
+interface Workflow { id: string; nome: string; descricao: string; cor: string; emoji: string; tarefas: WorkflowTask[] }
 
-interface Tarefa {
-  id: string; descricao: string; krId: string; okrId: string
-  status: TarefaStatus; prioridade: Prioridade; auto: boolean
-}
-
-/* ─────────────────────────────────────────────
-   CONSTANTES
-───────────────────────────────────────────── */
+/* ─── CONSTANTS ─── */
 const OKR_KEY     = 'okr_store_v1'
 const TAREFAS_KEY = 'tarefas_store_v1'
 
-const catColor: Record<string, string> = {
-  Autoridade: '#7B2FBE', Receita: '#10B981', Alcance: '#3B82F6', Produto: '#F59E0B',
-}
-const catBg: Record<string, string> = {
+const catColor: Record<string, string> = { Autoridade: '#7B2FBE', Receita: '#10B981', Alcance: '#3B82F6', Produto: '#F59E0B' }
+const catBg:    Record<string, string> = {
   Autoridade: 'rgba(123,47,190,0.09)', Receita: 'rgba(16,185,129,0.09)',
-  Alcance: 'rgba(59,130,246,0.09)', Produto: 'rgba(245,158,11,0.09)',
+  Alcance: 'rgba(59,130,246,0.09)',    Produto: 'rgba(245,158,11,0.09)',
 }
 
 const statusCycle: TarefaStatus[]   = ['pendente', 'em_andamento', 'feita', 'bloqueada']
 const prioridadeCycle: Prioridade[] = ['alta', 'media', 'baixa']
 
-const statusConfig: Record<TarefaStatus, { label: string; bg: string; text: string; dot: string; col: string }> = {
-  pendente:     { label: 'Pendente',     bg: '#F9FAFB', text: '#6B7280', dot: '#D1D5DB', col: '#6B7280' },
-  em_andamento: { label: 'Em andamento', bg: '#EFF6FF', text: '#2563EB', dot: '#3B82F6', col: '#3B82F6' },
-  feita:        { label: 'Feita',        bg: '#F0FDF4', text: '#16A34A', dot: '#22C55E', col: '#22C55E' },
-  bloqueada:    { label: 'Bloqueada',    bg: '#FEF2F2', text: '#DC2626', dot: '#EF4444', col: '#EF4444' },
+const statusConfig: Record<TarefaStatus, { label: string; bg: string; text: string; dot: string }> = {
+  pendente:     { label: 'Pendente',     bg: '#F9FAFB', text: '#6B7280', dot: '#D1D5DB' },
+  em_andamento: { label: 'Em andamento', bg: '#EFF6FF', text: '#2563EB', dot: '#3B82F6' },
+  feita:        { label: 'Feita',        bg: '#F0FDF4', text: '#16A34A', dot: '#22C55E' },
+  bloqueada:    { label: 'Bloqueada',    bg: '#FEF2F2', text: '#DC2626', dot: '#EF4444' },
 }
 const prioridadeConfig: Record<Prioridade, { label: string; bg: string; text: string }> = {
   alta:  { label: 'Alta',  bg: '#FEF2F2', text: '#DC2626' },
@@ -58,13 +48,88 @@ const prioridadeConfig: Record<Prioridade, { label: string; bg: string; text: st
   baixa: { label: 'Baixa', bg: '#F0FDF4', text: '#16A34A' },
 }
 
-/* ─────────────────────────────────────────────
-   HELPERS
-───────────────────────────────────────────── */
+const WORKFLOWS: Workflow[] = [
+  {
+    id: 'calendario-conteudo', nome: 'Calendário de Conteúdo', emoji: '📅',
+    descricao: 'Planejamento, produção e publicação de conteúdo semanal com consistência',
+    cor: '#7B2FBE',
+    tarefas: [
+      { fase: 'Planejamento', descricao: 'Definir os temas e formatos dos conteúdos da semana', prioridade: 'alta' },
+      { fase: 'Planejamento', descricao: 'Criar calendário editorial com datas, canais e chamadas para ação', prioridade: 'alta' },
+      { fase: 'Produção',     descricao: 'Escrever textos ou roteiros de todos os conteúdos planejados', prioridade: 'alta' },
+      { fase: 'Produção',     descricao: 'Criar artes, imagens ou gravar e editar vídeos', prioridade: 'media' },
+      { fase: 'Publicação',   descricao: 'Publicar conteúdos nos canais e horários definidos no calendário', prioridade: 'alta' },
+      { fase: 'Análise',      descricao: 'Registrar métricas de engajamento e listar aprendizados para a próxima semana', prioridade: 'baixa' },
+    ],
+  },
+  {
+    id: 'pipeline-vendas', nome: 'Pipeline de Vendas', emoji: '💼',
+    descricao: 'Da prospecção ao fechamento com etapas claras de qualificação',
+    cor: '#10B981',
+    tarefas: [
+      { fase: 'Prospecção',  descricao: 'Mapear e listar 10 leads qualificados dentro do perfil de cliente ideal', prioridade: 'alta' },
+      { fase: 'Prospecção',  descricao: 'Enviar mensagem de conexão personalizada para 5 leads da lista', prioridade: 'alta' },
+      { fase: 'Qualificação', descricao: 'Agendar conversa de descoberta com os leads que responderam', prioridade: 'alta' },
+      { fase: 'Qualificação', descricao: 'Identificar dor, orçamento e urgência em cada conversa', prioridade: 'alta' },
+      { fase: 'Proposta',    descricao: 'Elaborar proposta personalizada para o lead mais qualificado', prioridade: 'alta' },
+      { fase: 'Proposta',    descricao: 'Apresentar a proposta, tirar dúvidas e responder objeções', prioridade: 'alta' },
+      { fase: 'Fechamento',  descricao: 'Fazer follow-up com quem recebeu proposta e ainda não respondeu', prioridade: 'media' },
+      { fase: 'Fechamento',  descricao: 'Enviar contrato e confirmar início do projeto com o cliente', prioridade: 'alta' },
+    ],
+  },
+  {
+    id: 'lancamento-produto', nome: 'Lançamento de Produto', emoji: '🚀',
+    descricao: 'Prepare, lance e promova sua oferta com fases bem definidas',
+    cor: '#F59E0B',
+    tarefas: [
+      { fase: 'Preparação', descricao: 'Definir proposta de valor, nome e posicionamento do produto ou serviço', prioridade: 'alta' },
+      { fase: 'Preparação', descricao: 'Criar página de vendas ou material de apresentação completo', prioridade: 'alta' },
+      { fase: 'Preparação', descricao: 'Listar 20 contatos do público-alvo para comunicar no lançamento', prioridade: 'media' },
+      { fase: 'Lançamento', descricao: 'Publicar anúncio oficial com oferta, benefícios e prazo claro', prioridade: 'alta' },
+      { fase: 'Lançamento', descricao: 'Enviar mensagem para lista aquecida com oferta especial de lançamento', prioridade: 'alta' },
+      { fase: 'Promoção',   descricao: 'Criar 3 conteúdos de prova social: depoimento, resultado e bastidor', prioridade: 'alta' },
+      { fase: 'Promoção',   descricao: 'Fazer follow-up com quem demonstrou interesse mas ainda não comprou', prioridade: 'media' },
+      { fase: 'Iteração',   descricao: 'Coletar feedback dos primeiros clientes e listar melhorias prioritárias', prioridade: 'baixa' },
+    ],
+  },
+  {
+    id: 'eventos-aparicoes', nome: 'Eventos e Aparições', emoji: '🎤',
+    descricao: 'Conquiste palcos, podcasts e eventos para ampliar sua autoridade',
+    cor: '#3B82F6',
+    tarefas: [
+      { fase: 'Pesquisa',    descricao: 'Listar 15 eventos, podcasts e programas do setor com contato do responsável', prioridade: 'alta' },
+      { fase: 'Pitch',       descricao: 'Criar pitch de apresentação em 5 linhas com o tema proposto e credenciais', prioridade: 'alta' },
+      { fase: 'Pitch',       descricao: 'Enviar pitch personalizado para os 5 primeiros organizadores da lista', prioridade: 'alta' },
+      { fase: 'Confirmação', descricao: 'Fazer follow-up com quem não respondeu após 5 dias úteis', prioridade: 'media' },
+      { fase: 'Confirmação', descricao: 'Confirmar logística, formato e data com os organizadores que aceitaram', prioridade: 'alta' },
+      { fase: 'Execução',    descricao: 'Preparar apresentação, roteiro ou pontos-chave da participação', prioridade: 'alta' },
+      { fase: 'Pós-evento',  descricao: 'Publicar conteúdo sobre a participação e agradecer publicamente o organizador', prioridade: 'baixa' },
+    ],
+  },
+  {
+    id: 'posicionamento-marca', nome: 'Posicionamento de Marca', emoji: '🎯',
+    descricao: 'Defina e comunique quem você é e para quem resolve problemas',
+    cor: '#EC4899',
+    tarefas: [
+      { fase: 'Diagnóstico',  descricao: 'Listar seus 5 maiores diferenciais, casos de sucesso e público ideal', prioridade: 'alta' },
+      { fase: 'Diagnóstico',  descricao: 'Analisar 3 referências do setor e identificar lacunas de mercado', prioridade: 'media' },
+      { fase: 'Definição',    descricao: 'Escrever seu posicionamento: quem você ajuda, com o quê e com qual resultado', prioridade: 'alta' },
+      { fase: 'Definição',    descricao: 'Atualizar bio e "sobre" de todos os canais com o novo posicionamento', prioridade: 'alta' },
+      { fase: 'Criação',      descricao: 'Criar 3 conteúdos que demonstrem seu posicionamento na prática', prioridade: 'alta' },
+      { fase: 'Amplificação', descricao: 'Compartilhar conteúdos e engajar ativamente nos comentários por 5 dias', prioridade: 'media' },
+      { fase: 'Amplificação', descricao: 'Pedir para 3 pessoas da sua rede validarem seu posicionamento', prioridade: 'baixa' },
+    ],
+  },
+]
+
+/* ─── HELPERS ─── */
 function pct(atual: number, meta: number) { return !meta ? 0 : Math.min(100, Math.round((atual / meta) * 100)) }
 function objPct(obj: Objective) {
   if (!obj.keyResults.length) return 0
   return Math.round(obj.keyResults.reduce((s, kr) => s + pct(kr.atual, kr.meta), 0) / obj.keyResults.length)
+}
+function hexToRgb(hex: string) {
+  return `${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)}`
 }
 
 interface TarefaSugestao { descricao: string; prioridade: Prioridade }
@@ -107,7 +172,7 @@ function gerarTarefas(kr: KeyResult, okrId: string): Tarefa[] {
     ]
   else if (desc.includes('depoimento') || desc.includes('indicação') || desc.includes('referência'))
     s = [
-      { descricao: 'Selecionar os 5 clientes mais satisfeitos e pedir um depoimento curto por escrito ou vídeo', prioridade: 'alta' },
+      { descricao: 'Selecionar os 5 clientes mais satisfeitos e pedir um depoimento por escrito ou vídeo', prioridade: 'alta' },
       { descricao: 'Publicar o depoimento recebido com a autorização do cliente', prioridade: 'alta' },
       { descricao: 'Pedir indicações ativas para os 3 melhores clientes atendidos no trimestre', prioridade: 'media' },
     ]
@@ -143,9 +208,7 @@ function gerarTarefas(kr: KeyResult, okrId: string): Tarefa[] {
   }))
 }
 
-/* ─────────────────────────────────────────────
-   CHIPS
-───────────────────────────────────────────── */
+/* ─── CHIPS ─── */
 function StatusChip({ status, onClick }: { status: TarefaStatus; onClick: () => void }) {
   const c = statusConfig[status]
   return (
@@ -168,9 +231,7 @@ function PrioridadeChip({ prioridade, onClick }: { prioridade: Prioridade; onCli
   )
 }
 
-/* ─────────────────────────────────────────────
-   TOOLTIPS RECHARTS
-───────────────────────────────────────────── */
+/* ─── RECHARTS TOOLTIPS ─── */
 function OkrTip({ active, payload }: any) {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
@@ -203,9 +264,9 @@ function StatusTip({ active, payload }: any) {
   )
 }
 
-/* ═══════════════════════════════════════════════
-   VIEW 1 — DASHBOARD (gráficos Power BI–style)
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   VIEW 1 — DASHBOARD
+═══════════════════════════════════════════ */
 interface DashProps {
   okrs: Objective[]; tarefas: Tarefa[]
   totalKrs: number; progOkrs: number
@@ -213,41 +274,31 @@ interface DashProps {
 }
 function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndamento, bloqueadas, pctGeral }: DashProps) {
   const totalTarefas = tarefas.length
-
-  const okrBarData = okrs.map(o => ({
-    name:     o.titulo.length > 32 ? o.titulo.slice(0, 32) + '…' : o.titulo,
-    fullName: o.titulo,
-    value:    objPct(o),
-    color:    catColor[o.categoria] ?? '#7B2FBE',
+  const okrBarData   = okrs.map(o => ({
+    name: o.titulo.length > 32 ? o.titulo.slice(0, 32) + '…' : o.titulo,
+    fullName: o.titulo, value: objPct(o), color: catColor[o.categoria] ?? '#7B2FBE',
   }))
-
   const allKrs = okrs.flatMap(o => o.keyResults.map(kr => ({
-    label:     kr.descricao.length > 20 ? kr.descricao.slice(0, 20) + '…' : kr.descricao,
-    fullLabel: kr.descricao,
-    value:     pct(kr.atual, kr.meta),
-    atual:     kr.atual, meta: kr.meta, unit: kr.unit,
-    color:     catColor[o.categoria] ?? '#7B2FBE',
+    label: kr.descricao.length > 20 ? kr.descricao.slice(0, 20) + '…' : kr.descricao,
+    fullLabel: kr.descricao, value: pct(kr.atual, kr.meta),
+    atual: kr.atual, meta: kr.meta, unit: kr.unit,
+    color: catColor[o.categoria] ?? '#7B2FBE',
   })))
-
   const statusData = [
-    { name: 'Feita',        value: feitasCount,  color: '#22C55E' },
-    { name: 'Em andamento', value: emAndamento,   color: '#3B82F6' },
+    { name: 'Feita',        value: feitasCount, color: '#22C55E' },
+    { name: 'Em andamento', value: emAndamento,  color: '#3B82F6' },
     { name: 'Pendente',     value: tarefas.filter(t => t.status === 'pendente').length, color: '#D1D5DB' },
-    { name: 'Bloqueada',    value: bloqueadas,    color: '#EF4444' },
+    { name: 'Bloqueada',    value: bloqueadas,   color: '#EF4444' },
   ].filter(d => d.value > 0)
-
   const prioData = [
     { name: 'Alta',  value: tarefas.filter(t => t.prioridade === 'alta').length,  color: '#DC2626' },
     { name: 'Média', value: tarefas.filter(t => t.prioridade === 'media').length, color: '#D97706' },
     { name: 'Baixa', value: tarefas.filter(t => t.prioridade === 'baixa').length, color: '#16A34A' },
   ]
-
   const categoriasPresentes = Array.from(new Set(okrs.map(o => o.categoria)))
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-
-      {/* KPI tiles */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
         {[
           { label: 'OKRs ativos',        value: okrs.length,    color: '#111827' },
@@ -262,7 +313,6 @@ function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndam
         ))}
       </div>
 
-      {/* OKR Progress — horizontal bars */}
       <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '16px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
           <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: 0 }}>Progresso dos Objetivos</p>
@@ -288,10 +338,7 @@ function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndam
         </ResponsiveContainer>
       </div>
 
-      {/* Status donut + Priority bars */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-
-        {/* Donut — status das tarefas */}
         <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '16px 20px' }}>
           <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: '0 0 12px' }}>Status das Tarefas</p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
@@ -311,17 +358,14 @@ function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndam
                   <span style={{ fontSize: 12, fontWeight: 600, color: '#111827', fontVariantNumeric: 'tabular-nums' }}>{s.value}</span>
                 </div>
               ))}
-              <div style={{ marginTop: 4, paddingTop: 8, borderTop: '1px solid #F3F4F6' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 11, color: '#374151' }}>Conclusão</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#7B2FBE', fontVariantNumeric: 'tabular-nums' }}>{pctGeral}%</span>
-                </div>
+              <div style={{ marginTop: 4, paddingTop: 8, borderTop: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 11, color: '#374151' }}>Conclusão</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#7B2FBE', fontVariantNumeric: 'tabular-nums' }}>{pctGeral}%</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Priority vertical bars */}
         <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '16px 20px' }}>
           <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: '0 0 12px' }}>Distribuição por Prioridade</p>
           <ResponsiveContainer width="100%" height={120}>
@@ -338,7 +382,6 @@ function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndam
         </div>
       </div>
 
-      {/* KR comparison — all KRs */}
       {allKrs.length > 0 && (
         <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '16px 20px' }}>
           <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: '0 0 12px' }}>Comparativo de Resultados-Chave</p>
@@ -359,23 +402,50 @@ function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndam
   )
 }
 
-/* ═══════════════════════════════════════════════
-   VIEW 2 — KANBAN
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   VIEW 2 — KANBAN (back button + edit + add)
+═══════════════════════════════════════════ */
 interface KanbanProps {
   okrs: Objective[]; tarefas: Tarefa[]
   onCycleStatus: (id: string) => void
+  onCycleBack: (id: string) => void
   onCyclePrioridade: (id: string) => void
   onDelete: (id: string) => void
+  onUpdateDesc: (id: string, desc: string) => void
+  onAddTask: (desc: string, krId: string, okrId: string, status: TarefaStatus) => void
 }
-function KanbanView({ okrs, tarefas, onCycleStatus, onDelete }: KanbanProps) {
+function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePrioridade, onDelete, onUpdateDesc, onAddTask }: KanbanProps) {
+  const [editingId, setEditingId]   = useState<string | null>(null)
+  const [editDesc,  setEditDesc]    = useState('')
+  const [addingCol, setAddingCol]   = useState<TarefaStatus | null>(null)
+  const [addDesc,   setAddDesc]     = useState('')
+  const [addKr,     setAddKr]       = useState('')
+
+  const allKrOptions = okrs.flatMap(o => o.keyResults.map(kr => ({
+    value: `${o.id}::${kr.id}`,
+    label: `${o.titulo.length > 22 ? o.titulo.slice(0, 22) + '…' : o.titulo} › ${kr.descricao.length > 30 ? kr.descricao.slice(0, 30) + '…' : kr.descricao}`,
+  })))
+
+  function startEdit(id: string, desc: string) { setEditingId(id); setEditDesc(desc) }
+  function saveEdit() {
+    if (editingId && editDesc.trim()) onUpdateDesc(editingId, editDesc.trim())
+    setEditingId(null); setEditDesc('')
+  }
+  function cancelEdit() { setEditingId(null); setEditDesc('') }
+
+  function handleAdd() {
+    if (!addDesc.trim() || !addKr) return
+    const [okrId, krId] = addKr.split('::')
+    onAddTask(addDesc.trim(), krId, okrId, addingCol!)
+    setAddingCol(null); setAddDesc(''); setAddKr('')
+  }
+
   const cols: { key: TarefaStatus; label: string; dot: string; border: string }[] = [
     { key: 'pendente',     label: 'Pendente',     dot: '#D1D5DB', border: '#E5E7EB' },
     { key: 'em_andamento', label: 'Em andamento', dot: '#3B82F6', border: '#BFDBFE' },
     { key: 'feita',        label: 'Feita',        dot: '#22C55E', border: '#BBF7D0' },
     { key: 'bloqueada',    label: 'Bloqueada',    dot: '#EF4444', border: '#FECACA' },
   ]
-
   const okrMap: Record<string, Objective> = {}
   okrs.forEach(o => { okrMap[o.id] = o })
 
@@ -385,88 +455,88 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onDelete }: KanbanProps) {
         {cols.map(col => {
           const cards = tarefas.filter(t => t.status === col.key)
           return (
-            <div key={col.key}>
+            <div key={col.key} style={{ display: 'flex', flexDirection: 'column' }}>
               {/* Column header */}
               <div style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                padding: '10px 12px',
+                display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px',
                 background: '#fff', border: `1px solid ${col.border}`,
-                borderRadius: '8px 8px 0 0',
-                borderBottom: `2px solid ${col.dot}`,
-                marginBottom: 1,
+                borderRadius: '8px 8px 0 0', borderBottom: `2px solid ${col.dot}`,
               }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: col.dot, flexShrink: 0 }} />
                 <span style={{ fontSize: 12, fontWeight: 600, color: '#374151', flex: 1 }}>{col.label}</span>
-                <span style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', fontVariantNumeric: 'tabular-nums',
-                  background: '#F3F4F6', padding: '1px 6px', borderRadius: 10 }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', background: '#F3F4F6', padding: '1px 6px', borderRadius: 10, fontVariantNumeric: 'tabular-nums' }}>
                   {cards.length}
                 </span>
               </div>
 
               {/* Cards */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {cards.length === 0 ? (
-                  <div style={{
-                    background: '#FAFAFA', border: '1px dashed #E5E7EB', borderTop: 'none',
-                    borderRadius: '0 0 8px 8px', padding: '20px 12px', textAlign: 'center',
-                  }}>
+              <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                {cards.length === 0 && addingCol !== col.key ? (
+                  <div style={{ background: '#FAFAFA', border: '1px dashed #E5E7EB', borderTop: 'none', padding: '16px 12px', textAlign: 'center' }}>
                     <p style={{ fontSize: 11, color: '#D1D5DB', margin: 0 }}>Sem tarefas</p>
                   </div>
                 ) : cards.map((tarefa, ci) => {
                   const okr = okrMap[tarefa.okrId]
                   const cor = catColor[okr?.categoria ?? ''] ?? '#7B2FBE'
-                  const isLast = ci === cards.length - 1
+                  const isEditing = editingId === tarefa.id
                   return (
                     <div key={tarefa.id} style={{
-                      background: '#fff',
-                      border: '1px solid #E5E7EB',
-                      borderTop: 'none',
-                      borderLeft: `3px solid ${cor}`,
-                      borderRadius: isLast ? '0 0 8px 8px' : 0,
-                      padding: '10px 12px',
+                      background: '#fff', border: '1px solid #E5E7EB', borderTop: 'none',
+                      borderLeft: `3px solid ${cor}`, padding: '10px 12px',
+                      borderRadius: ci === cards.length - 1 && addingCol !== col.key ? '0 0 0 0' : 0,
                     }}>
-                      <p style={{
-                        fontSize: 12, color: '#374151', lineHeight: 1.5, margin: '0 0 8px',
-                        display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                      }}>
-                        {tarefa.descricao}
-                      </p>
+                      {isEditing ? (
+                        <div style={{ marginBottom: 8 }}>
+                          <textarea
+                            autoFocus
+                            value={editDesc}
+                            onChange={e => setEditDesc(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveEdit() } if (e.key === 'Escape') cancelEdit() }}
+                            rows={3}
+                            style={{ width: '100%', fontSize: 12, color: '#374151', resize: 'none', border: '1px solid #7B2FBE', borderRadius: 4, padding: '4px 6px', outline: 'none', lineHeight: 1.5, boxSizing: 'border-box' }}
+                          />
+                          <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                            <button onClick={saveEdit} style={{ flex: 1, fontSize: 10, padding: '3px 0', background: '#7B2FBE', color: '#fff', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 600 }}>Salvar</button>
+                            <button onClick={cancelEdit} style={{ fontSize: 10, padding: '3px 8px', background: '#F3F4F6', color: '#6B7280', border: 'none', borderRadius: 3, cursor: 'pointer' }}>Cancelar</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p
+                          onDoubleClick={() => startEdit(tarefa.id, tarefa.descricao)}
+                          title="Duplo clique para editar"
+                          style={{
+                            fontSize: 12, color: '#374151', lineHeight: 1.5, margin: '0 0 8px', cursor: 'text',
+                            display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                          }}
+                        >
+                          {tarefa.descricao}
+                        </p>
+                      )}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
                           {okr && (
-                            <span style={{
-                              fontSize: 9, fontWeight: 600, color: cor,
-                              background: catBg[okr.categoria], padding: '1px 5px', borderRadius: 3,
-                              textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0,
-                            }}>
+                            <span style={{ fontSize: 9, fontWeight: 600, color: cor, background: catBg[okr.categoria], padding: '1px 5px', borderRadius: 3, textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0 }}>
                               {okr.categoria}
                             </span>
                           )}
-                          <PrioridadeChip prioridade={tarefa.prioridade} />
+                          <PrioridadeChip prioridade={tarefa.prioridade} onClick={() => onCyclePrioridade(tarefa.id)} />
                         </div>
                         <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
-                          <button
-                            onClick={() => onCycleStatus(tarefa.id)}
-                            title="Avançar status"
-                            style={{
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              width: 22, height: 22, borderRadius: 4, border: '1px solid #E5E7EB',
-                              background: '#FAFAFA', color: '#9CA3AF', cursor: 'pointer',
-                            }}
-                          >
+                          {/* Back */}
+                          <button onClick={() => onCycleBack(tarefa.id)} title="Voltar status"
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: 4, border: '1px solid #E5E7EB', background: '#FAFAFA', color: '#9CA3AF', cursor: 'pointer' }}>
+                            <ChevronLeft size={12} />
+                          </button>
+                          {/* Forward */}
+                          <button onClick={() => onCycleStatus(tarefa.id)} title="Avançar status"
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: 4, border: '1px solid #E5E7EB', background: '#FAFAFA', color: '#9CA3AF', cursor: 'pointer' }}>
                             <ChevronRight size={12} />
                           </button>
-                          <button
-                            onClick={() => onDelete(tarefa.id)}
-                            title="Remover"
-                            style={{
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              width: 22, height: 22, borderRadius: 4, border: '1px solid #E5E7EB',
-                              background: '#FAFAFA', color: '#9CA3AF', cursor: 'pointer',
-                            }}
+                          {/* Delete */}
+                          <button onClick={() => onDelete(tarefa.id)} title="Remover"
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: 4, border: '1px solid #E5E7EB', background: '#FAFAFA', color: '#9CA3AF', cursor: 'pointer' }}
                             onMouseEnter={e => (e.currentTarget.style.color = '#EF4444')}
-                            onMouseLeave={e => (e.currentTarget.style.color = '#9CA3AF')}
-                          >
+                            onMouseLeave={e => (e.currentTarget.style.color = '#9CA3AF')}>
                             <Trash2 size={10} />
                           </button>
                         </div>
@@ -475,20 +545,55 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onDelete }: KanbanProps) {
                   )
                 })}
               </div>
+
+              {/* Add task to column */}
+              {addingCol === col.key ? (
+                <div style={{ border: '1px dashed #7B2FBE', borderTop: 'none', borderRadius: '0 0 8px 8px', padding: '8px 10px', background: 'rgba(123,47,190,0.02)' }}>
+                  <input
+                    autoFocus
+                    value={addDesc}
+                    onChange={e => setAddDesc(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleAdd(); if (e.key === 'Escape') { setAddingCol(null); setAddDesc(''); setAddKr('') } }}
+                    placeholder="Descreva a tarefa..."
+                    style={{ width: '100%', fontSize: 11, border: '1px solid #D1D5DB', borderRadius: 4, padding: '4px 8px', outline: 'none', marginBottom: 4, boxSizing: 'border-box' }}
+                  />
+                  <select
+                    value={addKr}
+                    onChange={e => setAddKr(e.target.value)}
+                    style={{ width: '100%', fontSize: 10, border: '1px solid #D1D5DB', borderRadius: 4, padding: '3px 6px', marginBottom: 6, boxSizing: 'border-box' }}
+                  >
+                    <option value="">Resultado-Chave...</option>
+                    {allKrOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    <button onClick={handleAdd} style={{ flex: 1, fontSize: 11, padding: '4px', background: '#7B2FBE', color: '#fff', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 600 }}>Adicionar</button>
+                    <button onClick={() => { setAddingCol(null); setAddDesc(''); setAddKr('') }} style={{ fontSize: 11, padding: '4px 8px', background: '#F3F4F6', color: '#6B7280', border: 'none', borderRadius: 3, cursor: 'pointer' }}>✕</button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => { setAddingCol(col.key); setAddDesc(''); setAddKr('') }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: 'transparent', border: '1px dashed #E5E7EB', borderTop: 'none', borderRadius: '0 0 8px 8px', cursor: 'pointer', fontSize: 11, color: '#D1D5DB', width: '100%' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.borderColor = '#D1D5DB' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = '#D1D5DB'; e.currentTarget.style.borderColor = '#E5E7EB' }}
+                >
+                  <Plus size={11} /> Adicionar tarefa
+                </button>
+              )}
             </div>
           )
         })}
       </div>
-      <p style={{ fontSize: 10, color: '#D1D5DB', marginTop: 12, textAlign: 'center' }}>
-        Clique em <ChevronRight size={10} style={{ display: 'inline', verticalAlign: 'middle' }} /> para avançar o status da tarefa
+      <p style={{ fontSize: 10, color: '#D1D5DB', marginTop: 10, textAlign: 'center' }}>
+        ← → para mover status · duplo clique na tarefa para editar · clique na prioridade para alterar
       </p>
     </div>
   )
 }
 
-/* ═══════════════════════════════════════════════
-   VIEW 3 — LISTA
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════
+   VIEW 3 — LISTA (com edição inline)
+═══════════════════════════════════════════ */
 interface ListaProps {
   okrs: Objective[]; tarefas: Tarefa[]
   expanded: Record<string, boolean>
@@ -496,13 +601,22 @@ interface ListaProps {
   onCycleStatus: (id: string) => void
   onCyclePrioridade: (id: string) => void
   onDelete: (id: string) => void
-  addingTo: string | null
-  novaDesc: string
-  setNovaDesc: (v: string) => void
-  setAddingTo: (v: string | null) => void
+  onUpdateDesc: (id: string, desc: string) => void
+  addingTo: string | null; novaDesc: string
+  setNovaDesc: (v: string) => void; setAddingTo: (v: string | null) => void
   addTarefa: (krId: string, okrId: string) => void
 }
-function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePrioridade, onDelete, addingTo, novaDesc, setNovaDesc, setAddingTo, addTarefa }: ListaProps) {
+function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePrioridade, onDelete, onUpdateDesc, addingTo, novaDesc, setNovaDesc, setAddingTo, addTarefa }: ListaProps) {
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editDesc,  setEditDesc]  = useState('')
+
+  function startEdit(id: string, desc: string) { setEditingId(id); setEditDesc(desc) }
+  function saveEdit() {
+    if (editingId && editDesc.trim()) onUpdateDesc(editingId, editDesc.trim())
+    setEditingId(null); setEditDesc('')
+  }
+  function cancelEdit() { setEditingId(null); setEditDesc('') }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {okrs.map(okr => {
@@ -531,7 +645,7 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
 
             {isExpanded && (
               <div>
-                <div className="grid items-center px-5 py-2 bg-gray-50 border-b border-gray-100" style={{ gridTemplateColumns: '1fr 120px 80px 28px' }}>
+                <div className="grid items-center px-5 py-2 bg-gray-50 border-b border-gray-100" style={{ gridTemplateColumns: '1fr 120px 80px 52px' }}>
                   <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Tarefa</p>
                   <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Status</p>
                   <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Prioridade</p>
@@ -561,21 +675,44 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
                         </div>
                       </div>
                       {krTarefas.map(tarefa => (
-                        <div key={tarefa.id}
-                          className={cn('group grid items-center px-5 py-2.5 border-b border-gray-50 last:border-0 hover:bg-gray-50/30 transition-colors', tarefa.status === 'feita' && 'opacity-60')}
-                          style={{ gridTemplateColumns: '1fr 120px 80px 28px' }}>
-                          <p className={cn('text-sm leading-snug pr-4', tarefa.status === 'feita' ? 'text-gray-400 line-through' : 'text-gray-700')}>
-                            {tarefa.descricao}
-                          </p>
-                          <div><StatusChip status={tarefa.status} onClick={() => onCycleStatus(tarefa.id)} /></div>
-                          <div><PrioridadeChip prioridade={tarefa.prioridade} onClick={() => onCyclePrioridade(tarefa.id)} /></div>
-                          <button onClick={() => onDelete(tarefa.id)} className="opacity-0 group-hover:opacity-100 p-1 text-gray-300 hover:text-red-400 transition-all">
-                            <Trash2 size={11} />
-                          </button>
-                        </div>
+                        editingId === tarefa.id ? (
+                          <div key={tarefa.id} className="grid items-center px-5 py-2 border-b border-gray-50 bg-purple-50/20" style={{ gridTemplateColumns: '1fr 180px 52px' }}>
+                            <input
+                              autoFocus
+                              value={editDesc}
+                              onChange={e => setEditDesc(e.target.value)}
+                              onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit() }}
+                              className="text-sm text-gray-700 bg-transparent focus:outline-none border-b border-purple-400 pr-4"
+                            />
+                            <div className="flex items-center gap-2">
+                              <button onClick={saveEdit} className="text-xs font-semibold text-[#7B2FBE] hover:text-[#6a1fa8]">Salvar</button>
+                              <button onClick={cancelEdit} className="text-gray-300 hover:text-gray-500"><X size={12} /></button>
+                            </div>
+                            <span />
+                          </div>
+                        ) : (
+                          <div key={tarefa.id}
+                            className={cn('group grid items-center px-5 py-2.5 border-b border-gray-50 last:border-0 hover:bg-gray-50/30 transition-colors', tarefa.status === 'feita' && 'opacity-60')}
+                            style={{ gridTemplateColumns: '1fr 120px 80px 52px' }}>
+                            <p
+                              onDoubleClick={() => startEdit(tarefa.id, tarefa.descricao)}
+                              title="Duplo clique para editar"
+                              className={cn('text-sm leading-snug pr-4 cursor-text', tarefa.status === 'feita' ? 'text-gray-400 line-through' : 'text-gray-700')}
+                            >
+                              {tarefa.descricao}
+                            </p>
+                            <div><StatusChip status={tarefa.status} onClick={() => onCycleStatus(tarefa.id)} /></div>
+                            <div><PrioridadeChip prioridade={tarefa.prioridade} onClick={() => onCyclePrioridade(tarefa.id)} /></div>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                              <button onClick={() => onDelete(tarefa.id)} className="p-1 text-gray-300 hover:text-red-400 transition-all">
+                                <Trash2 size={11} />
+                              </button>
+                            </div>
+                          </div>
+                        )
                       ))}
                       {addingTo === kr.id ? (
-                        <div className="grid items-center px-5 py-2.5 border-t border-gray-50 bg-blue-50/30" style={{ gridTemplateColumns: '1fr 120px 80px 28px' }}>
+                        <div className="grid items-center px-5 py-2.5 border-t border-gray-50 bg-blue-50/30" style={{ gridTemplateColumns: '1fr 120px 80px 52px' }}>
                           <input autoFocus value={novaDesc} onChange={e => setNovaDesc(e.target.value)}
                             onKeyDown={e => { if (e.key === 'Enter') addTarefa(kr.id, okr.id); if (e.key === 'Escape') { setAddingTo(null); setNovaDesc('') } }}
                             placeholder="Descreva a tarefa e pressione Enter..."
@@ -603,19 +740,172 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
   )
 }
 
-/* ═══════════════════════════════════════════════
+/* ═══════════════════════════════════════════
+   VIEW 4 — FLUXOS DE TRABALHO
+═══════════════════════════════════════════ */
+interface FluxosProps {
+  okrs: Objective[]
+  appliedWorkflows: string[]
+  onApply: (workflowId: string, krId: string, okrId: string) => void
+}
+function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
+  const [selected, setSelected] = useState<string | null>(null)
+  const [krTarget, setKrTarget] = useState('')
+
+  const allKrOptions = okrs.flatMap(o => o.keyResults.map(kr => ({
+    value: `${o.id}::${kr.id}`,
+    label: `${o.titulo.length > 28 ? o.titulo.slice(0, 28) + '…' : o.titulo} › ${kr.descricao.length > 36 ? kr.descricao.slice(0, 36) + '…' : kr.descricao}`,
+  })))
+
+  const selectedWf = WORKFLOWS.find(w => w.id === selected)
+
+  function handleApply() {
+    if (!selected || !krTarget) return
+    const [okrId, krId] = krTarget.split('::')
+    onApply(selected, krId, okrId)
+    setSelected(null); setKrTarget('')
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Banner */}
+      <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <Zap size={16} style={{ color: '#7B2FBE', flexShrink: 0 }} />
+        <div>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>Fluxos de Trabalho</p>
+          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0', lineHeight: 1.5 }}>
+            Escolha um fluxo pré-construído, selecione o Resultado-Chave e aplique tarefas organizadas por fases diretamente no seu plano.
+          </p>
+        </div>
+      </div>
+
+      {/* Workflow grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+        {WORKFLOWS.map(wf => {
+          const isSelected = selected === wf.id
+          const wasApplied = appliedWorkflows.includes(wf.id)
+          const phases = Array.from(new Set(wf.tarefas.map(t => t.fase)))
+          return (
+            <button
+              key={wf.id}
+              onClick={() => setSelected(isSelected ? null : wf.id)}
+              style={{
+                display: 'flex', flexDirection: 'column', gap: 10,
+                padding: '14px 16px', borderRadius: 8, textAlign: 'left', cursor: 'pointer',
+                border: isSelected ? `2px solid ${wf.cor}` : '1px solid #E5E7EB',
+                background: isSelected ? `rgba(${hexToRgb(wf.cor)},0.03)` : '#fff',
+                transition: 'border-color 0.15s, background 0.15s',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 20 }}>{wf.emoji}</span>
+                {wasApplied && (
+                  <span style={{ fontSize: 9, fontWeight: 600, color: '#16A34A', background: '#F0FDF4', padding: '2px 6px', borderRadius: 10 }}>✓ Aplicado</span>
+                )}
+              </div>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>{wf.nome}</p>
+                <p style={{ fontSize: 11, color: '#6B7280', margin: '3px 0 0', lineHeight: 1.5 }}>{wf.descricao}</p>
+              </div>
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                {phases.map(fase => (
+                  <span key={fase} style={{ fontSize: 9, fontWeight: 500, color: wf.cor, background: `rgba(${hexToRgb(wf.cor)},0.08)`, padding: '2px 6px', borderRadius: 3 }}>{fase}</span>
+                ))}
+              </div>
+              <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>{wf.tarefas.length} tarefas</p>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Selected workflow detail */}
+      {selectedWf && (
+        <div style={{ background: '#fff', border: `1.5px solid ${selectedWf.cor}`, borderRadius: 8, overflow: 'hidden' }}>
+          <div style={{ padding: '14px 20px', borderBottom: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 20 }}>{selectedWf.emoji}</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>{selectedWf.nome}</p>
+              <p style={{ fontSize: 11, color: '#6B7280', margin: '2px 0 0' }}>{selectedWf.descricao}</p>
+            </div>
+            <button onClick={() => setSelected(null)} style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
+              <X size={14} />
+            </button>
+          </div>
+
+          {/* Tasks preview by phase */}
+          <div style={{ padding: '12px 20px 0' }}>
+            {Array.from(new Set(selectedWf.tarefas.map(t => t.fase))).map(fase => {
+              const faseTarefas = selectedWf.tarefas.filter(t => t.fase === fase)
+              return (
+                <div key={fase} style={{ marginBottom: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: selectedWf.cor, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{fase}</span>
+                    <div style={{ flex: 1, height: 1, background: '#F3F4F6' }} />
+                  </div>
+                  {faseTarefas.map((t, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '4px 0 4px 8px' }}>
+                      <div style={{ width: 4, height: 4, borderRadius: '50%', background: selectedWf.cor, flexShrink: 0, marginTop: 6 }} />
+                      <p style={{ fontSize: 12, color: '#374151', margin: 0, lineHeight: 1.5, flex: 1 }}>{t.descricao}</p>
+                      <span style={{ fontSize: 9, fontWeight: 600, flexShrink: 0, padding: '2px 5px', borderRadius: 3, background: prioridadeConfig[t.prioridade].bg, color: prioridadeConfig[t.prioridade].text }}>
+                        {prioridadeConfig[t.prioridade].label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Apply section */}
+          <div style={{ padding: '12px 20px', borderTop: '1px solid #F3F4F6', background: '#FAFAFA', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: '#374151', flexShrink: 0 }}>Aplicar ao KR:</label>
+            {allKrOptions.length === 0 ? (
+              <span style={{ fontSize: 11, color: '#9CA3AF' }}>Crie OKRs em Metas de Impacto para poder aplicar fluxos</span>
+            ) : (
+              <>
+                <select
+                  value={krTarget}
+                  onChange={e => setKrTarget(e.target.value)}
+                  style={{ flex: 1, fontSize: 11, color: '#374151', border: '1px solid #D1D5DB', borderRadius: 5, padding: '5px 8px', background: '#fff', outline: 'none' }}
+                >
+                  <option value="">Selecione um Resultado-Chave...</option>
+                  {allKrOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                </select>
+                <button
+                  onClick={handleApply}
+                  disabled={!krTarget}
+                  style={{
+                    padding: '6px 16px', borderRadius: 5, border: 'none', cursor: krTarget ? 'pointer' : 'default',
+                    background: krTarget ? selectedWf.cor : '#E5E7EB',
+                    color: krTarget ? '#fff' : '#9CA3AF',
+                    fontSize: 12, fontWeight: 600, flexShrink: 0, transition: 'background 0.1s',
+                  }}
+                >
+                  Aplicar fluxo
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
    PÁGINA PRINCIPAL
-═══════════════════════════════════════════════ */
+═══════════════════════════════════════════ */
 function HomePage() {
   const { user } = useAuth()
   const firstName = user?.full_name?.split(' ')[0] ?? ''
 
-  const [okrs, setOkrs]         = useState<Objective[]>([])
-  const [tarefas, setTarefas]   = useState<Tarefa[]>([])
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
-  const [addingTo, setAddingTo] = useState<string | null>(null)
-  const [novaDesc, setNovaDesc] = useState('')
-  const [view, setView]         = useState<ViewMode>('dashboard')
+  const [okrs,             setOkrs]             = useState<Objective[]>([])
+  const [tarefas,          setTarefas]           = useState<Tarefa[]>([])
+  const [expanded,         setExpanded]          = useState<Record<string, boolean>>({})
+  const [addingTo,         setAddingTo]          = useState<string | null>(null)
+  const [novaDesc,         setNovaDesc]          = useState('')
+  const [view,             setView]              = useState<ViewMode>('dashboard')
+  const [appliedWorkflows, setAppliedWorkflows]  = useState<string[]>([])
 
   useEffect(() => {
     try { const s = localStorage.getItem(OKR_KEY); if (s) setOkrs(JSON.parse(s) ?? []) } catch {}
@@ -644,14 +934,33 @@ function HomePage() {
   function cycleStatus(id: string) {
     setTarefas(prev => prev.map(t => { if (t.id !== id) return t; const i = statusCycle.indexOf(t.status); return { ...t, status: statusCycle[(i + 1) % statusCycle.length] } }))
   }
+  function cycleStatusBack(id: string) {
+    setTarefas(prev => prev.map(t => { if (t.id !== id) return t; const i = statusCycle.indexOf(t.status); return { ...t, status: statusCycle[(i - 1 + statusCycle.length) % statusCycle.length] } }))
+  }
   function cyclePrioridade(id: string) {
     setTarefas(prev => prev.map(t => { if (t.id !== id) return t; const i = prioridadeCycle.indexOf(t.prioridade); return { ...t, prioridade: prioridadeCycle[(i + 1) % prioridadeCycle.length] } }))
   }
   function deleteTarefa(id: string) { setTarefas(prev => prev.filter(t => t.id !== id)) }
+  function updateDesc(id: string, desc: string) {
+    setTarefas(prev => prev.map(t => t.id === id ? { ...t, descricao: desc } : t))
+  }
   function addTarefa(krId: string, okrId: string) {
     const desc = novaDesc.trim(); if (!desc) return
     setTarefas(prev => [...prev, { id: `manual-${Date.now()}`, descricao: desc, krId, okrId, status: 'pendente', prioridade: 'media', auto: false }])
     setNovaDesc(''); setAddingTo(null)
+  }
+  function addTarefaWithStatus(desc: string, krId: string, okrId: string, status: TarefaStatus) {
+    setTarefas(prev => [...prev, { id: `manual-${Date.now()}`, descricao: desc, krId, okrId, status, prioridade: 'media', auto: false }])
+  }
+  function applyWorkflow(workflowId: string, krId: string, okrId: string) {
+    const wf = WORKFLOWS.find(w => w.id === workflowId)
+    if (!wf) return
+    const newTarefas: Tarefa[] = wf.tarefas.map((t, i) => ({
+      id: `wf-${workflowId}-${Date.now()}-${i}`, descricao: t.descricao,
+      krId, okrId, status: 'pendente' as TarefaStatus, prioridade: t.prioridade, auto: false,
+    }))
+    setTarefas(prev => [...prev, ...newTarefas])
+    setAppliedWorkflows(prev => [...prev, workflowId])
   }
 
   const totalKrs    = okrs.reduce((s, o) => s + o.keyResults.length, 0)
@@ -660,13 +969,13 @@ function HomePage() {
   const emAndamento = tarefas.filter(t => t.status === 'em_andamento').length
   const bloqueadas  = tarefas.filter(t => t.status === 'bloqueada').length
   const pctGeral    = tarefas.length > 0 ? Math.round((feitasCount / tarefas.length) * 100) : 0
-
-  const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
+  const hoje        = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
 
   const viewButtons: { key: ViewMode; label: string; Icon: typeof LayoutDashboard }[] = [
     { key: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
     { key: 'kanban',    label: 'Kanban',    Icon: Kanban          },
     { key: 'lista',     label: 'Lista',     Icon: LayoutList      },
+    { key: 'fluxos',    label: 'Fluxos',    Icon: Zap             },
   ]
 
   if (okrs.length === 0) {
@@ -679,7 +988,7 @@ function HomePage() {
         <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '48px 32px', textAlign: 'center' }}>
           <ClipboardList size={28} style={{ color: '#E5E7EB', margin: '0 auto 12px' }} />
           <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 6 }}>Nenhum objetivo criado ainda.</p>
-          <p style={{ fontSize: 12, color: '#9CA3AF' }}>Vá até <strong>Metas de Impacto</strong> para criar seus primeiros OKRs e gerar o plano de tarefas.</p>
+          <p style={{ fontSize: 12, color: '#9CA3AF' }}>Vá até <strong>Metas de Impacto</strong> para criar seus primeiros OKRs e gerar o plano de tarefas automaticamente.</p>
         </div>
       </div>
     )
@@ -687,17 +996,14 @@ function HomePage() {
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', paddingBottom: 48, display: 'flex', flexDirection: 'column', gap: 20 }}>
-
-      {/* Header + toggle */}
+      {/* Header + view toggle */}
       <div style={{ paddingTop: 4, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
         <div>
           <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 2 }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
           <h1 style={{ fontSize: 22, fontWeight: 600, color: '#111827', margin: 0, letterSpacing: '-0.01em' }}>Olá, {firstName}</h1>
         </div>
-
-        {/* View toggle */}
         <div style={{ display: 'flex', border: '1px solid #E5E7EB', borderRadius: 6, overflow: 'hidden', flexShrink: 0 }}>
-          {viewButtons.map(({ key, label, Icon }) => (
+          {viewButtons.map(({ key, label, Icon }, i) => (
             <button
               key={key}
               onClick={() => setView(key)}
@@ -707,7 +1013,7 @@ function HomePage() {
                 background: view === key ? '#7B2FBE' : '#fff',
                 color: view === key ? '#fff' : '#6B7280',
                 fontSize: 12, fontWeight: view === key ? 600 : 400,
-                borderRight: key !== 'lista' ? '1px solid #E5E7EB' : 'none',
+                borderRight: i < viewButtons.length - 1 ? '1px solid #E5E7EB' : 'none',
                 transition: 'background 0.1s, color 0.1s',
               }}
             >
@@ -718,7 +1024,6 @@ function HomePage() {
         </div>
       </div>
 
-      {/* Views */}
       {view === 'dashboard' && (
         <DashboardView
           okrs={okrs} tarefas={tarefas}
@@ -731,8 +1036,11 @@ function HomePage() {
         <KanbanView
           okrs={okrs} tarefas={tarefas}
           onCycleStatus={cycleStatus}
+          onCycleBack={cycleStatusBack}
           onCyclePrioridade={cyclePrioridade}
           onDelete={deleteTarefa}
+          onUpdateDesc={updateDesc}
+          onAddTask={addTarefaWithStatus}
         />
       )}
       {view === 'lista' && (
@@ -743,9 +1051,17 @@ function HomePage() {
           onCycleStatus={cycleStatus}
           onCyclePrioridade={cyclePrioridade}
           onDelete={deleteTarefa}
+          onUpdateDesc={updateDesc}
           addingTo={addingTo} novaDesc={novaDesc}
           setNovaDesc={setNovaDesc} setAddingTo={setAddingTo}
           addTarefa={addTarefa}
+        />
+      )}
+      {view === 'fluxos' && (
+        <FluxosView
+          okrs={okrs}
+          appliedWorkflows={appliedWorkflows}
+          onApply={applyWorkflow}
         />
       )}
     </div>
