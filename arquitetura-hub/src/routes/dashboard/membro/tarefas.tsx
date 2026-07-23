@@ -63,52 +63,88 @@ const prioridadeConfig: Record<Prioridade, { label: string; bg: string; text: st
 
 const prioridadeCycle: Prioridade[] = ['alta', 'media', 'baixa']
 
+interface TarefaSugestao {
+  descricao: string
+  prioridade: Prioridade
+}
+
 function gerarTarefas(kr: KeyResult, okrId: string): Tarefa[] {
   const desc = kr.descricao.toLowerCase()
-  let sugestoes: string[]
+  let sugestoes: TarefaSugestao[]
 
-  if (desc.includes('publicar') || desc.includes('conteúdo') || desc.includes('peças')) {
+  if (desc.includes('publicar') || desc.includes('conteúdo') || desc.includes('posicionamento') || desc.includes('peças') || desc.includes('editorial')) {
     sugestoes = [
-      'Definir o tema e formato do próximo conteúdo',
-      'Produzir o conteúdo (texto, vídeo ou áudio)',
-      'Publicar e registrar o resultado',
+      { descricao: 'Definir os 4 temas de conteúdo do mês e o formato de cada um (post, vídeo, artigo)', prioridade: 'alta' },
+      { descricao: 'Produzir e publicar o conteúdo desta semana conforme o calendário', prioridade: 'alta' },
+      { descricao: 'Registrar o engajamento e anotar o que performou melhor para repetir', prioridade: 'media' },
     ]
-  } else if (desc.includes('conversa') || desc.includes('cliente') || desc.includes('venda')) {
+  } else if (desc.includes('aparição') || desc.includes('evento') || desc.includes('palest') || desc.includes('podcast') || desc.includes('convidado') || desc.includes('entrevista')) {
     sugestoes = [
-      'Mapear contatos qualificados para abordar esta semana',
-      'Agendar reunião ou conversa de descoberta',
-      'Fazer follow-up com os leads em andamento',
+      { descricao: 'Pesquisar e listar 10 eventos, podcasts ou programas do seu setor com contato do responsável', prioridade: 'alta' },
+      { descricao: 'Escrever um pitch de apresentação de 5 linhas destacando sua expertise e o tema que pode trazer', prioridade: 'alta' },
+      { descricao: 'Entrar em contato com 3 organizadores da lista esta semana com o pitch personalizado', prioridade: 'alta' },
+      { descricao: 'Fazer follow-up com quem não respondeu após 5 dias úteis', prioridade: 'media' },
     ]
-  } else if (desc.includes('evento') || desc.includes('palest') || desc.includes('podcast')) {
+  } else if (desc.includes('conversa') || desc.includes('descoberta') || desc.includes('reunião')) {
     sugestoes = [
-      'Levantar lista de eventos ou podcasts relevantes do setor',
-      'Entrar em contato com organizadores e enviar proposta',
+      { descricao: 'Listar 10 contatos qualificados que poderiam se beneficiar do seu trabalho', prioridade: 'alta' },
+      { descricao: 'Enviar mensagem de conexão personalizada para 5 contatos da lista esta semana', prioridade: 'alta' },
+      { descricao: 'Agendar 2 conversas de descoberta para os próximos 7 dias', prioridade: 'alta' },
+      { descricao: 'Fazer follow-up com quem demonstrou interesse mas não confirmou', prioridade: 'media' },
     ]
-  } else if (desc.includes('menção') || desc.includes('depoimento') || desc.includes('indicação') || desc.includes('compartilh')) {
+  } else if (desc.includes('proposta') || desc.includes('comercial')) {
     sugestoes = [
-      'Solicitar depoimento para os últimos 3 clientes atendidos',
-      'Publicar o depoimento com a autorização do cliente',
+      { descricao: 'Identificar os 3 leads mais qualificados e prontos para receber uma proposta', prioridade: 'alta' },
+      { descricao: 'Escrever uma proposta comercial personalizada para o lead principal', prioridade: 'alta' },
+      { descricao: 'Enviar a proposta e agendar uma conversa de apresentação em até 48h', prioridade: 'alta' },
+      { descricao: 'Fazer follow-up com quem recebeu proposta e ainda não respondeu após 3 dias', prioridade: 'media' },
     ]
-  } else if (desc.includes('fechar') || desc.includes('projeto') || desc.includes('contrato')) {
+  } else if (desc.includes('fechar') || desc.includes('cliente') || desc.includes('contrato')) {
     sugestoes = [
-      'Preparar proposta comercial personalizada',
-      'Enviar proposta e agendar apresentação',
-      'Fazer follow-up após 3 dias sem retorno',
+      { descricao: 'Revisar todos os leads em negociação e definir o próximo passo de cada um', prioridade: 'alta' },
+      { descricao: 'Preparar e enviar proposta para o lead mais avançado no processo', prioridade: 'alta' },
+      { descricao: 'Fazer follow-up com quem recebeu proposta há mais de 3 dias sem retorno', prioridade: 'media' },
+    ]
+  } else if (desc.includes('depoimento') || desc.includes('indicação') || desc.includes('menção') || desc.includes('compartilh') || desc.includes('referência')) {
+    sugestoes = [
+      { descricao: 'Selecionar os 5 clientes mais satisfeitos e pedir um depoimento curto por escrito ou vídeo', prioridade: 'alta' },
+      { descricao: 'Publicar o depoimento recebido com a autorização do cliente', prioridade: 'alta' },
+      { descricao: 'Pedir indicações ativas para os 3 melhores clientes atendidos no trimestre', prioridade: 'media' },
+    ]
+  } else if (desc.includes('sessão') || desc.includes('demo') || desc.includes('descoberta') || desc.includes('produto')) {
+    sugestoes = [
+      { descricao: 'Criar um roteiro de 30 minutos para a sessão de descoberta ou demo do produto', prioridade: 'alta' },
+      { descricao: 'Agendar 3 sessões de descoberta ou demos esta semana com leads ou clientes', prioridade: 'alta' },
+      { descricao: 'Enviar um formulário de feedback estruturado após cada sessão realizada', prioridade: 'media' },
+    ]
+  } else if (desc.includes('feedback') || desc.includes('melhoria') || desc.includes('iteração') || desc.includes('coletar')) {
+    sugestoes = [
+      { descricao: 'Criar um formulário de feedback com 5 perguntas objetivas sobre o produto ou serviço', prioridade: 'alta' },
+      { descricao: 'Enviar o formulário para os últimos 10 clientes atendidos', prioridade: 'alta' },
+      { descricao: 'Analisar os feedbacks recebidos e listar as 3 principais melhorias a implementar', prioridade: 'alta' },
+      { descricao: 'Implementar a melhoria de maior impacto identificada no feedback', prioridade: 'media' },
+    ]
+  } else if (desc.includes('contato') || desc.includes('conexão') || desc.includes('seguidores') || desc.includes('alcance')) {
+    sugestoes = [
+      { descricao: 'Interagir com comentários e publicações de 10 perfis do público-alvo esta semana', prioridade: 'alta' },
+      { descricao: 'Publicar um conteúdo focado em atrair conexões qualificadas', prioridade: 'alta' },
+      { descricao: 'Enviar convite de conexão personalizado para 5 potenciais parceiros ou clientes', prioridade: 'media' },
     ]
   } else {
     sugestoes = [
-      `Definir os próximos passos para: ${kr.descricao}`,
-      'Revisar o progresso com o mentor na próxima sessão',
+      { descricao: `Definir os próximos passos concretos e mensuráveis para: ${kr.descricao}`, prioridade: 'alta' },
+      { descricao: 'Estabelecer uma rotina semanal de 30 minutos para avançar neste resultado', prioridade: 'media' },
+      { descricao: 'Revisar o progresso deste KR com o mentor na próxima sessão', prioridade: 'baixa' },
     ]
   }
 
-  return sugestoes.map((d, i) => ({
+  return sugestoes.map((s, i) => ({
     id: `auto-${kr.id}-${i}`,
-    descricao: d,
+    descricao: s.descricao,
     krId: kr.id,
     okrId,
-    status: 'pendente',
-    prioridade: 'media',
+    status: 'pendente' as TarefaStatus,
+    prioridade: s.prioridade,
     auto: true,
   }))
 }

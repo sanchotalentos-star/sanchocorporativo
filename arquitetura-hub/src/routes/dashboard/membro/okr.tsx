@@ -124,31 +124,47 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
       krs: [
         {
           descricao: publicoAlvo
-            ? `Publicar conteúdo de alta qualidade direcionado a ${publicoAlvo}`
-            : 'Publicar peças de conteúdo de alta qualidade no trimestre',
+            ? `Publicar conteúdos de posicionamento direcionados a ${publicoAlvo}`
+            : 'Publicar conteúdos de posicionamento no trimestre',
           meta: 12,
           unit: 'conteúdos',
         },
-        { descricao: 'Participar de eventos estratégicos do setor no trimestre', meta: 3, unit: 'eventos' },
-        { descricao: 'Conseguir convites para falar ou aparecer em conteúdos de terceiros', meta: 2, unit: 'convites' },
+        {
+          descricao: 'Aparecer como convidado em eventos, podcasts ou entrevistas do setor',
+          meta: 3,
+          unit: 'aparições',
+        },
+        {
+          descricao: 'Receber pedidos de conexão ou menções espontâneas de pessoas do público-alvo',
+          meta: 15,
+          unit: 'contatos',
+        },
       ],
     },
     (publicoAlvo || proposta) ? {
       id: 'conversao',
       titulo: proposta
-        ? `Converter: ${proposta}`
+        ? `Converter autoridade em receita com: ${proposta}`
         : 'Gerar conversões e receita com consistência',
       categoria: 'Receita',
       krs: [
         {
           descricao: publicoAlvo
-            ? `Realizar conversas qualificadas com ${publicoAlvo}`
-            : 'Realizar conversas qualificadas com potenciais clientes',
+            ? `Ter conversas de descoberta com ${publicoAlvo}`
+            : 'Ter conversas de descoberta com potenciais clientes',
           meta: 10,
           unit: 'conversas',
         },
-        { descricao: 'Fechar clientes ou projetos no trimestre', meta: 3, unit: 'clientes' },
-        { descricao: 'Atingir meta de receita faturada', meta: 0, unit: 'R$' },
+        {
+          descricao: 'Enviar propostas comerciais personalizadas para leads qualificados',
+          meta: 5,
+          unit: 'propostas',
+        },
+        {
+          descricao: 'Fechar novos clientes ou contratos no trimestre',
+          meta: 3,
+          unit: 'clientes',
+        },
       ],
     } : null,
     diferencial ? {
@@ -156,9 +172,21 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
       titulo: `Ser referência por: ${diferencial}`,
       categoria: 'Autoridade',
       krs: [
-        { descricao: 'Menções ou compartilhamentos de conteúdo no trimestre', meta: 20, unit: 'menções' },
-        { descricao: 'Depoimentos de clientes coletados e publicados', meta: 3, unit: 'depoimentos' },
-        { descricao: 'Aparições em mídias externas (podcast, entrevista, artigo)', meta: 2, unit: 'aparições' },
+        {
+          descricao: 'Coletar e publicar depoimentos de clientes atendidos',
+          meta: 5,
+          unit: 'depoimentos',
+        },
+        {
+          descricao: 'Receber indicações ativas de clientes satisfeitos',
+          meta: 8,
+          unit: 'indicações',
+        },
+        {
+          descricao: 'Aparecer em mídias ou conteúdos de terceiros referenciando seu diferencial',
+          meta: 2,
+          unit: 'aparições',
+        },
       ],
     } : null,
     formatoProduto ? {
@@ -166,9 +194,21 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
       titulo: `Escalar: ${formatoProduto}`,
       categoria: 'Produto',
       krs: [
-        { descricao: 'Pessoas que conheceram seu formato de produto/serviço', meta: 50, unit: 'pessoas' },
-        { descricao: 'Taxa de conversão de interessados em clientes', meta: 20, unit: '%' },
-        { descricao: 'Ciclo médio de vendas reduzido para', meta: 14, unit: 'dias' },
+        {
+          descricao: 'Realizar sessões de descoberta ou demos do produto com potenciais clientes',
+          meta: 10,
+          unit: 'sessões',
+        },
+        {
+          descricao: 'Coletar feedbacks estruturados de clientes ou leads após cada sessão',
+          meta: 8,
+          unit: 'feedbacks',
+        },
+        {
+          descricao: 'Aplicar melhorias concretas no produto com base nos feedbacks coletados',
+          meta: 3,
+          unit: 'iterações',
+        },
       ],
     } : null,
   ].filter(Boolean) as SugestaoOkr[]
