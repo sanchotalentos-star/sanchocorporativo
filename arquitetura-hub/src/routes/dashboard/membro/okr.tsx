@@ -410,9 +410,48 @@ function KrItem({
 /* ─────────────────────────────────────────────
    COMPONENTE PRINCIPAL
 ───────────────────────────────────────────── */
+function migrateOkrs(raw: Objective[]): Objective[] {
+  const id = getIdentidade()
+  const proposta       = id?.pilares.proposta?.reflexao?.trim() ?? ''
+  const publicoAlvo    = id?.pilares.publicoAlvo?.reflexao?.trim() ?? ''
+  const formatoProduto = id?.pilares.formatoProduto?.reflexao?.trim() ?? ''
+  const diferencial    = id?.diferenciais?.[0] ?? ''
+
+  const fixTitle = (t: string) => {
+    if (proposta && t.startsWith('Ser reconhecido por: ') && t.endsWith('...'))
+      return `Ser reconhecido por: ${proposta}`
+    if (proposta && t.startsWith('Converter: ') && t.endsWith('...'))
+      return `Converter: ${proposta}`
+    if (diferencial && t.startsWith('Ser referência por: ') && t.endsWith('...'))
+      return `Ser referência por: ${diferencial}`
+    if (formatoProduto && t.startsWith('Escalar: ') && t.endsWith('...'))
+      return `Escalar: ${formatoProduto}`
+    return t
+  }
+
+  const fixKr = (desc: string) => {
+    if (publicoAlvo && desc.startsWith('Publicar conteúdo de alta qualidade direcionado a ') && desc.endsWith('...'))
+      return `Publicar conteúdo de alta qualidade direcionado a ${publicoAlvo}`
+    if (publicoAlvo && desc.startsWith('Realizar conversas qualificadas com ') && desc.endsWith('...'))
+      return `Realizar conversas qualificadas com ${publicoAlvo}`
+    if (proposta && desc.startsWith('Converter: ') && desc.endsWith('...'))
+      return `Converter: ${proposta}`
+    return desc
+  }
+
+  return raw.map(obj => ({
+    ...obj,
+    titulo: fixTitle(obj.titulo),
+    keyResults: obj.keyResults.map(kr => ({ ...kr, descricao: fixKr(kr.descricao) })),
+  }))
+}
+
 function OkrPage() {
   const [okrs, setOkrs] = useState<Objective[]>(() => {
-    try { return JSON.parse(localStorage.getItem(OKR_KEY) ?? 'null') ?? [] }
+    try {
+      const raw: Objective[] = JSON.parse(localStorage.getItem(OKR_KEY) ?? 'null') ?? []
+      return migrateOkrs(raw)
+    }
     catch { return [] }
   })
   const [showNovoObj, setShowNovoObj] = useState(false)
