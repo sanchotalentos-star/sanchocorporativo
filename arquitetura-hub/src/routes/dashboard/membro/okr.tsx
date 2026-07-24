@@ -94,6 +94,27 @@ const statusLabel: Record<AcaoStatus, string> = {
 
 const OKR_KEY = 'okr_store_v1'
 
+/* ─── KR type detection ─── */
+type KrType = 'conteudo' | 'vendas' | 'eventos' | 'alcance' | 'produto' | 'geral'
+function detectKrType(desc: string): KrType {
+  const d = desc.toLowerCase()
+  if (d.includes('publicar') || d.includes('conteúdo') || d.includes('post') || d.includes('vídeo') || d.includes('artigo')) return 'conteudo'
+  if (d.includes('cliente') || d.includes('contrato') || d.includes('proposta') || d.includes('conversa') || d.includes('fechar') || d.includes('venda')) return 'vendas'
+  if (d.includes('aparição') || d.includes('podcast') || d.includes('evento') || d.includes('palco') || d.includes('convidado') || d.includes('entrevista')) return 'eventos'
+  if (d.includes('seguidor') || d.includes('conexão') || d.includes('menção') || d.includes('alcance') || d.includes('indicação') || d.includes('depoimento')) return 'alcance'
+  if (d.includes('produto') || d.includes('sessão') || d.includes('demo') || d.includes('feedback') || d.includes('iteração') || d.includes('melhoria')) return 'produto'
+  return 'geral'
+}
+
+const krActionLink: Record<KrType, { label: string; to: string; color: string; bg: string }> = {
+  conteudo: { label: 'Planejar no Marketing Anual →', to: '/dashboard/membro/marketing', color: '#7B2FBE', bg: 'rgba(123,47,190,0.08)' },
+  vendas:   { label: 'Registrar na Agenda →',         to: '/dashboard/membro/agenda',    color: '#10B981', bg: 'rgba(16,185,129,0.08)'  },
+  eventos:  { label: 'Planejar aparição na Agenda →', to: '/dashboard/membro/agenda',    color: '#3B82F6', bg: 'rgba(59,130,246,0.08)'  },
+  alcance:  { label: 'Acompanhar nos Indicadores →',  to: '/dashboard/membro/kpis',      color: '#EC4899', bg: 'rgba(236,72,153,0.08)'  },
+  produto:  { label: 'Acompanhar nos Indicadores →',  to: '/dashboard/membro/kpis',      color: '#F59E0B', bg: 'rgba(245,158,11,0.08)'  },
+  geral:    { label: 'Ver tarefas relacionadas →',    to: '/dashboard/membro',           color: '#6B7280', bg: 'rgba(107,114,128,0.08)' },
+}
+
 /* ─────────────────────────────────────────────
    SUGESTÕES DE OKR
 ───────────────────────────────────────────── */
@@ -337,12 +358,18 @@ function KrItem({
   const [editMeta, setEditMeta] = useState(false)
   const [metaVal, setMetaVal] = useState(String(kr.meta))
   const [unitVal, setUnitVal] = useState(kr.unit)
+  const [showPauta, setShowPauta] = useState(false)
+  const [pautaFormato, setPautaFormato] = useState('carousel')
+  const [pautaPlataforma, setPautaPlataforma] = useState('instagram')
+  const [pautaTema, setPautaTema] = useState('')
   const descRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { if (editDesc) descRef.current?.focus() }, [editDesc])
 
   const pct  = getProgress(kr.atual, kr.meta)
   const done = pct >= 100
+  const krType = detectKrType(kr.descricao)
+  const actionLink = krActionLink[krType]
 
   function commitDesc() {
     const v = descVal.trim()
@@ -421,6 +448,76 @@ function KrItem({
               {kr.atual}/{kr.meta} {kr.unit}
             </span>
           </button>
+        )}
+
+        {/* Atalho de ação contextual */}
+        <div className="flex items-center gap-2 mt-2.5 flex-wrap">
+          <Link to={actionLink.to as any}>
+            <span
+              className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
+              style={{ background: actionLink.bg, color: actionLink.color }}
+            >
+              {actionLink.label}
+            </span>
+          </Link>
+          {krType === 'conteudo' && (
+            <button
+              onClick={() => setShowPauta(p => !p)}
+              className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg transition-colors"
+              style={{ background: showPauta ? 'rgba(123,47,190,0.12)' : 'rgba(123,47,190,0.06)', color: '#7B2FBE' }}
+            >
+              <Sparkles size={10} />
+              Planejar conteúdo
+            </button>
+          )}
+        </div>
+
+        {/* Pauta de conteúdo expandível */}
+        {krType === 'conteudo' && showPauta && (
+          <div className="mt-3 rounded-xl border border-[#7B2FBE]/15 bg-[#7B2FBE]/[0.03] p-4 space-y-3">
+            <p className="text-[11px] font-semibold text-[#7B2FBE]">Planejar conteúdo para este KR</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[10px] text-gray-400 block mb-1">Formato</label>
+                <select value={pautaFormato} onChange={e => setPautaFormato(e.target.value)}
+                  className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 text-gray-800 bg-white focus:outline-none focus:border-[#7B2FBE]">
+                  <option value="carousel">Carrossel</option>
+                  <option value="reels">Reels / Vídeo curto</option>
+                  <option value="artigo">Artigo / Post longo</option>
+                  <option value="stories">Stories</option>
+                  <option value="live">Live / Podcast</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] text-gray-400 block mb-1">Plataforma</label>
+                <select value={pautaPlataforma} onChange={e => setPautaPlataforma(e.target.value)}
+                  className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 text-gray-800 bg-white focus:outline-none focus:border-[#7B2FBE]">
+                  <option value="instagram">Instagram</option>
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="youtube">YouTube</option>
+                  <option value="tiktok">TikTok</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="text-[10px] text-gray-400 block mb-1">Tema / Assunto</label>
+              <input
+                value={pautaTema}
+                onChange={e => setPautaTema(e.target.value)}
+                placeholder="Ex: Como eu ajudo profissionais a..."
+                className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 text-gray-800 bg-white focus:outline-none focus:border-[#7B2FBE] placeholder:text-gray-300"
+              />
+            </div>
+            <Link to="/dashboard/membro/marketing">
+              <div className="flex items-center justify-between bg-[#7B2FBE] text-white text-xs font-medium px-3 py-2.5 rounded-lg hover:bg-[#6a27a5] transition-colors cursor-pointer mt-1">
+                <span>Ir para Marketing Anual e criar conteúdo</span>
+                <ChevronRight size={12} />
+              </div>
+            </Link>
+            <p className="text-[10px] text-gray-400 leading-relaxed">
+              No Marketing Anual, agende este conteúdo e vincule à sua meta de {kr.meta} {kr.unit}.
+            </p>
+          </div>
         )}
       </div>
 
@@ -578,6 +675,9 @@ function OkrPage() {
       if (o.id !== objId) return o
       return { ...o, pdca: { ...o.pdca, plano: (o.pdca.plano ?? []).filter(a => a.id !== acaoId) } }
     }))
+  }
+  function setPlano(objId: string, plano: PlanoAcao[]) {
+    setOkrs(prev => prev.map(o => o.id !== objId ? o : { ...o, pdca: { ...o.pdca, plano } }))
   }
 
   /* ── sumário global ── */
@@ -785,6 +885,7 @@ function OkrPage() {
               onAddPlanoAcao={addPlanoAcao}
               onUpdatePlanoAcao={updatePlanoAcao}
               onDeletePlanoAcao={deletePlanoAcao}
+              onSetPlano={setPlano}
             />
           )
         })}
@@ -849,13 +950,14 @@ interface OkrCardProps {
   onAddPlanoAcao: (objId: string) => void
   onUpdatePlanoAcao: (objId: string, acaoId: string, patch: Partial<PlanoAcao>) => void
   onDeletePlanoAcao: (objId: string, acaoId: string) => void
+  onSetPlano: (objId: string, plano: PlanoAcao[]) => void
 }
 
 function OkrCard({
   obj, color, objPct,
   onSetObj, onUpdateKr, onUpdateKrAtual, onDeleteKr, onAddKr, onDeleteObjective,
   onSetPdca, onUpdateAcao, onDeleteAcao, onAddAcao,
-  onAddPlanoAcao, onUpdatePlanoAcao, onDeletePlanoAcao,
+  onAddPlanoAcao, onUpdatePlanoAcao, onDeletePlanoAcao, onSetPlano,
 }: OkrCardProps) {
   const [editTitulo, setEditTitulo] = useState(false)
   const [tituloVal, setTituloVal] = useState(obj.titulo)
@@ -1003,49 +1105,88 @@ function OkrCard({
 
           {/* ── PLANO DE AÇÃO ── */}
           {obj.pdcaTab === 'p' && (
-            <div className="p-5 space-y-3">
-              <p className="text-xs text-gray-500 leading-relaxed">
-                Liste o que precisa ser entregue para atingir este objetivo. Use o formato: <strong>Entregar [o quê]</strong> até <strong>[data]</strong>.
-              </p>
+            <div className="p-5 space-y-4">
+              {/* Orientação */}
+              <div className="rounded-xl bg-[#7B2FBE]/[0.04] border border-[#7B2FBE]/10 p-4">
+                <p className="text-xs font-semibold text-[#7B2FBE] mb-1.5">Como transformar seus KRs em ação</p>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Cada Key Result precisa de pelo menos uma entrega concreta com data. Depois, vá à <strong>Agenda Executiva</strong> para quebrar cada entrega em ações semanais.
+                </p>
+              </div>
+
+              {/* Auto-gerar a partir dos KRs */}
+              {obj.keyResults.length > 0 && plano.length === 0 && (
+                <button
+                  onClick={() => {
+                    const generated: PlanoAcao[] = obj.keyResults.map(kr => ({
+                      id: `auto-${kr.id}-${Date.now()}`,
+                      entrega: kr.descricao,
+                      dataLimite: '',
+                    }))
+                    onSetPlano(obj.id, generated)
+                  }}
+                  className="w-full flex items-center justify-center gap-2 border border-dashed border-[#7B2FBE]/30 text-[#7B2FBE] text-xs font-medium py-3 rounded-xl hover:bg-[#7B2FBE]/5 transition-colors"
+                >
+                  <Sparkles size={12} />
+                  Gerar entregas a partir dos meus Key Results
+                </button>
+              )}
 
               {plano.length === 0 ? (
-                <div className="py-4 text-center">
+                <div className="py-3 text-center">
                   <p className="text-sm text-gray-300 italic">Nenhuma entrega planejada ainda</p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {plano.map(acao => (
-                    <div key={acao.id} className="group flex items-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5">
-                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
-                      <input
-                        value={acao.entrega}
-                        onChange={e => onUpdatePlanoAcao(obj.id, acao.id, { entrega: e.target.value })}
-                        placeholder="Ex: Publicar 3 posts de autoridade"
-                        className="flex-1 text-sm text-gray-800 bg-transparent focus:outline-none placeholder:text-gray-300"
-                      />
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <Calendar size={12} className="text-gray-300" />
-                        <input
-                          type="date"
-                          value={acao.dataLimite}
-                          onChange={e => onUpdatePlanoAcao(obj.id, acao.id, { dataLimite: e.target.value })}
-                          className="text-xs text-gray-500 bg-transparent focus:outline-none border-0 w-32"
-                        />
-                        <button
-                          onClick={() => onDeletePlanoAcao(obj.id, acao.id)}
-                          className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-300 hover:text-red-400 transition-all"
-                        >
-                          <Trash2 size={11} />
-                        </button>
+                  {plano.map((acao, i) => {
+                    const planType = detectKrType(acao.entrega)
+                    const planLink = krActionLink[planType]
+                    return (
+                      <div key={acao.id} className="group rounded-xl border border-gray-100 bg-gray-50 overflow-hidden">
+                        <div className="flex items-center gap-2 px-3 py-2.5">
+                          <div className="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white" style={{ background: color }}>
+                            {i + 1}
+                          </div>
+                          <input
+                            value={acao.entrega}
+                            onChange={e => onUpdatePlanoAcao(obj.id, acao.id, { entrega: e.target.value })}
+                            placeholder="Ex: Publicar 3 posts de autoridade"
+                            className="flex-1 text-sm text-gray-800 bg-transparent focus:outline-none placeholder:text-gray-300"
+                          />
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <Calendar size={12} className="text-gray-300" />
+                            <input
+                              type="date"
+                              value={acao.dataLimite}
+                              onChange={e => onUpdatePlanoAcao(obj.id, acao.id, { dataLimite: e.target.value })}
+                              className="text-xs text-gray-500 bg-transparent focus:outline-none border-0 w-32"
+                            />
+                            <button
+                              onClick={() => onDeletePlanoAcao(obj.id, acao.id)}
+                              className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-300 hover:text-red-400 transition-all"
+                            >
+                              <Trash2 size={11} />
+                            </button>
+                          </div>
+                        </div>
+                        {acao.entrega.trim() && (
+                          <div className="border-t border-gray-100 px-3 py-1.5">
+                            <Link to={planLink.to as any}>
+                              <span className="text-[10px] font-medium hover:opacity-70 transition-opacity" style={{ color: planLink.color }}>
+                                {planLink.label}
+                              </span>
+                            </Link>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
 
               <button
                 onClick={() => onAddPlanoAcao(obj.id)}
-                className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#7B2FBE] font-medium transition-colors mt-1"
+                className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#7B2FBE] font-medium transition-colors"
               >
                 <Plus size={14} />
                 Adicionar entrega
