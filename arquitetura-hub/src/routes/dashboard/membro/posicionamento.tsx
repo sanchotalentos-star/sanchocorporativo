@@ -111,23 +111,23 @@ const PILARES: {
 // Caminhos sugeridos por pilar — aparecem quando o campo tem texto
 const PILAR_CAMINHOS: Record<PilarField, { titulo: string; texto: string }[]> = {
   publicoAlvo: [
-    { titulo: 'Especificidade gera atração', texto: 'Quanto mais preciso o perfil, mais magnético o posicionamento. O mentor vai aprofundar até o nível de consciência e dor que esse público carrega hoje — é aí que está o ouro.' },
+    { titulo: 'Especificidade gera atração', texto: 'Quanto mais preciso o perfil, mais magnético o posicionamento. O mentor vai aprofundar até o nível de consciência e dor que esse público carrega hoje. É aí que está o ouro.' },
     { titulo: 'Nomeie a dor melhor que eles', texto: 'O maior diferencial de um posicionamento forte é descrever a dor do cliente melhor do que ele mesmo consegue. Quando ele lê sua comunicação e pensa "é exatamente sobre mim", o posicionamento está funcionando.' },
-    { titulo: 'Base de tudo que vem depois', texto: 'Produto, preço, canal, história — tudo será calibrado para esse público. Quanto mais claro ele for agora, mais coerente e poderoso será tudo que você construir em cima.' },
+    { titulo: 'Base de tudo que vem depois', texto: 'Produto, preço, canal, história: tudo será calibrado para esse público. Quanto mais claro ele for agora, mais coerente e poderoso será tudo que você construir em cima.' },
   ],
   proposta: [
-    { titulo: 'O cliente compra o destino', texto: 'Seu cliente compra a transformação, não o processo. Traduzir o que você faz em resultado concreto e mensurável é o núcleo da sua proposta — e o que diferencia posicionamentos genéricos de magnéticos.' },
+    { titulo: 'O cliente compra o destino', texto: 'Seu cliente compra a transformação, não o processo. Traduzir o que você faz em resultado concreto e mensurável é o núcleo da sua proposta. É o que diferencia posicionamentos genéricos de magnéticos.' },
     { titulo: 'Prazo define a promessa', texto: '"Em 90 dias" converte mais do que "ao longo da jornada". O mentor vai ajudar a encontrar o prazo real que você consegue garantir e que o cliente considera crível.' },
-    { titulo: 'O núcleo da sua Zona de Genialidade', texto: 'O que existe de genuinamente único no seu jeito de trabalhar — algo que ninguém faz exatamente como você? Esse é o diferenciador que vai sustentar sua autoridade no longo prazo.' },
+    { titulo: 'O núcleo da sua Zona de Genialidade', texto: 'O que existe de genuinamente único no seu jeito de trabalhar, algo que ninguém faz exatamente como você? Esse é o diferenciador que vai sustentar sua autoridade no longo prazo.' },
   ],
   storytelling: [
     { titulo: 'Antes, virada e depois', texto: 'A estrutura que mais conecta: onde você estava (dor ou limitação), o que mudou (momento de virada) e onde chegou (estado atual que prova que a transformação é real e possível).' },
-    { titulo: 'Reconhecimento cria conexão', texto: 'Quando seu público lê sua história e pensa "eu já me senti assim", a conexão acontece instantaneamente. A especificidade do seu "antes" é o que gera identificação — não precisa ser dramático, precisa ser verdadeiro.' },
-    { titulo: 'Sua maior prova de autoridade', texto: 'Sua história mostra que você viveu o que ensina. É a prova social mais autêntica que existe — e o mentor vai extrair os elementos que geram mais autoridade e conexão para o seu posicionamento.' },
+    { titulo: 'Reconhecimento cria conexão', texto: 'Quando seu público lê sua história e pensa "eu já me senti assim", a conexão acontece instantaneamente. A especificidade do seu "antes" é o que gera identificação. Não precisa ser dramático, precisa ser verdadeiro.' },
+    { titulo: 'Sua maior prova de autoridade', texto: 'Sua história mostra que você viveu o que ensina. É a prova social mais autêntica que existe. O mentor vai extrair os elementos que geram mais autoridade e conexão para o seu posicionamento.' },
   ],
   formatoProduto: [
     { titulo: 'Formato comunica posicionamento', texto: 'Mentoria individual comunica exclusividade e alto valor. Grupo comunica comunidade. Curso comunica escala. A escolha precisa estar alinhada com quem você quer atrair e como quer ser percebido.' },
-    { titulo: 'Preço é uma declaração', texto: 'O valor que você pratica comunica onde você está no mercado. Um preço alinhado com a transformação entregue é diferente de um preço competitivo — e o mentor vai ajudar a encontrar esse equilíbrio.' },
+    { titulo: 'Preço é uma declaração', texto: 'O valor que você pratica comunica onde você está no mercado. Um preço alinhado com a transformação entregue é diferente de um preço competitivo. O mentor vai ajudar a encontrar esse equilíbrio.' },
     { titulo: 'Canal onde seu público já confia', texto: 'O melhor canal de aquisição é onde seu público ideal já está e já tem o hábito de buscar referências. Com o perfil definido, fica claro se ele está no LinkedIn, Instagram, em eventos ou em indicações.' },
   ],
 }
@@ -243,7 +243,7 @@ function ZonaDeGenialidade({ pilares, diferenciais }: { pilares: PilarStates; di
         <p className="text-xs text-[#7B2FBE] leading-relaxed">
           {filledCount < 4
             ? `Complete os ${4 - filledCount} bloco${4 - filledCount > 1 ? 's' : ''} restante${4 - filledCount > 1 ? 's' : ''} para revelar sua Zona de Genialidade completa. Seu mentor vai sintetizar tudo isso em uma declaração única de posicionamento.`
-            : 'Todos os blocos preenchidos. Leve isso para a sessão — seu mentor vai transformar essas peças na declaração da sua Zona de Genialidade.'}
+            : 'Todos os blocos preenchidos. Leve isso para a sessão. Seu mentor vai transformar essas peças na declaração da sua Zona de Genialidade.'}
         </p>
       </div>
     </div>

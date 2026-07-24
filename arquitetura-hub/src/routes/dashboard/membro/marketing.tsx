@@ -91,7 +91,7 @@ function SementesDeConteudo({ publicoAlvo, proposta, formatoProduto, diferenciai
       titulo: 'O que só você faz',
       descricao: diferencialPrincipal
         ? `Seu diferencial "${diferencialPrincipal.slice(0, 60)}" é o que o mercado precisa ver. Crie posts que mostram esse ângulo único com exemplos reais.`
-        : 'Explore o que torna sua abordagem única. Não o que você faz — mas como e por quê você faz diferente.',
+        : 'Explore o que torna sua abordagem única. Não o que você faz, mas como e por quê você faz diferente.',
       cor: '#F59E0B',
     },
     {
@@ -108,8 +108,8 @@ function SementesDeConteudo({ publicoAlvo, proposta, formatoProduto, diferenciai
       label: 'Formato',
       titulo: 'Como você chega ao mercado',
       descricao: formatoProduto
-        ? `Você atua via "${formatoProduto.slice(0, 60)}...". Crie conteúdo que explica esse formato — o que ele é, para quem serve e por que funciona.`
-        : 'Explique como funciona trabalhar com você — o formato, o processo, a jornada do cliente. Isso educa o mercado.',
+        ? `Você atua via "${formatoProduto.slice(0, 60)}...". Crie conteúdo que explica esse formato: o que ele é, para quem serve e por que funciona.`
+        : 'Explique como funciona trabalhar com você: o formato, o processo, a jornada do cliente. Isso educa o mercado.',
       cor: '#EC4899',
     },
     ...(storytelling ? [{
@@ -124,8 +124,8 @@ function SementesDeConteudo({ publicoAlvo, proposta, formatoProduto, diferenciai
       label: 'Evento Próprio',
       titulo: 'Crie o seu espaço de autoridade',
       descricao: proposta
-        ? `Organize 1 evento no ano posicionado em torno de: "${proposta.slice(0, 55)}...". Pode ser online ou presencial — o que importa é que você seja o anfitrião da conversa.`
-        : 'Organize 1 evento no ano onde você é o anfitrião da conversa. Webinar, workshop, masterclass ou encontro presencial — você define o palco.',
+        ? `Organize 1 evento no ano posicionado em torno de: "${proposta.slice(0, 55)}...". Pode ser online ou presencial. O que importa é que você seja o anfitrião da conversa.`
+        : 'Organize 1 evento no ano onde você é o anfitrião da conversa. Webinar, workshop, masterclass ou encontro presencial: você define o palco.',
       cor: '#8B5CF6',
     },
     {
@@ -602,7 +602,7 @@ function MarketingPage() {
             </div>
             <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Indicadores de Resultado</p>
             <p className="text-xs text-gray-500 leading-relaxed">
-              Cada ação executada gera dados — alcance, engajamento, leads, vendas. Esses números são os indicadores que você acompanha para ajustar a rota.
+              Cada ação executada gera dados: alcance, engajamento, leads, vendas. Esses números são os indicadores que você acompanha para ajustar a rota.
             </p>
           </div>
         </Link>

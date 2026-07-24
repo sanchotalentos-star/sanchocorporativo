@@ -249,7 +249,7 @@ function KrTip({ active, payload }: any) {
     <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 6, padding: '8px 12px', fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', maxWidth: 260 }}>
       <p style={{ fontWeight: 600, color: '#111827', marginBottom: 2, lineHeight: 1.4 }}>{d.fullLabel}</p>
       <p style={{ color: '#6B7280', margin: 0 }}>
-        {d.atual} / {d.meta} {d.unit} — <span style={{ color: d.color, fontWeight: 600 }}>{d.value}%</span>
+        {d.atual} / {d.meta} {d.unit} · <span style={{ color: d.color, fontWeight: 600 }}>{d.value}%</span>
       </p>
     </div>
   )

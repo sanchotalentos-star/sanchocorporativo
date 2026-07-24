@@ -87,7 +87,7 @@ function KrTooltip({ active, payload }: any) {
       <p style={{ fontWeight: 600, color: '#111827', marginBottom: 4, lineHeight: 1.4 }}>{d.fullLabel}</p>
       <p style={{ color: '#6B7280', margin: 0 }}>
         {d.atual} / {d.meta} {d.unit}
-        {' '}—{' '}
+        {' '}·{' '}
         <span style={{ color: d.color, fontWeight: 600 }}>{d.value}%</span>
       </p>
     </div>

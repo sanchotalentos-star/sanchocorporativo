@@ -57,7 +57,7 @@ function KpisPage() {
 
         <h1 className="text-xl font-semibold text-gray-900">Indicadores de Resultado</h1>
         <p className="text-gray-400 text-sm">
-          O que a execução do seu plano está gerando — cada número aqui é consequência das ações nos pilares e no marketing
+          O que a execução do seu plano está gerando. Cada número aqui é consequência das ações nos pilares e no marketing
         </p>
       </div>
 

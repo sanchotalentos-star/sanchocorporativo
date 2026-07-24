@@ -163,7 +163,7 @@ function SugestoesDePilares({ onAddPilar }: { onAddPilar: (p: Pilar) => void }) 
             )
           })}
           <p className="text-xs text-gray-400 pt-1 border-t border-gray-100">
-            Estes pilares são pontos de partida — na sessão com seu mentor, vocês refinam e personalizam cada frente.
+            Estes pilares são pontos de partida. Na sessão com seu mentor, vocês refinam e personalizam cada frente.
           </p>
         </div>
       )}
@@ -263,7 +263,7 @@ function PilaresPage() {
 
           <h1 className="text-xl font-semibold text-gray-900">Pilares da Marca</h1>
           <p className="text-gray-400 text-sm">
-            Definidos com seu mentor a partir da sua identidade — cada pilar traduz quem você é em ações concretas de presença
+            Definidos com seu mentor a partir da sua identidade. Cada pilar traduz quem você é em ações concretas de presença
           </p>
         </div>
 
@@ -416,7 +416,7 @@ function PilaresPage() {
               </div>
               <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">OKRs & Metas</p>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Os pilares definem onde você quer ter presença e autoridade — as metas OKR traduzem isso em objetivos mensuráveis por trimestre.
+                Os pilares definem onde você quer ter presença e autoridade. As metas OKR traduzem isso em objetivos mensuráveis por trimestre.
               </p>
             </div>
           </Link>

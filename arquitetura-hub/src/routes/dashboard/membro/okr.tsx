@@ -360,7 +360,7 @@ function SugestoesDeOkr({ onAddOkr }: { onAddOkr: (obj: Objective) => void }) {
             )
           })}
           <p className="text-xs text-gray-400 pt-1 border-t border-gray-100">
-            Ajuste os valores das metas com seu mentor — eles conhecem seu contexto e ritmo real.
+            Ajuste os valores das metas com seu mentor, eles conhecem seu contexto e ritmo real.
           </p>
         </div>
       )}
@@ -744,7 +744,7 @@ function OkrPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-semibold text-gray-900">Metas de Impacto</h1>
-            <p className="text-gray-500 mt-1 text-sm">O que você quer conquistar nos próximos 3 meses — definido com seu mentor, executado por você</p>
+            <p className="text-gray-500 mt-1 text-sm">O que você quer conquistar nos próximos 3 meses, definido com seu mentor e executado por você</p>
           </div>
           <button
             onClick={() => setShowNovoObj(true)}
@@ -935,7 +935,7 @@ function OkrPage() {
               </div>
               <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Marketing Anual</p>
               <p className="text-xs text-gray-500 leading-relaxed">
-                As metas definem as prioridades de conteúdo e presença — o calendário de marketing é construído para executar o que os OKRs exigem.
+                As metas definem as prioridades de conteúdo e presença. O calendário de marketing é construído para executar o que os OKRs exigem.
               </p>
             </div>
           </Link>
@@ -948,7 +948,7 @@ function OkrPage() {
               </div>
               <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Agenda Executiva</p>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Suas ações do plano aparecem na agenda integrada — semana a semana, saiba exatamente o que executar.
+                Suas ações do plano aparecem na agenda integrada. Semana a semana, saiba exatamente o que executar.
               </p>
             </div>
           </Link>
@@ -1139,7 +1139,7 @@ function OkrCard({
               <div className="rounded-xl bg-[#7B2FBE]/[0.04] border border-[#7B2FBE]/10 p-4">
                 <p className="text-xs font-semibold text-[#7B2FBE] mb-1.5">Aqui é o COMO, não o QUÊ</p>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  Os KRs já dizem <em>o que</em> você quer atingir. Aqui você define <strong>como vai executar</strong> — as estratégias e rotinas concretas. Ex: não "publicar 12 posts", mas "criar e publicar 1 post por semana toda segunda-feira".
+                  Os KRs já dizem <em>o que</em> você quer atingir. Aqui você define <strong>como vai executar</strong>: as estratégias e rotinas concretas. Ex: não "publicar 12 posts", mas "criar e publicar 1 post por semana toda segunda-feira".
                 </p>
               </div>
 
@@ -1248,7 +1248,7 @@ function OkrCard({
                         'text-[11px] font-medium px-2.5 py-0.5 rounded-md',
                         isCurrent ? 'bg-[#7B2FBE]/10 text-[#7B2FBE]' : 'text-gray-400'
                       )}>
-                        Semana {semana}{isCurrent ? ' — atual' : isPast ? ' — concluída' : ''}
+                        Semana {semana}{isCurrent ? ' (atual)' : isPast ? ' (concluída)' : ''}
                       </span>
                       <button onClick={() => onAddAcao(obj.id, semana)}
                         className="text-xs font-medium text-[#7B2FBE] hover:text-[#6a27a5] flex items-center gap-1"

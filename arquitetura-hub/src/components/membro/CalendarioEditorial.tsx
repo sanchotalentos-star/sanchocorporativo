@@ -110,7 +110,7 @@ export function CalendarioEditorial({ eventos }: CalendarioEditorialProps) {
       {/* Day detail */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
         <h3 className="font-black text-gray-900 uppercase tracking-tight mb-4">
-          {selectedDay ? `Dia ${selectedDay} — ${monthNames[current.month]}` : 'Selecione um dia'}
+          {selectedDay ? `Dia ${selectedDay} de ${monthNames[current.month]}` : 'Selecione um dia'}
         </h3>
         {selectedDayEvents.length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-8">Nenhum evento neste dia</p>

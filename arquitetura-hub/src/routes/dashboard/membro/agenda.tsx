@@ -187,7 +187,7 @@ function AgendaPage() {
           <Calendar size={32} className="text-gray-200 mx-auto mb-3" />
           <p className="text-sm font-semibold text-gray-500 mb-1">Agenda ainda vazia</p>
           <p className="text-xs text-gray-400 max-w-xs mx-auto leading-relaxed mb-5">
-            Adicione ações nos seus OKRs e no Marketing Anual — elas aparecem aqui automaticamente.
+            Adicione ações nos seus OKRs e no Marketing Anual. Elas aparecem aqui automaticamente.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link to="/dashboard/membro/okr"
@@ -268,7 +268,7 @@ function AgendaPage() {
                     <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gray-50/60">
                       <div className="flex items-center gap-2">
                         <Target size={12} className="text-[#7B2FBE]" />
-                        <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Semana {semana} — OKRs</p>
+                        <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Semana {semana}: OKRs</p>
                       </div>
                       <span className="text-[10px] text-gray-400">{acoesSem.length} ações</span>
                     </div>
@@ -309,7 +309,7 @@ function AgendaPage() {
                           <span className="text-[11px] text-gray-400">
                             {item.dataLimite
                               ? new Date(item.dataLimite + 'T00:00:00').toLocaleDateString('pt-BR')
-                              : '—'}
+                              : ''}
                           </span>
                         </div>
                       ))}
@@ -358,7 +358,7 @@ function AgendaPage() {
                           <span className="text-[11px] text-gray-400">
                             {item.dataLimite
                               ? new Date(item.dataLimite + 'T00:00:00').toLocaleDateString('pt-BR')
-                              : '—'}
+                              : ''}
                           </span>
                         </div>
                       ))}
@@ -380,7 +380,7 @@ function AgendaPage() {
                     <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gray-50/60">
                       <div className="flex items-center gap-2">
                         <Megaphone size={12} className="text-[#7B2FBE]" />
-                        <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">{mes} — Marketing</p>
+                        <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">{mes}: Marketing</p>
                       </div>
                       <span className="text-[10px] text-gray-400">{acoesMes.length} ações</span>
                     </div>
@@ -412,7 +412,7 @@ function AgendaPage() {
                             {item.titulo}
                           </p>
                           <StatusChip status={item.status ?? 'pendente'} />
-                          <span className="text-[11px] text-gray-400 truncate">{item.canal ?? '—'}</span>
+                          <span className="text-[11px] text-gray-400 truncate">{item.canal ?? ''}</span>
                         </div>
                       ))}
                     </div>

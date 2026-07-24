@@ -267,7 +267,7 @@ function AuthPage() {
       </div>
 
       <p style={{ marginTop: 24, fontSize: 11, color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>
-        Arquitetura de Relevância — Wladson Sidney
+        Arquitetura de Relevância, Wladson Sidney
       </p>
     </div>
   )

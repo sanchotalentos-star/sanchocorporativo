@@ -205,7 +205,7 @@ function buildSugestoes(id: IdentidadeStored | null): SugestaoPilar[] {
       descricao: `Tornar evidente para o mercado: "${tag(diferencial)}"`,
       acoes: [
         `Criar série de conteúdo mostrando sua abordagem versus o que o mercado costuma fazer`,
-        `Publicar seu ponto de vista sobre "${tag(diferencial)}" — o que você faz diferente e por quê`,
+        `Publicar seu ponto de vista sobre "${tag(diferencial)}": o que você faz diferente e por quê`,
         `Coletar e publicar provas concretas que validem seu diferencial (dados, resultados, depoimentos)`,
         `Criar 1 conteúdo/mês de comparativo mostrando como sua forma de trabalhar gera mais resultado`,
       ],
@@ -1712,7 +1712,7 @@ function MembrosPage() {
                                       <div key={sem} className="bg-white border border-gray-200 overflow-hidden">
                                         <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
                                           <Target size={12} className="text-[#7B2FBE]" />
-                                          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest flex-1">Semana {sem} — OKRs</p>
+                                          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest flex-1">Semana {sem}: OKRs</p>
                                           <span className="text-[10px] text-gray-400">{semItems.length} ações</span>
                                         </div>
                                         <div className="divide-y divide-gray-100">
@@ -1748,7 +1748,7 @@ function MembrosPage() {
                                       <div key={mes} className="bg-white border border-gray-200 overflow-hidden">
                                         <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
                                           <Megaphone size={12} className="text-[#7B2FBE]" />
-                                          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest flex-1">{mes} — Marketing</p>
+                                          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest flex-1">{mes}: Marketing</p>
                                           <span className="text-[10px] text-gray-400">{mesItems.length} ações</span>
                                         </div>
                                         <div className="divide-y divide-gray-100">
