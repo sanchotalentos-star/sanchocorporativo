@@ -81,6 +81,35 @@ function getProgress(atual: number, meta: number) {
   return Math.min(100, Math.round((atual / meta) * 100))
 }
 
+function autoPlanoFromKrs(krs: KeyResult[]): PlanoAcao[] {
+  const result: PlanoAcao[] = []
+  const stamp = Date.now()
+  krs.forEach((kr, i) => {
+    const t = detectKrType(kr.descricao)
+    const base = `auto-${kr.id}-${stamp}-${i}`
+    if (t === 'conteudo') {
+      const pw = Math.max(1, Math.ceil(kr.meta / 12))
+      result.push({ id: `${base}-a`, entrega: `Montar calendário editorial com ${kr.meta} ${kr.unit || 'conteúdos'} planejados`, dataLimite: '' })
+      result.push({ id: `${base}-b`, entrega: `Criar e publicar ${pw} ${kr.unit || 'peça'} por semana consistentemente`, dataLimite: '' })
+    } else if (t === 'vendas') {
+      result.push({ id: `${base}-a`, entrega: `Prospectar e qualificar ${kr.meta * 3} leads ao longo do trimestre`, dataLimite: '' })
+      result.push({ id: `${base}-b`, entrega: `Conduzir conversa de descoberta e enviar proposta para cada lead quente`, dataLimite: '' })
+    } else if (t === 'eventos') {
+      result.push({ id: `${base}-a`, entrega: `Mapear ${kr.meta * 2} oportunidades: podcasts, eventos e convites`, dataLimite: '' })
+      result.push({ id: `${base}-b`, entrega: `Confirmar e preparar material para ${kr.meta} ${kr.unit || 'aparições'}`, dataLimite: '' })
+    } else if (t === 'alcance') {
+      result.push({ id: `${base}-a`, entrega: `Publicar conteúdo de posicionamento 3× por semana para crescer ${kr.unit}`, dataLimite: '' })
+      result.push({ id: `${base}-b`, entrega: `Engajar ativamente com a comunidade e ampliar rede de contatos`, dataLimite: '' })
+    } else if (t === 'produto') {
+      result.push({ id: `${base}-a`, entrega: `Agendar e conduzir ${kr.meta} sessões de descoberta / demo`, dataLimite: '' })
+      result.push({ id: `${base}-b`, entrega: `Coletar feedback estruturado após cada sessão e aplicar melhorias`, dataLimite: '' })
+    } else {
+      result.push({ id: `${base}-a`, entrega: `Definir e executar estratégia para: ${kr.descricao.slice(0, 65)}`, dataLimite: '' })
+    }
+  })
+  return result
+}
+
 const statusIcon = {
   feito:     <CheckCircle2 size={15} className="text-emerald-500 flex-shrink-0" />,
   nao_feito: <XCircle      size={15} className="text-red-400 flex-shrink-0"     />,
@@ -1108,27 +1137,20 @@ function OkrCard({
             <div className="p-5 space-y-4">
               {/* Orientação */}
               <div className="rounded-xl bg-[#7B2FBE]/[0.04] border border-[#7B2FBE]/10 p-4">
-                <p className="text-xs font-semibold text-[#7B2FBE] mb-1.5">Como transformar seus KRs em ação</p>
+                <p className="text-xs font-semibold text-[#7B2FBE] mb-1.5">Aqui é o COMO, não o QUÊ</p>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  Cada Key Result precisa de pelo menos uma entrega concreta com data. Depois, vá à <strong>Agenda Executiva</strong> para quebrar cada entrega em ações semanais.
+                  Os KRs já dizem <em>o que</em> você quer atingir. Aqui você define <strong>como vai executar</strong> — as estratégias e rotinas concretas. Ex: não "publicar 12 posts", mas "criar e publicar 1 post por semana toda segunda-feira".
                 </p>
               </div>
 
-              {/* Auto-gerar a partir dos KRs */}
+              {/* Auto-gerar estratégias a partir dos KRs */}
               {obj.keyResults.length > 0 && plano.length === 0 && (
                 <button
-                  onClick={() => {
-                    const generated: PlanoAcao[] = obj.keyResults.map(kr => ({
-                      id: `auto-${kr.id}-${Date.now()}`,
-                      entrega: kr.descricao,
-                      dataLimite: '',
-                    }))
-                    onSetPlano(obj.id, generated)
-                  }}
+                  onClick={() => onSetPlano(obj.id, autoPlanoFromKrs(obj.keyResults))}
                   className="w-full flex items-center justify-center gap-2 border border-dashed border-[#7B2FBE]/30 text-[#7B2FBE] text-xs font-medium py-3 rounded-xl hover:bg-[#7B2FBE]/5 transition-colors"
                 >
                   <Sparkles size={12} />
-                  Gerar entregas a partir dos meus Key Results
+                  Sugerir estratégias de execução para os meus KRs
                 </button>
               )}
 
@@ -1150,7 +1172,7 @@ function OkrCard({
                           <input
                             value={acao.entrega}
                             onChange={e => onUpdatePlanoAcao(obj.id, acao.id, { entrega: e.target.value })}
-                            placeholder="Ex: Publicar 3 posts de autoridade"
+                            placeholder="Ex: Prospectar 5 leads por semana no LinkedIn"
                             className="flex-1 text-sm text-gray-800 bg-transparent focus:outline-none placeholder:text-gray-300"
                           />
                           <div className="flex items-center gap-1.5 flex-shrink-0">
