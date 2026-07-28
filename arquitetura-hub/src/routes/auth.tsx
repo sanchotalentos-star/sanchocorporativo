@@ -11,6 +11,14 @@ export const Route = createFileRoute('/auth')({
   component: AuthPage,
 })
 
+const GOLD = '#C5A880'
+const BG = '#0F0D0C'
+const CARD_BG = '#161412'
+const BORDER = 'rgba(255,255,255,0.08)'
+const BORDER_GOLD = 'rgba(197,168,128,0.25)'
+const TEXT = '#EFECE6'
+const TEXT_DIM = 'rgba(239,236,230,0.35)'
+
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
   password: z.string().min(1, 'Senha obrigatória'),
@@ -25,16 +33,17 @@ const requestSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>
 type RequestForm = z.infer<typeof requestSchema>
 
-const inputStyle: React.CSSProperties = {
+const baseInput: React.CSSProperties = {
   width: '100%',
   padding: '11px 14px',
-  fontSize: 14,
-  color: '#fff',
-  background: 'rgba(255,255,255,0.05)',
-  border: '1px solid rgba(255,255,255,0.1)',
+  fontSize: 13,
+  color: TEXT,
+  background: 'rgba(255,255,255,0.04)',
+  border: `1px solid ${BORDER}`,
   outline: 'none',
   boxSizing: 'border-box',
-  transition: 'border-color 0.15s',
+  transition: 'border-color 0.15s, background 0.15s',
+  fontFamily: 'inherit',
 }
 
 const AuthInput = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
@@ -45,9 +54,10 @@ const AuthInput = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInp
         {...props}
         ref={ref}
         style={{
-          ...inputStyle,
-          borderColor: focused ? '#7B2FBE' : 'rgba(255,255,255,0.1)',
-          background: focused ? 'rgba(123,47,190,0.07)' : 'rgba(255,255,255,0.04)',
+          ...baseInput,
+          ...props.style,
+          borderColor: focused ? GOLD : BORDER,
+          background: focused ? 'rgba(197,168,128,0.05)' : 'rgba(255,255,255,0.04)',
         }}
         onFocus={e => { setFocused(true); props.onFocus?.(e) }}
         onBlur={e => { setFocused(false); props.onBlur?.(e) }}
@@ -64,10 +74,11 @@ const AuthTextarea = forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttribute
         {...props}
         ref={ref}
         style={{
-          ...inputStyle,
+          ...baseInput,
           resize: 'none',
-          borderColor: focused ? '#7B2FBE' : 'rgba(255,255,255,0.1)',
-          background: focused ? 'rgba(123,47,190,0.07)' : 'rgba(255,255,255,0.04)',
+          borderColor: focused ? GOLD : BORDER,
+          background: focused ? 'rgba(197,168,128,0.05)' : 'rgba(255,255,255,0.04)',
+          fontFamily: 'inherit',
         }}
         onFocus={e => { setFocused(true); props.onFocus?.(e) }}
         onBlur={e => { setFocused(false); props.onBlur?.(e) }}
@@ -104,11 +115,23 @@ function AuthPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 16px', background: '#0D0D0D' }}>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '40px 16px',
+      background: BG,
+      fontFamily: "'Inter', system-ui, sans-serif",
+    }}>
 
-      {/* Logo */}
-      <div style={{ marginBottom: 40 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.02em', textAlign: 'center' }}>
+      {/* Brand mark */}
+      <div style={{ marginBottom: 44, textAlign: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 6 }}>
+          <span style={{ width: 4, height: 4, borderRadius: '50%', background: GOLD }} />
+        </div>
+        <p style={{ fontSize: 12, fontWeight: 600, color: 'rgba(239,236,230,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
           Arquitetura de Relevância
         </p>
       </div>
@@ -117,12 +140,13 @@ function AuthPage() {
       <div style={{
         width: '100%',
         maxWidth: 400,
-        background: '#161616',
-        border: '1px solid rgba(255,255,255,0.08)',
+        background: CARD_BG,
+        border: `1px solid ${BORDER_GOLD}`,
         padding: '36px 32px',
       }}>
+
         {/* Tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 28 }}>
+        <div style={{ display: 'flex', borderBottom: `1px solid ${BORDER}`, marginBottom: 28 }}>
           {(['login', 'request'] as const).map(t => (
             <button
               key={t}
@@ -130,16 +154,17 @@ function AuthPage() {
               style={{
                 flex: 1,
                 paddingBottom: 12,
-                fontSize: 13,
-                fontWeight: 500,
-                color: tab === t ? '#fff' : 'rgba(255,255,255,0.3)',
+                fontSize: 12,
+                fontWeight: 600,
+                letterSpacing: '0.04em',
+                color: tab === t ? TEXT : 'rgba(239,236,230,0.28)',
                 background: 'none',
                 border: 'none',
-                borderBottom: `2px solid ${tab === t ? '#7B2FBE' : 'transparent'}`,
+                borderBottom: `2px solid ${tab === t ? GOLD : 'transparent'}`,
                 marginBottom: -1,
                 cursor: 'pointer',
                 transition: 'all 0.15s',
-                letterSpacing: '0.01em',
+                textTransform: 'uppercase' as const,
               }}
             >
               {t === 'login' ? 'Entrar' : 'Solicitar acesso'}
@@ -148,9 +173,9 @@ function AuthPage() {
         </div>
 
         {tab === 'login' ? (
-          <form onSubmit={loginForm.handleSubmit(onLogin)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <form onSubmit={loginForm.handleSubmit(onLogin)} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: TEXT_DIM, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8 }}>
                 Email
               </label>
               <AuthInput
@@ -164,7 +189,7 @@ function AuthPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: TEXT_DIM, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8 }}>
                 Senha
               </label>
               <div style={{ position: 'relative' }}>
@@ -177,7 +202,7 @@ function AuthPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(v => !v)}
-                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', padding: 2 }}
+                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(239,236,230,0.3)', padding: 2 }}
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -192,28 +217,29 @@ function AuthPage() {
               disabled={loginForm.formState.isSubmitting}
               style={{
                 width: '100%',
-                padding: '12px',
-                background: '#7B2FBE',
-                color: '#fff',
+                padding: '13px',
+                background: GOLD,
+                color: '#1A1208',
                 border: 'none',
-                fontSize: 13,
-                fontWeight: 600,
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
                 cursor: loginForm.formState.isSubmitting ? 'not-allowed' : 'pointer',
                 opacity: loginForm.formState.isSubmitting ? 0.6 : 1,
-                letterSpacing: '0.03em',
-                marginTop: 4,
-                transition: 'background 0.15s',
+                marginTop: 6,
+                transition: 'opacity 0.15s',
               }}
-              onMouseOver={e => { if (!loginForm.formState.isSubmitting) e.currentTarget.style.background = '#6823a8' }}
-              onMouseOut={e => e.currentTarget.style.background = '#7B2FBE'}
+              onMouseOver={e => { if (!loginForm.formState.isSubmitting) e.currentTarget.style.opacity = '0.85' }}
+              onMouseOut={e => e.currentTarget.style.opacity = loginForm.formState.isSubmitting ? '0.6' : '1'}
             >
               {loginForm.formState.isSubmitting ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
         ) : (
-          <form onSubmit={requestForm.handleSubmit(onRequest)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <form onSubmit={requestForm.handleSubmit(onRequest)} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: TEXT_DIM, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8 }}>
                 Nome completo
               </label>
               <AuthInput placeholder="Seu nome" {...requestForm.register('full_name')} />
@@ -223,7 +249,7 @@ function AuthPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: TEXT_DIM, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8 }}>
                 Email
               </label>
               <AuthInput type="email" placeholder="seu@email.com" {...requestForm.register('email')} />
@@ -233,7 +259,7 @@ function AuthPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: TEXT_DIM, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8 }}>
                 Por que quer participar?
               </label>
               <AuthTextarea rows={4} placeholder="Conte sobre você e seus objetivos..." {...requestForm.register('mensagem')} />
@@ -246,19 +272,20 @@ function AuthPage() {
               type="submit"
               style={{
                 width: '100%',
-                padding: '12px',
-                background: '#7B2FBE',
-                color: '#fff',
+                padding: '13px',
+                background: GOLD,
+                color: '#1A1208',
                 border: 'none',
-                fontSize: 13,
-                fontWeight: 600,
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
                 cursor: 'pointer',
-                letterSpacing: '0.03em',
-                marginTop: 4,
-                transition: 'background 0.15s',
+                marginTop: 6,
+                transition: 'opacity 0.15s',
               }}
-              onMouseOver={e => e.currentTarget.style.background = '#6823a8'}
-              onMouseOut={e => e.currentTarget.style.background = '#7B2FBE'}
+              onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
+              onMouseOut={e => e.currentTarget.style.opacity = '1'}
             >
               Enviar solicitação
             </button>
@@ -266,8 +293,8 @@ function AuthPage() {
         )}
       </div>
 
-      <p style={{ marginTop: 24, fontSize: 11, color: 'rgba(255,255,255,0.18)', textAlign: 'center' }}>
-        Arquitetura de Relevância, Wladson Sidney
+      <p style={{ marginTop: 28, fontSize: 10, color: 'rgba(239,236,230,0.16)', textAlign: 'center', letterSpacing: '0.04em' }}>
+        Arquitetura de Relevância · Wladson Sidney
       </p>
     </div>
   )
