@@ -620,11 +620,49 @@ function migrateOkrs(raw: Objective[]): Objective[] {
   }))
 }
 
+const OKR_SEEDS: Record<string, Objective[]> = {
+  'member-4': [
+    {
+      id: 'seed-r-o1', titulo: 'FATURAMENTO DE 2.380.000 MILHÕES', categoria: 'Receita', trimestre: 'Q3 2026',
+      expanded: true, pdcaTab: 'okr', pdca: { semanaAtual: 1, acoes: [], plano: [] },
+      keyResults: [
+        { id: 'seed-r-kr1', descricao: 'ATINGIR 360.000 DE FATURAMENTO EM BILHETERIA NA IMERSÃO EM VENDAS NOVAS', meta: 360000, atual: 0,     unit: 'R$' },
+        { id: 'seed-r-kr2', descricao: 'ATINGIR 1440.000 EM VENDA DE CONSELHOS CONSULTIVOS',                       meta: 1440000, atual: 15000, unit: 'R$' },
+        { id: 'seed-r-kr3', descricao: 'ATINGIR 180 MIL EM TECNOLOGIA PRÓPRIA',                                    meta: 180000, atual: 0,     unit: 'R$' },
+        { id: 'seed-r-kr4', descricao: 'ATINGIR 400 MIL REAIS EM PATROCINIO',                                      meta: 400000, atual: 6000,  unit: 'R$' },
+      ],
+    },
+    {
+      id: 'seed-r-o2', titulo: 'ESTRUTURA DE FAMILY OFFICE PROFISSIONAL', categoria: 'Produto', trimestre: 'Q3 2026',
+      expanded: true, pdcaTab: 'okr', pdca: { semanaAtual: 1, acoes: [], plano: [] },
+      keyResults: [],
+    },
+    {
+      id: 'seed-r-o3', titulo: 'RELEVÂNCIA ESTADUAL', categoria: 'Alcance', trimestre: 'Q3 2026',
+      expanded: true, pdcaTab: 'okr', pdca: { semanaAtual: 1, acoes: [], plano: [] },
+      keyResults: [
+        { id: 'seed-r-kr5', descricao: '3 EVENTOS TOPO DE FUNIL UTILIZANDO A BASE ROMAZI',               meta: 3,     atual: 0,   unit: 'eventos'   },
+        { id: 'seed-r-kr6', descricao: '10 MIL SEGUIDORES NAS REDES SOCIAIS',                            meta: 10000, atual: 930, unit: 'seguidores' },
+        { id: 'seed-r-kr7', descricao: '10 PALESTRAS OU PAINÉS FEITAS EM PUBLICO ACIMA DE 100 PESSOAS', meta: 10,    atual: 1,   unit: 'palestras'  },
+      ],
+    },
+  ],
+}
+
 function OkrPage() {
   const [okrs, setOkrs] = useState<Objective[]>(() => {
     try {
-      const raw: Objective[] = JSON.parse(localStorage.getItem(okrStorageKey()) ?? 'null') ?? []
-      return migrateOkrs(raw)
+      const key = okrStorageKey()
+      const stored = localStorage.getItem(key)
+      if (stored) return migrateOkrs(JSON.parse(stored) ?? [])
+      // Seed pre-filled OKRs for specific members on first load
+      const u = JSON.parse(localStorage.getItem('mock_user') ?? 'null')
+      const seed = u?.id ? OKR_SEEDS[u.id] : null
+      if (seed) {
+        localStorage.setItem(key, JSON.stringify(seed))
+        return seed
+      }
+      return []
     }
     catch { return [] }
   })
