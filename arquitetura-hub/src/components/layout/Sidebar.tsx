@@ -2,7 +2,7 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import type { LucideIcon } from 'lucide-react'
 import {
   Home, Rocket, Layers, Compass, Megaphone, CalendarDays,
-  BarChart2, FileBarChart, Trophy, LogOut,
+  BarChart2, FileBarChart, LogOut,
   LayoutDashboard, Users, FileText, CheckSquare,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -30,7 +30,6 @@ const membroNav: NavItem[] = [
   { label: 'Marketing Anual',   href: '/dashboard/membro/marketing',      icon: Megaphone   },
   { label: 'Indicadores',       href: '/dashboard/membro/kpis',           icon: BarChart2   },
   { label: 'Agenda',            href: '/dashboard/membro/agenda',         icon: CalendarDays },
-  { label: 'Ranking',           href: '/dashboard/membro/ranking',        icon: Trophy      },
 ]
 
 export function Sidebar() {
