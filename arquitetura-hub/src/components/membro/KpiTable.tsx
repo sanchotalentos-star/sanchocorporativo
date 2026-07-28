@@ -14,9 +14,9 @@ interface KpiTableProps {
 const categoryColors: Record<string, string> = {
   'Conteúdo': '#3B82F6',
   'Conversão': '#10B981',
-  'Autoridade': '#7B2FBE',
+  'Autoridade': '#C5A880',
   'Mídia': '#8B5CF6',
-  'Rede': '#6B7280',
+  'Rede': '#9E9A94',
   'Receita': '#EF4444',
 }
 

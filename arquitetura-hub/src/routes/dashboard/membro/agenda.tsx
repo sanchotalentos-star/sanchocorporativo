@@ -27,10 +27,10 @@ interface ItemAgenda {
 }
 
 const STATUS_CONFIG: Record<AcaoStatus, { label: string; bg: string; text: string; dot: string }> = {
-  feito:     { label: 'Feito',      bg: '#DCFCE7', text: '#166534', dot: '#22C55E' },
-  nao_feito: { label: 'Não feito',  bg: '#FEE2E2', text: '#991B1B', dot: '#EF4444' },
-  bloqueado: { label: 'Bloqueado',  bg: '#FEF3C7', text: '#92400E', dot: '#F59E0B' },
-  pendente:  { label: 'Pendente',   bg: '#F3F4F6', text: '#6B7280', dot: '#9CA3AF' },
+  feito:     { label: 'Feito',      bg: 'rgba(34,197,94,0.15)',   text: '#4ADE80', dot: '#22C55E' },
+  nao_feito: { label: 'Não feito',  bg: 'rgba(239,68,68,0.15)',   text: '#F87171', dot: '#EF4444' },
+  bloqueado: { label: 'Bloqueado',  bg: 'rgba(245,158,11,0.15)',  text: '#FBB740', dot: '#F59E0B' },
+  pendente:  { label: 'Pendente',   bg: 'rgba(117,113,107,0.15)', text: '#9E9A94', dot: '#75716B' },
 }
 
 function StatusChip({ status }: { status: AcaoStatus }) {
@@ -279,7 +279,7 @@ function AgendaPage() {
                       display: 'grid',
                       gridTemplateColumns: '1fr 110px 100px',
                       padding: '6px 20px',
-                      borderBottom: '1px solid #F3F4F6',
+                      borderBottom: '1px solid rgba(255,255,255,0.05)',
                     }}>
                       <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Ação</span>
                       <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Status</span>
@@ -336,7 +336,7 @@ function AgendaPage() {
                       display: 'grid',
                       gridTemplateColumns: '1fr 100px',
                       padding: '6px 20px',
-                      borderBottom: '1px solid #F3F4F6',
+                      borderBottom: '1px solid rgba(255,255,255,0.05)',
                     }}>
                       <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Entrega</span>
                       <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Prazo</span>
@@ -390,7 +390,7 @@ function AgendaPage() {
                       display: 'grid',
                       gridTemplateColumns: '1fr 110px 80px',
                       padding: '6px 20px',
-                      borderBottom: '1px solid #F3F4F6',
+                      borderBottom: '1px solid rgba(255,255,255,0.05)',
                     }}>
                       <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Conteúdo</span>
                       <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Status</span>

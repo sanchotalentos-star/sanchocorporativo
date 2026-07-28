@@ -21,9 +21,9 @@ interface PilarData {
 }
 
 const statusConfig: Record<PilarStatus, { label: string; color: string; bg: string }> = {
-  aguardando:     { label: 'Aguardando reflexão',   color: '#9CA3AF', bg: '#F3F4F6' },
-  reflexao_feita: { label: 'Reflexão feita',        color: '#D97706', bg: '#FEF3C7' },
-  construido:     { label: 'Construído com mentor', color: '#7B2FBE', bg: '#F3E8FF' },
+  aguardando:     { label: 'Aguardando reflexão',   color: '#75716B', bg: 'rgba(117,113,107,0.15)' },
+  reflexao_feita: { label: 'Reflexão feita',        color: '#F59E0B', bg: 'rgba(245,158,11,0.15)'  },
+  construido:     { label: 'Construído com mentor', color: '#C5A880', bg: 'rgba(197,168,128,0.12)' },
 }
 
 const PILARES: {
@@ -391,7 +391,7 @@ function PosicionamentoPage() {
         <div className="w-full h-2 rounded-full bg-gray-100">
           <div
             className="h-full rounded-full transition-all duration-700"
-            style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #7B2FBE, #a855f7)' }}
+            style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #C5A880, #D4B891)' }}
           />
         </div>
         {comReflexao === 0 && (

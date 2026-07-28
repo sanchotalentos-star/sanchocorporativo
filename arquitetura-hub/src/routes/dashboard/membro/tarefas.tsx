@@ -41,7 +41,7 @@ const OKR_KEY    = 'okr_store_v1'
 const TAREFAS_KEY = 'tarefas_store_v1'
 
 const catColor: Record<string, string> = {
-  'Autoridade': '#7B2FBE',
+  'Autoridade': '#C5A880',
   'Receita':    '#10B981',
   'Alcance':    '#3B82F6',
   'Produto':    '#F59E0B',
@@ -50,16 +50,16 @@ const catColor: Record<string, string> = {
 const statusCycle: TarefaStatus[] = ['pendente', 'em_andamento', 'feita', 'bloqueada']
 
 const statusConfig: Record<TarefaStatus, { label: string; bg: string; text: string; dot: string }> = {
-  pendente:     { label: 'Pendente',     bg: '#F3F4F6', text: '#6B7280', dot: '#D1D5DB' },
-  em_andamento: { label: 'Em andamento', bg: '#EFF6FF', text: '#2563EB', dot: '#3B82F6' },
-  feita:        { label: 'Feita',        bg: '#F0FDF4', text: '#16A34A', dot: '#22C55E' },
-  bloqueada:    { label: 'Bloqueada',    bg: '#FEF2F2', text: '#DC2626', dot: '#EF4444' },
+  pendente:     { label: 'Pendente',     bg: 'rgba(117,113,107,0.15)', text: '#9E9A94', dot: '#75716B' },
+  em_andamento: { label: 'Em andamento', bg: 'rgba(59,130,246,0.15)',  text: '#60A5FA', dot: '#3B82F6' },
+  feita:        { label: 'Feita',        bg: 'rgba(34,197,94,0.15)',   text: '#4ADE80', dot: '#22C55E' },
+  bloqueada:    { label: 'Bloqueada',    bg: 'rgba(239,68,68,0.15)',   text: '#F87171', dot: '#EF4444' },
 }
 
 const prioridadeConfig: Record<Prioridade, { label: string; bg: string; text: string }> = {
-  alta:  { label: 'Alta',  bg: '#FEF2F2', text: '#DC2626' },
-  media: { label: 'Média', bg: '#FFFBEB', text: '#D97706' },
-  baixa: { label: 'Baixa', bg: '#F0FDF4', text: '#16A34A' },
+  alta:  { label: 'Alta',  bg: 'rgba(239,68,68,0.15)',  text: '#F87171' },
+  media: { label: 'Média', bg: 'rgba(245,158,11,0.15)', text: '#FBB740' },
+  baixa: { label: 'Baixa', bg: 'rgba(34,197,94,0.15)',  text: '#4ADE80' },
 }
 
 const prioridadeCycle: Prioridade[] = ['alta', 'media', 'baixa']
@@ -298,16 +298,16 @@ function TarefasPage() {
         {/* Tiles de resumo */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
           {([
-            { label: 'Total',         value: totalTarefas, color: '#111827' },
-            { label: 'Feitas',        value: feitasCount,  color: '#16A34A' },
-            { label: 'Em andamento',  value: emAndamento,  color: '#2563EB' },
-            { label: 'Bloqueadas',    value: bloqueadas,   color: bloqueadas > 0 ? '#DC2626' : '#9CA3AF' },
+            { label: 'Total',         value: totalTarefas, color: '#EFECE6' },
+            { label: 'Feitas',        value: feitasCount,  color: '#22C55E' },
+            { label: 'Em andamento',  value: emAndamento,  color: '#3B82F6' },
+            { label: 'Bloqueadas',    value: bloqueadas,   color: bloqueadas > 0 ? '#EF4444' : '#75716B' },
           ] as const).map(tile => (
             <div key={tile.label} style={{
-              background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+              background: '#1A1815', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8,
               padding: '14px 16px',
             }}>
-              <p style={{ fontSize: 10, fontWeight: 500, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
+              <p style={{ fontSize: 10, fontWeight: 500, color: '#75716B', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
                 {tile.label}
               </p>
               <p style={{ fontSize: 24, fontWeight: 600, color: tile.color, margin: '6px 0 0', fontVariantNumeric: 'tabular-nums' }}>
@@ -321,12 +321,12 @@ function TarefasPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 200px', gap: 12 }}>
 
           {/* Progresso por OKR (barras empilhadas CSS) */}
-          <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden' }}>
+          <div style={{ background: '#1A1815', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{
-              padding: '11px 16px', borderBottom: '1px solid #F3F4F6', background: '#FAFAFA',
+              padding: '11px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#161412',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: 0 }}>Progresso por OKR</p>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#EFECE6', margin: 0 }}>Progresso por OKR</p>
               <div style={{ display: 'flex', gap: 10 }}>
                 {([
                   { label: 'Feita',        dot: '#22C55E' },
@@ -350,22 +350,22 @@ function TarefasPage() {
                 const emAnd  = ots.filter(t => t.status === 'em_andamento').length
                 const pend   = ots.filter(t => t.status === 'pendente').length
                 const bloq   = ots.filter(t => t.status === 'bloqueada').length
-                const cor    = catColor[okr.categoria] ?? '#7B2FBE'
+                const cor    = catColor[okr.categoria] ?? '#C5A880'
                 return (
                   <div key={okr.id}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
                       <div style={{ width: 3, height: 14, background: cor, borderRadius: 2, flexShrink: 0 }} />
                       <span style={{
-                        flex: 1, fontSize: 11, color: '#374151',
+                        flex: 1, fontSize: 11, color: '#D4D0CA',
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
                         {okr.titulo.length > 52 ? okr.titulo.slice(0, 52) + '…' : okr.titulo}
                       </span>
-                      <span style={{ fontSize: 10, color: '#9CA3AF', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                      <span style={{ fontSize: 10, color: '#75716B', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
                         {feita}/{total}
                       </span>
                     </div>
-                    <div style={{ height: 6, display: 'flex', borderRadius: 3, overflow: 'hidden', background: '#F3F4F6' }}>
+                    <div style={{ height: 6, display: 'flex', borderRadius: 3, overflow: 'hidden', background: '#2A2520' }}>
                       {feita  > 0 && <div style={{ width: `${(feita/total)*100}%`,  background: '#22C55E', transition: 'width 0.4s' }} />}
                       {emAnd  > 0 && <div style={{ width: `${(emAnd/total)*100}%`,  background: '#3B82F6', transition: 'width 0.4s' }} />}
                       {pend   > 0 && <div style={{ width: `${(pend/total)*100}%`,   background: '#E5E7EB', transition: 'width 0.4s' }} />}
@@ -378,17 +378,17 @@ function TarefasPage() {
           </div>
 
           {/* Prioridade */}
-          <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden' }}>
+          <div style={{ background: '#1A1815', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{
-              padding: '11px 16px', borderBottom: '1px solid #F3F4F6', background: '#FAFAFA',
+              padding: '11px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#161412',
             }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: 0 }}>Prioridade</p>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#EFECE6', margin: 0 }}>Prioridade</p>
             </div>
             <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {([
-                { key: 'alta',  label: 'Alta',  color: '#DC2626', bg: '#FEE2E2' },
-                { key: 'media', label: 'Média', color: '#D97706', bg: '#FEF3C7' },
-                { key: 'baixa', label: 'Baixa', color: '#16A34A', bg: '#DCFCE7' },
+                { key: 'alta',  label: 'Alta',  color: '#EF4444', bg: 'rgba(239,68,68,0.15)' },
+                { key: 'media', label: 'Média', color: '#F59E0B', bg: 'rgba(245,158,11,0.15)' },
+                { key: 'baixa', label: 'Baixa', color: '#22C55E', bg: 'rgba(34,197,94,0.15)' },
               ] as const).map(p => {
                 const count = tarefas.filter(t => t.prioridade === p.key).length
                 const maxCount = Math.max(
@@ -400,10 +400,10 @@ function TarefasPage() {
                 return (
                   <div key={p.key}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{ fontSize: 11, color: '#374151' }}>{p.label}</span>
+                      <span style={{ fontSize: 11, color: '#D4D0CA' }}>{p.label}</span>
                       <span style={{ fontSize: 11, fontWeight: 600, color: p.color, fontVariantNumeric: 'tabular-nums' }}>{count}</span>
                     </div>
-                    <div style={{ height: 4, background: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
+                    <div style={{ height: 4, background: '#2A2520', borderRadius: 2, overflow: 'hidden' }}>
                       <div style={{
                         height: '100%', borderRadius: 2,
                         width: `${(count / maxCount) * 100}%`,
@@ -416,16 +416,16 @@ function TarefasPage() {
               })}
 
               {/* Conclusão geral */}
-              <div style={{ marginTop: 4, paddingTop: 10, borderTop: '1px solid #F3F4F6' }}>
+              <div style={{ marginTop: 4, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, color: '#374151' }}>Geral</span>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#7B2FBE', fontVariantNumeric: 'tabular-nums' }}>{pctGeral}%</span>
+                  <span style={{ fontSize: 11, color: '#D4D0CA' }}>Geral</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#C5A880', fontVariantNumeric: 'tabular-nums' }}>{pctGeral}%</span>
                 </div>
-                <div style={{ height: 4, background: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ height: 4, background: '#2A2520', borderRadius: 2, overflow: 'hidden' }}>
                   <div style={{
                     height: '100%', borderRadius: 2,
                     width: `${pctGeral}%`,
-                    background: '#7B2FBE',
+                    background: '#C5A880',
                     transition: 'width 0.4s',
                   }} />
                 </div>

@@ -84,7 +84,7 @@ function SementesDeConteudo({ publicoAlvo, proposta, formatoProduto, diferenciai
       descricao: publicoAlvo
         ? `Você fala para "${publicoAlvo.slice(0, 60)}...". Crie conteúdos que nomeia essa pessoa, seus desafios e o que ela está deixando de ganhar.`
         : 'Nomear quem é seu público-alvo em cada post cria identificação imediata e atrai as pessoas certas.',
-      cor: '#7B2FBE',
+      cor: '#C5A880',
     },
     {
       icon: Star,
@@ -399,7 +399,7 @@ function MarketingPage() {
         </div>
         <div className="w-full h-2.5 rounded-full bg-gray-100">
           <div className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${progresso}%`, background: 'linear-gradient(90deg, #7B2FBE, #a855f7)' }} />
+            style={{ width: `${progresso}%`, background: 'linear-gradient(90deg, #C5A880, #D4B891)' }} />
         </div>
       </div>
 

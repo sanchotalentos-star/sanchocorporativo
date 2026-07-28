@@ -50,7 +50,7 @@ function AdminOverview() {
               <div key={member.id}>
                 <div className="rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 p-5 transition-all">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#7B2FBE] flex items-center justify-center text-white font-black text-sm flex-shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#2A2420] border border-[rgba(197,168,128,0.3)] flex items-center justify-center text-sm flex-shrink-0" style={{ color: '#C5A880', fontWeight: 600 }}>
                       {member.full_name.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">

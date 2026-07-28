@@ -42,17 +42,17 @@ interface Tarefa {
    PALETA POR CATEGORIA (fixa por identidade)
 ───────────────────────────────────────────── */
 const catColor: Record<string, string> = {
-  Autoridade: '#7B2FBE',
+  Autoridade: '#C5A880',
   Receita:    '#10B981',
   Alcance:    '#3B82F6',
   Produto:    '#F59E0B',
 }
 
 const catBg: Record<string, string> = {
-  Autoridade: 'rgba(123,47,190,0.09)',
-  Receita:    'rgba(16,185,129,0.09)',
-  Alcance:    'rgba(59,130,246,0.09)',
-  Produto:    'rgba(245,158,11,0.09)',
+  Autoridade: 'rgba(197,168,128,0.12)',
+  Receita:    'rgba(16,185,129,0.12)',
+  Alcance:    'rgba(59,130,246,0.12)',
+  Produto:    'rgba(245,158,11,0.12)',
 }
 
 /* ─────────────────────────────────────────────
@@ -77,16 +77,16 @@ function KrTooltip({ active, payload }: any) {
   const d = payload[0].payload
   return (
     <div style={{
-      background: '#fff',
-      border: '1px solid #E5E7EB',
+      background: '#1A1815',
+      border: '1px solid rgba(255,255,255,0.12)',
       borderRadius: 6,
       padding: '8px 12px',
       fontSize: 12,
-      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
       maxWidth: 240,
     }}>
-      <p style={{ fontWeight: 600, color: '#111827', marginBottom: 4, lineHeight: 1.4 }}>{d.fullLabel}</p>
-      <p style={{ color: '#6B7280', margin: 0 }}>
+      <p style={{ fontWeight: 600, color: '#EFECE6', marginBottom: 4, lineHeight: 1.4 }}>{d.fullLabel}</p>
+      <p style={{ color: '#9E9A94', margin: 0 }}>
         {d.atual} / {d.meta} {d.unit}
         {' '}·{' '}
         <span style={{ color: d.color, fontWeight: 600 }}>{d.value}%</span>
@@ -155,21 +155,21 @@ function RelatoriosPage() {
     return (
       <div style={{ maxWidth: 860, margin: '0 auto', paddingBottom: 48 }}>
         <div style={{ paddingTop: 4, marginBottom: 28 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 600, color: '#111827', margin: 0, letterSpacing: '-0.01em' }}>
+          <h1 style={{ fontSize: 22, fontWeight: 600, color: '#EFECE6', margin: 0, letterSpacing: '-0.01em' }}>
             Painel de Metas
           </h1>
-          <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 4 }}>
+          <p style={{ fontSize: 12, color: '#75716B', marginTop: 4 }}>
             Progresso dos seus OKRs e resultados-chave
           </p>
         </div>
         <div style={{
-          background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+          background: '#1A1815', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8,
           padding: '48px 32px', textAlign: 'center',
         }}>
-          <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 6 }}>
+          <p style={{ fontSize: 14, color: '#9E9A94', marginBottom: 6 }}>
             Nenhum OKR criado ainda
           </p>
-          <p style={{ fontSize: 12, color: '#9CA3AF' }}>
+          <p style={{ fontSize: 12, color: '#75716B' }}>
             Vá até <strong>Metas de Impacto</strong> para criar seus primeiros objetivos e KRs.
           </p>
         </div>
@@ -185,10 +185,10 @@ function RelatoriosPage() {
 
       {/* ── Header ── */}
       <div style={{ paddingTop: 4 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 600, color: '#111827', margin: 0, letterSpacing: '-0.01em' }}>
+        <h1 style={{ fontSize: 22, fontWeight: 600, color: '#EFECE6', margin: 0, letterSpacing: '-0.01em' }}>
           Painel de Metas
         </h1>
-        <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 4 }}>
+        <p style={{ fontSize: 12, color: '#75716B', marginTop: 4 }}>
           Progresso dos seus OKRs e resultados-chave
         </p>
       </div>
@@ -202,24 +202,24 @@ function RelatoriosPage() {
           { label: 'Progresso geral',       value: `${progGeral}%`, sub: 'média dos OKRs', accent: true },
         ] as const).map(item => (
           <div key={item.label} style={{
-            background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+            background: '#1A1815', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8,
             padding: '14px 16px',
           }}>
             <p style={{
-              fontSize: 10, fontWeight: 500, color: '#9CA3AF',
+              fontSize: 10, fontWeight: 500, color: '#75716B',
               textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0,
             }}>
               {item.label}
             </p>
             <p style={{
               fontSize: 24, fontWeight: 600,
-              color: ('accent' in item && item.accent) ? '#7B2FBE' : '#111827',
+              color: ('accent' in item && item.accent) ? '#C5A880' : '#EFECE6',
               margin: '6px 0 2px',
               fontVariantNumeric: 'tabular-nums',
             }}>
               {item.value}
             </p>
-            <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{item.sub}</p>
+            <p style={{ fontSize: 11, color: '#75716B', margin: 0 }}>{item.sub}</p>
           </div>
         ))}
       </div>
@@ -227,27 +227,27 @@ function RelatoriosPage() {
       {/* ── Progresso por OKR ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>Progresso por OKR</p>
-          <span style={{ fontSize: 11, color: '#9CA3AF' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#EFECE6', margin: 0 }}>Progresso por OKR</p>
+          <span style={{ fontSize: 11, color: '#75716B' }}>
             {okrs.length} {okrs.length === 1 ? 'objetivo' : 'objetivos'}
           </span>
         </div>
 
         {okrs.map(obj => {
           const op    = objPct(obj)
-          const color = catColor[obj.categoria] ?? '#7B2FBE'
+          const color = catColor[obj.categoria] ?? '#C5A880'
 
           return (
             <div key={obj.id} style={{
-              background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+              background: '#1A1815', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8,
               overflow: 'hidden',
             }}>
               {/* Cabeçalho do objetivo */}
               <div style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '11px 20px',
-                borderBottom: '1px solid #F3F4F6',
-                background: '#FAFAFA',
+                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                background: '#161412',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
                   <span style={{
@@ -259,14 +259,14 @@ function RelatoriosPage() {
                     {obj.categoria}
                   </span>
                   <p style={{
-                    fontSize: 13, fontWeight: 600, color: '#111827', margin: 0,
+                    fontSize: 13, fontWeight: 600, color: '#EFECE6', margin: 0,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     {obj.titulo}
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 20 }}>
-                  <div style={{ width: 72, height: 4, background: '#E5E7EB', borderRadius: 2, overflow: 'hidden' }}>
+                  <div style={{ width: 72, height: 4, background: '#2A2520', borderRadius: 2, overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${op}%`, background: color, borderRadius: 2 }} />
                   </div>
                   <span style={{
@@ -284,11 +284,11 @@ function RelatoriosPage() {
                 display: 'grid',
                 gridTemplateColumns: '1fr 180px 100px',
                 padding: '5px 20px',
-                borderBottom: '1px solid #F3F4F6',
+                borderBottom: '1px solid rgba(255,255,255,0.05)',
               }}>
                 {['Resultado-chave', 'Progresso', 'Atual / Meta'].map(h => (
                   <span key={h} style={{
-                    fontSize: 10, fontWeight: 500, color: '#B0B7C3',
+                    fontSize: 10, fontWeight: 500, color: '#75716B',
                     textTransform: 'uppercase', letterSpacing: '0.06em',
                   }}>
                     {h}
@@ -299,7 +299,7 @@ function RelatoriosPage() {
               {/* KR rows */}
               {obj.keyResults.length === 0 ? (
                 <div style={{ padding: '12px 20px' }}>
-                  <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>Nenhum KR definido.</p>
+                  <p style={{ fontSize: 12, color: '#75716B', margin: 0 }}>Nenhum KR definido.</p>
                 </div>
               ) : (
                 obj.keyResults.map((kr, i) => {
@@ -312,15 +312,15 @@ function RelatoriosPage() {
                       alignItems: 'center',
                       gap: 0,
                       padding: '9px 20px',
-                      borderBottom: i < obj.keyResults.length - 1 ? '1px solid #F9FAFB' : 'none',
+                      borderBottom: i < obj.keyResults.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none',
                     }}>
-                      <p style={{ fontSize: 12, color: '#374151', margin: 0, lineHeight: 1.45, paddingRight: 16 }}>
+                      <p style={{ fontSize: 12, color: '#D4D0CA', margin: 0, lineHeight: 1.45, paddingRight: 16 }}>
                         {kr.descricao}
                       </p>
 
                       {/* Progress bar + % */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ flex: 1, height: 4, background: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
+                        <div style={{ flex: 1, height: 4, background: '#2A2520', borderRadius: 2, overflow: 'hidden' }}>
                           <div style={{
                             height: '100%',
                             width: `${p}%`,
@@ -331,7 +331,7 @@ function RelatoriosPage() {
                         </div>
                         <span style={{
                           fontSize: 11, fontWeight: 600,
-                          color: p === 100 ? '#10B981' : p > 0 ? color : '#D1D5DB',
+                          color: p === 100 ? '#10B981' : p > 0 ? color : '#4A4540',
                           minWidth: 30, textAlign: 'right',
                           fontVariantNumeric: 'tabular-nums',
                         }}>
@@ -341,12 +341,12 @@ function RelatoriosPage() {
 
                       {/* Atual / Meta */}
                       <p style={{
-                        fontSize: 11, color: '#9CA3AF', margin: 0,
+                        fontSize: 11, color: '#75716B', margin: 0,
                         textAlign: 'right', fontVariantNumeric: 'tabular-nums',
                       }}>
-                        <span style={{ fontWeight: 600, color: '#374151' }}>{kr.atual}</span>
+                        <span style={{ fontWeight: 600, color: '#D4D0CA' }}>{kr.atual}</span>
                         {' '}/ {kr.meta}{' '}
-                        <span style={{ color: '#B0B7C3' }}>{kr.unit}</span>
+                        <span style={{ color: '#4A4540' }}>{kr.unit}</span>
                       </p>
                     </div>
                   )
@@ -360,14 +360,14 @@ function RelatoriosPage() {
       {/* ── Gráfico: todos os KRs comparados ── */}
       {barData.length > 0 && (
         <div style={{
-          background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+          background: '#1A1815', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8,
           padding: '18px 20px 12px',
         }}>
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             marginBottom: 16,
           }}>
-            <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, color: '#EFECE6', margin: 0 }}>
               Comparativo de Resultados-Chave
             </p>
             {/* Legenda por categoria */}
@@ -376,10 +376,10 @@ function RelatoriosPage() {
                 <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <div style={{
                     width: 8, height: 8,
-                    background: catColor[cat] ?? '#7B2FBE',
+                    background: catColor[cat] ?? '#C5A880',
                     borderRadius: 2, flexShrink: 0,
                   }} />
-                  <span style={{ fontSize: 10, color: '#6B7280' }}>{cat}</span>
+                  <span style={{ fontSize: 10, color: '#9E9A94' }}>{cat}</span>
                 </div>
               ))}
             </div>
@@ -391,10 +391,10 @@ function RelatoriosPage() {
               margin={{ top: 4, right: 4, left: -24, bottom: 52 }}
               barSize={20}
             >
-              <CartesianGrid vertical={false} stroke="#F3F4F6" />
+              <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.06)" />
               <XAxis
                 dataKey="label"
-                tick={{ fontSize: 9, fill: '#9CA3AF' }}
+                tick={{ fontSize: 9, fill: '#75716B' }}
                 axisLine={false}
                 tickLine={false}
                 angle={-35}
@@ -403,12 +403,12 @@ function RelatoriosPage() {
               />
               <YAxis
                 domain={[0, 100]}
-                tick={{ fontSize: 10, fill: '#9CA3AF' }}
+                tick={{ fontSize: 10, fill: '#75716B' }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={v => `${v}%`}
               />
-              <Tooltip content={<KrTooltip />} cursor={{ fill: '#F9FAFB' }} />
+              <Tooltip content={<KrTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
               <Bar dataKey="value" radius={[3, 3, 0, 0]}>
                 {barData.map((entry, i) => (
                   <Cell key={i} fill={entry.color} />
@@ -422,17 +422,17 @@ function RelatoriosPage() {
       {/* ── Tarefas por OKR ── */}
       {tasksByOkr.length > 0 && (
         <div style={{
-          background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8,
+          background: '#1A1815', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8,
           overflow: 'hidden',
         }}>
           {/* Header */}
           <div style={{
-            padding: '11px 20px', borderBottom: '1px solid #F3F4F6',
-            background: '#FAFAFA',
+            padding: '11px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)',
+            background: '#161412',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           }}>
-            <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>Tarefas por OKR</p>
-            <span style={{ fontSize: 11, color: '#9CA3AF' }}>
+            <p style={{ fontSize: 13, fontWeight: 600, color: '#EFECE6', margin: 0 }}>Tarefas por OKR</p>
+            <span style={{ fontSize: 11, color: '#75716B' }}>
               {tarefasFeitas} de {tarefas.length} concluídas
             </span>
           </div>
@@ -440,11 +440,11 @@ function RelatoriosPage() {
           {/* Column headers */}
           <div style={{
             display: 'grid', gridTemplateColumns: '1fr 64px 96px 72px 88px',
-            padding: '5px 20px', borderBottom: '1px solid #F3F4F6',
+            padding: '5px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)',
           }}>
             {['OKR', 'Feitas', 'Em andamento', 'Pendentes', 'Bloqueadas'].map(h => (
               <span key={h} style={{
-                fontSize: 10, fontWeight: 500, color: '#B0B7C3',
+                fontSize: 10, fontWeight: 500, color: '#75716B',
                 textTransform: 'uppercase', letterSpacing: '0.06em',
               }}>
                 {h}
@@ -457,23 +457,23 @@ function RelatoriosPage() {
               display: 'grid', gridTemplateColumns: '1fr 64px 96px 72px 88px',
               alignItems: 'center',
               padding: '9px 20px',
-              borderBottom: i < tasksByOkr.length - 1 ? '1px solid #F9FAFB' : 'none',
+              borderBottom: i < tasksByOkr.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                 <div style={{
                   width: 3, height: 18, flexShrink: 0,
-                  background: catColor[item.categoria] ?? '#7B2FBE',
+                  background: catColor[item.categoria] ?? '#C5A880',
                   borderRadius: 2,
                 }} />
                 <span style={{
-                  fontSize: 12, color: '#374151',
+                  fontSize: 12, color: '#D4D0CA',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>
                   {item.titulo.length > 48 ? item.titulo.slice(0, 48) + '…' : item.titulo}
                 </span>
               </div>
               <span style={{
-                fontSize: 12, fontWeight: 600, color: '#10B981',
+                fontSize: 12, fontWeight: 600, color: '#22C55E',
                 fontVariantNumeric: 'tabular-nums',
               }}>
                 {item.feitas}
@@ -481,12 +481,12 @@ function RelatoriosPage() {
               <span style={{ fontSize: 12, color: '#3B82F6', fontVariantNumeric: 'tabular-nums' }}>
                 {item.em_andamento}
               </span>
-              <span style={{ fontSize: 12, color: '#6B7280', fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontSize: 12, color: '#9E9A94', fontVariantNumeric: 'tabular-nums' }}>
                 {item.pendentes}
               </span>
               <span style={{
                 fontSize: 12, fontVariantNumeric: 'tabular-nums',
-                color: item.bloqueadas > 0 ? '#EF4444' : '#6B7280',
+                color: item.bloqueadas > 0 ? '#EF4444' : '#9E9A94',
               }}>
                 {item.bloqueadas}
               </span>

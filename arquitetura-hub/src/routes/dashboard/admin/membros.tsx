@@ -152,7 +152,7 @@ const BLOCOS: {
     ],
   },
   {
-    id: 'proposta', num: '02', label: 'O Que Você Entrega de Diferente', cor: '#7B2FBE',
+    id: 'proposta', num: '02', label: 'O Que Você Entrega de Diferente', cor: '#C5A880',
     placeholder: 'Síntese sobre a proposta: o resultado, o prazo e o diferenciador...',
     reflexaoKey: 'proposta',
     perguntas: [
@@ -193,7 +193,7 @@ const BLOCOS: {
 ]
 
 const CATEGORIA_COLORS: Record<string, string> = {
-  Autoridade: '#7B2FBE', Receita: '#10B981', Alcance: '#3B82F6', Produto: '#F59E0B',
+  Autoridade: '#C5A880', Receita: '#10B981', Alcance: '#3B82F6', Produto: '#F59E0B',
 }
 
 function tag(text: string, max = 55) {
@@ -221,7 +221,7 @@ function buildSugestoes(id: IdentidadeStored | null): SugestaoPilar[] {
     } : null,
 
     proposta ? {
-      id: 'autoridade', cor: '#7B2FBE', nome: 'Autoridade pela Entrega',
+      id: 'autoridade', cor: '#C5A880', nome: 'Autoridade pela Entrega',
       descricao: `Tornar visível a transformação que você gera: "${tag(proposta)}"`,
       acoes: [
         `Documentar 1 caso real de cliente por mês, mostrando o antes e o depois da transformação`,
@@ -374,12 +374,12 @@ function MiniChart({ data }: { data: { month: string; alcance: number }[] }) {
     <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-14" preserveAspectRatio="none">
       <defs>
         <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#7B2FBE" stopOpacity="0.2" />
-          <stop offset="100%" stopColor="#7B2FBE" stopOpacity="0" />
+          <stop offset="0%" stopColor="#C5A880" stopOpacity="0.2" />
+          <stop offset="100%" stopColor="#C5A880" stopOpacity="0" />
         </linearGradient>
       </defs>
       <path d={area} fill="url(#cg)" />
-      <path d={line} fill="none" stroke="#7B2FBE" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={line} fill="none" stroke="#C5A880" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -755,7 +755,7 @@ function MembrosPage() {
                   </div>
                   <div className="text-right pl-5">
                     <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Identidade</p>
-                    <p className="text-[11px] font-bold" style={{ color: filled > 0 ? '#7B2FBE' : '#9CA3AF' }}>
+                    <p className="text-[11px] font-bold" style={{ color: filled > 0 ? '#C5A880' : '#9CA3AF' }}>
                       {filled}/5 · {constructed} construídos
                     </p>
                   </div>
@@ -881,7 +881,7 @@ function MembrosPage() {
                                   const content = getBlocoContent(member, bloco)
                                   const hasCont = content !== null && (Array.isArray(content) ? content.length > 0 : content.length > 0)
                                   const status  = bs.construido ? 'construido' : hasCont ? 'pronto' : 'aguardando'
-                                  const dotColor = { aguardando: '#D1D5DB', pronto: '#D97706', construido: '#7B2FBE' }[status]
+                                  const dotColor = { aguardando: '#D1D5DB', pronto: '#D97706', construido: '#C5A880' }[status]
 
                                   return (
                                     <div key={bloco.id} className="px-4 py-3">
@@ -939,10 +939,10 @@ function MembrosPage() {
                                     return (
                                     <div key={okr.id} className="px-4 py-3">
                                       <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-2 h-2 flex-shrink-0" style={{ background: CATEGORIA_COLORS[okr.categoria] ?? '#7B2FBE' }} />
+                                        <div className="w-2 h-2 flex-shrink-0" style={{ background: CATEGORIA_COLORS[okr.categoria] ?? '#C5A880' }} />
                                         <p className="text-xs font-bold text-gray-800 flex-1">{okr.titulo}</p>
                                         <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 flex-shrink-0"
-                                          style={{ background: `${CATEGORIA_COLORS[okr.categoria] ?? '#7B2FBE'}18`, color: CATEGORIA_COLORS[okr.categoria] ?? '#7B2FBE' }}>
+                                          style={{ background: `${CATEGORIA_COLORS[okr.categoria] ?? '#C5A880'}18`, color: CATEGORIA_COLORS[okr.categoria] ?? '#C5A880' }}>
                                           {okr.categoria}
                                         </span>
                                       </div>
@@ -1160,7 +1160,7 @@ function MembrosPage() {
                               const hasCont = content !== null && (Array.isArray(content) ? content.length > 0 : content.length > 0)
                               const status  = bs.construido ? 'construido' : hasCont ? 'pronto' : 'aguardando'
                               const statusLabel = { aguardando: 'Aguardando', pronto: 'Pronto para sessão', construido: 'Construído' }[status]
-                              const statusColor = { aguardando: '#9CA3AF', pronto: '#D97706', construido: '#7B2FBE' }[status]
+                              const statusColor = { aguardando: '#9CA3AF', pronto: '#D97706', construido: '#C5A880' }[status]
 
                               return (
                                 <div key={bloco.id} className="bg-white border border-gray-200 overflow-hidden" style={{ borderTopWidth: 2, borderTopColor: bloco.cor }}>
@@ -1256,7 +1256,7 @@ function MembrosPage() {
                                 <div className="divide-y divide-gray-100">
                                   {okrSugestoes.map(s => {
                                     const added = (addedOkrIds[member.id] ?? new Set()).has(s.id) || okrs.some(o => o.id.startsWith(`sug-${s.id}-`))
-                                    const cor = CATEGORIA_COLORS[s.categoria] ?? '#7B2FBE'
+                                    const cor = CATEGORIA_COLORS[s.categoria] ?? '#C5A880'
                                     return (
                                       <div key={s.id} className="px-4 py-3">
                                         <div className="flex items-start justify-between gap-3 mb-2">
@@ -1320,7 +1320,7 @@ function MembrosPage() {
                                   const avgPct   = krsCount > 0
                                     ? Math.round(krsArr.reduce((sum, kr) => sum + (kr.meta > 0 ? Math.min((kr.atual / kr.meta) * 100, 100) : 0), 0) / krsCount)
                                     : 0
-                                  const catColor = CATEGORIA_COLORS[okr.categoria] ?? '#7B2FBE'
+                                  const catColor = CATEGORIA_COLORS[okr.categoria] ?? '#C5A880'
                                   return (
                                     <div key={okr.id} className="bg-white border border-gray-200 overflow-hidden">
                                       <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100" style={{ borderLeftWidth: 3, borderLeftColor: catColor }}>
@@ -1480,7 +1480,7 @@ function MembrosPage() {
                               <button
                                 onClick={() => setShowAddMkt(v => !v)}
                                 className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 text-white flex-shrink-0"
-                                style={{ background: '#7B2FBE' }}
+                                style={{ background: '#C5A880' }}
                               >
                                 <Plus size={10} /> Nova Ação
                               </button>
@@ -1538,7 +1538,7 @@ function MembrosPage() {
                                   </button>
                                   <button onClick={() => addMktAcao(member.id)} disabled={!mktNovaForm.titulo.trim()}
                                     className="flex-1 text-xs font-bold text-white py-2 uppercase tracking-wider disabled:opacity-40"
-                                    style={{ background: '#7B2FBE' }}>
+                                    style={{ background: '#C5A880' }}>
                                     Adicionar
                                   </button>
                                 </div>
@@ -1580,7 +1580,7 @@ function MembrosPage() {
                                       <button
                                         onClick={() => toggleMktConcluida(member.id, acao.id)}
                                         className="w-4 h-4 border-2 flex items-center justify-center flex-shrink-0 transition-all"
-                                        style={{ borderColor: acao.concluida ? '#10B981' : '#7B2FBE', background: acao.concluida ? '#10B981' : 'transparent' }}
+                                        style={{ borderColor: acao.concluida ? '#10B981' : '#C5A880', background: acao.concluida ? '#10B981' : 'transparent' }}
                                       >
                                         {acao.concluida && <Check size={9} className="text-white" />}
                                       </button>
@@ -1657,7 +1657,7 @@ function MembrosPage() {
                                 <button
                                   onClick={() => setShowAddKpi(v => !v)}
                                   className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 text-white flex-shrink-0"
-                                  style={{ background: '#7B2FBE' }}
+                                  style={{ background: '#C5A880' }}
                                 >
                                   <Plus size={10} /> Novo Indicador
                                 </button>
@@ -1702,7 +1702,7 @@ function MembrosPage() {
                                       className="flex-1 border border-gray-200 text-xs font-bold text-gray-500 py-2 uppercase tracking-wider hover:bg-gray-50">Cancelar</button>
                                     <button onClick={() => addKpi(member.id)} disabled={!kpiForm.kpi_name.trim() || !kpiForm.meta}
                                       className="flex-1 text-xs font-bold text-white py-2 uppercase tracking-wider disabled:opacity-40"
-                                      style={{ background: '#7B2FBE' }}>Adicionar</button>
+                                      style={{ background: '#C5A880' }}>Adicionar</button>
                                   </div>
                                 </div>
                               )}
@@ -1741,8 +1741,8 @@ function MembrosPage() {
                               {/* Stats */}
                               <div className="grid grid-cols-4 gap-px bg-gray-200">
                                 {[
-                                  { label: 'OKR', value: okrItems.length, icon: Target, color: '#7B2FBE' },
-                                  { label: 'Marketing', value: mktItems.length, icon: Megaphone, color: '#7B2FBE' },
+                                  { label: 'OKR', value: okrItems.length, icon: Target, color: '#C5A880' },
+                                  { label: 'Marketing', value: mktItems.length, icon: Megaphone, color: '#C5A880' },
                                   { label: 'Feito', value: feitos, icon: CheckCircle2, color: '#10B981' },
                                   { label: 'Pendente', value: pendentes, icon: Circle, color: '#9CA3AF' },
                                 ].map(s => (
