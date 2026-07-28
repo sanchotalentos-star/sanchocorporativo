@@ -4,6 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Cell,
   ResponsiveContainer, Tooltip, CartesianGrid,
 } from 'recharts'
+import { memberKey } from '@/lib/memberStorage'
 
 export const Route = createFileRoute('/dashboard/membro/relatorios')({
   component: RelatoriosPage,
@@ -103,11 +104,11 @@ function RelatoriosPage() {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem('okr_store_v1')
+      const raw = localStorage.getItem(memberKey('okr_store_v1'))
       if (raw) setOkrs(JSON.parse(raw))
     } catch {}
     try {
-      const raw = localStorage.getItem('tarefas_store_v1')
+      const raw = localStorage.getItem(memberKey('tarefas_store_v1'))
       if (raw) setTarefas(JSON.parse(raw))
     } catch {}
   }, [])

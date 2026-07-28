@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Mail, Trash2, ChevronDown, ChevronUp, ChevronRight, Sparkles, BookOpen, Star, Users, Lightbulb, Layers, X, Trophy, Globe } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getIdentidade } from '@/lib/identidade'
+import { memberKey } from '@/lib/memberStorage'
 
 const MARKETING_KEY = 'marketing_store_v1'
 
@@ -49,7 +50,7 @@ const canalColors: Record<Canal, string> = {
 const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 
 function loadAcoes(): AcaoMarketing[] {
-  try { return JSON.parse(localStorage.getItem(MARKETING_KEY) ?? 'null') ?? [] }
+  try { return JSON.parse(localStorage.getItem(memberKey(MARKETING_KEY)) ?? 'null') ?? [] }
   catch { return [] }
 }
 
@@ -223,7 +224,7 @@ function MarketingPage() {
   const formatoProduto = identidade?.pilares.formatoProduto?.reflexao?.trim()
 
   useEffect(() => {
-    localStorage.setItem(MARKETING_KEY, JSON.stringify(acoes))
+    localStorage.setItem(memberKey(MARKETING_KEY), JSON.stringify(acoes))
   }, [acoes])
 
   function addAcao() {

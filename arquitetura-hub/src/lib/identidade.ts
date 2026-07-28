@@ -1,3 +1,5 @@
+import { memberKey } from '@/lib/memberStorage'
+
 export const IDENTIDADE_KEY = 'identidade_marca_v1'
 
 export interface IdentidadeStored {
@@ -12,7 +14,7 @@ export interface IdentidadeStored {
 
 export function getIdentidade(): IdentidadeStored | null {
   try {
-    const raw = localStorage.getItem(IDENTIDADE_KEY)
+    const raw = localStorage.getItem(memberKey(IDENTIDADE_KEY))
     return raw ? JSON.parse(raw) : null
   } catch {
     return null

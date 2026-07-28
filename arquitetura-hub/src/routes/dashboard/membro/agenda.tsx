@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useMemo } from 'react'
 import { Calendar, Target, Megaphone, ChevronRight, Filter } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { memberKey } from '@/lib/memberStorage'
 
 export const Route = createFileRoute('/dashboard/membro/agenda')({
   component: AgendaPage,
@@ -70,7 +71,7 @@ function AgendaPage() {
       titulo: string
       categoria: string
       pdca: { acoes: Array<{ id: string; descricao: string; semana: number; status: AcaoStatus; dataLimite?: string }>; plano: Array<{ id: string; entrega: string; dataLimite: string }> }
-    }>(OKR_KEY)
+    }>(memberKey(OKR_KEY))
 
     const marketing = loadFromStorage<{
       id: string
@@ -78,7 +79,7 @@ function AgendaPage() {
       canal: string
       mes: number
       concluida: boolean
-    }>(MARKETING_KEY)
+    }>(memberKey(MARKETING_KEY))
 
     const okrItems: ItemAgenda[] = okrs.flatMap(obj =>
       [

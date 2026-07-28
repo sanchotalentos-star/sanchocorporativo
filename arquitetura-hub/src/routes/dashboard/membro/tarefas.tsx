@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { Plus, X, Trash2, ChevronDown, ChevronUp, ClipboardList } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { memberKey } from '@/lib/memberStorage'
 
 export const Route = createFileRoute('/dashboard/membro/tarefas')({
   component: TarefasPage,
@@ -185,7 +186,7 @@ function TarefasPage() {
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(OKR_KEY)
+      const stored = localStorage.getItem(memberKey(OKR_KEY))
       if (stored) setOkrs(JSON.parse(stored) ?? [])
     } catch {}
   }, [])
@@ -195,7 +196,7 @@ function TarefasPage() {
 
     let stored: Tarefa[] = []
     try {
-      const raw = JSON.parse(localStorage.getItem(TAREFAS_KEY) ?? '[]') ?? []
+      const raw = JSON.parse(localStorage.getItem(memberKey(TAREFAS_KEY)) ?? '[]') ?? []
       // Migrate old format (done boolean) to new (status field)
       stored = raw.map((t: Tarefa & { done?: boolean }) => ({
         ...t,
@@ -223,8 +224,8 @@ function TarefasPage() {
   }, [okrs])
 
   useEffect(() => {
-    if (tarefas.length > 0 || localStorage.getItem(TAREFAS_KEY)) {
-      localStorage.setItem(TAREFAS_KEY, JSON.stringify(tarefas))
+    if (tarefas.length > 0 || localStorage.getItem(memberKey(TAREFAS_KEY))) {
+      localStorage.setItem(memberKey(TAREFAS_KEY), JSON.stringify(tarefas))
     }
   }, [tarefas])
 
