@@ -906,93 +906,74 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
 const WELCOME_KEY = 'hub_welcome_v1'
 
 const GUIA_STEPS = [
-  {
-    num: 1, color: '#7B2FBE',
-    title: 'Começa pela Identidade',
-    body: 'Antes de qualquer coisa, você vai preencher quem você é como profissional. Para quem você serve, qual problema você resolve melhor do que qualquer um, o que te diferencia. Essa parte parece simples mas é a mais profunda. Não precisa estar perfeito na primeira vez, escreve o que você acredita hoje e a gente vai afinando nas reuniões. Tudo que vem depois nasce daqui.',
-  },
-  {
-    num: 2, color: '#3B82F6',
-    title: 'Depois vão os Pilares',
-    body: 'Com a identidade no lugar, você escolhe os temas que sustentam a sua autoridade. São os assuntos sobre os quais você tem profundidade real e pode falar repetidamente sem forçar. De 3 a 5 pilares. Eles vão ser o filtro de todo conteúdo que você produzir. Se não cabe em nenhum pilar, provavelmente não precisa existir.',
-  },
-  {
-    num: 3, color: '#10B981',
-    title: 'A gente define os OKRs',
-    body: 'Aqui você coloca para onde quer ir nos próximos 90 dias. Um objetivo grande e inspirador, e os números que vão mostrar se você está chegando lá. Seguidores, leads, convites, receita — o que fizer mais sentido para o seu momento. Toda semana você atualiza esses valores e a plataforma te mostra o que está no caminho certo e o que precisa de atenção. É o que a gente vai revisar juntos em cada reunião.',
-  },
-  {
-    num: 4, color: '#F59E0B',
-    title: 'Depois o plano de Marketing',
-    body: 'Com tudo isso definido, você monta o seu plano de distribuição. Quais canais vai usar, com que frequência e em qual mês. LinkedIn, lives, eventos, podcasts, o que fizer parte da sua estratégia. Conforme vai executando, você marca como concluído. Isso te ajuda a sair do achismo e ter clareza do que você realmente está fazendo.',
-  },
-  {
-    num: 5, color: '#EC4899',
-    title: 'Por último, os Indicadores',
-    body: 'Aqui entram os números que mostram se está funcionando. Alcance, leads, oportunidades, receita. Você cadastra cada um com uma meta e vai atualizando ao longo do tempo. Com isso a gente consegue ver juntos não só se você está executando, mas se a execução está gerando resultado.',
-  },
+  { num: 1, color: '#1A1A1A', title: 'Identidade Profissional', body: 'Alinhamento de posicionamento, essência e o tom da sua marca.' },
+  { num: 2, color: '#1A1A1A', title: 'Pilares de Atuação',      body: 'Definição das frentes centrais do seu modelo de negócio.' },
+  { num: 3, color: '#1A1A1A', title: 'Metas e OKRs',            body: 'Estabelecimento de objetivos claros e direcionadores de crescimento.' },
+  { num: 4, color: '#1A1A1A', title: 'Plano de Marketing',      body: 'Estruturação da estratégia de visibilidade e atração.' },
+  { num: 5, color: '#1A1A1A', title: 'Indicadores de Sucesso',  body: 'Métricas de acompanhamento contínuo e evolução.' },
 ]
 
-function WelcomeGuia({ defaultOpen = true }: { defaultOpen?: boolean }) {
+function WelcomeGuia({ defaultOpen = false }: { defaultOpen?: boolean }) {
   const [open, setOpen] = useState(() => {
     const saved = localStorage.getItem(WELCOME_KEY)
     if (saved !== null) return saved !== 'closed'
     return defaultOpen
   })
 
-  function toggle() {
-    const next = !open
-    setOpen(next)
-    localStorage.setItem(WELCOME_KEY, next ? 'open' : 'closed')
+  const handleToggle = () => {
+    const nextState = !open
+    setOpen(nextState)
+    localStorage.setItem(WELCOME_KEY, nextState ? 'open' : 'closed')
   }
 
   return (
-    <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, overflow: 'hidden' }}>
+    <div style={{ background: '#FCFCFB', border: '1px solid #E6E4DF', borderRadius: 8, overflow: 'hidden' }}>
       <button
-        onClick={toggle}
+        onClick={handleToggle}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(123,47,190,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Rocket size={14} style={{ color: '#7B2FBE' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 6, background: '#F1EFEA', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Rocket size={13} style={{ color: '#1A1A1A' }} />
           </div>
           <div>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: 0 }}>Bem-vindo ao hub da sua mentoria</p>
-            <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Como funciona cada etapa da jornada</p>
+            <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0, letterSpacing: '-0.01em' }}>Guia da Jornada de Mentoria</p>
+            <p style={{ fontSize: 11, color: '#787672', margin: '2px 0 0' }}>Visão geral das 5 etapas do seu repositório</p>
           </div>
         </div>
         {open
-          ? <ChevronUp size={14} style={{ color: '#9CA3AF', flexShrink: 0 }} />
-          : <ChevronDown size={14} style={{ color: '#9CA3AF', flexShrink: 0 }} />
+          ? <ChevronUp size={14} color="#787672" style={{ flexShrink: 0 }} />
+          : <ChevronDown size={14} color="#787672" style={{ flexShrink: 0 }} />
         }
       </button>
 
       {open && (
-        <div style={{ borderTop: '1px solid #F3F4F6', padding: '20px 20px 24px' }}>
-          <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.7, marginBottom: 24, marginTop: 0 }}>
-            Criei um hub exclusivo pra você acompanhar toda a sua jornada na mentoria. É aqui que a gente vai registrar sua identidade profissional, seus pilares, metas, plano de marketing e indicadores. Tudo num lugar só, organizado e fácil de acessar a qualquer hora.
+        <div style={{ borderTop: '1px solid #E6E4DF', padding: '24px 20px 28px', background: '#FFFFFF' }}>
+          <p style={{ fontSize: 13, color: '#4A4845', lineHeight: 1.6, marginBottom: 24, marginTop: 0, maxWidth: 700 }}>
+            Este espaço centraliza o acompanhamento da sua mentoria. Aqui estruturamos sua identidade,
+            direcionamentos e indicadores de forma integrada e progressiva.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
             {GUIA_STEPS.map((step, i) => (
-              <div key={step.num} style={{ display: 'flex', gap: 16, paddingBottom: i < GUIA_STEPS.length - 1 ? 22 : 0, position: 'relative' }}>
+              <div key={step.num} style={{ display: 'flex', gap: 16, paddingBottom: i < GUIA_STEPS.length - 1 ? 20 : 0, position: 'relative' }}>
                 {i < GUIA_STEPS.length - 1 && (
-                  <div style={{ position: 'absolute', left: 14, top: 30, bottom: 0, width: 1, background: '#F3F4F6', zIndex: 0 }} />
+                  <div style={{ position: 'absolute', left: 13, top: 26, bottom: 0, width: 1, background: '#E6E4DF', zIndex: 0 }} />
                 )}
                 <div style={{
-                  width: 28, height: 28, borderRadius: '50%', flexShrink: 0, zIndex: 1,
-                  background: step.color, color: '#fff',
+                  width: 26, height: 26, borderRadius: '50%', flexShrink: 0, zIndex: 1,
+                  background: '#1A1A1A', color: '#fff',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, fontWeight: 700, letterSpacing: '-0.02em',
+                  fontSize: 11, fontWeight: 500,
                 }}>
                   {step.num}
                 </div>
-                <div style={{ flex: 1, paddingTop: 3 }}>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>{step.title}</p>
-                  <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.7, margin: 0 }}>{step.body}</p>
+                <div style={{ flex: 1, paddingTop: 2 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: '0 0 2px', letterSpacing: '-0.01em' }}>{step.title}</p>
+                  <p style={{ fontSize: 12, color: '#787672', lineHeight: 1.5, margin: 0 }}>{step.body}</p>
                 </div>
               </div>
             ))}
@@ -1107,29 +1088,29 @@ function HomePage() {
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', paddingBottom: 48, display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ maxWidth: 880, margin: '0 auto', padding: '24px 20px 48px', display: 'flex', flexDirection: 'column', gap: 24, fontFamily: 'inherit' }}>
       {/* Header + view toggle */}
-      <div style={{ paddingTop: 4, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: '1px solid #E6E4DF', paddingBottom: 16 }}>
         <div>
-          <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 2 }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
-          <h1 style={{ fontSize: 22, fontWeight: 600, color: '#111827', margin: 0, letterSpacing: '-0.01em' }}>Olá, {firstName}</h1>
+          <p style={{ fontSize: 11, color: '#787672', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
+          <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1A1A1A', margin: 0, letterSpacing: '-0.02em' }}>Olá, {firstName}</h1>
         </div>
-        <div style={{ display: 'flex', border: '1px solid #E5E7EB', borderRadius: 6, overflow: 'hidden', flexShrink: 0 }}>
-          {viewButtons.map(({ key, label, Icon }, i) => (
+        <div style={{ display: 'flex', background: '#F1EFEA', padding: 2, borderRadius: 6, flexShrink: 0 }}>
+          {viewButtons.map(({ key, label, Icon }) => (
             <button
               key={key}
               onClick={() => setView(key)}
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
-                padding: '7px 14px', border: 'none', cursor: 'pointer',
-                background: view === key ? '#7B2FBE' : '#fff',
-                color: view === key ? '#fff' : '#6B7280',
+                padding: '6px 12px', border: 'none', cursor: 'pointer', borderRadius: 4,
+                background: view === key ? '#FFFFFF' : 'transparent',
+                color: view === key ? '#1A1A1A' : '#787672',
+                boxShadow: view === key ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
                 fontSize: 12, fontWeight: view === key ? 600 : 400,
-                borderRight: i < viewButtons.length - 1 ? '1px solid #E5E7EB' : 'none',
-                transition: 'background 0.1s, color 0.1s',
+                transition: 'all 0.15s ease',
               }}
             >
-              <Icon size={13} />
+              <Icon size={12} />
               {label}
             </button>
           ))}
@@ -1138,46 +1119,48 @@ function HomePage() {
 
       <WelcomeGuia defaultOpen={false} />
 
-      {view === 'dashboard' && (
-        <DashboardView
-          okrs={okrs} tarefas={tarefas}
-          totalKrs={totalKrs} progOkrs={progOkrs}
-          feitasCount={feitasCount} emAndamento={emAndamento}
-          bloqueadas={bloqueadas} pctGeral={pctGeral}
-        />
-      )}
-      {view === 'kanban' && (
-        <KanbanView
-          okrs={okrs} tarefas={tarefas}
-          onCycleStatus={cycleStatus}
-          onCycleBack={cycleStatusBack}
-          onCyclePrioridade={cyclePrioridade}
-          onDelete={deleteTarefa}
-          onUpdateDesc={updateDesc}
-          onAddTask={addTarefaWithStatus}
-        />
-      )}
-      {view === 'lista' && (
-        <ListaView
-          okrs={okrs} tarefas={tarefas}
-          expanded={expanded}
-          onToggle={id => setExpanded(p => ({ ...p, [id]: !p[id] }))}
-          onCycleStatus={cycleStatus}
-          onCyclePrioridade={cyclePrioridade}
-          onDelete={deleteTarefa}
-          onUpdateDesc={updateDesc}
-          addingTo={addingTo} novaDesc={novaDesc}
-          setNovaDesc={setNovaDesc} setAddingTo={setAddingTo}
-          addTarefa={addTarefa}
-        />
-      )}
-      {view === 'fluxos' && (
-        <FluxosView
-          okrs={okrs}
-          appliedWorkflows={appliedWorkflows}
-          onApply={applyWorkflow}
-        />
-      )}
+      <div style={{ minHeight: 300 }}>
+        {view === 'dashboard' && (
+          <DashboardView
+            okrs={okrs} tarefas={tarefas}
+            totalKrs={totalKrs} progOkrs={progOkrs}
+            feitasCount={feitasCount} emAndamento={emAndamento}
+            bloqueadas={bloqueadas} pctGeral={pctGeral}
+          />
+        )}
+        {view === 'kanban' && (
+          <KanbanView
+            okrs={okrs} tarefas={tarefas}
+            onCycleStatus={cycleStatus}
+            onCycleBack={cycleStatusBack}
+            onCyclePrioridade={cyclePrioridade}
+            onDelete={deleteTarefa}
+            onUpdateDesc={updateDesc}
+            onAddTask={addTarefaWithStatus}
+          />
+        )}
+        {view === 'lista' && (
+          <ListaView
+            okrs={okrs} tarefas={tarefas}
+            expanded={expanded}
+            onToggle={id => setExpanded(p => ({ ...p, [id]: !p[id] }))}
+            onCycleStatus={cycleStatus}
+            onCyclePrioridade={cyclePrioridade}
+            onDelete={deleteTarefa}
+            onUpdateDesc={updateDesc}
+            addingTo={addingTo} novaDesc={novaDesc}
+            setNovaDesc={setNovaDesc} setAddingTo={setAddingTo}
+            addTarefa={addTarefa}
+          />
+        )}
+        {view === 'fluxos' && (
+          <FluxosView
+            okrs={okrs}
+            appliedWorkflows={appliedWorkflows}
+            onApply={applyWorkflow}
+          />
+        )}
+      </div>
     </div>
   )
 }
