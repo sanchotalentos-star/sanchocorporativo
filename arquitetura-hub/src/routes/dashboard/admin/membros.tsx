@@ -61,6 +61,30 @@ interface SugestaoPilar {
 
 // Storage keys — member-3 (Vitor) keeps legacy generic keys for backward compat
 function okrKeyFor(id: string)  { return id === 'member-3' ? OKR_KEY       : `${OKR_KEY}_${id}` }
+
+const RODRIGO_OKR_SEED: OkrObj[] = [
+  {
+    id: 'seed-r-o1', titulo: 'FATURAMENTO DE 2.380.000 MILHÕES', categoria: 'Receita', trimestre: 'Q3 2026',
+    keyResults: [
+      { id: 'seed-r-kr1', descricao: 'ATINGIR 360.000 DE FATURAMENTO EM BILHETERIA NA IMERSÃO EM VENDAS NOVAS', meta: 360000, atual: 0,     unit: 'R$' },
+      { id: 'seed-r-kr2', descricao: 'ATINGIR 1440.000 EM VENDA DE CONSELHOS CONSULTIVOS',                       meta: 1440000, atual: 15000, unit: 'R$' },
+      { id: 'seed-r-kr3', descricao: 'ATINGIR 180 MIL EM TECNOLOGIA PRÓPRIA',                                    meta: 180000, atual: 0,     unit: 'R$' },
+      { id: 'seed-r-kr4', descricao: 'ATINGIR 400 MIL REAIS EM PATROCINIO',                                      meta: 400000, atual: 6000,  unit: 'R$' },
+    ],
+  },
+  {
+    id: 'seed-r-o2', titulo: 'ESTRUTURA DE FAMILY OFFICE PROFISSIONAL', categoria: 'Produto', trimestre: 'Q3 2026',
+    keyResults: [],
+  },
+  {
+    id: 'seed-r-o3', titulo: 'RELEVÂNCIA ESTADUAL', categoria: 'Alcance', trimestre: 'Q3 2026',
+    keyResults: [
+      { id: 'seed-r-kr5', descricao: '3 EVENTOS TOPO DE FUNIL UTILIZANDO A BASE ROMAZI',                    meta: 3,     atual: 0,   unit: 'eventos'    },
+      { id: 'seed-r-kr6', descricao: '10 MIL SEGUIDORES NAS REDES SOCIAIS',                                meta: 10000, atual: 930, unit: 'seguidores'  },
+      { id: 'seed-r-kr7', descricao: '10 PALESTRAS OU PAINÉS FEITAS EM PUBLICO ACIMA DE 100 PESSOAS',      meta: 10,    atual: 1,   unit: 'palestras'   },
+    ],
+  },
+]
 function mktKeyFor(id: string)  { return id === 'member-3' ? MARKETING_KEY  : `${MARKETING_KEY}_${id}` }
 function kpiKeyFor(id: string)  { return id === 'member-3' ? KPI_KEY        : `${KPI_KEY}_${id}` }
 function idKeyFor(id: string)   { return id === 'member-3' ? IDENTIDADE_KEY : `${IDENTIDADE_KEY}_${id}` }
@@ -369,9 +393,14 @@ function MembrosPage() {
   const [expanded, setExpanded] = useState<string | null>(null)
 
   // Per-member data maps (each member has isolated localStorage)
-  const [okrMap, setOkrMap] = useState<Record<string, OkrObj[]>>(() =>
-    Object.fromEntries(mockMembers.map(m => [m.id, loadOkrsFor(m.id)]))
-  )
+  const [okrMap, setOkrMap] = useState<Record<string, OkrObj[]>>(() => {
+    const map = Object.fromEntries(mockMembers.map(m => [m.id, loadOkrsFor(m.id)]))
+    if (!map['member-4'] || map['member-4'].length === 0) {
+      map['member-4'] = RODRIGO_OKR_SEED
+      try { localStorage.setItem(okrKeyFor('member-4'), JSON.stringify(RODRIGO_OKR_SEED)) } catch {}
+    }
+    return map
+  })
   const [mktMap, setMktMap] = useState<Record<string, MktAcao[]>>(() =>
     Object.fromEntries(mockMembers.map(m => [m.id, loadMktFor(m.id)]))
   )

@@ -27,6 +27,14 @@ interface Workflow { id: string; nome: string; descricao: string; cor: string; e
 const OKR_KEY     = 'okr_store_v1'
 const TAREFAS_KEY = 'tarefas_store_v1'
 
+function userStorageKey(base: string): string {
+  try {
+    const u = JSON.parse(localStorage.getItem('mock_user') ?? 'null')
+    if (u?.id && u.id !== 'member-3') return `${base}_${u.id}`
+  } catch {}
+  return base
+}
+
 const catColor: Record<string, string> = { Autoridade: '#7B2FBE', Receita: '#10B981', Alcance: '#3B82F6', Produto: '#F59E0B' }
 const catBg:    Record<string, string> = {
   Autoridade: 'rgba(123,47,190,0.09)', Receita: 'rgba(16,185,129,0.09)',
@@ -1011,14 +1019,14 @@ function HomePage() {
   const [appliedWorkflows, setAppliedWorkflows]  = useState<string[]>([])
 
   useEffect(() => {
-    try { const s = localStorage.getItem(OKR_KEY); if (s) setOkrs(JSON.parse(s) ?? []) } catch {}
+    try { const s = localStorage.getItem(userStorageKey(OKR_KEY)); if (s) setOkrs(JSON.parse(s) ?? []) } catch {}
   }, [])
 
   useEffect(() => {
     if (!okrs.length) return
     let stored: Tarefa[] = []
     try {
-      const raw = JSON.parse(localStorage.getItem(TAREFAS_KEY) ?? '[]') ?? []
+      const raw = JSON.parse(localStorage.getItem(userStorageKey(TAREFAS_KEY)) ?? '[]') ?? []
       stored = raw.map((t: Tarefa & { done?: boolean }) => ({ ...t, status: t.status ?? (t.done ? 'feita' : 'pendente'), prioridade: t.prioridade ?? 'media' }))
     } catch {}
     const existingKrIds = new Set(stored.map(t => t.krId))
@@ -1031,7 +1039,7 @@ function HomePage() {
   }, [okrs])
 
   useEffect(() => {
-    if (tarefas.length > 0 || localStorage.getItem(TAREFAS_KEY)) localStorage.setItem(TAREFAS_KEY, JSON.stringify(tarefas))
+    if (tarefas.length > 0 || localStorage.getItem(userStorageKey(TAREFAS_KEY))) localStorage.setItem(userStorageKey(TAREFAS_KEY), JSON.stringify(tarefas))
   }, [tarefas])
 
   function cycleStatus(id: string) {

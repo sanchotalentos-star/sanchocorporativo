@@ -123,6 +123,14 @@ const statusLabel: Record<AcaoStatus, string> = {
 
 const OKR_KEY = 'okr_store_v1'
 
+function okrStorageKey(): string {
+  try {
+    const u = JSON.parse(localStorage.getItem('mock_user') ?? 'null')
+    if (u?.id && u.id !== 'member-3') return `${OKR_KEY}_${u.id}`
+  } catch {}
+  return OKR_KEY
+}
+
 /* ─── KR type detection ─── */
 type KrType = 'conteudo' | 'vendas' | 'eventos' | 'alcance' | 'produto' | 'geral'
 function detectKrType(desc: string): KrType {
@@ -615,7 +623,7 @@ function migrateOkrs(raw: Objective[]): Objective[] {
 function OkrPage() {
   const [okrs, setOkrs] = useState<Objective[]>(() => {
     try {
-      const raw: Objective[] = JSON.parse(localStorage.getItem(OKR_KEY) ?? 'null') ?? []
+      const raw: Objective[] = JSON.parse(localStorage.getItem(okrStorageKey()) ?? 'null') ?? []
       return migrateOkrs(raw)
     }
     catch { return [] }
@@ -624,7 +632,7 @@ function OkrPage() {
   const [novoForm, setNovoForm] = useState({ titulo: '', categoria: 'Autoridade', trimestre: 'Q3 2026' })
 
   useEffect(() => {
-    localStorage.setItem(OKR_KEY, JSON.stringify(okrs))
+    localStorage.setItem(okrStorageKey(), JSON.stringify(okrs))
   }, [okrs])
 
   function addObjective() {
