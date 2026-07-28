@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import {
   Plus, X, Trash2, ChevronDown, ChevronUp, ClipboardList,
-  LayoutDashboard, Kanban, LayoutList, ChevronRight, ChevronLeft, Zap,
+  LayoutDashboard, Kanban, LayoutList, ChevronRight, ChevronLeft, Zap, Rocket,
 } from 'lucide-react'
 import {
   BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer,
@@ -893,6 +893,109 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
 }
 
 /* ═══════════════════════════════════════════
+   GUIA DE BOAS-VINDAS
+═══════════════════════════════════════════ */
+const WELCOME_KEY = 'hub_welcome_v1'
+
+const GUIA_STEPS = [
+  {
+    num: 1, color: '#7B2FBE',
+    title: 'Começa pela Identidade',
+    body: 'Antes de qualquer coisa, você vai preencher quem você é como profissional. Para quem você serve, qual problema você resolve melhor do que qualquer um, o que te diferencia. Essa parte parece simples mas é a mais profunda. Não precisa estar perfeito na primeira vez, escreve o que você acredita hoje e a gente vai afinando nas reuniões. Tudo que vem depois nasce daqui.',
+  },
+  {
+    num: 2, color: '#3B82F6',
+    title: 'Depois vão os Pilares',
+    body: 'Com a identidade no lugar, você escolhe os temas que sustentam a sua autoridade. São os assuntos sobre os quais você tem profundidade real e pode falar repetidamente sem forçar. De 3 a 5 pilares. Eles vão ser o filtro de todo conteúdo que você produzir. Se não cabe em nenhum pilar, provavelmente não precisa existir.',
+  },
+  {
+    num: 3, color: '#10B981',
+    title: 'A gente define os OKRs',
+    body: 'Aqui você coloca para onde quer ir nos próximos 90 dias. Um objetivo grande e inspirador, e os números que vão mostrar se você está chegando lá. Seguidores, leads, convites, receita — o que fizer mais sentido para o seu momento. Toda semana você atualiza esses valores e a plataforma te mostra o que está no caminho certo e o que precisa de atenção. É o que a gente vai revisar juntos em cada reunião.',
+  },
+  {
+    num: 4, color: '#F59E0B',
+    title: 'Depois o plano de Marketing',
+    body: 'Com tudo isso definido, você monta o seu plano de distribuição. Quais canais vai usar, com que frequência e em qual mês. LinkedIn, lives, eventos, podcasts, o que fizer parte da sua estratégia. Conforme vai executando, você marca como concluído. Isso te ajuda a sair do achismo e ter clareza do que você realmente está fazendo.',
+  },
+  {
+    num: 5, color: '#EC4899',
+    title: 'Por último, os Indicadores',
+    body: 'Aqui entram os números que mostram se está funcionando. Alcance, leads, oportunidades, receita. Você cadastra cada um com uma meta e vai atualizando ao longo do tempo. Com isso a gente consegue ver juntos não só se você está executando, mas se a execução está gerando resultado.',
+  },
+]
+
+function WelcomeGuia({ defaultOpen = true }: { defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(() => {
+    const saved = localStorage.getItem(WELCOME_KEY)
+    if (saved !== null) return saved !== 'closed'
+    return defaultOpen
+  })
+
+  function toggle() {
+    const next = !open
+    setOpen(next)
+    localStorage.setItem(WELCOME_KEY, next ? 'open' : 'closed')
+  }
+
+  return (
+    <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, overflow: 'hidden' }}>
+      <button
+        onClick={toggle}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(123,47,190,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Rocket size={14} style={{ color: '#7B2FBE' }} />
+          </div>
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: 0 }}>Bem-vindo ao hub da sua mentoria</p>
+            <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Como funciona cada etapa da jornada</p>
+          </div>
+        </div>
+        {open
+          ? <ChevronUp size={14} style={{ color: '#9CA3AF', flexShrink: 0 }} />
+          : <ChevronDown size={14} style={{ color: '#9CA3AF', flexShrink: 0 }} />
+        }
+      </button>
+
+      {open && (
+        <div style={{ borderTop: '1px solid #F3F4F6', padding: '20px 20px 24px' }}>
+          <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.7, marginBottom: 24, marginTop: 0 }}>
+            Criei um hub exclusivo pra você acompanhar toda a sua jornada na mentoria. É aqui que a gente vai registrar sua identidade profissional, seus pilares, metas, plano de marketing e indicadores. Tudo num lugar só, organizado e fácil de acessar a qualquer hora.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {GUIA_STEPS.map((step, i) => (
+              <div key={step.num} style={{ display: 'flex', gap: 16, paddingBottom: i < GUIA_STEPS.length - 1 ? 22 : 0, position: 'relative' }}>
+                {i < GUIA_STEPS.length - 1 && (
+                  <div style={{ position: 'absolute', left: 14, top: 30, bottom: 0, width: 1, background: '#F3F4F6', zIndex: 0 }} />
+                )}
+                <div style={{
+                  width: 28, height: 28, borderRadius: '50%', flexShrink: 0, zIndex: 1,
+                  background: step.color, color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 11, fontWeight: 700, letterSpacing: '-0.02em',
+                }}>
+                  {step.num}
+                </div>
+                <div style={{ flex: 1, paddingTop: 3 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>{step.title}</p>
+                  <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.7, margin: 0 }}>{step.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
    PÁGINA PRINCIPAL
 ═══════════════════════════════════════════ */
 function HomePage() {
@@ -980,12 +1083,13 @@ function HomePage() {
 
   if (okrs.length === 0) {
     return (
-      <div style={{ maxWidth: 900, margin: '0 auto', paddingBottom: 48 }}>
-        <div style={{ paddingTop: 4, marginBottom: 32 }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', paddingBottom: 48, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ paddingTop: 4 }}>
           <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 2 }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
           <h1 style={{ fontSize: 22, fontWeight: 600, color: '#111827', margin: 0, letterSpacing: '-0.01em' }}>Olá, {firstName}</h1>
         </div>
-        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '48px 32px', textAlign: 'center' }}>
+        <WelcomeGuia defaultOpen={true} />
+        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '32px', textAlign: 'center' }}>
           <ClipboardList size={28} style={{ color: '#E5E7EB', margin: '0 auto 12px' }} />
           <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 6 }}>Nenhum objetivo criado ainda.</p>
           <p style={{ fontSize: 12, color: '#9CA3AF' }}>Vá até <strong>Metas de Impacto</strong> para criar seus primeiros OKRs e gerar o plano de tarefas automaticamente.</p>
@@ -1023,6 +1127,8 @@ function HomePage() {
           ))}
         </div>
       </div>
+
+      <WelcomeGuia defaultOpen={false} />
 
       {view === 'dashboard' && (
         <DashboardView
