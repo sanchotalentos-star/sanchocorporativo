@@ -16,21 +16,21 @@ import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/dashboard/membro/')({ component: HomePage })
 
-/* ─── DARK PALETTE ─── */
+/* ─── LIGHT PALETTE ─── */
 const D = {
-  bg:        '#121110',
-  card:      '#1A1815',
-  surface:   '#161412',
-  surface2:  '#1D1A17',
-  border:    'rgba(255,255,255,0.07)',
-  border2:   'rgba(255,255,255,0.12)',
-  text:      '#EFECE6',
-  textMid:   '#D4D0CA',
-  textSub:   '#9E9A94',
-  textMuted: '#75716B',
-  textFaint: '#4A4540',
+  bg:        '#FFFFFF',
+  card:      '#FFFFFF',
+  surface:   '#F8F7F5',
+  surface2:  '#F0EEE9',
+  border:    'rgba(0,0,0,0.07)',
+  border2:   'rgba(0,0,0,0.12)',
+  text:      '#1A1610',
+  textMid:   '#3A3530',
+  textSub:   '#6B6560',
+  textMuted: '#9E9A94',
+  textFaint: '#C5C0BA',
   gold:      '#C5A880',
-  goldDim:   'rgba(197,168,128,0.55)',
+  goldDim:   'rgba(197,168,128,0.70)',
 }
 
 /* ─── TYPES ─── */
@@ -59,15 +59,15 @@ const statusCycle: TarefaStatus[]   = ['pendente', 'em_andamento', 'feita', 'blo
 const prioridadeCycle: Prioridade[] = ['alta', 'media', 'baixa']
 
 const statusConfig: Record<TarefaStatus, { label: string; bg: string; text: string; dot: string }> = {
-  pendente:     { label: 'Pendente',     bg: 'rgba(117,113,107,0.18)', text: '#9E9A94', dot: '#75716B' },
-  em_andamento: { label: 'Em andamento', bg: 'rgba(59,130,246,0.18)',  text: '#60A5FA', dot: '#3B82F6' },
-  feita:        { label: 'Feita',        bg: 'rgba(34,197,94,0.18)',   text: '#4ADE80', dot: '#22C55E' },
-  bloqueada:    { label: 'Bloqueada',    bg: 'rgba(239,68,68,0.18)',   text: '#F87171', dot: '#EF4444' },
+  pendente:     { label: 'Pendente',     bg: 'rgba(0,0,0,0.05)',       text: '#6B6560', dot: '#9E9A94' },
+  em_andamento: { label: 'Em andamento', bg: 'rgba(59,130,246,0.10)',  text: '#2563EB', dot: '#3B82F6' },
+  feita:        { label: 'Feita',        bg: 'rgba(16,185,129,0.10)',  text: '#059669', dot: '#10B981' },
+  bloqueada:    { label: 'Bloqueada',    bg: 'rgba(239,68,68,0.10)',   text: '#DC2626', dot: '#EF4444' },
 }
 const prioridadeConfig: Record<Prioridade, { label: string; bg: string; text: string }> = {
-  alta:  { label: 'Alta',  bg: 'rgba(239,68,68,0.18)',  text: '#F87171' },
-  media: { label: 'Média', bg: 'rgba(245,158,11,0.18)', text: '#FBB740' },
-  baixa: { label: 'Baixa', bg: 'rgba(34,197,94,0.18)',  text: '#4ADE80' },
+  alta:  { label: 'Alta',  bg: 'rgba(239,68,68,0.10)',  text: '#DC2626' },
+  media: { label: 'Média', bg: 'rgba(245,158,11,0.10)', text: '#D97706' },
+  baixa: { label: 'Baixa', bg: 'rgba(16,185,129,0.10)', text: '#059669' },
 }
 
 const WORKFLOWS: Workflow[] = [
@@ -328,10 +328,10 @@ function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndam
         </div>
         <ResponsiveContainer width="100%" height={okrs.length * 44 + 16}>
           <BarChart data={okrBarData} layout="vertical" margin={{ top: 0, right: 48, left: 0, bottom: 0 }} barSize={14}>
-            <CartesianGrid horizontal={false} stroke="rgba(255,255,255,0.05)" />
+            <CartesianGrid horizontal={false} stroke="rgba(0,0,0,0.06)" />
             <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
             <YAxis type="category" dataKey="name" width={200} tick={{ fontSize: 11, fill: D.textMid }} axisLine={false} tickLine={false} />
-            <Tooltip content={<OkrTip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+            <Tooltip content={<OkrTip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
             <Bar dataKey="value" radius={[0, 3, 3, 0]} label={{ position: 'right', fontSize: 11, fontWeight: 600, fill: D.textSub, formatter: (v: number) => `${v}%` }}>
               {okrBarData.map((e, i) => <Cell key={i} fill={e.color} />)}
             </Bar>
@@ -371,10 +371,10 @@ function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndam
           <p style={{ fontSize: 12, fontWeight: 600, color: D.text, margin: '0 0 12px' }}>Distribuição por Prioridade</p>
           <ResponsiveContainer width="100%" height={120}>
             <BarChart data={prioData} margin={{ top: 0, right: 4, left: -24, bottom: 0 }} barSize={36}>
-              <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" />
+              <CartesianGrid vertical={false} stroke="rgba(0,0,0,0.06)" />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: D.textSub }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} />
-              <Tooltip content={<StatusTip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+              <Tooltip content={<StatusTip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
               <Bar dataKey="value" radius={[3, 3, 0, 0]} label={{ position: 'top', fontSize: 11, fontWeight: 600, fill: D.textSub }}>
                 {prioData.map((e, i) => <Cell key={i} fill={e.color} />)}
               </Bar>
@@ -388,10 +388,10 @@ function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndam
           <p style={{ fontSize: 12, fontWeight: 600, color: D.text, margin: '0 0 12px' }}>Comparativo de Resultados-Chave</p>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={allKrs} margin={{ top: 4, right: 4, left: -24, bottom: 52 }} barSize={18}>
-              <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" />
+              <CartesianGrid vertical={false} stroke="rgba(0,0,0,0.06)" />
               <XAxis dataKey="label" tick={{ fontSize: 9, fill: D.textMuted }} axisLine={false} tickLine={false} angle={-35} textAnchor="end" interval={0} />
               <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
-              <Tooltip content={<KrTip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+              <Tooltip content={<KrTip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
               <Bar dataKey="value" radius={[3, 3, 0, 0]}>
                 {allKrs.map((e, i) => <Cell key={i} fill={e.color} />)}
               </Bar>

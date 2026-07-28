@@ -12,7 +12,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="dark-hub flex min-h-screen" style={{ backgroundColor: '#121110' }}>
+    <div className="flex min-h-screen" style={{ backgroundColor: '#F8F7F5' }}>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
@@ -34,7 +34,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} title={title} />
-        <main className="flex-1 overflow-auto" style={{ backgroundColor: '#121110' }}>
+        <main className="flex-1 overflow-auto" style={{ backgroundColor: '#F8F7F5' }}>
           {children}
         </main>
       </div>
