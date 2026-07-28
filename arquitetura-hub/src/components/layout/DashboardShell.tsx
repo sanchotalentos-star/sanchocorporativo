@@ -12,12 +12,13 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex min-h-screen bg-[#F4F4F5]">
+    <div className="dark-hub flex min-h-screen" style={{ backgroundColor: '#121110' }}>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          className="fixed inset-0 z-40 lg:hidden"
+          style={{ background: 'rgba(0,0,0,0.6)' }}
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -33,7 +34,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} title={title} />
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 overflow-auto" style={{ backgroundColor: '#121110' }}>
           {children}
         </main>
       </div>

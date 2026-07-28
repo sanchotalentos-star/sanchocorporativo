@@ -29,31 +29,40 @@ export function Topbar({ onMenuClick, title }: TopbarProps) {
   const firstName = user?.full_name?.split(' ')[0] ?? ''
 
   return (
-    <header className="h-12 border-b border-gray-200 bg-white flex items-center justify-between px-6 flex-shrink-0">
+    <header style={{
+      height: 48, flexShrink: 0,
+      borderBottom: '1px solid rgba(255,255,255,0.07)',
+      background: '#0D0C0B',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '0 24px',
+    }}>
 
       {/* Left */}
-      <div className="flex items-center gap-3">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {onMenuClick && (
-          <button
-            onClick={onMenuClick}
-            className="lg:hidden text-gray-400 hover:text-gray-700 mr-1"
-          >
+          <button onClick={onMenuClick} className="lg:hidden"
+            style={{ color: 'rgba(255,255,255,0.3)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 4 }}>
             <Menu size={18} />
           </button>
         )}
-        <p className="text-[13px] font-semibold text-gray-800">{pageName}</p>
+        <p style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.45)', margin: 0, letterSpacing: '0.02em' }}>{pageName}</p>
       </div>
 
       {/* Right */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2.5">
-          <div className="text-right hidden sm:block">
-            <p className="text-[11px] font-semibold text-gray-700 leading-tight">{firstName}</p>
-            <p className="text-[9px] text-gray-400 uppercase tracking-wider">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="hidden sm:block" style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: '#EFECE6', lineHeight: 1.3 }}>{firstName}</p>
+            <p style={{ fontSize: 9, color: '#75716B', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
               {user?.role === 'admin' ? 'Mentor' : 'Mentorado'}
             </p>
           </div>
-          <div className="w-7 h-7 bg-[#7B2FBE] rounded-full flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0">
+          <div style={{
+            width: 28, height: 28, borderRadius: '50%',
+            background: '#2A2420', border: '1px solid rgba(197,168,128,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 11, fontWeight: 600, color: '#C5A880', flexShrink: 0,
+          }}>
             {user?.full_name?.charAt(0) ?? 'U'}
           </div>
         </div>

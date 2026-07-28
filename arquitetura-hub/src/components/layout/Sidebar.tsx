@@ -39,40 +39,43 @@ export function Sidebar() {
   const nav = user?.role === 'admin' ? adminNav : membroNav
 
   return (
-    <aside style={{ display: 'flex', flexDirection: 'column', width: 224, minHeight: '100vh', background: '#111827', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
+    <aside style={{ display: 'flex', flexDirection: 'column', width: 220, minHeight: '100vh', background: '#0D0C0B', borderRight: '1px solid rgba(255,255,255,0.07)' }}>
 
       {/* Logo */}
-      <div style={{ padding: '18px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <p style={{ fontSize: 12, fontWeight: 600, color: '#fff', letterSpacing: '0.02em', lineHeight: 1.4 }}>
-          Arquitetura
-        </p>
-        <p style={{ fontSize: 12, fontWeight: 400, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.02em', lineHeight: 1.4 }}>
-          de Relevância
+      <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 20, height: 1, background: '#C5A880' }} />
+          <p style={{ fontSize: 11, fontWeight: 600, color: '#EFECE6', letterSpacing: '0.12em', textTransform: 'uppercase', margin: 0 }}>
+            Hub de Relevância
+          </p>
+        </div>
+        <p style={{ fontSize: 10, fontWeight: 400, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.04em', lineHeight: 1.4, marginTop: 4 }}>
+          Arquitetura de Marca
         </p>
       </div>
 
       {/* User */}
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{
           width: 28, height: 28, borderRadius: '50%',
-          background: '#7B2FBE',
+          background: '#2A2420', border: '1px solid rgba(197,168,128,0.3)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 11, fontWeight: 600, color: '#fff', flexShrink: 0,
+          fontSize: 11, fontWeight: 600, color: '#C5A880', flexShrink: 0,
         }}>
           {user?.full_name?.charAt(0) ?? 'U'}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 12, fontWeight: 500, color: '#fff', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <p style={{ fontSize: 12, fontWeight: 500, color: '#EFECE6', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {user?.full_name}
           </p>
-          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 1 }}>
+          <p style={{ fontSize: 10, color: '#75716B', marginTop: 1 }}>
             {user?.role === 'admin' ? 'Mentor' : 'Mentorado'}
           </p>
         </div>
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '8px 8px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 1 }}>
+      <nav style={{ flex: 1, padding: '8px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 1 }}>
         {nav.map((item) => {
           const active =
             pathname === item.href || (
@@ -86,28 +89,30 @@ export function Sidebar() {
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '7px 12px',
-                borderRadius: 5,
+                borderRadius: 4,
                 cursor: 'pointer',
-                background: active ? 'rgba(123,47,190,0.18)' : 'transparent',
-                transition: 'background 0.1s',
+                background: active ? 'rgba(197,168,128,0.1)' : 'transparent',
+                borderLeft: active ? '2px solid #C5A880' : '2px solid transparent',
+                transition: 'all 0.1s',
               }}
-              onMouseEnter={e => { if (!active) (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.05)' }}
+              onMouseEnter={e => { if (!active) (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.04)' }}
               onMouseLeave={e => { if (!active) (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
               >
                 <item.icon
                   size={14}
                   strokeWidth={active ? 2 : 1.75}
-                  style={{ flexShrink: 0, color: active ? '#a78bfa' : 'rgba(255,255,255,0.35)' }}
+                  style={{ flexShrink: 0, color: active ? '#C5A880' : 'rgba(255,255,255,0.3)' }}
                 />
                 <span style={{
                   fontSize: 13, flex: 1,
-                  color: active ? '#e5e7eb' : 'rgba(255,255,255,0.45)',
+                  color: active ? '#EFECE6' : 'rgba(255,255,255,0.4)',
                   fontWeight: active ? 500 : 400,
+                  letterSpacing: active ? '0.01em' : '0',
                 }}>
                   {item.label}
                 </span>
                 {item.badge && (
-                  <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(123,47,190,0.25)', color: '#a78bfa', padding: '2px 5px', borderRadius: 3 }}>
+                  <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(197,168,128,0.15)', color: '#C5A880', padding: '2px 5px', borderRadius: 3 }}>
                     {item.badge}
                   </span>
                 )}
@@ -118,18 +123,18 @@ export function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <div style={{ padding: '8px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ padding: '8px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
         <button
           onClick={() => void logout()}
           style={{
             display: 'flex', alignItems: 'center', gap: 10,
             padding: '7px 12px', width: '100%',
-            background: 'none', border: 'none', borderRadius: 5,
-            fontSize: 13, color: 'rgba(255,255,255,0.3)',
+            background: 'none', border: 'none', borderRadius: 4,
+            fontSize: 13, color: 'rgba(255,255,255,0.25)',
             cursor: 'pointer', transition: 'color 0.1s',
           }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#f87171')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
+          onMouseEnter={e => (e.currentTarget.style.color = '#EF4444')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.25)')}
         >
           <LogOut size={14} />
           Sair
