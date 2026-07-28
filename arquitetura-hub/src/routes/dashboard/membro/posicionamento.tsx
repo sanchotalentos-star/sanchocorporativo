@@ -141,9 +141,17 @@ const initialPilarStates: PilarStates = {
   formatoProduto: { reflexao: '', analise: '', analiseLocked: true, status: 'aguardando' },
 }
 
+function identidadeStorageKey(): string {
+  try {
+    const u = JSON.parse(localStorage.getItem('mock_user') ?? 'null')
+    if (u?.id && u.id !== 'member-3') return `${IDENTIDADE_KEY}_${u.id}`
+  } catch {}
+  return IDENTIDADE_KEY
+}
+
 function loadSaved(): { pilares: PilarStates; diferenciais: string[] } | null {
   try {
-    const raw = localStorage.getItem(IDENTIDADE_KEY)
+    const raw = localStorage.getItem(identidadeStorageKey())
     return raw ? JSON.parse(raw) : null
   } catch {
     return null
@@ -261,7 +269,7 @@ function PosicionamentoPage() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(IDENTIDADE_KEY, JSON.stringify({ pilares, diferenciais }))
+      localStorage.setItem(identidadeStorageKey(), JSON.stringify({ pilares, diferenciais }))
     } catch {}
   }, [pilares, diferenciais])
 

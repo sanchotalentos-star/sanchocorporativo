@@ -62,6 +62,32 @@ interface SugestaoPilar {
 // Storage keys — member-3 (Vitor) keeps legacy generic keys for backward compat
 function okrKeyFor(id: string)  { return id === 'member-3' ? OKR_KEY       : `${OKR_KEY}_${id}` }
 
+const RODRIGO_IDENTIDADE_SEED = {
+  pilares: {
+    publicoAlvo: {
+      reflexao: 'Sucessores de empresas familiares que estão numa queda de braço invisível com a geração anterior. Gestores que têm competência técnica, mas estão perdidos emocionalmente dentro do próprio negócio. Líderes que tentaram fugir do problema em vez de enfrentá-lo e estão pagando o preço disso.\n\nEm uma frase: sucessores e líderes de empresas familiares que sabem que o problema não é só de gestão, mas ainda não tiveram coragem de sentar e resolver o que está destruindo valor dentro de casa.\n\nMaiores dores: sentir que está brigando sozinho numa empresa que deveria ser aliada. Ter resultado melhorando mas relação com a família piorando. Acreditar que, pra crescer, alguém da família precisa perder espaço.',
+      analise: '', analiseLocked: true, status: 'reflexao_feita',
+    },
+    proposta: {
+      reflexao: 'Uma empresa familiar que para de gastar energia com conflito interno e passa a direcionar tudo isso para resultado. EBITDA +45%, lucro líquido +38%, margem que saiu de -3% para +17%.\n\nEle entrega o método completo, não só a parte bonita: finanças, governança, comercial, marca e as áreas que não existiam, incluindo a conversa que ninguém quer ter. A maioria dos consultores entrega gestão. Ele entrega gestão mais reconciliação, porque viveu as duas coisas na pele.\n\nFormato: palestra presencial de 40 minutos com tarefa concreta para executar ainda na semana.',
+      analise: '', analiseLocked: true, status: 'reflexao_feita',
+    },
+    storytelling: {
+      reflexao: 'Segunda-feira de manhã, dentro de um carro, depois do retiro católico. Três fracassos como empreendedor solo, perda de todas as reservas, síndrome do impostor instalada. Pediu um sinal no rádio. Tocou "Fix You" do Coldplay. Chegou na empresa, entrou na sala dos pais, pediu desculpa e perdoou. Ali destravou tudo.\n\nO que ele tinha antes que o cliente ideal também tem hoje: competência técnica reconhecida, empresa melhorando nos números, família que o amava e mesmo assim se sentindo vazio, perdido, achando que sozinho não construía nada. A sensação de estar brigando pela coisa errada.\n\nComo isso o capacitou: ele não é consultor de fora que estudou empresa familiar. Ele é o sucessor que tentou fugir três vezes, perdeu tudo, pediu desculpa ao pai e à mãe, e depois transformou a empresa no maior resultado da história. Ele conhece o custo da queda de braço invisível porque pagou esse custo com dinheiro, com saúde e com tempo de família.',
+      analise: '', analiseLocked: true, status: 'reflexao_feita',
+    },
+    formatoProduto: {
+      reflexao: 'Palestra presencial de 40 minutos com estrutura narrativa (história real) + sistema aberto (3 palavras-chave + 5 frentes de gestão) + tarefa para executar na semana.\n\nPosicionamento premium para plateia de executivos e líderes de empresas familiares em eventos corporativos. Canal de aquisição principal: palco de eventos corporativos e de família empresária. Cada apresentação gera novas oportunidades.',
+      analise: '', analiseLocked: true, status: 'reflexao_feita',
+    },
+  },
+  diferenciais: [
+    'Ele é o protagonista da história, não o narrador. Rodrigo Cunha não estudou empresa familiar, ele é a empresa familiar. Isso é impossível de replicar.',
+    'Resultado numérico comprovado (margem de -3% pra +17%, EBITDA +45%) combinado com história de reconciliação familiar. Pouquíssimos speakers entregam os dois.',
+    'Evidências concretas: números da empresa (EBITDA, lucro líquido, margem, faturamento 3x), cronologia da virada (2017-2024), sucessão formalizada em 2024 e a mesa de domingo que voltou a ser lugar de paz.',
+  ],
+}
+
 const RODRIGO_OKR_SEED: OkrObj[] = [
   {
     id: 'seed-r-o1', titulo: 'FATURAMENTO DE 2.380.000 MILHÕES', categoria: 'Receita', trimestre: 'Q3 2026',
@@ -398,6 +424,11 @@ function MembrosPage() {
     if (!map['member-4'] || map['member-4'].length === 0) {
       map['member-4'] = RODRIGO_OKR_SEED
       try { localStorage.setItem(okrKeyFor('member-4'), JSON.stringify(RODRIGO_OKR_SEED)) } catch {}
+    }
+    // Seed Rodrigo's identidade if empty
+    const idKey = idKeyFor('member-4')
+    if (!localStorage.getItem(idKey)) {
+      try { localStorage.setItem(idKey, JSON.stringify(RODRIGO_IDENTIDADE_SEED)) } catch {}
     }
     return map
   })
