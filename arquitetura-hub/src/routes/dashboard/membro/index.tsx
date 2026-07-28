@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import {
   Plus, X, Trash2, ChevronDown, ChevronUp, ClipboardList,
   LayoutDashboard, Kanban, LayoutList, ChevronRight, ChevronLeft, Zap, Rocket,
+  Briefcase, Target, TrendingUp, Users,
 } from 'lucide-react'
 import {
   BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer,
@@ -906,11 +907,11 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
 const WELCOME_KEY = 'hub_welcome_v1'
 
 const GUIA_STEPS = [
-  { num: 1, color: '#1A1A1A', title: 'Identidade Profissional', body: 'Alinhamento de posicionamento, essência e o tom da sua marca.' },
-  { num: 2, color: '#1A1A1A', title: 'Pilares de Atuação',      body: 'Definição das frentes centrais do seu modelo de negócio.' },
-  { num: 3, color: '#1A1A1A', title: 'Metas e OKRs',            body: 'Estabelecimento de objetivos claros e direcionadores de crescimento.' },
-  { num: 4, color: '#1A1A1A', title: 'Plano de Marketing',      body: 'Estruturação da estratégia de visibilidade e atração.' },
-  { num: 5, color: '#1A1A1A', title: 'Indicadores de Sucesso',  body: 'Métricas de acompanhamento contínuo e evolução.' },
+  { num: 1, color: '#6600CC', title: 'Identidade Profissional', body: 'Defina o seu posicionamento, essência e voz.',            Icon: Briefcase  },
+  { num: 2, color: '#00C884', title: 'Pilares de Atuação',      body: 'Estruture as frentes centrais do seu negócio.',           Icon: Target     },
+  { num: 3, color: '#FF6600', title: 'Metas e OKRs',            body: 'Estabeleça objetivos claros e mensuráveis.',              Icon: TrendingUp },
+  { num: 4, color: '#0084FF', title: 'Plano de Marketing',      body: 'Crie estratégias para atrair os clientes certos.',        Icon: Zap        },
+  { num: 5, color: '#CC00CC', title: 'Indicadores de Sucesso',  body: 'Monitore o desempenho com métricas essenciais.',          Icon: Users      },
 ]
 
 function WelcomeGuia({ defaultOpen = false }: { defaultOpen?: boolean }) {
@@ -927,53 +928,80 @@ function WelcomeGuia({ defaultOpen = false }: { defaultOpen?: boolean }) {
   }
 
   return (
-    <div style={{ background: '#FCFCFB', border: '1px solid #E6E4DF', borderRadius: 8, overflow: 'hidden' }}>
+    <div style={{
+      background: open ? '#FFFFFF' : '#FAFAFA',
+      border: '1px solid #E5E5E5',
+      borderRadius: 12,
+      overflow: 'hidden',
+      boxShadow: open ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
+      transition: 'all 0.3s ease',
+    }}>
       <button
         onClick={handleToggle}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+          padding: '24px 32px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 6, background: '#F1EFEA', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Rocket size={13} style={{ color: '#1A1A1A' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: '50%', background: '#6600CC',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', flexShrink: 0,
+          }}>
+            <Rocket size={24} strokeWidth={1.5} />
           </div>
           <div>
-            <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0, letterSpacing: '-0.01em' }}>Guia da Jornada de Mentoria</p>
-            <p style={{ fontSize: 11, color: '#787672', margin: '2px 0 0' }}>Visão geral das 5 etapas do seu repositório</p>
+            <p style={{ fontSize: 20, fontWeight: 600, color: '#333333', margin: '0 0 4px 0', letterSpacing: '-0.01em' }}>
+              Bem-vindo ao seu Hub de Arquitetura de Relevância!
+            </p>
+            <p style={{ fontSize: 16, color: '#666666', margin: 0 }}>
+              Vamos estruturar sua mentoria em 5 passos claros e acionáveis.
+            </p>
           </div>
         </div>
         {open
-          ? <ChevronUp size={14} color="#787672" style={{ flexShrink: 0 }} />
-          : <ChevronDown size={14} color="#787672" style={{ flexShrink: 0 }} />
+          ? <ChevronUp size={20} color="#666666" style={{ flexShrink: 0 }} />
+          : <ChevronDown size={20} color="#666666" style={{ flexShrink: 0 }} />
         }
       </button>
 
       {open && (
-        <div style={{ borderTop: '1px solid #E6E4DF', padding: '24px 20px 28px', background: '#FFFFFF' }}>
-          <p style={{ fontSize: 13, color: '#4A4845', lineHeight: 1.6, marginBottom: 24, marginTop: 0, maxWidth: 700 }}>
-            Este espaço centraliza o acompanhamento da sua mentoria. Aqui estruturamos sua identidade,
-            direcionamentos e indicadores de forma integrada e progressiva.
+        <div style={{ borderTop: '1px solid #F0F0F0', padding: '32px', background: '#FFFFFF' }}>
+          <p style={{ fontSize: 16, color: '#333333', lineHeight: 1.7, marginBottom: 32, marginTop: 0, maxWidth: 800 }}>
+            Este é o seu painel central. Use-o para registrar e acompanhar cada etapa da sua jornada profissional.
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            {GUIA_STEPS.map((step, i) => (
-              <div key={step.num} style={{ display: 'flex', gap: 16, paddingBottom: i < GUIA_STEPS.length - 1 ? 20 : 0, position: 'relative' }}>
-                {i < GUIA_STEPS.length - 1 && (
-                  <div style={{ position: 'absolute', left: 13, top: 26, bottom: 0, width: 1, background: '#E6E4DF', zIndex: 0 }} />
-                )}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
+            {GUIA_STEPS.map((step) => (
+              <div
+                key={step.num}
+                style={{
+                  background: '#FAFAFA', border: '1px solid #E5E5E5', borderRadius: 12,
+                  padding: '28px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 16,
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = step.color
+                  e.currentTarget.style.boxShadow = `0 8px 16px ${step.color}20`
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = '#E5E5E5'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
+              >
                 <div style={{
-                  width: 26, height: 26, borderRadius: '50%', flexShrink: 0, zIndex: 1,
-                  background: '#1A1A1A', color: '#fff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, fontWeight: 500,
+                  width: 40, height: 40, borderRadius: 10, background: step.color,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF',
                 }}>
-                  {step.num}
+                  <step.Icon size={20} strokeWidth={2} />
                 </div>
-                <div style={{ flex: 1, paddingTop: 2 }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: '0 0 2px', letterSpacing: '-0.01em' }}>{step.title}</p>
-                  <p style={{ fontSize: 12, color: '#787672', lineHeight: 1.5, margin: 0 }}>{step.body}</p>
+                <div>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: '#333333', margin: '0 0 6px 0' }}>
+                    {step.num}. {step.title}
+                  </p>
+                  <p style={{ fontSize: 14, color: '#666666', lineHeight: 1.6, margin: 0 }}>
+                    {step.body}
+                  </p>
                 </div>
               </div>
             ))}
@@ -1072,14 +1100,15 @@ function HomePage() {
 
   if (okrs.length === 0) {
     return (
-      <div style={{ maxWidth: 900, margin: '0 auto', paddingBottom: 48, display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div style={{ paddingTop: 4 }}>
-          <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 2 }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
-          <h1 style={{ fontSize: 22, fontWeight: 600, color: '#111827', margin: 0, letterSpacing: '-0.01em' }}>Olá, {firstName}</h1>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px 48px', display: 'flex', flexDirection: 'column', gap: 40, background: '#FFFFFF' }}>
+        <div style={{ paddingTop: 4, borderBottom: '2px solid #F0F0F0', paddingBottom: 24 }}>
+          <p style={{ fontSize: 12, color: '#999999', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
+          <h1 style={{ fontSize: 32, fontWeight: 700, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>Olá, {firstName}</h1>
+          <p style={{ fontSize: 18, color: '#666666', margin: '8px 0 0 0' }}>Bem-vindo ao seu hub de inteligência e estratégia.</p>
         </div>
         <WelcomeGuia defaultOpen={true} />
-        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '32px', textAlign: 'center' }}>
-          <ClipboardList size={28} style={{ color: '#E5E7EB', margin: '0 auto 12px' }} />
+        <div style={{ background: '#FAFAFA', border: '1px solid #E5E5E5', borderRadius: 12, padding: '32px', textAlign: 'center' }}>
+          <ClipboardList size={28} style={{ color: '#D1D5DB', margin: '0 auto 12px' }} />
           <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 6 }}>Nenhum objetivo criado ainda.</p>
           <p style={{ fontSize: 12, color: '#9CA3AF' }}>Vá até <strong>Metas de Impacto</strong> para criar seus primeiros OKRs e gerar o plano de tarefas automaticamente.</p>
         </div>
@@ -1088,36 +1117,37 @@ function HomePage() {
   }
 
   return (
-    <div style={{ maxWidth: 880, margin: '0 auto', padding: '24px 20px 48px', display: 'flex', flexDirection: 'column', gap: 24, fontFamily: 'inherit' }}>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px 48px', display: 'flex', flexDirection: 'column', gap: 40, background: '#FFFFFF' }}>
       {/* Header + view toggle */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: '1px solid #E6E4DF', paddingBottom: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: '2px solid #F0F0F0', paddingBottom: 24 }}>
         <div>
-          <p style={{ fontSize: 11, color: '#787672', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
-          <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1A1A1A', margin: 0, letterSpacing: '-0.02em' }}>Olá, {firstName}</h1>
+          <p style={{ fontSize: 12, color: '#999999', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
+          <h1 style={{ fontSize: 32, fontWeight: 700, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>Olá, {firstName}</h1>
+          <p style={{ fontSize: 18, color: '#666666', margin: '8px 0 0 0' }}>Bem-vindo ao seu hub de inteligência e estratégia.</p>
         </div>
-        <div style={{ display: 'flex', background: '#F1EFEA', padding: 2, borderRadius: 6, flexShrink: 0 }}>
+        <div style={{ display: 'flex', background: '#F5F5F5', padding: 4, borderRadius: 8, border: '1px solid #E5E5E5', flexShrink: 0 }}>
           {viewButtons.map(({ key, label, Icon }) => (
             <button
               key={key}
               onClick={() => setView(key)}
               style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                padding: '6px 12px', border: 'none', cursor: 'pointer', borderRadius: 4,
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '10px 20px', border: 'none', cursor: 'pointer', borderRadius: 6,
                 background: view === key ? '#FFFFFF' : 'transparent',
-                color: view === key ? '#1A1A1A' : '#787672',
-                boxShadow: view === key ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
-                fontSize: 12, fontWeight: view === key ? 600 : 400,
+                color: view === key ? '#111827' : '#666666',
+                boxShadow: view === key ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                fontSize: 14, fontWeight: view === key ? 600 : 400,
                 transition: 'all 0.15s ease',
               }}
             >
-              <Icon size={12} />
+              <Icon size={14} />
               {label}
             </button>
           ))}
         </div>
       </div>
 
-      <WelcomeGuia defaultOpen={false} />
+      <WelcomeGuia defaultOpen={true} />
 
       <div style={{ minHeight: 300 }}>
         {view === 'dashboard' && (
