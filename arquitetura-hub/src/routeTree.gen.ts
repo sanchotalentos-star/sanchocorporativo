@@ -17,7 +17,6 @@ import { Route as DashboardMembroIndexRouteImport } from './routes/dashboard/mem
 import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard/admin/index'
 import { Route as DashboardMembroTarefasRouteImport } from './routes/dashboard/membro/tarefas'
 import { Route as DashboardMembroRelatoriosRouteImport } from './routes/dashboard/membro/relatorios'
-import { Route as DashboardMembroRankingRouteImport } from './routes/dashboard/membro/ranking'
 import { Route as DashboardMembroPosicionamentoRouteImport } from './routes/dashboard/membro/posicionamento'
 import { Route as DashboardMembroPilaresRouteImport } from './routes/dashboard/membro/pilares'
 import { Route as DashboardMembroOkrRouteImport } from './routes/dashboard/membro/okr'
@@ -68,11 +67,6 @@ const DashboardMembroRelatoriosRoute =
     path: '/relatorios',
     getParentRoute: () => DashboardMembroRoute,
   } as any)
-const DashboardMembroRankingRoute = DashboardMembroRankingRouteImport.update({
-  id: '/ranking',
-  path: '/ranking',
-  getParentRoute: () => DashboardMembroRoute,
-} as any)
 const DashboardMembroPosicionamentoRoute =
   DashboardMembroPosicionamentoRouteImport.update({
     id: '/posicionamento',
@@ -130,7 +124,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/membro/okr': typeof DashboardMembroOkrRoute
   '/dashboard/membro/pilares': typeof DashboardMembroPilaresRoute
   '/dashboard/membro/posicionamento': typeof DashboardMembroPosicionamentoRoute
-  '/dashboard/membro/ranking': typeof DashboardMembroRankingRoute
   '/dashboard/membro/relatorios': typeof DashboardMembroRelatoriosRoute
   '/dashboard/membro/tarefas': typeof DashboardMembroTarefasRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
@@ -147,7 +140,6 @@ export interface FileRoutesByTo {
   '/dashboard/membro/okr': typeof DashboardMembroOkrRoute
   '/dashboard/membro/pilares': typeof DashboardMembroPilaresRoute
   '/dashboard/membro/posicionamento': typeof DashboardMembroPosicionamentoRoute
-  '/dashboard/membro/ranking': typeof DashboardMembroRankingRoute
   '/dashboard/membro/relatorios': typeof DashboardMembroRelatoriosRoute
   '/dashboard/membro/tarefas': typeof DashboardMembroTarefasRoute
   '/dashboard/admin': typeof DashboardAdminIndexRoute
@@ -167,7 +159,6 @@ export interface FileRoutesById {
   '/dashboard/membro/okr': typeof DashboardMembroOkrRoute
   '/dashboard/membro/pilares': typeof DashboardMembroPilaresRoute
   '/dashboard/membro/posicionamento': typeof DashboardMembroPosicionamentoRoute
-  '/dashboard/membro/ranking': typeof DashboardMembroRankingRoute
   '/dashboard/membro/relatorios': typeof DashboardMembroRelatoriosRoute
   '/dashboard/membro/tarefas': typeof DashboardMembroTarefasRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
@@ -188,7 +179,6 @@ export interface FileRouteTypes {
     | '/dashboard/membro/okr'
     | '/dashboard/membro/pilares'
     | '/dashboard/membro/posicionamento'
-    | '/dashboard/membro/ranking'
     | '/dashboard/membro/relatorios'
     | '/dashboard/membro/tarefas'
     | '/dashboard/admin/'
@@ -205,7 +195,6 @@ export interface FileRouteTypes {
     | '/dashboard/membro/okr'
     | '/dashboard/membro/pilares'
     | '/dashboard/membro/posicionamento'
-    | '/dashboard/membro/ranking'
     | '/dashboard/membro/relatorios'
     | '/dashboard/membro/tarefas'
     | '/dashboard/admin'
@@ -224,7 +213,6 @@ export interface FileRouteTypes {
     | '/dashboard/membro/okr'
     | '/dashboard/membro/pilares'
     | '/dashboard/membro/posicionamento'
-    | '/dashboard/membro/ranking'
     | '/dashboard/membro/relatorios'
     | '/dashboard/membro/tarefas'
     | '/dashboard/admin/'
@@ -294,13 +282,6 @@ declare module '@tanstack/react-router' {
       path: '/relatorios'
       fullPath: '/dashboard/membro/relatorios'
       preLoaderRoute: typeof DashboardMembroRelatoriosRouteImport
-      parentRoute: typeof DashboardMembroRoute
-    }
-    '/dashboard/membro/ranking': {
-      id: '/dashboard/membro/ranking'
-      path: '/ranking'
-      fullPath: '/dashboard/membro/ranking'
-      preLoaderRoute: typeof DashboardMembroRankingRouteImport
       parentRoute: typeof DashboardMembroRoute
     }
     '/dashboard/membro/posicionamento': {
@@ -385,7 +366,6 @@ interface DashboardMembroRouteChildren {
   DashboardMembroOkrRoute: typeof DashboardMembroOkrRoute
   DashboardMembroPilaresRoute: typeof DashboardMembroPilaresRoute
   DashboardMembroPosicionamentoRoute: typeof DashboardMembroPosicionamentoRoute
-  DashboardMembroRankingRoute: typeof DashboardMembroRankingRoute
   DashboardMembroRelatoriosRoute: typeof DashboardMembroRelatoriosRoute
   DashboardMembroTarefasRoute: typeof DashboardMembroTarefasRoute
   DashboardMembroIndexRoute: typeof DashboardMembroIndexRoute
@@ -398,7 +378,6 @@ const DashboardMembroRouteChildren: DashboardMembroRouteChildren = {
   DashboardMembroOkrRoute: DashboardMembroOkrRoute,
   DashboardMembroPilaresRoute: DashboardMembroPilaresRoute,
   DashboardMembroPosicionamentoRoute: DashboardMembroPosicionamentoRoute,
-  DashboardMembroRankingRoute: DashboardMembroRankingRoute,
   DashboardMembroRelatoriosRoute: DashboardMembroRelatoriosRoute,
   DashboardMembroTarefasRoute: DashboardMembroTarefasRoute,
   DashboardMembroIndexRoute: DashboardMembroIndexRoute,
