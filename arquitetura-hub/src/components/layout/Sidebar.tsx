@@ -1,9 +1,9 @@
 import { Link, useRouterState } from '@tanstack/react-router'
 import type { LucideIcon } from 'lucide-react'
 import {
-  Home, Rocket, Layers, Compass, Megaphone, CalendarDays,
-  BarChart2, FileBarChart, LogOut,
-  LayoutDashboard, Users, FileText, CheckSquare,
+  LayoutGrid, Target, Building2, Fingerprint, Send, Calendar,
+  TrendingUp, LogOut,
+  LayoutDashboard, Users, FileText, ListChecks,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
@@ -22,14 +22,14 @@ const adminNav: NavItem[] = [
 ]
 
 const membroNav: NavItem[] = [
-  { label: 'Home',              href: '/dashboard/membro',                icon: Home        },
-  { label: 'Minha Identidade',  href: '/dashboard/membro/posicionamento', icon: Compass     },
-  { label: 'Pilares da Marca',  href: '/dashboard/membro/pilares',        icon: Layers      },
-  { label: 'Metas de Impacto',  href: '/dashboard/membro/okr',            icon: Rocket      },
-  { label: 'Tarefas',           href: '/dashboard/membro/tarefas',        icon: CheckSquare },
-  { label: 'Marketing Anual',   href: '/dashboard/membro/marketing',      icon: Megaphone   },
-  { label: 'Indicadores',       href: '/dashboard/membro/kpis',           icon: BarChart2   },
-  { label: 'Agenda',            href: '/dashboard/membro/agenda',         icon: CalendarDays },
+  { label: 'Home',              href: '/dashboard/membro',                icon: LayoutGrid  },
+  { label: 'Minha Identidade',  href: '/dashboard/membro/posicionamento', icon: Fingerprint },
+  { label: 'Pilares da Marca',  href: '/dashboard/membro/pilares',        icon: Building2   },
+  { label: 'Metas de Impacto',  href: '/dashboard/membro/okr',            icon: Target      },
+  { label: 'Tarefas',           href: '/dashboard/membro/tarefas',        icon: ListChecks  },
+  { label: 'Marketing Anual',   href: '/dashboard/membro/marketing',      icon: Send        },
+  { label: 'Indicadores',       href: '/dashboard/membro/kpis',           icon: TrendingUp  },
+  { label: 'Agenda',            href: '/dashboard/membro/agenda',         icon: Calendar    },
 ]
 
 export function Sidebar() {
