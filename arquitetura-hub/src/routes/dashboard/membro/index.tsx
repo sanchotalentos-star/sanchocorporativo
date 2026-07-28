@@ -1,15 +1,17 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import {
   Plus, X, Trash2, ChevronDown, ChevronUp, ClipboardList,
   LayoutDashboard, Kanban, LayoutList, ChevronRight, ChevronLeft, Zap, Rocket,
-  Briefcase, Target, TrendingUp, Users,
+  Briefcase, Target, TrendingUp, Users, Grid3x3, Sliders,
+  CheckCircle2, Circle,
 } from 'lucide-react'
 import {
   BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer,
   Tooltip, CartesianGrid, PieChart, Pie,
 } from 'recharts'
 import { useAuth } from '@/context/AuthContext'
+import { memberKey } from '@/lib/memberStorage'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/dashboard/membro/')({ component: HomePage })
@@ -902,112 +904,184 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
 }
 
 /* ═══════════════════════════════════════════
-   GUIA DE BOAS-VINDAS
+   QUICK CARD
 ═══════════════════════════════════════════ */
-const WELCOME_KEY = 'hub_welcome_v1'
-
-const GUIA_STEPS = [
-  { num: 1, color: '#6600CC', title: 'Identidade Profissional', body: 'Defina o seu posicionamento, essência e voz.',            Icon: Briefcase  },
-  { num: 2, color: '#00C884', title: 'Pilares de Atuação',      body: 'Estruture as frentes centrais do seu negócio.',           Icon: Target     },
-  { num: 3, color: '#FF6600', title: 'Metas e OKRs',            body: 'Estabeleça objetivos claros e mensuráveis.',              Icon: TrendingUp },
-  { num: 4, color: '#0084FF', title: 'Plano de Marketing',      body: 'Crie estratégias para atrair os clientes certos.',        Icon: Zap        },
-  { num: 5, color: '#CC00CC', title: 'Indicadores de Sucesso',  body: 'Monitore o desempenho com métricas essenciais.',          Icon: Users      },
-]
-
-function WelcomeGuia({ defaultOpen = false }: { defaultOpen?: boolean }) {
-  const [open, setOpen] = useState(() => {
-    const saved = localStorage.getItem(WELCOME_KEY)
-    if (saved !== null) return saved !== 'closed'
-    return defaultOpen
-  })
-
-  const handleToggle = () => {
-    const nextState = !open
-    setOpen(nextState)
-    localStorage.setItem(WELCOME_KEY, nextState ? 'open' : 'closed')
-  }
-
+interface QuickCardProps { href: string; color: string; Icon: typeof Briefcase; title: string; subtitle: string }
+function QuickCard({ href, color, Icon, title, subtitle }: QuickCardProps) {
   return (
-    <div style={{
-      background: open ? '#FFFFFF' : '#FAFAFA',
-      border: '1px solid #E5E5E5',
-      borderRadius: 12,
-      overflow: 'hidden',
-      boxShadow: open ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-      transition: 'all 0.3s ease',
-    }}>
-      <button
-        onClick={handleToggle}
+    <Link to={href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
+      <div
         style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '24px 32px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+          background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10,
+          padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12,
+          cursor: 'pointer', height: '100%', boxSizing: 'border-box', transition: 'all 0.15s ease',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.borderColor = color
+          e.currentTarget.style.boxShadow = `0 4px 12px ${color}22`
+          e.currentTarget.style.transform = 'translateY(-1px)'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.borderColor = '#E5E7EB'
+          e.currentTarget.style.boxShadow = 'none'
+          e.currentTarget.style.transform = 'none'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <div style={{
-            width: 48, height: 48, borderRadius: '50%', background: '#6600CC',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF', flexShrink: 0,
-          }}>
-            <Rocket size={24} strokeWidth={1.5} />
-          </div>
-          <div>
-            <p style={{ fontSize: 20, fontWeight: 600, color: '#333333', margin: '0 0 4px 0', letterSpacing: '-0.01em' }}>
-              Bem-vindo ao seu Hub de Arquitetura de Relevância!
-            </p>
-            <p style={{ fontSize: 16, color: '#666666', margin: 0 }}>
-              Vamos estruturar sua mentoria em 5 passos claros e acionáveis.
-            </p>
-          </div>
+        <div style={{ width: 36, height: 36, borderRadius: 8, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Icon size={18} style={{ color }} />
         </div>
-        {open
-          ? <ChevronUp size={20} color="#666666" style={{ flexShrink: 0 }} />
-          : <ChevronDown size={20} color="#666666" style={{ flexShrink: 0 }} />
+        <div style={{ flex: 1 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: '0 0 3px' }}>{title}</p>
+          <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0, lineHeight: 1.5 }}>{subtitle}</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color }}>Acessar</span>
+          <ChevronRight size={12} style={{ color }} />
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   CHECKLIST GUIA
+═══════════════════════════════════════════ */
+interface ChecklistStepProps { done: boolean; label: string; href: string }
+function ChecklistStep({ done, label, href }: ChecklistStepProps) {
+  return (
+    <Link to={href} style={{ textDecoration: 'none', display: 'block' }}>
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 7, transition: 'background 0.1s', cursor: done ? 'default' : 'pointer' }}
+        onMouseEnter={e => { if (!done) e.currentTarget.style.background = '#F9FAFB' }}
+        onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+      >
+        {done
+          ? <CheckCircle2 size={16} style={{ color: '#22C55E', flexShrink: 0 }} />
+          : <Circle size={16} style={{ color: '#D1D5DB', flexShrink: 0 }} />
         }
-      </button>
+        <span style={{
+          fontSize: 13, flex: 1, lineHeight: 1.4,
+          color: done ? '#9CA3AF' : '#374151',
+          textDecoration: done ? 'line-through' : 'none',
+        }}>
+          {label}
+        </span>
+        {!done && <ChevronRight size={12} style={{ color: '#D1D5DB', flexShrink: 0 }} />}
+      </div>
+    </Link>
+  )
+}
 
-      {open && (
-        <div style={{ borderTop: '1px solid #F0F0F0', padding: '32px', background: '#FFFFFF' }}>
-          <p style={{ fontSize: 16, color: '#333333', lineHeight: 1.7, marginBottom: 32, marginTop: 0, maxWidth: 800 }}>
-            Este é o seu painel central. Use-o para registrar e acompanhar cada etapa da sua jornada profissional.
-          </p>
+interface ChecklistGuiaProps {
+  hasIdentidade: boolean; hasPilares: boolean; hasOkrs: boolean
+  hasMarketing: boolean; hasKpis: boolean
+}
+function ChecklistGuia({ hasIdentidade, hasPilares, hasOkrs, hasMarketing, hasKpis }: ChecklistGuiaProps) {
+  const steps = [
+    { label: 'Definir identidade profissional',   done: hasIdentidade, href: '/dashboard/membro/posicionamento' },
+    { label: 'Estruturar os pilares da marca',     done: hasPilares,    href: '/dashboard/membro/pilares'        },
+    { label: 'Criar metas e OKRs',                done: hasOkrs,       href: '/dashboard/membro/okr'            },
+    { label: 'Planejar ações de marketing anual', done: hasMarketing,  href: '/dashboard/membro/marketing'      },
+    { label: 'Configurar indicadores-chave',      done: hasKpis,       href: '/dashboard/membro/kpis'           },
+  ]
+  const completedCount = steps.filter(s => s.done).length
+  const pct = Math.round((completedCount / steps.length) * 100)
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
-            {GUIA_STEPS.map((step) => (
-              <div
-                key={step.num}
-                style={{
-                  background: '#FAFAFA', border: '1px solid #E5E5E5', borderRadius: 12,
-                  padding: '28px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 16,
-                  transition: 'all 0.2s ease',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = step.color
-                  e.currentTarget.style.boxShadow = `0 8px 16px ${step.color}20`
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = '#E5E5E5'
-                  e.currentTarget.style.boxShadow = 'none'
-                }}
-              >
-                <div style={{
-                  width: 40, height: 40, borderRadius: 10, background: step.color,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF',
-                }}>
-                  <step.Icon size={20} strokeWidth={2} />
-                </div>
-                <div>
-                  <p style={{ fontSize: 15, fontWeight: 600, color: '#333333', margin: '0 0 6px 0' }}>
-                    {step.num}. {step.title}
-                  </p>
-                  <p style={{ fontSize: 14, color: '#666666', lineHeight: 1.6, margin: 0 }}>
-                    {step.body}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+  return (
+    <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '20px 20px 14px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>Sua Jornada de Configuração</p>
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#7B2FBE' }}>{completedCount}/{steps.length}</span>
+      </div>
+      <div style={{ height: 5, background: '#F3F4F6', borderRadius: 3, overflow: 'hidden', marginBottom: 14 }}>
+        <div style={{ height: '100%', width: `${pct}%`, background: '#7B2FBE', borderRadius: 3, transition: 'width 0.4s ease' }} />
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        {steps.map((s, i) => <ChecklistStep key={i} done={s.done} label={s.label} href={s.href} />)}
+      </div>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   STATUS DA JORNADA (painel direito)
+═══════════════════════════════════════════ */
+interface StatusJornadaProps {
+  okrs: Objective[]; tarefas: Tarefa[]; progOkrs: number
+  feitasCount: number; totalTarefas: number; bloqueadas: number; emAndamento: number
+}
+function StatusJornada({ okrs, tarefas, progOkrs, feitasCount, totalTarefas, bloqueadas, emAndamento }: StatusJornadaProps) {
+  const pctTarefas = totalTarefas > 0 ? Math.round((feitasCount / totalTarefas) * 100) : 0
+  const pendentes  = tarefas.filter(t => t.status === 'pendente').length
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {/* OKR Progress */}
+      <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '18px 20px' }}>
+        <p style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 14px' }}>Progresso OKRs</p>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 10 }}>
+          <span style={{ fontSize: 36, fontWeight: 700, color: '#7B2FBE', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{progOkrs}%</span>
+          <span style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 4 }}>{okrs.length} objetivo{okrs.length !== 1 ? 's' : ''}</span>
         </div>
-      )}
+        <div style={{ height: 6, background: '#F3F4F6', borderRadius: 3, overflow: 'hidden', marginBottom: 12 }}>
+          <div style={{ height: '100%', width: `${progOkrs}%`, background: '#7B2FBE', borderRadius: 3, transition: 'width 0.4s ease' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {okrs.slice(0, 3).map(o => (
+            <div key={o.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', flexShrink: 0, background: catColor[o.categoria] ?? '#7B2FBE' }} />
+              <span style={{ fontSize: 11, color: '#374151', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.titulo}</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: catColor[o.categoria] ?? '#7B2FBE', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{objPct(o)}%</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Tarefas */}
+      <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '18px 20px' }}>
+        <p style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 12px' }}>Tarefas</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {[
+            { label: 'Concluídas', value: feitasCount, color: '#22C55E', bg: '#F0FDF4' },
+            { label: 'Em andamento', value: emAndamento, color: '#3B82F6', bg: '#EFF6FF' },
+            { label: 'Pendentes', value: pendentes, color: '#9CA3AF', bg: '#F9FAFB' },
+            { label: 'Bloqueadas', value: bloqueadas, color: '#EF4444', bg: '#FEF2F2' },
+          ].map(s => (
+            <div key={s.label} style={{ background: s.bg, borderRadius: 7, padding: '10px 12px' }}>
+              <p style={{ fontSize: 18, fontWeight: 700, color: s.color, margin: 0, fontVariantNumeric: 'tabular-nums' }}>{s.value}</p>
+              <p style={{ fontSize: 10, color: '#6B7280', margin: '2px 0 0', lineHeight: 1.3 }}>{s.label}</p>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 10, height: 4, background: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${pctTarefas}%`, background: '#22C55E', borderRadius: 2, transition: 'width 0.4s ease' }} />
+        </div>
+        <p style={{ fontSize: 10, color: '#9CA3AF', margin: '6px 0 0', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{pctTarefas}% concluído</p>
+      </div>
+
+      {/* Acesso rápido */}
+      <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '14px 16px' }}>
+        <p style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>Acesso rápido</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {([
+            { href: '/dashboard/membro/tarefas', label: 'Ver todas as tarefas', Icon: ClipboardList },
+            { href: '/dashboard/membro/agenda',  label: 'Calendário e agenda',  Icon: Sliders        },
+            { href: '/dashboard/membro/kpis',    label: 'Indicadores',          Icon: TrendingUp     },
+          ] as { href: string; label: string; Icon: typeof ClipboardList }[]).map(item => (
+            <Link key={item.href} to={item.href} style={{ textDecoration: 'none' }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 8px', borderRadius: 6, transition: 'background 0.1s' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#F9FAFB' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+              >
+                <item.Icon size={13} style={{ color: '#9CA3AF', flexShrink: 0 }} />
+                <span style={{ fontSize: 12, color: '#374151', flex: 1 }}>{item.label}</span>
+                <ChevronRight size={11} style={{ color: '#D1D5DB', flexShrink: 0 }} />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
@@ -1027,15 +1101,25 @@ function HomePage() {
   const [view,             setView]              = useState<ViewMode>('dashboard')
   const [appliedWorkflows, setAppliedWorkflows]  = useState<string[]>([])
 
+  /* completion flags for checklist */
+  const [hasIdentidade, setHasIdentidade] = useState(false)
+  const [hasMarketing,  setHasMarketing]  = useState(false)
+
   useEffect(() => {
-    try { const s = localStorage.getItem(userStorageKey(OKR_KEY)); if (s) setOkrs(JSON.parse(s) ?? []) } catch {}
+    try { const s = localStorage.getItem(memberKey(OKR_KEY)); if (s) setOkrs(JSON.parse(s) ?? []) } catch {}
+    try { setHasIdentidade(!!localStorage.getItem(memberKey('identidade_marca_v1'))) } catch {}
+    try {
+      const mRaw = localStorage.getItem(memberKey('marketing_store_v1'))
+      const mArr = mRaw ? JSON.parse(mRaw) : []
+      setHasMarketing(Array.isArray(mArr) && mArr.length > 0)
+    } catch {}
   }, [])
 
   useEffect(() => {
     if (!okrs.length) return
     let stored: Tarefa[] = []
     try {
-      const raw = JSON.parse(localStorage.getItem(userStorageKey(TAREFAS_KEY)) ?? '[]') ?? []
+      const raw = JSON.parse(localStorage.getItem(memberKey(TAREFAS_KEY)) ?? '[]') ?? []
       stored = raw.map((t: Tarefa & { done?: boolean }) => ({ ...t, status: t.status ?? (t.done ? 'feita' : 'pendente'), prioridade: t.prioridade ?? 'media' }))
     } catch {}
     const existingKrIds = new Set(stored.map(t => t.krId))
@@ -1048,7 +1132,7 @@ function HomePage() {
   }, [okrs])
 
   useEffect(() => {
-    if (tarefas.length > 0 || localStorage.getItem(userStorageKey(TAREFAS_KEY))) localStorage.setItem(userStorageKey(TAREFAS_KEY), JSON.stringify(tarefas))
+    if (tarefas.length > 0 || localStorage.getItem(memberKey(TAREFAS_KEY))) localStorage.setItem(memberKey(TAREFAS_KEY), JSON.stringify(tarefas))
   }, [tarefas])
 
   function cycleStatus(id: string) {
@@ -1098,98 +1182,141 @@ function HomePage() {
     { key: 'fluxos',    label: 'Fluxos',    Icon: Zap             },
   ]
 
+  const header = (
+    <div style={{ paddingTop: 4, borderBottom: '2px solid #F0F0F0', paddingBottom: 24 }}>
+      <p style={{ fontSize: 12, color: '#999999', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
+      <h1 style={{ fontSize: 32, fontWeight: 700, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>Olá, {firstName}</h1>
+      <p style={{ fontSize: 18, color: '#666666', margin: '8px 0 0 0' }}>Bem-vindo ao seu hub de inteligência e estratégia.</p>
+    </div>
+  )
+
   if (okrs.length === 0) {
     return (
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px 48px', display: 'flex', flexDirection: 'column', gap: 40, background: '#FFFFFF' }}>
-        <div style={{ paddingTop: 4, borderBottom: '2px solid #F0F0F0', paddingBottom: 24 }}>
-          <p style={{ fontSize: 12, color: '#999999', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
-          <h1 style={{ fontSize: 32, fontWeight: 700, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>Olá, {firstName}</h1>
-          <p style={{ fontSize: 18, color: '#666666', margin: '8px 0 0 0' }}>Bem-vindo ao seu hub de inteligência e estratégia.</p>
-        </div>
-        <WelcomeGuia defaultOpen={true} />
-        <div style={{ background: '#FAFAFA', border: '1px solid #E5E5E5', borderRadius: 12, padding: '32px', textAlign: 'center' }}>
-          <ClipboardList size={28} style={{ color: '#D1D5DB', margin: '0 auto 12px' }} />
-          <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 6 }}>Nenhum objetivo criado ainda.</p>
-          <p style={{ fontSize: 12, color: '#9CA3AF' }}>Vá até <strong>Metas de Impacto</strong> para criar seus primeiros OKRs e gerar o plano de tarefas automaticamente.</p>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px 48px', display: 'flex', flexDirection: 'column', gap: 32, background: '#FFFFFF' }}>
+        {header}
+        {/* 2-col layout even without OKRs */}
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+              <QuickCard href="/dashboard/membro/posicionamento" color="#6600CC" Icon={Briefcase} title="Minha Identidade" subtitle="Posicionamento e essência" />
+              <QuickCard href="/dashboard/membro/pilares"        color="#00C884" Icon={Target}   title="Pilares da Marca" subtitle="Frentes do seu negócio" />
+              <QuickCard href="/dashboard/membro/okr"            color="#FF6600" Icon={Rocket}   title="Metas de Impacto" subtitle="Objetivos e resultados-chave" />
+            </div>
+            <ChecklistGuia
+              hasIdentidade={hasIdentidade} hasPilares={false}
+              hasOkrs={false} hasMarketing={hasMarketing} hasKpis={false}
+            />
+          </div>
+          <div style={{ background: '#FAFAFA', border: '1px solid #E5E7EB', borderRadius: 10, padding: '28px 24px', textAlign: 'center' }}>
+            <ClipboardList size={28} style={{ color: '#D1D5DB', margin: '0 auto 12px' }} />
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#374151', marginBottom: 6 }}>Nenhum objetivo criado ainda</p>
+            <p style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 1.6 }}>Vá até <strong>Metas de Impacto</strong> para criar seus primeiros OKRs.</p>
+            <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none' }}>
+              <div style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: '#7B2FBE', color: '#fff', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                <Rocket size={13} /> Criar OKRs
+              </div>
+            </Link>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px 48px', display: 'flex', flexDirection: 'column', gap: 40, background: '#FFFFFF' }}>
-      {/* Header + view toggle */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', borderBottom: '2px solid #F0F0F0', paddingBottom: 24 }}>
-        <div>
-          <p style={{ fontSize: 12, color: '#999999', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
-          <h1 style={{ fontSize: 32, fontWeight: 700, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>Olá, {firstName}</h1>
-          <p style={{ fontSize: 18, color: '#666666', margin: '8px 0 0 0' }}>Bem-vindo ao seu hub de inteligência e estratégia.</p>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px 48px', display: 'flex', flexDirection: 'column', gap: 32, background: '#FFFFFF' }}>
+      {header}
+
+      {/* ── 2-column hero ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, alignItems: 'start' }}>
+        {/* Left: quick cards + checklist */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+            <QuickCard href="/dashboard/membro/posicionamento" color="#6600CC" Icon={Briefcase} title="Minha Identidade" subtitle="Posicionamento e essência" />
+            <QuickCard href="/dashboard/membro/pilares"        color="#00C884" Icon={Target}   title="Pilares da Marca" subtitle="Frentes do seu negócio" />
+            <QuickCard href="/dashboard/membro/okr"            color="#FF6600" Icon={Rocket}   title="Metas de Impacto" subtitle="Objetivos e resultados-chave" />
+          </div>
+          <ChecklistGuia
+            hasIdentidade={hasIdentidade} hasPilares={false}
+            hasOkrs={okrs.length > 0} hasMarketing={hasMarketing} hasKpis={false}
+          />
         </div>
-        <div style={{ display: 'flex', background: '#F5F5F5', padding: 4, borderRadius: 8, border: '1px solid #E5E5E5', flexShrink: 0 }}>
-          {viewButtons.map(({ key, label, Icon }) => (
-            <button
-              key={key}
-              onClick={() => setView(key)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                padding: '10px 20px', border: 'none', cursor: 'pointer', borderRadius: 6,
-                background: view === key ? '#FFFFFF' : 'transparent',
-                color: view === key ? '#111827' : '#666666',
-                boxShadow: view === key ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                fontSize: 14, fontWeight: view === key ? 600 : 400,
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <Icon size={14} />
-              {label}
-            </button>
-          ))}
-        </div>
+
+        {/* Right: status panel */}
+        <StatusJornada
+          okrs={okrs} tarefas={tarefas} progOkrs={progOkrs}
+          feitasCount={feitasCount} totalTarefas={tarefas.length}
+          bloqueadas={bloqueadas} emAndamento={emAndamento}
+        />
       </div>
 
-      <WelcomeGuia defaultOpen={true} />
+      {/* ── Plano de Ação ── */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 600, color: '#111827', margin: 0 }}>Meu Plano de Ação</h2>
+          <div style={{ display: 'flex', background: '#F5F5F5', padding: 4, borderRadius: 8, border: '1px solid #E5E5E5', flexShrink: 0 }}>
+            {viewButtons.map(({ key, label, Icon }) => (
+              <button
+                key={key}
+                onClick={() => setView(key)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 7,
+                  padding: '8px 16px', border: 'none', cursor: 'pointer', borderRadius: 6,
+                  background: view === key ? '#FFFFFF' : 'transparent',
+                  color: view === key ? '#111827' : '#666666',
+                  boxShadow: view === key ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                  fontSize: 13, fontWeight: view === key ? 600 : 400,
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Icon size={13} />
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-      <div style={{ minHeight: 300 }}>
-        {view === 'dashboard' && (
-          <DashboardView
-            okrs={okrs} tarefas={tarefas}
-            totalKrs={totalKrs} progOkrs={progOkrs}
-            feitasCount={feitasCount} emAndamento={emAndamento}
-            bloqueadas={bloqueadas} pctGeral={pctGeral}
-          />
-        )}
-        {view === 'kanban' && (
-          <KanbanView
-            okrs={okrs} tarefas={tarefas}
-            onCycleStatus={cycleStatus}
-            onCycleBack={cycleStatusBack}
-            onCyclePrioridade={cyclePrioridade}
-            onDelete={deleteTarefa}
-            onUpdateDesc={updateDesc}
-            onAddTask={addTarefaWithStatus}
-          />
-        )}
-        {view === 'lista' && (
-          <ListaView
-            okrs={okrs} tarefas={tarefas}
-            expanded={expanded}
-            onToggle={id => setExpanded(p => ({ ...p, [id]: !p[id] }))}
-            onCycleStatus={cycleStatus}
-            onCyclePrioridade={cyclePrioridade}
-            onDelete={deleteTarefa}
-            onUpdateDesc={updateDesc}
-            addingTo={addingTo} novaDesc={novaDesc}
-            setNovaDesc={setNovaDesc} setAddingTo={setAddingTo}
-            addTarefa={addTarefa}
-          />
-        )}
-        {view === 'fluxos' && (
-          <FluxosView
-            okrs={okrs}
-            appliedWorkflows={appliedWorkflows}
-            onApply={applyWorkflow}
-          />
-        )}
+        <div style={{ minHeight: 300 }}>
+          {view === 'dashboard' && (
+            <DashboardView
+              okrs={okrs} tarefas={tarefas}
+              totalKrs={totalKrs} progOkrs={progOkrs}
+              feitasCount={feitasCount} emAndamento={emAndamento}
+              bloqueadas={bloqueadas} pctGeral={pctGeral}
+            />
+          )}
+          {view === 'kanban' && (
+            <KanbanView
+              okrs={okrs} tarefas={tarefas}
+              onCycleStatus={cycleStatus}
+              onCycleBack={cycleStatusBack}
+              onCyclePrioridade={cyclePrioridade}
+              onDelete={deleteTarefa}
+              onUpdateDesc={updateDesc}
+              onAddTask={addTarefaWithStatus}
+            />
+          )}
+          {view === 'lista' && (
+            <ListaView
+              okrs={okrs} tarefas={tarefas}
+              expanded={expanded}
+              onToggle={id => setExpanded(p => ({ ...p, [id]: !p[id] }))}
+              onCycleStatus={cycleStatus}
+              onCyclePrioridade={cyclePrioridade}
+              onDelete={deleteTarefa}
+              onUpdateDesc={updateDesc}
+              addingTo={addingTo} novaDesc={novaDesc}
+              setNovaDesc={setNovaDesc} setAddingTo={setAddingTo}
+              addTarefa={addTarefa}
+            />
+          )}
+          {view === 'fluxos' && (
+            <FluxosView
+              okrs={okrs}
+              appliedWorkflows={appliedWorkflows}
+              onApply={applyWorkflow}
+            />
+          )}
+        </div>
       </div>
     </div>
   )
