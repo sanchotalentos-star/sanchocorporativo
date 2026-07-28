@@ -613,11 +613,19 @@ function migrateOkrs(raw: Objective[]): Objective[] {
     return desc
   }
 
-  return raw.map(obj => ({
-    ...obj,
-    titulo: fixTitle(obj.titulo),
-    keyResults: obj.keyResults.map(kr => ({ ...kr, descricao: fixKr(kr.descricao) })),
-  }))
+  return raw.map(obj => {
+    const rawPdca = (obj.pdca as unknown as Record<string, unknown>) ?? {}
+    return {
+      ...obj,
+      titulo: fixTitle(obj.titulo),
+      keyResults: (obj.keyResults ?? []).map(kr => ({ ...kr, descricao: fixKr(kr.descricao) })),
+      pdca: {
+        semanaAtual: typeof rawPdca.semanaAtual === 'number' ? rawPdca.semanaAtual : 1,
+        acoes: Array.isArray(rawPdca.acoes) ? rawPdca.acoes : [],
+        plano: Array.isArray(rawPdca.plano) ? rawPdca.plano : [],
+      },
+    }
+  })
 }
 
 const OKR_SEEDS: Record<string, Objective[]> = {
@@ -1284,7 +1292,7 @@ function OkrCard({
               </div>
 
               {[1,2,3,4].map(semana => {
-                const acoesSem = obj.pdca.acoes.filter(a => a.semana === semana)
+                const acoesSem = (obj.pdca.acoes ?? []).filter(a => a.semana === semana)
                 const isCurrent = semana === obj.pdca.semanaAtual
                 const isPast = semana < obj.pdca.semanaAtual
                 return (
