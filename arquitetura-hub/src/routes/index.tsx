@@ -75,8 +75,8 @@ export default function LandingPage() {
         ]}
         mainText="Programa de mentoria para profissionais que querem construir autoridade real, com método, dados e acompanhamento próximo."
         readMoreLink="#metodo"
-        imageSrc="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=500&q=80"
-        imageAlt="Profissional de autoridade"
+        imageSrc="https://drive.google.com/thumbnail?id=1yTVciUHLlDjORTs4DU27fxjzRGVT3Shz&sz=w800"
+        imageAlt="Wladson Sidney"
         overlayText={{ part1: 'relevância', part2: 'real.' }}
         socialLinks={[
           { icon: Linkedin,  href: '#' },
