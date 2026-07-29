@@ -73,7 +73,7 @@ export default function LandingPage() {
           { label: 'MÉTODO',    href: '#metodo' },
           { label: 'PARA QUEM', href: '#para-quem' },
         ]}
-        mainText="Programa de mentoria para profissionais que querem construir autoridade real — com método, dados e acompanhamento próximo."
+        mainText="Programa de mentoria para profissionais que querem construir autoridade real, com método, dados e acompanhamento próximo."
         readMoreLink="#metodo"
         imageSrc="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=500&q=80"
         imageAlt="Profissional de autoridade"
@@ -178,7 +178,7 @@ export default function LandingPage() {
             }}>
               Para quem quer ser{' '}
               <span style={{ fontStyle: 'italic', color: GOLD }}>referência</span>
-              {' '}— não só conhecido.
+              {'. Não só conhecido.'}
             </h2>
           </FadeUp>
 

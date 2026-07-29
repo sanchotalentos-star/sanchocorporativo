@@ -18,6 +18,7 @@ interface MinimalistHeroProps {
   locationText: string;
   className?: string;
   circleColor?: string;
+  overlayStyle?: React.CSSProperties;
 }
 
 const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
@@ -47,6 +48,7 @@ export const MinimalistHero = ({
   locationText,
   className,
   circleColor = 'bg-yellow-400/90',
+  overlayStyle,
 }: MinimalistHeroProps) => {
   return (
     <div
@@ -133,7 +135,10 @@ export const MinimalistHero = ({
           transition={{ duration: 0.6, delay: 1.2 }}
           className="z-20 order-3 flex items-center justify-center text-center md:justify-start"
         >
-          <h1 className="text-7xl font-extrabold text-foreground md:text-8xl lg:text-9xl">
+          <h1
+            className="font-extrabold text-foreground"
+            style={{ fontSize: 'clamp(2.8rem, 5.5vw, 7rem)', lineHeight: 1.0, letterSpacing: '-0.03em', ...overlayStyle }}
+          >
             {overlayText.part1}
             <br />
             {overlayText.part2}
