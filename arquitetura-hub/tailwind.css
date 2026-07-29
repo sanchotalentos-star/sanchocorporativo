@@ -4,6 +4,8 @@
    DESIGN TOKENS — HUB DE RELEVÂNCIA (tema escuro quente)
 ═══════════════════════════════════════════════════ */
 @theme inline {
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
   --color-primary:            #C5A880;
   --color-primary-hover:      #D4B891;
   --color-accent:             #C5A880;
@@ -21,6 +23,8 @@
 }
 
 :root {
+  --background:               #FFFFFF;
+  --foreground:               #0A0907;
   --color-primary:            #C5A880;
   --color-primary-hover:      #D4B891;
   --color-accent:             #C5A880;
