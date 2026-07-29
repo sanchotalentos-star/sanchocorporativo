@@ -3,7 +3,7 @@ import type { LucideIcon } from 'lucide-react'
 import {
   LayoutGrid, Target, Building2, Fingerprint, Send, Calendar,
   TrendingUp, LogOut,
-  LayoutDashboard, Users, FileText, ListChecks,
+  LayoutDashboard, Users, FileText, ListChecks, BookOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
@@ -19,6 +19,7 @@ const adminNav: NavItem[] = [
   { label: 'Visão Geral',  href: '/dashboard/admin',            icon: LayoutDashboard },
   { label: 'Membros',      href: '/dashboard/admin/membros',    icon: Users           },
   { label: 'Relatórios',  href: '/dashboard/admin/relatorios',  icon: FileText        },
+  { label: 'Meu Hub',      href: '/dashboard/membro',           icon: BookOpen        },
 ]
 
 const membroNav: NavItem[] = [
