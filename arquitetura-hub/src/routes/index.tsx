@@ -67,7 +67,7 @@ export default function LandingPage() {
 
       {/* ── HERO ── */}
       <MinimalistHero
-        logoText="AR."
+        logoText="Arquitetura de Relevância"
         navLinks={[
           { label: 'PROGRAMA',  href: '#metodo' },
           { label: 'MÉTODO',    href: '#metodo' },
@@ -82,7 +82,7 @@ export default function LandingPage() {
           { icon: Linkedin,  href: '#' },
           { icon: Instagram, href: '#' },
         ]}
-        locationText="Brasil · 2025"
+        locationText="Brasil · 2026"
         circleColor="bg-[#C5A880]/70"
       />
 

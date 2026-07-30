@@ -63,7 +63,8 @@ export const MinimalistHero = ({
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-xl font-bold tracking-wider"
+          className="font-bold"
+          style={{ fontSize: logoText.length > 4 ? '0.85rem' : '1.25rem', letterSpacing: logoText.length > 4 ? '0.06em' : '0.05em', textTransform: 'uppercase' }}
         >
           {logoText}
         </motion.div>
