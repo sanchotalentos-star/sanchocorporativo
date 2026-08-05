@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
-import { Lock, Sparkles, PenLine, MessageSquare, Search, Lightbulb, Target, Layers, ChevronRight, CheckCircle2, Circle, Download, Users } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Lock, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { IDENTIDADE_KEY } from '@/lib/identidade'
 
@@ -10,6 +9,21 @@ export const Route = createFileRoute('/dashboard/membro/posicionamento')({
   component: PosicionamentoPage,
 })
 
+// ─── Design tokens ────────────────────────────────────────────────
+const D = {
+  bg:        '#FAFAF9',
+  surface:   '#F5F4F2',
+  border:    'rgba(26,25,22,0.07)',
+  text:      '#1A1916',
+  textMid:   '#3A3530',
+  textSub:   '#6B6560',
+  textMuted: '#8A8680',
+  textFaint: '#C5C0BA',
+  gold:      '#C5A880',
+  serif:     "'Cormorant Garamond', Georgia, serif",
+} as const
+
+// ─── Types ────────────────────────────────────────────────────────
 type PilarStatus = 'aguardando' | 'reflexao_feita' | 'construido'
 type PilarField  = 'publicoAlvo' | 'proposta' | 'storytelling' | 'formatoProduto'
 
@@ -20,23 +34,45 @@ interface PilarData {
   status:        PilarStatus
 }
 
-const statusConfig: Record<PilarStatus, { label: string; color: string; bg: string }> = {
-  aguardando:     { label: 'Aguardando reflexão',   color: '#75716B', bg: 'rgba(117,113,107,0.15)' },
-  reflexao_feita: { label: 'Reflexão feita',        color: '#F59E0B', bg: 'rgba(245,158,11,0.15)'  },
-  construido:     { label: 'Construído com mentor', color: '#C5A880', bg: 'rgba(197,168,128,0.12)' },
+type PilarStates = Record<PilarField, PilarData>
+
+// ─── Micro components ─────────────────────────────────────────────
+function HR() {
+  return (
+    <hr style={{
+      border: 'none',
+      borderTop: `1px solid ${D.border}`,
+      margin: 0,
+    }} />
+  )
 }
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{
+      fontSize: 9,
+      fontWeight: 700,
+      letterSpacing: '0.2em',
+      textTransform: 'uppercase',
+      color: D.textMuted,
+      margin: 0,
+    }}>
+      {children}
+    </p>
+  )
+}
+
+// ─── Data ─────────────────────────────────────────────────────────
 const PILARES: {
-  id:            PilarField
-  num:           string
-  label:         string
-  desc:          string
-  pergunta:      string
-  placeholder:   string
-  dica:          string
-  mentorFoco:    string
-  mentorItens:   string[]
-  MentorIcon:    React.ElementType
+  id:          PilarField
+  num:         string
+  label:       string
+  desc:        string
+  pergunta:    string
+  placeholder: string
+  dica:        string
+  mentorFoco:  string
+  mentorItens: string[]
 }[] = [
   {
     id:          'publicoAlvo',
@@ -46,7 +82,6 @@ const PILARES: {
     pergunta:    'Na sua percepção, quem é a pessoa ideal para o que você faz?',
     placeholder: 'Ex: Profissionais liberais entre 35 e 50 anos que têm expertise consolidada mas ainda trocam horas por dinheiro e querem criar um produto de alto valor...',
     dica:        'Pense em alguém real que você já ajudou. Qual era a situação dela antes? O que mudou depois do seu trabalho com ela?',
-    MentorIcon:  Search,
     mentorFoco:  'Na sessão, seu mentor vai aprofundar o que você escreveu e construir com você um perfil preciso do seu cliente ideal.',
     mentorItens: [
       'Validar se a percepção que você tem do seu cliente bate com o mercado real',
@@ -63,7 +98,6 @@ const PILARES: {
     pergunta:    'Qual transformação concreta você gera nas pessoas que trabalham com você?',
     placeholder: 'Ex: Em 90 dias, profissionais de saúde saem de uma agenda lotada para um produto digital estruturado e a primeira venda realizada...',
     dica:        'Foque no resultado, não no processo. O que a pessoa TEM depois de trabalhar com você que não tinha antes?',
-    MentorIcon:  Target,
     mentorFoco:  'Seu mentor vai ajudar a transformar o que você entrega em uma proposta que o cliente sente, não apenas entende.',
     mentorItens: [
       'Separar o que é processo do que é resultado real e tangível',
@@ -80,7 +114,6 @@ const PILARES: {
     pergunta:    'Qual experiência pessoal te capacita a ajudar quem você ajuda hoje?',
     placeholder: 'Ex: Por 8 anos fui consultor trocando horas por dinheiro. Quando criei meu primeiro produto, percebi que meu conhecimento valia muito mais do que meu tempo disponível...',
     dica:        'Boa história tem o antes (dor ou limitação), o momento de virada e o depois: o que você conquistou e como isso te capacita a ajudar outros.',
-    MentorIcon:  Lightbulb,
     mentorFoco:  'Toda autoridade tem uma história de transformação. Seu mentor vai extrair o que há de mais poderoso na sua trajetória.',
     mentorItens: [
       'Identificar os elementos da sua história que mais geram conexão e credibilidade',
@@ -97,7 +130,6 @@ const PILARES: {
     pergunta:    'Como você imagina que seu produto ou serviço deve ser estruturado?',
     placeholder: 'Ex: Mentoria individual de 3 meses, com 6 sessões de 1h via Google Meet e canal de suporte no WhatsApp. Investimento: R$ 4.800 à vista ou 3 parcelas de R$ 1.700...',
     dica:        'Descreva: formato (mentoria, grupo, curso), duração, frequência, canais e a faixa de preço que você considera justo pelo que entrega.',
-    MentorIcon:  Layers,
     mentorFoco:  'Seu mentor vai alinhar o formato do seu produto com o que o seu público está disposto a comprar e com o que faz sentido para o seu modelo de negócio.',
     mentorItens: [
       'Validar se o formato escolhido é o que o seu cliente ideal prefere e pode pagar',
@@ -108,31 +140,34 @@ const PILARES: {
   },
 ]
 
-// Caminhos sugeridos por pilar — aparecem quando o campo tem texto
 const PILAR_CAMINHOS: Record<PilarField, { titulo: string; texto: string }[]> = {
   publicoAlvo: [
-    { titulo: 'Especificidade gera atração', texto: 'Quanto mais preciso o perfil, mais magnético o posicionamento. O mentor vai aprofundar até o nível de consciência e dor que esse público carrega hoje. É aí que está o ouro.' },
+    { titulo: 'Especificidade gera atração', texto: 'Quanto mais preciso o perfil, mais magnético o posicionamento. O mentor vai aprofundar até o nível de consciência e dor que esse público carrega hoje.' },
     { titulo: 'Nomeie a dor melhor que eles', texto: 'O maior diferencial de um posicionamento forte é descrever a dor do cliente melhor do que ele mesmo consegue. Quando ele lê sua comunicação e pensa "é exatamente sobre mim", o posicionamento está funcionando.' },
-    { titulo: 'Base de tudo que vem depois', texto: 'Produto, preço, canal, história: tudo será calibrado para esse público. Quanto mais claro ele for agora, mais coerente e poderoso será tudo que você construir em cima.' },
+    { titulo: 'Base de tudo que vem depois', texto: 'Produto, preço, canal, história: tudo será calibrado para esse público. Quanto mais claro ele for agora, mais coerente e poderoso será tudo que você construir.' },
   ],
   proposta: [
-    { titulo: 'O cliente compra o destino', texto: 'Seu cliente compra a transformação, não o processo. Traduzir o que você faz em resultado concreto e mensurável é o núcleo da sua proposta. É o que diferencia posicionamentos genéricos de magnéticos.' },
+    { titulo: 'O cliente compra o destino', texto: 'Seu cliente compra a transformação, não o processo. Traduzir o que você faz em resultado concreto e mensurável é o núcleo da sua proposta.' },
     { titulo: 'Prazo define a promessa', texto: '"Em 90 dias" converte mais do que "ao longo da jornada". O mentor vai ajudar a encontrar o prazo real que você consegue garantir e que o cliente considera crível.' },
-    { titulo: 'O núcleo da sua Zona de Genialidade', texto: 'O que existe de genuinamente único no seu jeito de trabalhar, algo que ninguém faz exatamente como você? Esse é o diferenciador que vai sustentar sua autoridade no longo prazo.' },
+    { titulo: 'O núcleo da sua Zona de Genialidade', texto: 'O que existe de genuinamente único no seu jeito de trabalhar? Esse é o diferenciador que vai sustentar sua autoridade no longo prazo.' },
   ],
   storytelling: [
-    { titulo: 'Antes, virada e depois', texto: 'A estrutura que mais conecta: onde você estava (dor ou limitação), o que mudou (momento de virada) e onde chegou (estado atual que prova que a transformação é real e possível).' },
-    { titulo: 'Reconhecimento cria conexão', texto: 'Quando seu público lê sua história e pensa "eu já me senti assim", a conexão acontece instantaneamente. A especificidade do seu "antes" é o que gera identificação. Não precisa ser dramático, precisa ser verdadeiro.' },
-    { titulo: 'Sua maior prova de autoridade', texto: 'Sua história mostra que você viveu o que ensina. É a prova social mais autêntica que existe. O mentor vai extrair os elementos que geram mais autoridade e conexão para o seu posicionamento.' },
+    { titulo: 'Antes, virada e depois', texto: 'A estrutura que mais conecta: onde você estava (dor ou limitação), o que mudou (momento de virada) e onde chegou (estado atual que prova que a transformação é real).' },
+    { titulo: 'Reconhecimento cria conexão', texto: 'Quando seu público lê sua história e pensa "eu já me senti assim", a conexão acontece instantaneamente. A especificidade do seu "antes" é o que gera identificação.' },
+    { titulo: 'Sua maior prova de autoridade', texto: 'Sua história mostra que você viveu o que ensina. É a prova social mais autêntica que existe.' },
   ],
   formatoProduto: [
-    { titulo: 'Formato comunica posicionamento', texto: 'Mentoria individual comunica exclusividade e alto valor. Grupo comunica comunidade. Curso comunica escala. A escolha precisa estar alinhada com quem você quer atrair e como quer ser percebido.' },
-    { titulo: 'Preço é uma declaração', texto: 'O valor que você pratica comunica onde você está no mercado. Um preço alinhado com a transformação entregue é diferente de um preço competitivo. O mentor vai ajudar a encontrar esse equilíbrio.' },
-    { titulo: 'Canal onde seu público já confia', texto: 'O melhor canal de aquisição é onde seu público ideal já está e já tem o hábito de buscar referências. Com o perfil definido, fica claro se ele está no LinkedIn, Instagram, em eventos ou em indicações.' },
+    { titulo: 'Formato comunica posicionamento', texto: 'Mentoria individual comunica exclusividade e alto valor. Grupo comunica comunidade. Curso comunica escala. A escolha precisa estar alinhada com quem você quer atrair.' },
+    { titulo: 'Preço é uma declaração', texto: 'O valor que você pratica comunica onde você está no mercado. Um preço alinhado com a transformação entregue é diferente de um preço competitivo.' },
+    { titulo: 'Canal onde seu público já confia', texto: 'O melhor canal de aquisição é onde seu público ideal já está e já tem o hábito de buscar referências.' },
   ],
 }
 
-type PilarStates = Record<PilarField, PilarData>
+const statusConfig: Record<PilarStatus, { label: string; color: string }> = {
+  aguardando:     { label: 'Aguardando',    color: D.textFaint },
+  reflexao_feita: { label: 'Reflexão feita', color: D.gold     },
+  construido:     { label: 'Construído',    color: '#6BA36B'   },
+}
 
 const initialPilarStates: PilarStates = {
   publicoAlvo:    { reflexao: '', analise: '', analiseLocked: true, status: 'aguardando' },
@@ -141,6 +176,7 @@ const initialPilarStates: PilarStates = {
   formatoProduto: { reflexao: '', analise: '', analiseLocked: true, status: 'aguardando' },
 }
 
+// ─── Storage ──────────────────────────────────────────────────────
 function identidadeStorageKey(): string {
   try {
     const u = JSON.parse(localStorage.getItem('mock_user') ?? 'null')
@@ -153,26 +189,26 @@ const IDENTIDADE_SEEDS: Record<string, { pilares: PilarStates; diferenciais: str
   'member-4': {
     pilares: {
       publicoAlvo: {
-        reflexao: 'Sucessores de empresas familiares que estão numa queda de braço invisível com a geração anterior. Gestores que têm competência técnica, mas estão perdidos emocionalmente dentro do próprio negócio. Líderes que tentaram fugir do problema em vez de enfrentá-lo e estão pagando o preço disso.\n\nEm uma frase: sucessores e líderes de empresas familiares que sabem que o problema não é só de gestão, mas ainda não tiveram coragem de sentar e resolver o que está destruindo valor dentro de casa.\n\nMaiores dores: sentir que está brigando sozinho numa empresa que deveria ser aliada. Ter resultado melhorando mas relação com a família piorando. Acreditar que, pra crescer, alguém da família precisa perder espaço.',
+        reflexao: 'Sucessores de empresas familiares que estão numa queda de braço invisível com a geração anterior. Gestores que têm competência técnica, mas estão perdidos emocionalmente dentro do próprio negócio. Líderes que tentaram fugir do problema em vez de enfrentá-lo e estão pagando o preço disso.\n\nEm uma frase: sucessores e líderes de empresas familiares que sabem que o problema não é só de gestão, mas ainda não tiveram coragem de sentar e resolver o que está destruindo valor dentro de casa.\n\nMaiores dores: sentir que está brigando sozinho numa empresa que deveria ser aliada. Ter resultado melhorando mas relação com a família piorando.',
         analise: '', analiseLocked: true, status: 'reflexao_feita',
       },
       proposta: {
-        reflexao: 'Uma empresa familiar que para de gastar energia com conflito interno e passa a direcionar tudo isso para resultado. EBITDA +45%, lucro líquido +38%, margem que saiu de -3% para +17%.\n\nEle entrega o método completo, não só a parte bonita: finanças, governança, comercial, marca e as áreas que não existiam, incluindo a conversa que ninguém quer ter. A maioria dos consultores entrega gestão. Ele entrega gestão mais reconciliação, porque viveu as duas coisas na pele.\n\nFormato: palestra presencial de 40 minutos com tarefa concreta para executar ainda na semana.',
+        reflexao: 'Uma empresa familiar que para de gastar energia com conflito interno e passa a direcionar tudo isso para resultado. EBITDA +45%, lucro líquido +38%, margem que saiu de -3% para +17%.\n\nEle entrega o método completo, não só a parte bonita: finanças, governança, comercial, marca e as áreas que não existiam, incluindo a conversa que ninguém quer ter.',
         analise: '', analiseLocked: true, status: 'reflexao_feita',
       },
       storytelling: {
-        reflexao: 'Segunda-feira de manhã, dentro de um carro, depois do retiro católico. Três fracassos como empreendedor solo, perda de todas as reservas, síndrome do impostor instalada. Pediu um sinal no rádio. Tocou "Fix You" do Coldplay. Chegou na empresa, entrou na sala dos pais, pediu desculpa e perdoou. Ali destravou tudo.\n\nO que ele tinha antes que o cliente ideal também tem hoje: competência técnica reconhecida, empresa melhorando nos números, família que o amava e mesmo assim se sentindo vazio, perdido, achando que sozinho não construía nada. A sensação de estar brigando pela coisa errada.\n\nComo isso o capacitou: ele não é consultor de fora que estudou empresa familiar. Ele é o sucessor que tentou fugir três vezes, perdeu tudo, pediu desculpa ao pai e à mãe, e depois transformou a empresa no maior resultado da história. Ele conhece o custo da queda de braço invisível porque pagou esse custo com dinheiro, com saúde e com tempo de família.',
+        reflexao: 'Segunda-feira de manhã, dentro de um carro, depois do retiro católico. Três fracassos como empreendedor solo, perda de todas as reservas, síndrome do impostor instalada. Chegou na empresa, entrou na sala dos pais, pediu desculpa e perdoou. Ali destravou tudo.\n\nComo isso o capacitou: ele não é consultor de fora que estudou empresa familiar. Ele é o sucessor que tentou fugir três vezes, perdeu tudo, pediu desculpa ao pai e à mãe, e depois transformou a empresa no maior resultado da história.',
         analise: '', analiseLocked: true, status: 'reflexao_feita',
       },
       formatoProduto: {
-        reflexao: 'Palestra presencial de 40 minutos com estrutura narrativa (história real) + sistema aberto (3 palavras-chave + 5 frentes de gestão) + tarefa para executar na semana.\n\nPosicionamento premium para plateia de executivos e líderes de empresas familiares em eventos corporativos. Canal de aquisição principal: palco de eventos corporativos e de família empresária. Cada apresentação gera novas oportunidades.',
+        reflexao: 'Palestra presencial de 40 minutos com estrutura narrativa (história real) + sistema aberto (3 palavras-chave + 5 frentes de gestão) + tarefa para executar na semana.\n\nPosicionamento premium para plateia de executivos e líderes de empresas familiares em eventos corporativos.',
         analise: '', analiseLocked: true, status: 'reflexao_feita',
       },
     },
     diferenciais: [
-      'Ele é o protagonista da história, não o narrador. Rodrigo Cunha não estudou empresa familiar, ele é a empresa familiar. Isso é impossível de replicar.',
-      'Resultado numérico comprovado (margem de -3% pra +17%, EBITDA +45%) combinado com história de reconciliação familiar. Pouquíssimos speakers entregam os dois.',
-      'Evidências concretas: números da empresa (EBITDA, lucro líquido, margem, faturamento 3x), cronologia da virada (2017-2024), sucessão formalizada em 2024 e a mesa de domingo que voltou a ser lugar de paz.',
+      'Ele é o protagonista da história, não o narrador. Rodrigo Cunha não estudou empresa familiar, ele é a empresa familiar.',
+      'Resultado numérico comprovado (margem de -3% pra +17%, EBITDA +45%) combinado com história de reconciliação familiar.',
+      'Evidências concretas: números da empresa, cronologia da virada (2017-2024), sucessão formalizada em 2024.',
     ],
   },
 }
@@ -182,8 +218,7 @@ function loadSaved(): { pilares: PilarStates; diferenciais: string[] } | null {
     const key = identidadeStorageKey()
     const raw = localStorage.getItem(key)
     if (raw) return JSON.parse(raw)
-    // Seed pre-filled data for specific members on first load
-    const u = JSON.parse(localStorage.getItem('mock_user') ?? 'null')
+    const u    = JSON.parse(localStorage.getItem('mock_user') ?? 'null')
     const seed = u?.id ? IDENTIDADE_SEEDS[u.id] : null
     if (seed) {
       localStorage.setItem(key, JSON.stringify(seed))
@@ -195,112 +230,158 @@ function loadSaved(): { pilares: PilarStates; diferenciais: string[] } | null {
   }
 }
 
-// Componente: Zona de Genialidade em Formação
+// ─── Zona de Genialidade — editorial ─────────────────────────────
 function ZonaDeGenialidade({ pilares, diferenciais }: { pilares: PilarStates; diferenciais: string[] }) {
   const publico  = pilares.publicoAlvo.reflexao.trim()
   const proposta = pilares.proposta.reflexao.trim()
   const historia = pilares.storytelling.reflexao.trim()
   const formato  = pilares.formatoProduto.reflexao.trim()
   const difs     = diferenciais.filter(d => d.trim())
+  const filled   = [publico, proposta, historia, formato].filter(Boolean).length
 
-  const filledCount = [publico, proposta, historia, formato].filter(Boolean).length
-  if (filledCount < 2) return null
+  if (filled < 2) return null
 
-  const short = (text: string, max = 130) => text.length > max ? text.slice(0, max).trimEnd() + '…' : text
+  const short = (text: string, max = 160) =>
+    text.length > max ? text.slice(0, max).trimEnd() + '…' : text
 
   return (
-    <div
-      className="rounded-xl border border-[#7B2FBE]/25 bg-[#7B2FBE]/[0.03] p-5"
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Sparkles size={15} className="text-[#7B2FBE]" />
-          <p className="text-sm font-semibold text-gray-900">Zona de Genialidade em Formação</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+      <HR />
+      <div style={{ padding: '32px 0', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        {/* Label + title */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <SectionLabel>Zona de Genialidade em formação · {filled}/4 blocos</SectionLabel>
+          <h2 style={{
+            fontFamily: D.serif,
+            fontSize: 'clamp(26px, 3vw, 36px)',
+            fontWeight: 400,
+            color: D.text,
+            margin: 0,
+            lineHeight: 1.15,
+            fontStyle: 'italic',
+          }}>
+            {proposta ? short(proposta, 90) : 'Sua proposta ainda não foi definida.'}
+          </h2>
         </div>
-        <span className="text-[10px] font-medium bg-[#7B2FBE]/10 text-[#7B2FBE] px-2.5 py-1 rounded-full">
-          {filledCount}/4 blocos
-        </span>
+
+        {/* Editorial rows */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {proposta && (
+            <>
+              <HR />
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '120px 1fr',
+                gap: 24,
+                padding: '16px 0',
+              }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: D.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0, paddingTop: 2 }}>
+                  Você gera
+                </p>
+                <p style={{ fontSize: 14, color: D.textMid, margin: 0, lineHeight: 1.6 }}>
+                  {short(proposta)}
+                </p>
+              </div>
+            </>
+          )}
+
+          {publico && (
+            <>
+              <HR />
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '120px 1fr',
+                gap: 24,
+                padding: '16px 0',
+              }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: D.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0, paddingTop: 2 }}>
+                  Para quem
+                </p>
+                <p style={{ fontSize: 14, color: D.textMid, margin: 0, lineHeight: 1.6 }}>
+                  {short(publico)}
+                </p>
+              </div>
+            </>
+          )}
+
+          {difs.length > 0 && (
+            <>
+              <HR />
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '120px 1fr',
+                gap: 24,
+                padding: '16px 0',
+              }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: D.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0, paddingTop: 2 }}>
+                  Seu diferencial
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {difs.map((d, i) => (
+                    <p key={i} style={{ fontSize: 14, color: D.textMid, margin: 0, lineHeight: 1.6 }}>
+                      {d}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {historia && (
+            <>
+              <HR />
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '120px 1fr',
+                gap: 24,
+                padding: '16px 0',
+              }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: D.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0, paddingTop: 2 }}>
+                  O que te capacita
+                </p>
+                <p style={{ fontSize: 14, color: D.textMid, margin: 0, lineHeight: 1.6 }}>
+                  {short(historia)}
+                </p>
+              </div>
+            </>
+          )}
+
+          {formato && (
+            <>
+              <HR />
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '120px 1fr',
+                gap: 24,
+                padding: '16px 0',
+              }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: D.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0, paddingTop: 2 }}>
+                  Como você chega
+                </p>
+                <p style={{ fontSize: 14, color: D.textMid, margin: 0, lineHeight: 1.6 }}>
+                  {short(formato)}
+                </p>
+              </div>
+            </>
+          )}
+        </div>
+
+        {filled < 4 && (
+          <p style={{ fontSize: 13, color: D.textFaint, margin: 0 }}>
+            Complete os {4 - filled} bloco{4 - filled > 1 ? 's' : ''} restante{4 - filled > 1 ? 's' : ''} para revelar sua Zona de Genialidade completa.
+          </p>
+        )}
       </div>
-
-      <div className="space-y-3">
-        {proposta && (
-          <div className="flex items-start gap-3">
-            <div className="w-5 h-5 rounded bg-[#7B2FBE] flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Target size={10} className="text-white" />
-            </div>
-            <div>
-              <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-0.5">Transformação que você gera</p>
-              <p className="text-xs text-gray-700 leading-relaxed">{short(proposta)}</p>
-            </div>
-          </div>
-        )}
-
-        {publico && (
-          <div className="flex items-start gap-3">
-            <div className="w-5 h-5 rounded bg-[#7B2FBE] flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Users size={10} className="text-white" />
-            </div>
-            <div>
-              <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-0.5">Para quem essa transformação acontece</p>
-              <p className="text-xs text-gray-700 leading-relaxed">{short(publico)}</p>
-            </div>
-          </div>
-        )}
-
-        {difs.length > 0 && (
-          <div className="flex items-start gap-3">
-            <div className="w-5 h-5 rounded bg-[#7B2FBE] flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Sparkles size={10} className="text-white" />
-            </div>
-            <div>
-              <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-0.5">O que te diferencia</p>
-              <p className="text-xs text-gray-700 leading-relaxed">{difs.join(' · ')}</p>
-            </div>
-          </div>
-        )}
-
-        {historia && (
-          <div className="flex items-start gap-3">
-            <div className="w-5 h-5 rounded bg-[#7B2FBE] flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Lightbulb size={10} className="text-white" />
-            </div>
-            <div>
-              <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-0.5">O que te capacita</p>
-              <p className="text-xs text-gray-700 leading-relaxed">{short(historia)}</p>
-            </div>
-          </div>
-        )}
-
-        {formato && (
-          <div className="flex items-start gap-3">
-            <div className="w-5 h-5 rounded bg-[#7B2FBE] flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Layers size={10} className="text-white" />
-            </div>
-            <div>
-              <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-0.5">Como você chega</p>
-              <p className="text-xs text-gray-700 leading-relaxed">{short(formato)}</p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="mt-4 pt-4 border-t border-[#7B2FBE]/10">
-        <p className="text-xs text-[#7B2FBE] leading-relaxed">
-          {filledCount < 4
-            ? `Complete os ${4 - filledCount} bloco${4 - filledCount > 1 ? 's' : ''} restante${4 - filledCount > 1 ? 's' : ''} para revelar sua Zona de Genialidade completa. Seu mentor vai sintetizar tudo isso em uma declaração única de posicionamento.`
-            : 'Todos os blocos preenchidos. Leve isso para a sessão. Seu mentor vai transformar essas peças na declaração da sua Zona de Genialidade.'}
-        </p>
-      </div>
+      <HR />
     </div>
   )
 }
 
+// ─── Main page ────────────────────────────────────────────────────
 function PosicionamentoPage() {
   const { user }                        = useAuth()
   const saved                           = useState(() => loadSaved())[0]
   const [pilares, setPilares]           = useState<PilarStates>(saved?.pilares ?? initialPilarStates)
-  const [genLocked]                     = useState(true)
-  const [genText]                       = useState('')
   const [diferenciais, setDiferenciais] = useState<string[]>(saved?.diferenciais ?? ['', '', ''])
   const toastedFields                   = useState(() => new Set<PilarField>())[0]
 
@@ -318,7 +399,7 @@ function PosicionamentoPage() {
   }
 
   function updateReflexao(field: PilarField, value: string) {
-    const wasEmpty   = !pilares[field].reflexao.trim()
+    const wasEmpty    = !pilares[field].reflexao.trim()
     const isNowFilled = value.trim().length > 0
 
     if (wasEmpty && isNowFilled && !toastedFields.has(field)) {
@@ -329,7 +410,7 @@ function PosicionamentoPage() {
     }
 
     setPilares(prev => {
-      const current = prev[field]
+      const current   = prev[field]
       const newStatus: PilarStatus = current.analise
         ? 'construido'
         : value.trim() ? 'reflexao_feita' : 'aguardando'
@@ -338,428 +419,405 @@ function PosicionamentoPage() {
   }
 
   const comReflexao = Object.values(pilares).filter(p => p.reflexao.trim()).length
-  const construidos = Object.values(pilares).filter(p => p.status === 'construido').length
   const total       = PILARES.length
   const pct         = Math.round((comReflexao / total) * 100)
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, maxWidth: 780, paddingBottom: 80 }}>
 
-      {/* Header */}
-      <div>
-        <h1 className="text-xl font-semibold text-gray-900">Minha Identidade de Marca</h1>
-        <p className="text-gray-500 mt-1 text-sm">
+      {/* ── Heading ── */}
+      <div style={{ paddingBottom: 32, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <h1 style={{
+          fontFamily: D.serif,
+          fontSize: 'clamp(36px, 4.5vw, 52px)',
+          fontWeight: 400,
+          color: D.text,
+          margin: 0,
+          lineHeight: 1.1,
+          letterSpacing: '-0.01em',
+        }}>
+          Minha Identidade de Marca
+        </h1>
+        <p style={{ fontSize: 15, color: D.textSub, margin: 0, lineHeight: 1.6, maxWidth: 520 }}>
           Preencha sua percepção inicial em cada bloco. Na sessão com seu mentor, vocês analisam juntos e constroem seu perfil de autoridade.
         </p>
-      </div>
 
-      {/* Como funciona */}
-      <div
-        className="rounded-xl border border-[#7B2FBE]/15 bg-[#7B2FBE]/[0.03] p-5"
-      >
-        <p className="text-[10px] font-medium text-[#7B2FBE] uppercase tracking-wide mb-3">Como funciona</p>
-        <div className="grid sm:grid-cols-3 gap-4">
-          {[
-            { num: '1', text: 'Antes da sessão, preencha sua percepção inicial em cada bloco abaixo' },
-            { num: '2', text: 'Na sessão com o mentor, vocês analisam juntos o que você escreveu' },
-            { num: '3', text: 'O mentor enriquece com a visão profissional e o bloco fica construído' },
-          ].map(step => (
-            <div key={step.num} className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-[#7B2FBE] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-[10px] font-semibold text-white">{step.num}</span>
-              </div>
-              <p className="text-xs text-gray-600 leading-relaxed">{step.text}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Progresso */}
-      <div
-        className="rounded-xl border border-gray-100 bg-white shadow-sm p-5"
-      >
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <p className="text-sm font-semibold text-gray-800">Seu Perfil de Autoridade</p>
-            <p className="text-xs text-gray-400 mt-0.5">
+        {/* Inline progress — no card */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <p style={{ fontSize: 12, color: D.textMuted, margin: 0 }}>
               {comReflexao} de {total} reflexões preenchidas
-              {construidos > 0 && ` · ${construidos} construído${construidos > 1 ? 's' : ''} com mentor`}
+            </p>
+            <p style={{
+              fontFamily: D.serif,
+              fontSize: 18,
+              color: pct === 100 ? '#6BA36B' : D.gold,
+              margin: 0,
+            }}>
+              {pct}%
             </p>
           </div>
-          <span className="text-xl font-bold text-[#7B2FBE]">{pct}%</span>
+          <div style={{ width: '100%', height: 3, background: `rgba(26,25,22,0.06)`, borderRadius: 2, overflow: 'hidden' }}>
+            <div style={{
+              width: `${pct}%`,
+              height: '100%',
+              background: pct === 100 ? '#6BA36B' : D.gold,
+              borderRadius: 2,
+              transition: 'width 600ms ease',
+            }} />
+          </div>
+          {/* Como funciona — inline, no card */}
+          <div style={{ display: 'flex', gap: 24, marginTop: 4 }}>
+            {[
+              'Preencha sua percepção inicial antes da sessão',
+              'Na sessão, o mentor analisa o que você escreveu',
+              'O bloco fica construído com a visão profissional',
+            ].map((step, i) => (
+              <p key={i} style={{ fontSize: 11, color: D.textFaint, margin: 0, lineHeight: 1.5 }}>
+                <span style={{ color: D.gold, fontWeight: 600, marginRight: 4 }}>{i + 1}</span>
+                {step}
+              </p>
+            ))}
+          </div>
         </div>
-        <div className="w-full h-2 rounded-full bg-gray-100">
-          <div
-            className="h-full rounded-full transition-all duration-700"
-            style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #C5A880, #D4B891)' }}
-          />
-        </div>
-        {comReflexao === 0 && (
-          <p className="text-xs text-gray-400 mt-3 text-center">
-            Comece preenchendo sua percepção inicial em cada bloco. Leva menos de 10 minutos.
-          </p>
-        )}
       </div>
 
-      {/* Zona de Genialidade — aparece a partir de 2 blocos preenchidos */}
+      <HR />
+
+      {/* ── Zona de Genialidade — aparece com 2+ blocos ── */}
       <ZonaDeGenialidade pilares={pilares} diferenciais={diferenciais} />
 
-      {/* Cartão de Identidade de Marca */}
-      <div
-        className={cn(
-          'rounded-xl border p-5 transition-all',
-          comReflexao === total
-            ? 'border-[#7B2FBE]/30 bg-[#7B2FBE]/[0.03]'
-            : 'border-gray-200 bg-white shadow-sm'
-        )}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-[10px] font-medium text-[#7B2FBE] uppercase tracking-wide">
-              Cartão de Identidade de Marca
-            </p>
-            <p className="text-xs text-gray-400 mt-0.5">
-              Monta automaticamente conforme você preenche os blocos abaixo
-            </p>
-          </div>
-          {comReflexao === total && (
-            <span className="flex items-center gap-1.5 text-[10px] font-medium text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full">
-              <CheckCircle2 size={11} />
-              Pronto para a sessão
-            </span>
-          )}
-        </div>
+      {/* ── Os 4 Pilares — sem card wrappers ── */}
+      <div style={{ paddingTop: 32, display: 'flex', flexDirection: 'column', gap: 0 }}>
+        <SectionLabel>Os 4 Pilares da Sua Marca</SectionLabel>
 
-        <div className="rounded-xl border border-[#7B2FBE]/20 overflow-hidden">
-          <div className="bg-[#7B2FBE] px-5 py-3 flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-medium text-white/60 uppercase tracking-wide">Arquitetura de Relevância</p>
-              <p className="text-sm font-semibold text-white mt-0.5">{user?.full_name ?? 'Seu Nome'}</p>
-            </div>
-            <Download size={14} className="text-white/40" />
-          </div>
+        {PILARES.map((pilar, idx) => {
+          const state    = pilares[pilar.id]
+          const sConfig  = statusConfig[state.status]
+          const temTexto = state.reflexao.trim().length > 40
+          const caminhos = PILAR_CAMINHOS[pilar.id]
 
-          <div className="divide-y divide-gray-100">
-            {PILARES.map((pilar) => {
-              const texto = pilares[pilar.id].reflexao.trim()
-              return (
-                <div key={pilar.id} className="px-5 py-3.5 flex items-start gap-3">
-                  <span className="text-[10px] font-medium text-[#7B2FBE] mt-0.5 w-5 flex-shrink-0">{pilar.num}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-0.5">{pilar.label}</p>
-                    {texto ? (
-                      <p className="text-sm text-gray-800 leading-relaxed">{texto}</p>
-                    ) : (
-                      <p className="text-sm text-gray-300 italic">Aguardando sua percepção...</p>
-                    )}
-                  </div>
-                  <div className="flex-shrink-0 mt-1">
-                    {texto
-                      ? <CheckCircle2 size={14} className="text-[#7B2FBE]" />
-                      : <Circle size={14} className="text-gray-200" />
-                    }
-                  </div>
-                </div>
-              )
-            })}
+          return (
+            <div key={pilar.id}>
+              <div style={{ padding: '32px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-            <div className="px-5 py-3.5 flex items-start gap-3">
-              <span className="text-[10px] font-medium text-[#7B2FBE] mt-0.5 w-5 flex-shrink-0">05</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">Diferenciais</p>
-                {diferenciais.some(d => d.trim()) ? (
-                  <div className="space-y-1">
-                    {diferenciais.filter(d => d.trim()).map((d, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <span className="w-1 h-1 rounded-full bg-[#7B2FBE] flex-shrink-0" />
-                        <p className="text-sm text-gray-800">{d}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-300 italic">Aguardando seus diferenciais...</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {comReflexao === total && (
-          <p className="text-xs text-center text-[#7B2FBE] font-medium mt-3">
-            Leve este cartão para a sessão com seu mentor. Ele será o ponto de partida da construção.
-          </p>
-        )}
-      </div>
-
-      {/* Os 4 Pilares */}
-      <div>
-        <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-4">
-          Os 4 Pilares da Sua Marca
-        </h2>
-        <div
-          className="space-y-4"
-        >
-          {PILARES.map((pilar) => {
-            const state   = pilares[pilar.id]
-            const sConfig = statusConfig[state.status]
-            const temTexto = state.reflexao.trim().length > 40
-            const caminhos = PILAR_CAMINHOS[pilar.id]
-
-            return (
-              <div
-                key={pilar.id}
-                className="rounded-xl border border-gray-100 bg-white shadow-sm p-6"
-              >
-                {/* Cabeçalho */}
-                <div className="flex items-start justify-between gap-4 mb-5">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#7B2FBE]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-[11px] font-semibold text-[#7B2FBE]">{pilar.num}</span>
-                    </div>
-                    <div>
-                      <p className="text-base font-semibold text-gray-900 mb-0.5">{pilar.label}</p>
-                      <p className="text-xs text-gray-400 leading-relaxed">{pilar.desc}</p>
-                    </div>
-                  </div>
-                  <span
-                    className="text-[10px] font-medium px-2.5 py-0.5 rounded-full whitespace-nowrap flex-shrink-0 mt-1"
-                    style={{ color: sConfig.color, background: sConfig.bg }}
-                  >
-                    {sConfig.label}
+                {/* Pilar heading */}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+                  <span style={{
+                    fontFamily: D.serif,
+                    fontSize: 13,
+                    color: D.gold,
+                    fontStyle: 'italic',
+                    flexShrink: 0,
+                  }}>
+                    {pilar.num}
                   </span>
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+                    <h2 style={{
+                      fontFamily: D.serif,
+                      fontSize: 'clamp(20px, 2.5vw, 26px)',
+                      fontWeight: 400,
+                      color: D.text,
+                      margin: 0,
+                      lineHeight: 1.2,
+                    }}>
+                      {pilar.label}
+                    </h2>
+                    <span style={{ fontSize: 11, color: sConfig.color, flexShrink: 0 }}>
+                      {sConfig.label}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Reflexão */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <PenLine size={13} className="text-gray-400" />
-                    <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Sua percepção inicial</p>
-                  </div>
-                  <p className="text-xs text-gray-500 italic pl-0.5">{pilar.pergunta}</p>
+                {/* Description + question */}
+                <p style={{ fontSize: 13, color: D.textSub, margin: 0, lineHeight: 1.6, maxWidth: 560 }}>
+                  {pilar.desc}
+                </p>
+                <p style={{ fontSize: 13, color: D.textMuted, margin: 0, fontStyle: 'italic' }}>
+                  {pilar.pergunta}
+                </p>
+
+                {/* Textarea — minimal, no card */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <textarea
                     value={state.reflexao}
                     onChange={e => updateReflexao(pilar.id, e.target.value)}
                     placeholder={pilar.placeholder}
                     rows={4}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-2 focus:ring-[#7B2FBE]/10 resize-none"
+                    style={{
+                      width: '100%',
+                      background: '#F5F4F2',
+                      border: `1px solid ${D.border}`,
+                      borderRadius: 6,
+                      padding: '12px 14px',
+                      fontSize: 14,
+                      color: D.text,
+                      lineHeight: 1.6,
+                      resize: 'vertical',
+                      outline: 'none',
+                      fontFamily: 'inherit',
+                      boxSizing: 'border-box',
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.borderColor = D.gold
+                      e.currentTarget.style.boxShadow  = `0 0 0 3px rgba(197,168,128,0.12)`
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.borderColor = D.border
+                      e.currentTarget.style.boxShadow   = 'none'
+                    }}
                   />
                   {!state.reflexao.trim() && (
-                    <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3.5 py-2.5 leading-relaxed">
-                      {pilar.dica}
+                    <p style={{ fontSize: 12, color: D.textMuted, margin: 0, lineHeight: 1.5, fontStyle: 'italic' }}>
+                      💡 {pilar.dica}
                     </p>
-                  )}
-
-                  {/* Caminhos sugeridos — aparecem quando há texto suficiente */}
-                  {temTexto && (
-                    <div className="rounded-xl border border-[#7B2FBE]/15 bg-[#7B2FBE]/[0.03] p-4 space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Sparkles size={12} className="text-[#7B2FBE]" />
-                        <p className="text-[10px] font-medium text-[#7B2FBE] uppercase tracking-wide">Caminhos que emergem desta reflexão</p>
-                      </div>
-                      {caminhos.map((c, i) => (
-                        <div key={i} className="flex items-start gap-2.5">
-                          <div className="w-1.5 h-1.5 rounded-full bg-[#7B2FBE]/50 flex-shrink-0 mt-1.5" />
-                          <div>
-                            <p className="text-[11px] font-semibold text-gray-700 mb-0.5">{c.titulo}</p>
-                            <p className="text-xs text-gray-500 leading-relaxed">{c.texto}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
                   )}
                 </div>
 
-                {/* Construção com o mentor */}
-                <div className="mt-5 pt-5 border-t border-gray-100">
-                  {state.analiseLocked ? (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <MessageSquare size={13} className="text-gray-400" />
-                        <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Construção com o mentor</p>
+                {/* Caminhos que emergem — sem card, só texto muted */}
+                {temTexto && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: D.textFaint, margin: 0 }}>
+                      Caminhos que emergem desta reflexão
+                    </p>
+                    {caminhos.map((c, i) => (
+                      <div key={i} style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 16 }}>
+                        <p style={{ fontSize: 12, fontWeight: 600, color: D.textMuted, margin: 0, paddingTop: 1 }}>
+                          {c.titulo}
+                        </p>
+                        <p style={{ fontSize: 13, color: D.textSub, margin: 0, lineHeight: 1.6 }}>
+                          {c.texto}
+                        </p>
                       </div>
-                      <p className="text-xs text-gray-500 leading-relaxed pl-0.5">{pilar.mentorFoco}</p>
-                      <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 space-y-2.5">
-                        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-3">O que será trabalhado na sessão</p>
+                    ))}
+                  </div>
+                )}
+
+                {/* Construção com o mentor — muted text, no card */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: D.textFaint, margin: 0 }}>
+                    Construção com o mentor
+                  </p>
+                  {state.analiseLocked ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <p style={{ fontSize: 13, color: D.textSub, margin: 0, lineHeight: 1.6 }}>
+                        {pilar.mentorFoco}
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
                         {pilar.mentorItens.map((item, i) => (
-                          <div key={i} className="flex items-start gap-2.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#7B2FBE]/40 flex-shrink-0 mt-1.5" />
-                            <p className="text-xs text-gray-500 leading-relaxed">{item}</p>
+                          <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                            <span style={{ width: 4, height: 4, borderRadius: '50%', background: D.textFaint, flexShrink: 0, marginTop: 7 }} />
+                            <p style={{ fontSize: 12, color: D.textMuted, margin: 0, lineHeight: 1.6 }}>{item}</p>
                           </div>
                         ))}
-                        <div className="flex items-center gap-2 pt-1 mt-1 border-t border-gray-200">
-                          <Lock size={11} className="text-gray-300 flex-shrink-0" />
-                          <p className="text-[11px] text-gray-400 italic">
-                            O resultado da análise ficará registrado aqui após a sessão
-                          </p>
-                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
+                        <Lock size={10} style={{ color: D.textFaint, flexShrink: 0 }} />
+                        <p style={{ fontSize: 11, color: D.textFaint, margin: 0, fontStyle: 'italic' }}>
+                          O resultado da análise ficará registrado aqui após a sessão
+                        </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <MessageSquare size={13} className="text-[#7B2FBE]" />
-                        <p className="text-[11px] font-medium text-[#7B2FBE] uppercase tracking-wide">Construção com o mentor</p>
-                      </div>
-                      <div className="rounded-xl bg-[#7B2FBE]/[0.04] border border-[#7B2FBE]/20 px-4 py-3.5">
-                        <p className="text-sm text-gray-700 leading-relaxed">{state.analise}</p>
-                      </div>
-                    </div>
+                    <p style={{ fontSize: 14, color: D.textMid, margin: 0, lineHeight: 1.7 }}>
+                      {state.analise}
+                    </p>
                   )}
                 </div>
+
               </div>
-            )
-          })}
-        </div>
+              {idx < PILARES.length - 1 && <HR />}
+            </div>
+          )
+        })}
       </div>
 
-      {/* Bloco 00: Seu Maior Diferencial */}
-      <div
-        className={cn(
-          'rounded-xl border p-6 transition-all',
-          genLocked ? 'bg-gray-50 border-gray-100' : 'bg-[#7B2FBE]/[0.04] border-[#7B2FBE]/20'
-        )}
-      >
-        <div className="flex items-start gap-3 mb-4">
-          <div className={cn(
-            'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
-            genLocked ? 'bg-gray-200' : 'bg-[#7B2FBE]/10'
-          )}>
-            {genLocked
-              ? <Lock size={15} className="text-gray-400" />
-              : <Sparkles size={15} className="text-[#7B2FBE]" />
-            }
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-[10px] font-medium text-[#7B2FBE]">00</span>
-              <p className={cn('text-base font-semibold', genLocked ? 'text-gray-400' : 'text-gray-900')}>
-                Seu Maior Diferencial
-              </p>
-            </div>
-            <p className="text-xs text-gray-400">
-              Síntese construída pelo mentor após mapear os 4 pilares da sua marca
-            </p>
-          </div>
+      <HR />
+
+      {/* ── Diferenciais — sem card ── */}
+      <div style={{ padding: '32px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+          <span style={{ fontFamily: D.serif, fontSize: 13, color: D.gold, fontStyle: 'italic' }}>05</span>
+          <h2 style={{
+            fontFamily: D.serif,
+            fontSize: 'clamp(20px, 2.5vw, 26px)',
+            fontWeight: 400,
+            color: D.text,
+            margin: 0,
+          }}>
+            O Que Te Destaca da Concorrência
+          </h2>
         </div>
-
-        <div className="ml-11">
-          {genLocked ? (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Após analisar os 4 pilares da sua identidade, seu mentor vai sintetizar em uma declaração o que te torna único no mercado. Esse é o coração da sua Arquitetura de Relevância: uma afirmação precisa, autêntica e posicionada, que você vai usar em tudo que construir.
-              </p>
-              <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-white border border-gray-200">
-                <Lock size={12} className="text-gray-300 mt-0.5 flex-shrink-0" />
-                <p className="text-xs text-gray-400 leading-relaxed">
-                  Revelado pelo seu mentor ao final das sessões de posicionamento, quando os 4 pilares estiverem construídos juntos.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-xl border border-[#7B2FBE]/20 px-4 py-3.5">
-              <p className="text-sm text-gray-800 leading-relaxed italic">"{genText}"</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Esta construção alimenta */}
-      <div
-        className="rounded-xl border border-gray-100 bg-white shadow-sm p-5"
-      >
-        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">Esta construção alimenta</p>
-        <div className="grid sm:grid-cols-3 gap-3">
-
-          <Link to="/dashboard/membro/pilares">
-            <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-medium text-[#7B2FBE]">02</span>
-                <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
-              </div>
-              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Pilares da Marca</p>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                Seu público e sua proposta definem as frentes estratégicas de presença que o mentor vai construir com você.
-              </p>
-            </div>
-          </Link>
-
-          <Link to="/dashboard/membro/okr">
-            <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-medium text-[#7B2FBE]">03</span>
-                <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
-              </div>
-              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">OKRs & Metas</p>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                Sua proposta de valor e seu público-alvo são a base para definir metas mensuráveis com seu mentor.
-              </p>
-            </div>
-          </Link>
-
-          <Link to="/dashboard/membro/marketing">
-            <div className="group rounded-xl border border-gray-100 bg-gray-50 hover:border-[#7B2FBE]/20 hover:bg-[#7B2FBE]/[0.03] p-4 transition-all cursor-pointer">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-medium text-[#7B2FBE]">04</span>
-                <ChevronRight size={12} className="text-gray-300 group-hover:text-[#7B2FBE] transition-colors" />
-              </div>
-              <p className="text-sm font-semibold text-gray-800 leading-tight mb-1.5">Marketing Anual</p>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                Sua história, seu diferencial e seu formato de produto guiam os temas, canais e frequência do calendário.
-              </p>
-            </div>
-          </Link>
-
-        </div>
-      </div>
-
-      {/* O Que Te Destaca da Concorrência */}
-      <div
-        className="rounded-xl bg-white border border-gray-100 shadow-sm p-6"
-      >
-        <div className="mb-4">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-medium text-[#7B2FBE]">05</span>
-            <p className="text-sm font-semibold text-gray-900">O Que Te Destaca da Concorrência</p>
-          </div>
-          <p className="text-xs text-gray-500">
-            Liste os diferenciais que você já percebe em você. O mentor vai refinar e validar cada um na sessão.
-          </p>
-        </div>
-        <div className="space-y-2.5">
+        <p style={{ fontSize: 13, color: D.textSub, margin: 0, lineHeight: 1.6 }}>
+          Liste os diferenciais que você já percebe em você. O mentor vai refinar e validar cada um na sessão.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {diferenciais.map((d, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <div className={cn(
-                'w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all',
-                d.trim() ? 'bg-[#7B2FBE]' : 'border-2 border-gray-200'
-              )}>
-                {d.trim() && <span className="text-[10px] text-white font-medium">✓</span>}
-              </div>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: d.trim() ? D.gold : D.textFaint,
+                flexShrink: 0,
+                transition: 'background 300ms',
+              }} />
               <input
                 type="text"
                 value={d}
                 onChange={e => {
                   const next = [...diferenciais]
-                  next[i] = e.target.value
+                  next[i]   = e.target.value
                   setDiferenciais(next)
                 }}
                 placeholder={`Diferencial ${i + 1}. Ex: único a combinar X com Y para Z`}
-                className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] focus:ring-1 focus:ring-[#7B2FBE]/20"
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: `1px solid ${D.border}`,
+                  padding: '8px 0',
+                  fontSize: 14,
+                  color: D.text,
+                  outline: 'none',
+                  fontFamily: 'inherit',
+                }}
+                onFocus={e => { e.currentTarget.style.borderBottomColor = D.gold }}
+                onBlur={e => { e.currentTarget.style.borderBottomColor = D.border }}
               />
             </div>
           ))}
         </div>
+      </div>
 
-        {diferenciais.some(d => d.trim()) && (
-          <div className="mt-4 rounded-xl border border-[#7B2FBE]/15 bg-[#7B2FBE]/[0.03] p-3.5">
-            <div className="flex items-center gap-2 mb-1.5">
-              <Sparkles size={11} className="text-[#7B2FBE]" />
-              <p className="text-[10px] font-medium text-[#7B2FBE] uppercase tracking-wide">Próximo passo</p>
-            </div>
-            <p className="text-xs text-gray-600 leading-relaxed">
-              O mentor vai validar se esses diferenciais são percebidos pelo mercado, refiná-los com evidências concretas e integrá-los à sua declaração de Zona de Genialidade.
+      <HR />
+
+      {/* ── Cartão de Identidade — compact, sem card wrapper decorativo ── */}
+      <div style={{ padding: '32px 0', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <SectionLabel>Cartão de Identidade de Marca</SectionLabel>
+            <p style={{ fontSize: 12, color: D.textMuted, margin: 0 }}>
+              {user?.full_name ?? 'Seu Nome'} · Arquitetura de Relevância
             </p>
           </div>
+          {comReflexao === total && (
+            <span style={{ fontSize: 11, color: '#6BA36B', fontWeight: 500 }}>
+              ✓ Pronto para a sessão
+            </span>
+          )}
+        </div>
+
+        <div style={{
+          border: `1px solid ${D.border}`,
+          borderRadius: 8,
+          overflow: 'hidden',
+        }}>
+          {PILARES.map((pilar, i) => {
+            const texto = pilares[pilar.id].reflexao.trim()
+            return (
+              <div key={pilar.id} style={{
+                display: 'grid',
+                gridTemplateColumns: '120px 1fr',
+                gap: 0,
+                borderBottom: i < PILARES.length - 1 ? `1px solid ${D.border}` : 'none',
+              }}>
+                <div style={{
+                  padding: '14px 16px',
+                  borderRight: `1px solid ${D.border}`,
+                  background: '#F5F4F2',
+                }}>
+                  <p style={{ fontSize: 11, color: D.textMuted, margin: 0 }}>
+                    {pilar.label}
+                  </p>
+                </div>
+                <div style={{ padding: '14px 16px' }}>
+                  {texto ? (
+                    <p style={{ fontSize: 13, color: D.textMid, margin: 0, lineHeight: 1.6 }}>
+                      {texto.length > 100 ? texto.slice(0, 100) + '…' : texto}
+                    </p>
+                  ) : (
+                    <p style={{ fontSize: 13, color: D.textFaint, margin: 0, fontStyle: 'italic' }}>
+                      Aguardando reflexão...
+                    </p>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+
+          {/* Diferenciais row */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '120px 1fr',
+            gap: 0,
+            borderTop: `1px solid ${D.border}`,
+          }}>
+            <div style={{ padding: '14px 16px', borderRight: `1px solid ${D.border}`, background: '#F5F4F2' }}>
+              <p style={{ fontSize: 11, color: D.textMuted, margin: 0 }}>Diferenciais</p>
+            </div>
+            <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {diferenciais.some(d => d.trim()) ? (
+                diferenciais.filter(d => d.trim()).map((d, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                    <span style={{ width: 4, height: 4, borderRadius: '50%', background: D.gold, flexShrink: 0, marginTop: 6 }} />
+                    <p style={{ fontSize: 13, color: D.textMid, margin: 0, lineHeight: 1.5 }}>{d}</p>
+                  </div>
+                ))
+              ) : (
+                <p style={{ fontSize: 13, color: D.textFaint, margin: 0, fontStyle: 'italic' }}>
+                  Aguardando diferenciais...
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {comReflexao === total && (
+          <p style={{ fontSize: 12, color: D.textMuted, margin: 0 }}>
+            Leve este cartão para a sessão com seu mentor. Ele será o ponto de partida da construção.
+          </p>
         )}
+      </div>
+
+      <HR />
+
+      {/* ── Esta construção alimenta — links simples ── */}
+      <div style={{ padding: '32px 0', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <SectionLabel>Esta construção alimenta</SectionLabel>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {[
+            { to: '/dashboard/membro/pilares',   num: '02', label: 'Pilares da Marca',    desc: 'Seu público e sua proposta definem as frentes estratégicas de presença.' },
+            { to: '/dashboard/membro/okr',        num: '03', label: 'OKRs & Metas',        desc: 'Sua proposta de valor e seu público-alvo são a base para definir metas mensuráveis.' },
+            { to: '/dashboard/membro/marketing', num: '04', label: 'Marketing Anual',     desc: 'Sua história, seu diferencial e formato de produto guiam os temas e canais.' },
+          ].map((link, i) => (
+            <div key={link.to}>
+              {i > 0 && <HR />}
+              <Link to={link.to} style={{ textDecoration: 'none' }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  padding: '14px 0',
+                  cursor: 'pointer',
+                  transition: 'opacity 200ms',
+                }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.opacity = '0.6' }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.opacity = '1'   }}
+                >
+                  <span style={{ fontFamily: D.serif, fontSize: 13, color: D.gold, fontStyle: 'italic', width: 20, flexShrink: 0 }}>
+                    {link.num}
+                  </span>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: 14, fontWeight: 500, color: D.text, margin: 0 }}>{link.label}</p>
+                    <p style={{ fontSize: 12, color: D.textMuted, margin: '2px 0 0', lineHeight: 1.5 }}>{link.desc}</p>
+                  </div>
+                  <ChevronRight size={14} style={{ color: D.textFaint, flexShrink: 0 }} />
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
       </div>
 
     </div>

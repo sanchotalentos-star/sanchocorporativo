@@ -1,15 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import {
-  Plus, X, Trash2, ChevronDown, ChevronUp, ClipboardList,
-  LayoutDashboard, Kanban, LayoutList, ChevronRight, ChevronLeft, Zap, Rocket,
-  Briefcase, Target, TrendingUp, Sliders,
-  CheckCircle2, Circle,
+  Plus, X, Trash2, ChevronDown, ChevronUp,
+  ChevronRight, ChevronLeft, Zap,
 } from 'lucide-react'
-import {
-  BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer,
-  Tooltip, CartesianGrid, PieChart, Pie,
-} from 'recharts'
 import { useAuth } from '@/context/AuthContext'
 import { memberKey } from '@/lib/memberStorage'
 import { cn } from '@/lib/utils'
@@ -30,7 +24,6 @@ const D = {
   textMuted: '#8A8680',
   textFaint: '#C5C0BA',
   gold:      '#C5A880',
-  goldDim:   'rgba(197,168,128,0.70)',
   serif:     "'Cormorant Garamond', Georgia, serif",
 }
 
@@ -39,7 +32,7 @@ interface KeyResult { id: string; descricao: string; meta: number; atual: number
 interface Objective  { id: string; titulo: string; categoria: string; trimestre: string; keyResults: KeyResult[] }
 type TarefaStatus = 'pendente' | 'em_andamento' | 'feita' | 'bloqueada'
 type Prioridade   = 'alta' | 'media' | 'baixa'
-type ViewMode     = 'dashboard' | 'kanban' | 'lista' | 'fluxos'
+type ViewMode     = 'lista' | 'kanban' | 'fluxos'
 interface Tarefa  { id: string; descricao: string; krId: string; okrId: string; status: TarefaStatus; prioridade: Prioridade; auto: boolean }
 interface WorkflowTask { descricao: string; prioridade: Prioridade; fase: string }
 interface Workflow { id: string; nome: string; descricao: string; cor: string; emoji: string; tarefas: WorkflowTask[] }
@@ -233,189 +226,75 @@ function PrioridadeChip({ prioridade, onClick }: { prioridade: Prioridade; onCli
   )
 }
 
-/* ─── RECHARTS TOOLTIPS ─── */
-function OkrTip({ active, payload }: any) {
-  if (!active || !payload?.length) return null
-  const d = payload[0].payload
+/* ─── MINI COMPONENTS ─── */
+function HR() {
+  return <hr style={{ border: 'none', borderTop: `1px solid ${D.border}`, margin: 0 }} />
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ background: D.card, border: `1px solid ${D.border2}`, borderRadius: 6, padding: '8px 12px', fontSize: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.4)', maxWidth: 260 }}>
-      <p style={{ fontWeight: 600, color: D.text, marginBottom: 2, lineHeight: 1.4 }}>{d.fullName}</p>
-      <p style={{ color: d.color, margin: 0, fontWeight: 600 }}>{d.value}% concluído</p>
-    </div>
+    <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: D.textMuted, margin: 0 }}>
+      {children}
+    </p>
   )
 }
-function KrTip({ active, payload }: any) {
-  if (!active || !payload?.length) return null
-  const d = payload[0].payload
+
+function ChecklistRow({ done, label, href }: { done: boolean; label: string; href: string }) {
   return (
-    <div style={{ background: D.card, border: `1px solid ${D.border2}`, borderRadius: 6, padding: '8px 12px', fontSize: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.4)', maxWidth: 260 }}>
-      <p style={{ fontWeight: 600, color: D.text, marginBottom: 2, lineHeight: 1.4 }}>{d.fullLabel}</p>
-      <p style={{ color: D.textSub, margin: 0 }}>
-        {d.atual} / {d.meta} {d.unit} · <span style={{ color: d.color, fontWeight: 600 }}>{d.value}%</span>
-      </p>
-    </div>
+    <Link to={href} style={{ textDecoration: 'none', display: 'block' }}>
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '8px 0', transition: 'opacity 0.12s' }}
+        onMouseEnter={e => { if (!done) e.currentTarget.style.opacity = '0.65' }}
+        onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
+      >
+        {done ? (
+          <div style={{ width: 15, height: 15, borderRadius: '50%', background: D.gold, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: 8, color: '#fff', fontWeight: 700, lineHeight: 1 }}>✓</span>
+          </div>
+        ) : (
+          <div style={{ width: 15, height: 15, borderRadius: '50%', border: `1.5px solid ${D.textFaint}`, flexShrink: 0 }} />
+        )}
+        <span style={{ fontSize: 14, flex: 1, color: done ? D.textMuted : D.textMid, textDecoration: done ? 'line-through' : 'none', lineHeight: 1.4 }}>
+          {label}
+        </span>
+        {!done && <ChevronRight size={13} style={{ color: D.textFaint, flexShrink: 0 }} />}
+      </div>
+    </Link>
   )
 }
-function StatusTip({ active, payload }: any) {
-  if (!active || !payload?.length) return null
-  const d = payload[0].payload
+
+function OkrRow({ okr }: { okr: Objective }) {
+  const p   = objPct(okr)
+  const col = catColor[okr.categoria] ?? D.gold
   return (
-    <div style={{ background: D.card, border: `1px solid ${D.border2}`, borderRadius: 6, padding: '8px 12px', fontSize: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.4)' }}>
-      <p style={{ fontWeight: 600, color: d.color, margin: 0 }}>{d.name}: {d.value}</p>
-    </div>
+    <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none', display: 'block' }}>
+      <div
+        style={{ display: 'grid', gridTemplateColumns: '96px 1fr 140px 44px', alignItems: 'center', gap: 16, padding: '9px 0', transition: 'opacity 0.1s' }}
+        onMouseEnter={e => e.currentTarget.style.opacity = '0.68'}
+        onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+      >
+        <span style={{ fontSize: 10, fontWeight: 600, color: col, textTransform: 'uppercase', letterSpacing: '0.07em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {okr.categoria}
+        </span>
+        <span style={{ fontSize: 13, color: D.textMid, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {okr.titulo}
+        </span>
+        <div style={{ height: 2, background: D.surface2, borderRadius: 1, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${p}%`, background: col, borderRadius: 1, transition: 'width 0.5s ease' }} />
+        </div>
+        <span style={{
+          fontSize: 12, fontWeight: 600, fontVariantNumeric: 'tabular-nums', textAlign: 'right',
+          color: p >= 75 ? '#22C55E' : (p >= 40 ? D.gold : D.textMuted),
+        }}>
+          {p}%
+        </span>
+      </div>
+    </Link>
   )
 }
 
 /* ═══════════════════════════════════════════
-   VIEW 1 — DASHBOARD
-═══════════════════════════════════════════ */
-interface DashProps {
-  okrs: Objective[]; tarefas: Tarefa[]
-  totalKrs: number; progOkrs: number
-  feitasCount: number; emAndamento: number; bloqueadas: number; pctGeral: number
-}
-function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndamento, bloqueadas, pctGeral }: DashProps) {
-  const totalTarefas = tarefas.length
-  const okrBarData   = okrs.map(o => ({
-    name: o.titulo.length > 32 ? o.titulo.slice(0, 32) + '…' : o.titulo,
-    fullName: o.titulo, value: objPct(o), color: catColor[o.categoria] ?? D.gold,
-  }))
-  const allKrs = okrs.flatMap(o => o.keyResults.map(kr => ({
-    label: kr.descricao.length > 20 ? kr.descricao.slice(0, 20) + '…' : kr.descricao,
-    fullLabel: kr.descricao, value: pct(kr.atual, kr.meta),
-    atual: kr.atual, meta: kr.meta, unit: kr.unit,
-    color: catColor[o.categoria] ?? D.gold,
-  })))
-  const statusData = [
-    { name: 'Feita',        value: feitasCount, color: '#22C55E' },
-    { name: 'Em andamento', value: emAndamento,  color: '#3B82F6' },
-    { name: 'Pendente',     value: tarefas.filter(t => t.status === 'pendente').length, color: D.textFaint },
-    { name: 'Bloqueada',    value: bloqueadas,   color: '#EF4444' },
-  ].filter(d => d.value > 0)
-  const prioData = [
-    { name: 'Alta',  value: tarefas.filter(t => t.prioridade === 'alta').length,  color: '#EF4444' },
-    { name: 'Média', value: tarefas.filter(t => t.prioridade === 'media').length, color: '#F59E0B' },
-    { name: 'Baixa', value: tarefas.filter(t => t.prioridade === 'baixa').length, color: '#22C55E' },
-  ]
-  const categoriasPresentes = Array.from(new Set(okrs.map(o => o.categoria)))
-
-  /* indicator strip cells */
-  const kpiStrip = [
-    { label: 'OKRs ativos',        value: String(okrs.length),             sub: `${totalKrs} resultado${totalKrs !== 1 ? 's' : ''}-chave`,    numColor: D.text  },
-    { label: 'Progresso geral',    value: `${progOkrs}%`,                   sub: 'média dos objetivos',                                         numColor: D.gold  },
-    { label: 'Tarefas concluídas', value: `${feitasCount}`,                 sub: `de ${tarefas.length} no total`,                               numColor: feitasCount > 0 ? '#22C55E' : D.textMuted },
-    { label: 'Bloqueadas',         value: `${bloqueadas}`,                  sub: bloqueadas > 0 ? 'requerem atenção' : 'tudo desbloqueado',      numColor: bloqueadas > 0 ? '#EF4444' : D.textMuted  },
-  ]
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* ── KPI strip ── */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: 1, background: D.border,
-        borderRadius: 8, overflow: 'hidden',
-        border: `1px solid ${D.border}`,
-      }}>
-        {kpiStrip.map(k => (
-          <div key={k.label} style={{ background: D.card, padding: '20px 22px 16px' }}>
-            <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 10px' }}>{k.label}</p>
-            <p style={{ fontFamily: D.serif, fontSize: 38, fontWeight: 600, lineHeight: 1, letterSpacing: '-0.02em', color: k.numColor, margin: 0, fontVariantNumeric: 'tabular-nums' }}>{k.value}</p>
-            <p style={{ fontSize: 11, color: D.textMuted, marginTop: 5 }}>{k.sub}</p>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ background: D.card, borderRadius: 10, padding: '20px 24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>Progresso dos Objetivos</p>
-          <div style={{ display: 'flex', gap: 12 }}>
-            {categoriasPresentes.map(cat => (
-              <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <div style={{ width: 8, height: 8, background: catColor[cat], borderRadius: 2, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, color: D.textSub }}>{cat}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <ResponsiveContainer width="100%" height={okrs.length * 44 + 16}>
-          <BarChart data={okrBarData} layout="vertical" margin={{ top: 0, right: 48, left: 0, bottom: 0 }} barSize={14}>
-            <CartesianGrid horizontal={false} stroke="rgba(0,0,0,0.06)" />
-            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
-            <YAxis type="category" dataKey="name" width={200} tick={{ fontSize: 11, fill: D.textMid }} axisLine={false} tickLine={false} />
-            <Tooltip content={<OkrTip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
-            <Bar dataKey="value" radius={[0, 3, 3, 0]} label={{ position: 'right', fontSize: 11, fontWeight: 600, fill: D.textSub, formatter: (v: number) => `${v}%` }}>
-              {okrBarData.map((e, i) => <Cell key={i} fill={e.color} />)}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        <div style={{ background: D.card, borderRadius: 10, padding: '20px 24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: '0 0 16px' }}>Status das Tarefas</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <ResponsiveContainer width={120} height={120}>
-              <PieChart>
-                <Pie data={statusData} cx="50%" cy="50%" innerRadius={36} outerRadius={55} dataKey="value" paddingAngle={2}>
-                  {statusData.map((e, i) => <Cell key={i} fill={e.color} />)}
-                </Pie>
-                <Tooltip content={<StatusTip />} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
-              {statusData.map(s => (
-                <div key={s.name} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
-                  <span style={{ fontSize: 11, color: D.textMid, flex: 1 }}>{s.name}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: D.text, fontVariantNumeric: 'tabular-nums' }}>{s.value}</span>
-                </div>
-              ))}
-              <div style={{ marginTop: 4, paddingTop: 8, borderTop: `1px solid ${D.border}`, display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 11, color: D.textMid }}>Conclusão</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: D.gold, fontVariantNumeric: 'tabular-nums' }}>{pctGeral}%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ background: D.card, borderRadius: 10, padding: '20px 24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: '0 0 16px' }}>Distribuição por Prioridade</p>
-          <ResponsiveContainer width="100%" height={120}>
-            <BarChart data={prioData} margin={{ top: 0, right: 4, left: -24, bottom: 0 }} barSize={36}>
-              <CartesianGrid vertical={false} stroke="rgba(0,0,0,0.06)" />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: D.textSub }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} />
-              <Tooltip content={<StatusTip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
-              <Bar dataKey="value" radius={[3, 3, 0, 0]} label={{ position: 'top', fontSize: 11, fontWeight: 600, fill: D.textSub }}>
-                {prioData.map((e, i) => <Cell key={i} fill={e.color} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {allKrs.length > 0 && (
-        <div style={{ background: D.card, borderRadius: 10, padding: '20px 24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: '0 0 16px' }}>Comparativo de Resultados-Chave</p>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={allKrs} margin={{ top: 4, right: 4, left: -24, bottom: 52 }} barSize={18}>
-              <CartesianGrid vertical={false} stroke="rgba(0,0,0,0.06)" />
-              <XAxis dataKey="label" tick={{ fontSize: 9, fill: D.textMuted }} axisLine={false} tickLine={false} angle={-35} textAnchor="end" interval={0} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
-              <Tooltip content={<KrTip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
-              <Bar dataKey="value" radius={[3, 3, 0, 0]}>
-                {allKrs.map((e, i) => <Cell key={i} fill={e.color} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-    </div>
-  )
-}
-
-/* ═══════════════════════════════════════════
-   VIEW 2 — KANBAN
+   KANBAN VIEW
 ═══════════════════════════════════════════ */
 interface KanbanProps {
   okrs: Objective[]; tarefas: Tarefa[]
@@ -467,7 +346,6 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
           const cards = tarefas.filter(t => t.status === col.key)
           return (
             <div key={col.key} style={{ display: 'flex', flexDirection: 'column' }}>
-              {/* Column header */}
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px',
                 background: D.surface, border: `1px solid ${D.border}`,
@@ -479,8 +357,6 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
                   {cards.length}
                 </span>
               </div>
-
-              {/* Cards */}
               <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                 {cards.length === 0 && addingCol !== col.key ? (
                   <div style={{ background: D.surface, border: `1px dashed ${D.border}`, borderTop: 'none', padding: '16px 12px', textAlign: 'center' }}>
@@ -514,10 +390,7 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
                         <p
                           onDoubleClick={() => startEdit(tarefa.id, tarefa.descricao)}
                           title="Duplo clique para editar"
-                          style={{
-                            fontSize: 12, color: D.textMid, lineHeight: 1.5, margin: '0 0 8px', cursor: 'text',
-                            display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                          }}
+                          style={{ fontSize: 12, color: D.textMid, lineHeight: 1.5, margin: '0 0 8px', cursor: 'text', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
                         >
                           {tarefa.descricao}
                         </p>
@@ -552,8 +425,6 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
                   )
                 })}
               </div>
-
-              {/* Add task */}
               {addingCol === col.key ? (
                 <div style={{ border: `1px dashed ${D.gold}`, borderTop: 'none', borderRadius: '0 0 8px 8px', padding: '8px 10px', background: 'rgba(197,168,128,0.04)' }}>
                   <input
@@ -595,7 +466,7 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
 }
 
 /* ═══════════════════════════════════════════
-   VIEW 3 — LISTA
+   LISTA VIEW
 ═══════════════════════════════════════════ */
 interface ListaProps {
   okrs: Objective[]; tarefas: Tarefa[]
@@ -702,12 +573,7 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
                             <p
                               onDoubleClick={() => startEdit(tarefa.id, tarefa.descricao)}
                               title="Duplo clique para editar"
-                              style={{
-                                fontSize: 13, lineHeight: 1.45, paddingRight: 16, cursor: 'text',
-                                color: tarefa.status === 'feita' ? D.textMuted : D.textMid,
-                                textDecoration: tarefa.status === 'feita' ? 'line-through' : 'none',
-                                margin: 0,
-                              }}
+                              style={{ fontSize: 13, lineHeight: 1.45, paddingRight: 16, cursor: 'text', color: tarefa.status === 'feita' ? D.textMuted : D.textMid, textDecoration: tarefa.status === 'feita' ? 'line-through' : 'none', margin: 0 }}
                             >
                               {tarefa.descricao}
                             </p>
@@ -737,7 +603,7 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
                         </div>
                       ) : (
                         <button onClick={() => { setAddingTo(kr.id); setNovaDesc('') }}
-                          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 20px', borderTop: `1px solid ${D.border}`, width: '100%', textAlign: 'left', fontSize: 12, color: D.textFaint, background: 'transparent', border: 'none', cursor: 'pointer', borderTopWidth: 1, borderTopStyle: 'solid', borderTopColor: D.border }}
+                          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 20px', width: '100%', textAlign: 'left', fontSize: 12, color: D.textFaint, background: 'transparent', border: 'none', borderTop: `1px solid ${D.border}`, cursor: 'pointer' }}
                           onMouseEnter={e => { e.currentTarget.style.color = D.gold }}
                           onMouseLeave={e => { e.currentTarget.style.color = D.textFaint }}
                         >
@@ -757,7 +623,7 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
 }
 
 /* ═══════════════════════════════════════════
-   VIEW 4 — FLUXOS
+   FLUXOS VIEW
 ═══════════════════════════════════════════ */
 interface FluxosProps {
   okrs: Objective[]; appliedWorkflows: string[]
@@ -843,7 +709,6 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
               <X size={14} />
             </button>
           </div>
-
           <div style={{ padding: '12px 20px 0' }}>
             {Array.from(new Set(selectedWf.tarefas.map(t => t.fase))).map(fase => {
               const faseTarefas = selectedWf.tarefas.filter(t => t.fase === fase)
@@ -866,7 +731,6 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
               )
             })}
           </div>
-
           <div style={{ padding: '12px 20px', borderTop: `1px solid ${D.border}`, background: D.surface, display: 'flex', alignItems: 'center', gap: 10 }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: D.textMid, flexShrink: 0 }}>Aplicar ao KR:</label>
             {allKrOptions.length === 0 ? (
@@ -880,12 +744,7 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
                 </select>
                 <button
                   onClick={handleApply} disabled={!krTarget}
-                  style={{
-                    padding: '6px 16px', borderRadius: 5, border: 'none', cursor: krTarget ? 'pointer' : 'default',
-                    background: krTarget ? selectedWf.cor : D.surface2,
-                    color: krTarget ? '#fff' : D.textMuted,
-                    fontSize: 12, fontWeight: 600, flexShrink: 0, transition: 'background 0.1s',
-                  }}
+                  style={{ padding: '6px 16px', borderRadius: 5, border: 'none', cursor: krTarget ? 'pointer' : 'default', background: krTarget ? selectedWf.cor : D.surface2, color: krTarget ? '#fff' : D.textMuted, fontSize: 12, fontWeight: 600, flexShrink: 0, transition: 'background 0.1s' }}
                 >
                   Aplicar fluxo
                 </button>
@@ -894,219 +753,6 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
           </div>
         </div>
       )}
-    </div>
-  )
-}
-
-/* ─── QUICK CARD ─── */
-interface QuickCardProps { href: string; color: string; Icon: typeof Briefcase; title: string; subtitle: string }
-function QuickCard({ href, color, title, subtitle }: QuickCardProps) {
-  return (
-    <Link to={href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
-      <div
-        style={{
-          background: D.card, borderRadius: 10,
-          padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 10,
-          cursor: 'pointer', height: '100%', boxSizing: 'border-box',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.03)',
-          transition: 'box-shadow 0.15s, transform 0.15s',
-          borderTop: `2px solid ${color}`,
-        }}
-        onMouseEnter={e => {
-          e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.10)'
-          e.currentTarget.style.transform = 'translateY(-1px)'
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.03)'
-          e.currentTarget.style.transform = 'none'
-        }}
-      >
-        <div style={{ flex: 1 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: '0 0 4px' }}>{title}</p>
-          <p style={{ fontSize: 11.5, color: D.textSub, margin: 0, lineHeight: 1.55 }}>{subtitle}</p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color, letterSpacing: '0.02em' }}>Acessar</span>
-          <ChevronRight size={11} style={{ color }} />
-        </div>
-      </div>
-    </Link>
-  )
-}
-
-/* ─── CHECKLIST GUIA ─── */
-interface ChecklistStepProps { done: boolean; label: string; href: string }
-function ChecklistStep({ done, label, href }: ChecklistStepProps) {
-  return (
-    <Link to={href} style={{ textDecoration: 'none', display: 'block' }}>
-      <div
-        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 7, transition: 'background 0.1s', cursor: done ? 'default' : 'pointer' }}
-        onMouseEnter={e => { if (!done) e.currentTarget.style.background = D.surface2 }}
-        onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
-      >
-        {done
-          ? <CheckCircle2 size={16} style={{ color: '#22C55E', flexShrink: 0 }} />
-          : <Circle size={16} style={{ color: D.textFaint, flexShrink: 0 }} />
-        }
-        <span style={{ fontSize: 13, flex: 1, lineHeight: 1.4, color: done ? D.textMuted : D.textMid, textDecoration: done ? 'line-through' : 'none' }}>
-          {label}
-        </span>
-        {!done && <ChevronRight size={12} style={{ color: D.textFaint, flexShrink: 0 }} />}
-      </div>
-    </Link>
-  )
-}
-interface ChecklistGuiaProps {
-  hasIdentidade: boolean; hasPilares: boolean; hasOkrs: boolean
-  hasMarketing: boolean; hasKpis: boolean
-}
-function ChecklistGuia({ hasIdentidade, hasPilares, hasOkrs, hasMarketing, hasKpis }: ChecklistGuiaProps) {
-  const steps = [
-    { label: 'Definir identidade profissional',   done: hasIdentidade, href: '/dashboard/membro/posicionamento' },
-    { label: 'Estruturar os pilares da marca',     done: hasPilares,    href: '/dashboard/membro/pilares'        },
-    { label: 'Criar metas e OKRs',                done: hasOkrs,       href: '/dashboard/membro/okr'            },
-    { label: 'Planejar ações de marketing anual', done: hasMarketing,  href: '/dashboard/membro/marketing'      },
-    { label: 'Configurar indicadores-chave',      done: hasKpis,       href: '/dashboard/membro/kpis'           },
-  ]
-  const completedCount = steps.filter(s => s.done).length
-  const progressPct = Math.round((completedCount / steps.length) * 100)
-
-  return (
-    <div style={{ background: D.card, borderRadius: 10, padding: '22px 22px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>Configuração do Hub</p>
-        <span style={{ fontFamily: D.serif, fontSize: 20, fontWeight: 600, color: D.gold, letterSpacing: '-0.02em' }}>{completedCount}/{steps.length}</span>
-      </div>
-      <div style={{ height: 4, background: D.surface2, borderRadius: 3, overflow: 'hidden', marginBottom: 14 }}>
-        <div style={{ height: '100%', width: `${progressPct}%`, background: D.gold, borderRadius: 3, transition: 'width 0.4s ease' }} />
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-        {steps.map((s, i) => <ChecklistStep key={i} done={s.done} label={s.label} href={s.href} />)}
-      </div>
-    </div>
-  )
-}
-
-/* ─── STATUS JORNADA ─── */
-interface StatusJornadaProps {
-  okrs: Objective[]; tarefas: Tarefa[]; progOkrs: number
-  feitasCount: number; totalTarefas: number; bloqueadas: number; emAndamento: number
-}
-function StatusJornada({ okrs, tarefas, progOkrs, feitasCount, totalTarefas, bloqueadas, emAndamento }: StatusJornadaProps) {
-  const pctTarefas = totalTarefas > 0 ? Math.round((feitasCount / totalTarefas) * 100) : 0
-
-  /* Build a journey phase list from OKRs */
-  const phases = [
-    { label: 'Identidade',  done: true  },
-    { label: 'Pilares',     done: okrs.some(o => o.categoria === 'Autoridade') },
-    { label: 'Metas',       done: okrs.length > 0 },
-    { label: 'Marketing',   done: false },
-    { label: 'Indicadores', done: false },
-  ]
-  const currentPhaseIdx = phases.findLastIndex(p => p.done)
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-
-      {/* Score block */}
-      <div style={{ background: D.card, borderRadius: 10, padding: '22px 22px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
-        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 8px' }}>Progresso Geral</p>
-        <p style={{ fontFamily: D.serif, fontSize: 56, fontWeight: 600, lineHeight: 1, letterSpacing: '-0.03em', color: D.text, margin: 0, fontVariantNumeric: 'tabular-nums' }}>
-          {progOkrs}<span style={{ fontSize: 20, color: D.textMuted, fontWeight: 400 }}>%</span>
-        </p>
-        <div style={{ marginTop: 12, height: 3, background: D.surface2, borderRadius: 2, overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${progOkrs}%`, background: `linear-gradient(90deg, ${D.gold}, #D4B896)`, borderRadius: 2, transition: 'width 0.5s ease' }} />
-        </div>
-        <p style={{ fontSize: 11, color: D.textMuted, marginTop: 7 }}>{okrs.length} objetivo{okrs.length !== 1 ? 's' : ''} · {tarefas.filter(t => t.status === 'em_andamento').length} tarefas em andamento</p>
-      </div>
-
-      {/* Vertical journey timeline */}
-      <div style={{ background: D.card, borderRadius: 10, padding: '20px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
-        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 18px' }}>Sua Jornada</p>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {phases.map((phase, i) => {
-            const isActive = i === currentPhaseIdx + 1
-            const isDone   = phase.done
-            const isFuture = !isDone && !isActive
-            const isLast   = i === phases.length - 1
-            return (
-              <div key={phase.label} style={{ display: 'grid', gridTemplateColumns: '20px 1fr', gap: 14, paddingBottom: isLast ? 0 : 20, position: 'relative' }}>
-                {/* Connector line */}
-                {!isLast && (
-                  <div style={{
-                    position: 'absolute', left: 7, top: 14, bottom: 0, width: 1,
-                    background: isDone ? `rgba(197,168,128,0.35)` : 'rgba(138,134,128,0.15)',
-                  }} />
-                )}
-                {/* Dot */}
-                <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 3 }}>
-                  <div style={{
-                    width: isDone ? 10 : (isActive ? 10 : 8),
-                    height: isDone ? 10 : (isActive ? 10 : 8),
-                    borderRadius: '50%', flexShrink: 0,
-                    background: isDone ? D.gold : (isActive ? D.gold : 'rgba(138,134,128,0.2)'),
-                    border: isFuture ? '1.5px solid rgba(138,134,128,0.25)' : 'none',
-                    boxShadow: isActive ? `0 0 0 4px rgba(197,168,128,0.18)` : 'none',
-                    zIndex: 1, position: 'relative',
-                  }} />
-                </div>
-                {/* Content */}
-                <div style={{ opacity: isFuture ? 0.45 : 1 }}>
-                  <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: isDone || isActive ? D.gold : D.textMuted, margin: '0 0 1px' }}>
-                    {isDone ? 'Concluído' : (isActive ? 'Em andamento' : 'A seguir')}
-                  </p>
-                  <p style={{ fontSize: 13, fontWeight: isDone || isActive ? 500 : 400, color: isFuture ? D.textMuted : D.text, margin: 0 }}>
-                    {phase.label}
-                  </p>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Tasks summary */}
-      <div style={{ background: D.card, borderRadius: 10, padding: '18px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, margin: 0 }}>Tarefas</p>
-          <span style={{ fontFamily: D.serif, fontSize: 22, fontWeight: 600, color: D.gold, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
-            {feitasCount}<span style={{ fontSize: 13, color: D.textMuted, fontWeight: 400, fontFamily: 'inherit' }}>/{totalTarefas}</span>
-          </span>
-        </div>
-        <div style={{ height: 3, background: D.surface2, borderRadius: 2, overflow: 'hidden', marginBottom: 12 }}>
-          <div style={{ height: '100%', width: `${pctTarefas}%`, background: '#22C55E', borderRadius: 2, transition: 'width 0.4s ease' }} />
-        </div>
-        {[
-          { label: 'Em andamento', value: emAndamento,  color: '#60A5FA' },
-          { label: 'Bloqueadas',   value: bloqueadas,   color: '#F87171' },
-        ].map(s => (
-          <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <div style={{ width: 5, height: 5, borderRadius: '50%', flexShrink: 0, background: s.color }} />
-            <span style={{ fontSize: 12, color: D.textSub, flex: 1 }}>{s.label}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: D.text, fontVariantNumeric: 'tabular-nums' }}>{s.value}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Quick links */}
-      <div style={{ background: D.card, borderRadius: 10, padding: '14px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-        {([
-          { href: '/dashboard/membro/tarefas', label: 'Ver todas as tarefas' },
-          { href: '/dashboard/membro/kpis',    label: 'Indicadores'          },
-          { href: '/dashboard/membro/agenda',  label: 'Agenda'               },
-        ]).map(item => (
-          <Link key={item.href} to={item.href} style={{ textDecoration: 'none', display: 'block' }}>
-            <div
-              style={{ display: 'flex', alignItems: 'center', padding: '7px 8px', borderRadius: 5, transition: 'background 0.1s' }}
-              onMouseEnter={e => { e.currentTarget.style.background = D.surface2 }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
-            >
-              <span style={{ fontSize: 12.5, color: D.textSub, flex: 1 }}>{item.label}</span>
-              <ChevronRight size={11} style={{ color: D.textFaint, flexShrink: 0 }} />
-            </div>
-          </Link>
-        ))}
-      </div>
     </div>
   )
 }
@@ -1123,10 +769,11 @@ function HomePage() {
   const [expanded,         setExpanded]         = useState<Record<string, boolean>>({})
   const [addingTo,         setAddingTo]         = useState<string | null>(null)
   const [novaDesc,         setNovaDesc]         = useState('')
-  const [view,             setView]             = useState<ViewMode>('dashboard')
+  const [view,             setView]             = useState<ViewMode>('lista')
   const [appliedWorkflows, setAppliedWorkflows] = useState<string[]>([])
   const [hasIdentidade,    setHasIdentidade]    = useState(false)
   const [hasMarketing,     setHasMarketing]     = useState(false)
+  const [hasKpis,          setHasKpis]          = useState(false)
 
   useEffect(() => {
     try { const s = localStorage.getItem(memberKey(OKR_KEY)); if (s) setOkrs(JSON.parse(s) ?? []) } catch {}
@@ -1135,6 +782,11 @@ function HomePage() {
       const mRaw = localStorage.getItem(memberKey('marketing_store_v1'))
       const mArr = mRaw ? JSON.parse(mRaw) : []
       setHasMarketing(Array.isArray(mArr) && mArr.length > 0)
+    } catch {}
+    try {
+      const kRaw = localStorage.getItem(memberKey('kpis_store_v1'))
+      const kArr = kRaw ? JSON.parse(kRaw) : []
+      setHasKpis(Array.isArray(kArr) && kArr.length > 0)
     } catch {}
   }, [])
 
@@ -1189,121 +841,227 @@ function HomePage() {
     setAppliedWorkflows(prev => [...prev, workflowId])
   }
 
-  const totalKrs    = okrs.reduce((s, o) => s + o.keyResults.length, 0)
   const progOkrs    = okrs.length ? Math.round(okrs.reduce((s, o) => s + objPct(o), 0) / okrs.length) : 0
   const feitasCount = tarefas.filter(t => t.status === 'feita').length
   const emAndamento = tarefas.filter(t => t.status === 'em_andamento').length
   const bloqueadas  = tarefas.filter(t => t.status === 'bloqueada').length
   const pctGeral    = tarefas.length > 0 ? Math.round((feitasCount / tarefas.length) * 100) : 0
-  const hoje        = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
+  const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
 
-  const viewButtons: { key: ViewMode; label: string; Icon: typeof LayoutDashboard }[] = [
-    { key: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
-    { key: 'kanban',    label: 'Kanban',    Icon: Kanban          },
-    { key: 'lista',     label: 'Lista',     Icon: LayoutList      },
-    { key: 'fluxos',    label: 'Fluxos',    Icon: Zap             },
+  /* Journey & checklist */
+  const setupSteps = [
+    { label: 'Definir identidade profissional',   done: hasIdentidade,   href: '/dashboard/membro/posicionamento' },
+    { label: 'Estruturar os pilares da marca',     done: false,           href: '/dashboard/membro/pilares'        },
+    { label: 'Criar metas e OKRs',                done: okrs.length > 0, href: '/dashboard/membro/okr'            },
+    { label: 'Planejar ações de marketing anual', done: hasMarketing,    href: '/dashboard/membro/marketing'      },
+    { label: 'Configurar indicadores-chave',      done: hasKpis,         href: '/dashboard/membro/kpis'           },
+  ]
+  const firstUnfinished = setupSteps.find(s => !s.done)
+
+  const journeyPhases = [
+    { label: 'Identidade',  done: hasIdentidade   },
+    { label: 'Pilares',     done: false           },
+    { label: 'Metas',       done: okrs.length > 0 },
+    { label: 'Marketing',   done: hasMarketing    },
+    { label: 'Indicadores', done: hasKpis         },
+  ]
+  const completedCount = journeyPhases.filter(p => p.done).length
+  const journeyPct     = Math.round((completedCount / journeyPhases.length) * 100)
+  const currentPhaseIdx = journeyPhases.reduce((last, p, i) => p.done ? i : last, -1)
+
+  const viewTabs = [
+    { key: 'lista'  as ViewMode, label: 'Lista'  },
+    { key: 'kanban' as ViewMode, label: 'Kanban' },
+    { key: 'fluxos' as ViewMode, label: 'Fluxos' },
   ]
 
-  const header = (
-    <div style={{ paddingBottom: 36, borderBottom: `1px solid ${D.border}` }}>
-      <p style={{ fontSize: 10, fontWeight: 600, color: D.textMuted, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 10 }}>
+  return (
+    <div style={{ maxWidth: 860, padding: '48px 32px 80px', display: 'flex', flexDirection: 'column' }}>
+
+      {/* ── DATE ── */}
+      <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 14px' }}>
         {hoje.charAt(0).toUpperCase() + hoje.slice(1)}
       </p>
-      <h1 style={{ fontFamily: D.serif, fontSize: 'clamp(36px, 4vw, 52px)', fontWeight: 600, color: D.text, margin: 0, letterSpacing: '-0.025em', lineHeight: 1.05 }}>
-        Olá, {firstName}
+
+      {/* ── GREETING ── */}
+      <h1 style={{ fontFamily: D.serif, fontSize: 'clamp(38px,4.5vw,58px)', fontWeight: 600, color: D.text, margin: 0, letterSpacing: '-0.025em', lineHeight: 1.05 }}>
+        Olá, {firstName}.
       </h1>
-      <p style={{ fontSize: 15, color: D.textSub, margin: '10px 0 0', lineHeight: 1.6 }}>Seu hub de autoridade e estratégia de marca.</p>
-    </div>
-  )
 
-  if (okrs.length === 0) {
-    return (
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px 48px', display: 'flex', flexDirection: 'column', gap: 32 }}>
-        {header}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, alignItems: 'start' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-              <QuickCard href="/dashboard/membro/posicionamento" color={D.gold}    Icon={Briefcase} title="Minha Identidade" subtitle="Posicionamento e essência" />
-              <QuickCard href="/dashboard/membro/pilares"        color="#10B981"   Icon={Target}    title="Pilares da Marca" subtitle="Frentes do seu negócio" />
-              <QuickCard href="/dashboard/membro/okr"            color="#F59E0B"   Icon={Rocket}    title="Metas de Impacto" subtitle="Objetivos e resultados-chave" />
+      {/* ── STATEMENT ── */}
+      <p style={{ fontSize: 16, color: D.textSub, margin: '10px 0 0', lineHeight: 1.7, maxWidth: 500 }}>
+        {okrs.length > 0
+          ? `Você concluiu ${progOkrs}% da construção da sua marca.`
+          : 'Seu hub de autoridade e estratégia de marca.'
+        }
+      </p>
+
+      {/* ── CONTINUE CTA ── */}
+      {firstUnfinished && (
+        <Link to={firstUnfinished.href} style={{ textDecoration: 'none' }}>
+          <span
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 13, color: D.gold, margin: '14px 0 0', transition: 'opacity 0.1s', cursor: 'pointer' }}
+            onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
+            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+          >
+            Continue → {firstUnfinished.label}
+          </span>
+        </Link>
+      )}
+
+      {/* ── MAIN SECTIONS ── */}
+      <div style={{ marginTop: 44, display: 'flex', flexDirection: 'column' }}>
+
+        {/* ── HOJE ── */}
+        <div style={{ paddingBottom: 36 }}>
+          <SectionLabel>Hoje</SectionLabel>
+          <div style={{ marginTop: 14 }}>
+            {setupSteps.map((step, i) => (
+              <ChecklistRow key={i} done={step.done} label={step.label} href={step.href} />
+            ))}
+          </div>
+        </div>
+
+        <HR />
+
+        {/* ── JORNADA ── */}
+        <div style={{ padding: '36px 0' }}>
+          <SectionLabel>Sua Jornada</SectionLabel>
+          <div style={{ marginTop: 18 }}>
+            {/* Progress bar */}
+            <div style={{ height: 3, background: D.surface2, borderRadius: 2, overflow: 'hidden', maxWidth: 340 }}>
+              <div style={{ height: '100%', width: `${Math.max(2, journeyPct)}%`, background: D.gold, borderRadius: 2, transition: 'width 0.6s ease' }} />
             </div>
-            <ChecklistGuia hasIdentidade={hasIdentidade} hasPilares={false} hasOkrs={false} hasMarketing={hasMarketing} hasKpis={false} />
+            <p style={{ fontSize: 12, color: D.textSub, margin: '8px 0 0' }}>
+              {journeyPct}% concluído · Fase {journeyPhases[Math.min(currentPhaseIdx + 1, journeyPhases.length - 1)]?.label ?? 'Completa'}
+            </p>
+
+            {/* Phase dots */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: 28, overflowX: 'auto', paddingBottom: 4 }}>
+              {journeyPhases.map((phase, i) => {
+                const isDone   = phase.done
+                const isActive = i === currentPhaseIdx + 1
+                const isFuture = !isDone && !isActive
+                const isLast   = i === journeyPhases.length - 1
+                return (
+                  <div key={phase.label} style={{ display: 'flex', alignItems: 'flex-start', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                      <div style={{
+                        width: isDone || isActive ? 10 : 8,
+                        height: isDone || isActive ? 10 : 8,
+                        borderRadius: '50%',
+                        background: isDone ? D.gold : (isActive ? D.gold : 'transparent'),
+                        border: isFuture ? `1.5px solid ${D.textFaint}` : 'none',
+                        boxShadow: isActive ? `0 0 0 4px rgba(197,168,128,0.22)` : 'none',
+                        flexShrink: 0, marginTop: isFuture ? 1 : 0,
+                      }} />
+                      <span style={{ fontSize: 11, color: isFuture ? D.textFaint : (isActive ? D.text : D.textSub), fontWeight: isActive ? 500 : 400, whiteSpace: 'nowrap' }}>
+                        {phase.label}
+                      </span>
+                      <span style={{ fontSize: 9, color: D.textFaint, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+                        {isDone ? 'concluído' : (isActive ? 'em andamento' : 'a seguir')}
+                      </span>
+                    </div>
+                    {!isLast && (
+                      <div style={{ width: 40, height: 1, background: isDone ? 'rgba(197,168,128,0.4)' : D.border, margin: '5px 6px 0', flexShrink: 0 }} />
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
-          <div style={{ background: D.surface, border: `1px dashed ${D.border}`, borderRadius: 10, padding: '28px 24px', textAlign: 'center' }}>
-            <ClipboardList size={28} style={{ color: D.textFaint, margin: '0 auto 12px' }} />
-            <p style={{ fontSize: 14, fontWeight: 600, color: D.textMid, marginBottom: 6 }}>Nenhum objetivo criado ainda</p>
-            <p style={{ fontSize: 12, color: D.textSub, lineHeight: 1.6 }}>Vá até <strong>Metas de Impacto</strong> para criar seus primeiros OKRs.</p>
-            <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none' }}>
-              <div style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: D.gold, color: '#1A1208', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                <Rocket size={13} /> Criar OKRs
+        </div>
+
+        {okrs.length > 0 && (
+          <>
+            <HR />
+            {/* ── OBJETIVOS ATIVOS ── */}
+            <div style={{ padding: '36px 0' }}>
+              <SectionLabel>Objetivos Ativos</SectionLabel>
+              <div style={{ marginTop: 14 }}>
+                {okrs.map(okr => <OkrRow key={okr.id} okr={okr} />)}
               </div>
-            </Link>
+            </div>
+          </>
+        )}
+
+        <HR />
+
+        {/* ── PLANO DE AÇÃO ── */}
+        <div style={{ paddingTop: 36 }}>
+          <h2 style={{ fontFamily: D.serif, fontSize: 32, fontWeight: 600, color: D.text, margin: 0, letterSpacing: '-0.02em' }}>
+            Plano de Ação
+          </h2>
+          <p style={{ fontSize: 13, color: D.textSub, margin: '6px 0 0', lineHeight: 1.6 }}>
+            {tarefas.length > 0
+              ? `${feitasCount} de ${tarefas.length} tarefas concluídas · ${emAndamento} em andamento${bloqueadas > 0 ? ` · ${bloqueadas} bloqueadas` : ''}`
+              : 'Crie OKRs para gerar tarefas automaticamente.'
+            }
+          </p>
+
+          {/* Tab bar */}
+          <div style={{ display: 'flex', borderBottom: `1px solid ${D.border}`, marginTop: 20, marginBottom: 24 }}>
+            {viewTabs.map(({ key, label }) => (
+              <button key={key} onClick={() => setView(key)}
+                style={{
+                  padding: '8px 18px', border: 'none', background: 'none', cursor: 'pointer',
+                  borderBottom: view === key ? `2px solid ${D.gold}` : '2px solid transparent',
+                  marginBottom: '-1px',
+                  fontSize: 13, fontWeight: view === key ? 500 : 400,
+                  color: view === key ? D.text : D.textMuted,
+                  transition: 'color 0.1s', letterSpacing: '0.01em',
+                }}
+                onMouseEnter={e => { if (view !== key) (e.currentTarget as HTMLButtonElement).style.color = D.textMid }}
+                onMouseLeave={e => { if (view !== key) (e.currentTarget as HTMLButtonElement).style.color = D.textMuted }}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-        </div>
-      </div>
-    )
-  }
 
-  return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px 48px', display: 'flex', flexDirection: 'column', gap: 32 }}>
-      {header}
-
-      {/* 2-column hero */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, alignItems: 'start' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-            <QuickCard href="/dashboard/membro/posicionamento" color={D.gold}  Icon={Briefcase} title="Minha Identidade" subtitle="Posicionamento e essência" />
-            <QuickCard href="/dashboard/membro/pilares"        color="#10B981" Icon={Target}    title="Pilares da Marca" subtitle="Frentes do seu negócio" />
-            <QuickCard href="/dashboard/membro/okr"            color="#F59E0B" Icon={Rocket}    title="Metas de Impacto" subtitle="Objetivos e resultados-chave" />
-          </div>
-          <ChecklistGuia hasIdentidade={hasIdentidade} hasPilares={false} hasOkrs={okrs.length > 0} hasMarketing={hasMarketing} hasKpis={false} />
-        </div>
-        <StatusJornada okrs={okrs} tarefas={tarefas} progOkrs={progOkrs} feitasCount={feitasCount} totalTarefas={tarefas.length} bloqueadas={bloqueadas} emAndamento={emAndamento} />
-      </div>
-
-      {/* Plano de Ação */}
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0 }}>
-          <h2 style={{ fontFamily: D.serif, fontSize: 28, fontWeight: 600, color: D.text, margin: 0, letterSpacing: '-0.02em' }}>Plano de Ação</h2>
-        </div>
-        {/* Underline tab bar */}
-        <div style={{ display: 'flex', borderBottom: `1px solid ${D.border}`, marginTop: 20, marginBottom: 24 }}>
-          {viewButtons.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setView(key)}
-              style={{
-                padding: '9px 20px',
-                border: 'none', background: 'none', cursor: 'pointer',
-                borderBottom: view === key ? `2px solid ${D.gold}` : '2px solid transparent',
-                marginBottom: '-1px',
-                fontSize: 13, fontWeight: view === key ? 500 : 400,
-                color: view === key ? D.text : D.textMuted,
-                transition: 'all 0.12s',
-                letterSpacing: '0.01em',
-              }}
-              onMouseEnter={e => { if (view !== key) (e.currentTarget as HTMLButtonElement).style.color = D.textMid }}
-              onMouseLeave={e => { if (view !== key) (e.currentTarget as HTMLButtonElement).style.color = D.textMuted }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ minHeight: 300 }}>
-          {view === 'dashboard' && (
-            <DashboardView okrs={okrs} tarefas={tarefas} totalKrs={totalKrs} progOkrs={progOkrs} feitasCount={feitasCount} emAndamento={emAndamento} bloqueadas={bloqueadas} pctGeral={pctGeral} />
-          )}
-          {view === 'kanban' && (
-            <KanbanView okrs={okrs} tarefas={tarefas} onCycleStatus={cycleStatus} onCycleBack={cycleStatusBack} onCyclePrioridade={cyclePrioridade} onDelete={deleteTarefa} onUpdateDesc={updateDesc} onAddTask={addTarefaWithStatus} />
-          )}
-          {view === 'lista' && (
-            <ListaView okrs={okrs} tarefas={tarefas} expanded={expanded} onToggle={id => setExpanded(p => ({ ...p, [id]: !p[id] }))} onCycleStatus={cycleStatus} onCyclePrioridade={cyclePrioridade} onDelete={deleteTarefa} onUpdateDesc={updateDesc} addingTo={addingTo} novaDesc={novaDesc} setNovaDesc={setNovaDesc} setAddingTo={setAddingTo} addTarefa={addTarefa} />
-          )}
-          {view === 'fluxos' && (
-            <FluxosView okrs={okrs} appliedWorkflows={appliedWorkflows} onApply={applyWorkflow} />
+          {okrs.length === 0 ? (
+            <div style={{ padding: '40px 0', textAlign: 'center' }}>
+              <p style={{ fontSize: 14, fontWeight: 500, color: D.textMid, margin: '0 0 6px' }}>Nenhum objetivo criado ainda</p>
+              <p style={{ fontSize: 13, color: D.textSub, lineHeight: 1.6, margin: '0 0 24px' }}>
+                Vá até <strong style={{ color: D.textMid }}>Metas de Impacto</strong> para criar seus primeiros OKRs.
+              </p>
+              <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none' }}>
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '10px 22px', background: D.gold, color: '#1A1208',
+                  fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer',
+                }}>
+                  Criar OKRs →
+                </span>
+              </Link>
+            </div>
+          ) : (
+            <div style={{ minHeight: 240 }}>
+              {view === 'lista' && (
+                <ListaView
+                  okrs={okrs} tarefas={tarefas} expanded={expanded}
+                  onToggle={id => setExpanded(p => ({ ...p, [id]: !p[id] }))}
+                  onCycleStatus={cycleStatus} onCyclePrioridade={cyclePrioridade}
+                  onDelete={deleteTarefa} onUpdateDesc={updateDesc}
+                  addingTo={addingTo} novaDesc={novaDesc}
+                  setNovaDesc={setNovaDesc} setAddingTo={setAddingTo} addTarefa={addTarefa}
+                />
+              )}
+              {view === 'kanban' && (
+                <KanbanView
+                  okrs={okrs} tarefas={tarefas}
+                  onCycleStatus={cycleStatus} onCycleBack={cycleStatusBack}
+                  onCyclePrioridade={cyclePrioridade} onDelete={deleteTarefa}
+                  onUpdateDesc={updateDesc} onAddTask={addTarefaWithStatus}
+                />
+              )}
+              {view === 'fluxos' && (
+                <FluxosView okrs={okrs} appliedWorkflows={appliedWorkflows} onApply={applyWorkflow} />
+              )}
+            </div>
           )}
         </div>
+
       </div>
     </div>
   )
