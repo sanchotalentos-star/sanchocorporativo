@@ -131,23 +131,37 @@ function AgendaPage() {
   const semanas = [1, 2, 3, 4]
 
   return (
-    <div className="space-y-6">
+    <div style={{ maxWidth: 860, padding: '48px 0 80px', display: 'flex', flexDirection: 'column', gap: 24 }}>
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold text-gray-900">Agenda Executiva</h1>
-          <p className="text-gray-400 mt-1 text-sm">
+      {/* ── Header ── */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <h1 style={{
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontSize: 'clamp(36px, 4.5vw, 52px)',
+            fontWeight: 400,
+            color: '#1A1916',
+            margin: 0,
+            lineHeight: 1.1,
+            letterSpacing: '-0.01em',
+          }}>
+            Agenda Executiva
+          </h1>
+          <p style={{ fontSize: 14, color: '#6B6560', margin: 0, lineHeight: 1.6 }}>
             Visão integrada das suas ações de OKR e Marketing
           </p>
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-gray-400 flex-shrink-0">
-          <Link to="/dashboard/membro/okr">
-            <span className="hover:text-[#7B2FBE] transition-colors">OKRs</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, paddingTop: 8 }}>
+          <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none' }}>
+            <span style={{ fontSize: 11, color: '#C5C0BA', transition: 'color 0.15s' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#C5A880' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#C5C0BA' }}>OKRs</span>
           </Link>
-          <span>·</span>
-          <Link to="/dashboard/membro/marketing">
-            <span className="hover:text-[#7B2FBE] transition-colors">Marketing</span>
+          <span style={{ color: '#C5C0BA', fontSize: 11 }}>·</span>
+          <Link to="/dashboard/membro/marketing" style={{ textDecoration: 'none' }}>
+            <span style={{ fontSize: 11, color: '#C5C0BA', transition: 'color 0.15s' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#C5A880' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#C5C0BA' }}>Marketing</span>
           </Link>
         </div>
       </div>

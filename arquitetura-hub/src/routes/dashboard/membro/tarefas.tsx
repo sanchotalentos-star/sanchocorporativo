@@ -286,10 +286,20 @@ function TarefasPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div style={{ maxWidth: 860, padding: '48px 0 80px', display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div>
-        <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">Tarefas</h1>
-        <p className="text-sm text-gray-400 mt-0.5">Ações concretas para avançar nos seus objetivos.</p>
+        <h1 style={{
+          fontFamily: "'Cormorant Garamond', Georgia, serif",
+          fontSize: 'clamp(36px, 4.5vw, 52px)',
+          fontWeight: 400,
+          color: '#1A1916',
+          margin: 0,
+          lineHeight: 1.1,
+          letterSpacing: '-0.01em',
+        }}>Tarefas</h1>
+        <p style={{ fontSize: 14, color: '#6B6560', margin: '8px 0 0', lineHeight: 1.6 }}>
+          Ações concretas para avançar nos seus objetivos.
+        </p>
       </div>
 
       {/* ── Dashboard macro ── */}

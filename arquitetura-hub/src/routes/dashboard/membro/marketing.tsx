@@ -261,42 +261,63 @@ function MarketingPage() {
   const progresso = acoes.length > 0 ? Math.round((concluidas / acoes.length) * 100) : 0
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-2">
-        {/* Mini cadeia */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <Link to="/dashboard/membro/posicionamento">
-            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">01 Identidade</span>
-          </Link>
-          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
-          <Link to="/dashboard/membro/pilares">
-            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">02 Pilares</span>
-          </Link>
-          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
-          <Link to="/dashboard/membro/okr">
-            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">03 OKRs</span>
-          </Link>
-          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
-          <span className="text-xs font-bold text-[#7B2FBE] bg-[#7B2FBE]/10 px-2 py-0.5 rounded-md">
-            04 Marketing
-          </span>
-          <ChevronRight size={12} className="text-gray-200 flex-shrink-0" />
-          <Link to="/dashboard/membro/kpis">
-            <span className="text-xs text-gray-400 hover:text-gray-600 transition-colors">05 Resultados</span>
-          </Link>
+    <div style={{ maxWidth: 960, paddingBottom: 80, display: 'flex', flexDirection: 'column', gap: 24 }}>
+      {/* ── Breadcrumb + Heading ── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0, paddingTop: 48 }}>
+        {/* Breadcrumb */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' as const }}>
+          {([
+            { num: '01', label: 'Identidade', to: '/dashboard/membro/posicionamento' },
+            { num: '02', label: 'Pilares',    to: '/dashboard/membro/pilares'        },
+            { num: '03', label: 'OKRs',       to: '/dashboard/membro/okr'            },
+            { num: '04', label: 'Marketing',  to: null                               },
+            { num: '05', label: 'Resultados', to: '/dashboard/membro/kpis'           },
+          ] as const).map((c, i) => (
+            <span key={c.num} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              {i > 0 && <ChevronRight size={11} style={{ color: '#C5C0BA' }} />}
+              {c.to === null ? (
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#C5A880' }}>{c.num} {c.label}</span>
+              ) : (
+                <Link to={c.to} style={{ textDecoration: 'none' }}>
+                  <span style={{ fontSize: 11, color: '#C5C0BA' }}>{c.num} {c.label}</span>
+                </Link>
+              )}
+            </span>
+          ))}
         </div>
 
-        <div className="flex items-start justify-between gap-4">
+        {/* Heading row */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 24, marginTop: 20 }}>
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">Agenda de Marketing Anual</h1>
-            <p className="text-gray-400 mt-1 text-sm">Planeje suas ações de conteúdo e distribuição ao longo do ano</p>
+            <h1 style={{
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontSize: 'clamp(36px, 4.5vw, 52px)',
+              fontWeight: 400,
+              color: '#1A1916',
+              margin: 0,
+              lineHeight: 1.1,
+              letterSpacing: '-0.01em',
+            }}>
+              Agenda de Marketing Anual
+            </h1>
+            <p style={{ fontSize: 14, color: '#6B6560', margin: '8px 0 0', lineHeight: 1.6 }}>
+              Planeje suas ações de conteúdo e distribuição ao longo do ano
+            </p>
           </div>
           <button
             onClick={() => setShowNovaAcao(true)}
-            className="flex items-center gap-2 bg-[#7B2FBE] hover:bg-[#6a27a5] text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm shadow-[#7B2FBE]/20 flex-shrink-0"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              background: '#C5A880', color: '#fff',
+              fontSize: 13, fontWeight: 500,
+              padding: '8px 16px', borderRadius: 6,
+              border: 'none', cursor: 'pointer', flexShrink: 0,
+              transition: 'opacity 0.15s',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.85' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1' }}
           >
-            <Plus size={16} />
+            <Plus size={14} />
             Nova Ação
           </button>
         </div>
