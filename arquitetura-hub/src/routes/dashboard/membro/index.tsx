@@ -676,12 +676,11 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
                 transition: 'border-color 0.15s, background 0.15s',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 20 }}>{wf.emoji}</span>
-                {wasApplied && (
+              {wasApplied && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   <span style={{ fontSize: 9, fontWeight: 600, color: '#4ADE80', background: 'rgba(34,197,94,0.15)', padding: '2px 6px', borderRadius: 10 }}>✓ Aplicado</span>
-                )}
-              </div>
+                </div>
+              )}
               <div>
                 <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>{wf.nome}</p>
                 <p style={{ fontSize: 11, color: D.textSub, margin: '3px 0 0', lineHeight: 1.5 }}>{wf.descricao}</p>
@@ -700,7 +699,6 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
       {selectedWf && (
         <div style={{ background: D.card, border: `1.5px solid ${selectedWf.cor}`, borderRadius: 8, overflow: 'hidden' }}>
           <div style={{ padding: '14px 20px', borderBottom: `1px solid ${D.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 20 }}>{selectedWf.emoji}</span>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>{selectedWf.nome}</p>
               <p style={{ fontSize: 11, color: D.textSub, margin: '2px 0 0' }}>{selectedWf.descricao}</p>

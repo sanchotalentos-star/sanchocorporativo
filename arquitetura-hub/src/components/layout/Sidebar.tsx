@@ -347,8 +347,7 @@ const block: React.CSSProperties = {
 function LogoBlock() {
   return (
     <div style={{ padding: '18px 14px 14px' }}>
-      <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.88)', margin: 0 }}>AR.</p>
-      <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.18)', marginTop: 2, letterSpacing: '0.04em' }}>Arquitetura de Relevância</p>
+      <p style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.88)', margin: 0 }}>Arquitetura de Relevância</p>
     </div>
   )
 }
