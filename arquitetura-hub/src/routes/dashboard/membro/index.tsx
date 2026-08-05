@@ -16,21 +16,22 @@ import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/dashboard/membro/')({ component: HomePage })
 
-/* ─── LIGHT PALETTE ─── */
+/* ─── PALETTE ─── */
 const D = {
-  bg:        '#FFFFFF',
+  bg:        '#FAFAF9',
   card:      '#FFFFFF',
-  surface:   '#F8F7F5',
-  surface2:  '#F0EEE9',
-  border:    'rgba(0,0,0,0.07)',
-  border2:   'rgba(0,0,0,0.12)',
-  text:      '#1A1610',
+  surface:   '#F5F4F2',
+  surface2:  '#EEECEA',
+  border:    'rgba(26,25,22,0.07)',
+  border2:   'rgba(26,25,22,0.12)',
+  text:      '#1A1916',
   textMid:   '#3A3530',
   textSub:   '#6B6560',
-  textMuted: '#9E9A94',
+  textMuted: '#8A8680',
   textFaint: '#C5C0BA',
   gold:      '#C5A880',
   goldDim:   'rgba(197,168,128,0.70)',
+  serif:     "'Cormorant Garamond', Georgia, serif",
 }
 
 /* ─── TYPES ─── */
@@ -298,25 +299,35 @@ function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndam
   ]
   const categoriasPresentes = Array.from(new Set(okrs.map(o => o.categoria)))
 
+  /* indicator strip cells */
+  const kpiStrip = [
+    { label: 'OKRs ativos',        value: String(okrs.length),             sub: `${totalKrs} resultado${totalKrs !== 1 ? 's' : ''}-chave`,    numColor: D.text  },
+    { label: 'Progresso geral',    value: `${progOkrs}%`,                   sub: 'média dos objetivos',                                         numColor: D.gold  },
+    { label: 'Tarefas concluídas', value: `${feitasCount}`,                 sub: `de ${tarefas.length} no total`,                               numColor: feitasCount > 0 ? '#22C55E' : D.textMuted },
+    { label: 'Bloqueadas',         value: `${bloqueadas}`,                  sub: bloqueadas > 0 ? 'requerem atenção' : 'tudo desbloqueado',      numColor: bloqueadas > 0 ? '#EF4444' : D.textMuted  },
+  ]
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-        {[
-          { label: 'OKRs ativos',        value: okrs.length,    color: D.text },
-          { label: 'Resultados-chave',   value: totalKrs,       color: D.text },
-          { label: 'Progresso OKRs',     value: `${progOkrs}%`, color: D.gold },
-          { label: 'Tarefas concluídas', value: `${feitasCount}/${totalTarefas}`, color: '#4ADE80' },
-        ].map(t => (
-          <div key={t.label} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 8, padding: '14px 18px' }}>
-            <p style={{ fontSize: 10, fontWeight: 500, color: D.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>{t.label}</p>
-            <p style={{ fontSize: 26, fontWeight: 600, color: t.color, margin: '6px 0 0', fontVariantNumeric: 'tabular-nums' }}>{t.value}</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* ── KPI strip ── */}
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: 1, background: D.border,
+        borderRadius: 8, overflow: 'hidden',
+        border: `1px solid ${D.border}`,
+      }}>
+        {kpiStrip.map(k => (
+          <div key={k.label} style={{ background: D.card, padding: '20px 22px 16px' }}>
+            <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 10px' }}>{k.label}</p>
+            <p style={{ fontFamily: D.serif, fontSize: 38, fontWeight: 600, lineHeight: 1, letterSpacing: '-0.02em', color: k.numColor, margin: 0, fontVariantNumeric: 'tabular-nums' }}>{k.value}</p>
+            <p style={{ fontSize: 11, color: D.textMuted, marginTop: 5 }}>{k.sub}</p>
           </div>
         ))}
       </div>
 
-      <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 8, padding: '16px 20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: D.text, margin: 0 }}>Progresso dos Objetivos</p>
+      <div style={{ background: D.card, borderRadius: 10, padding: '20px 24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>Progresso dos Objetivos</p>
           <div style={{ display: 'flex', gap: 12 }}>
             {categoriasPresentes.map(cat => (
               <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -339,9 +350,9 @@ function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndam
         </ResponsiveContainer>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 8, padding: '16px 20px' }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: D.text, margin: '0 0 12px' }}>Status das Tarefas</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div style={{ background: D.card, borderRadius: 10, padding: '20px 24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: '0 0 16px' }}>Status das Tarefas</p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <ResponsiveContainer width={120} height={120}>
               <PieChart>
@@ -367,8 +378,8 @@ function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndam
           </div>
         </div>
 
-        <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 8, padding: '16px 20px' }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: D.text, margin: '0 0 12px' }}>Distribuição por Prioridade</p>
+        <div style={{ background: D.card, borderRadius: 10, padding: '20px 24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: '0 0 16px' }}>Distribuição por Prioridade</p>
           <ResponsiveContainer width="100%" height={120}>
             <BarChart data={prioData} margin={{ top: 0, right: 4, left: -24, bottom: 0 }} barSize={36}>
               <CartesianGrid vertical={false} stroke="rgba(0,0,0,0.06)" />
@@ -384,8 +395,8 @@ function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndam
       </div>
 
       {allKrs.length > 0 && (
-        <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 8, padding: '16px 20px' }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: D.text, margin: '0 0 12px' }}>Comparativo de Resultados-Chave</p>
+        <div style={{ background: D.card, borderRadius: 10, padding: '20px 24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: '0 0 16px' }}>Comparativo de Resultados-Chave</p>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={allKrs} margin={{ top: 4, right: 4, left: -24, bottom: 52 }} barSize={18}>
               <CartesianGrid vertical={false} stroke="rgba(0,0,0,0.06)" />
@@ -889,36 +900,34 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
 
 /* ─── QUICK CARD ─── */
 interface QuickCardProps { href: string; color: string; Icon: typeof Briefcase; title: string; subtitle: string }
-function QuickCard({ href, color, Icon, title, subtitle }: QuickCardProps) {
+function QuickCard({ href, color, title, subtitle }: QuickCardProps) {
   return (
     <Link to={href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
       <div
         style={{
-          background: D.card, border: `1px solid ${D.border}`, borderRadius: 10,
-          padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12,
-          cursor: 'pointer', height: '100%', boxSizing: 'border-box', transition: 'all 0.15s ease',
+          background: D.card, borderRadius: 10,
+          padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 10,
+          cursor: 'pointer', height: '100%', boxSizing: 'border-box',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.03)',
+          transition: 'box-shadow 0.15s, transform 0.15s',
+          borderTop: `2px solid ${color}`,
         }}
         onMouseEnter={e => {
-          e.currentTarget.style.borderColor = color
-          e.currentTarget.style.boxShadow = `0 4px 12px ${color}22`
+          e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.10)'
           e.currentTarget.style.transform = 'translateY(-1px)'
         }}
         onMouseLeave={e => {
-          e.currentTarget.style.borderColor = D.border
-          e.currentTarget.style.boxShadow = 'none'
+          e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.03)'
           e.currentTarget.style.transform = 'none'
         }}
       >
-        <div style={{ width: 36, height: 36, borderRadius: 8, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <Icon size={18} style={{ color }} />
-        </div>
         <div style={{ flex: 1 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: '0 0 3px' }}>{title}</p>
-          <p style={{ fontSize: 11, color: D.textSub, margin: 0, lineHeight: 1.5 }}>{subtitle}</p>
+          <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: '0 0 4px' }}>{title}</p>
+          <p style={{ fontSize: 11.5, color: D.textSub, margin: 0, lineHeight: 1.55 }}>{subtitle}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color }}>Acessar</span>
-          <ChevronRight size={12} style={{ color }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color, letterSpacing: '0.02em' }}>Acessar</span>
+          <ChevronRight size={11} style={{ color }} />
         </div>
       </div>
     </Link>
@@ -963,10 +972,10 @@ function ChecklistGuia({ hasIdentidade, hasPilares, hasOkrs, hasMarketing, hasKp
   const progressPct = Math.round((completedCount / steps.length) * 100)
 
   return (
-    <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 10, padding: '20px 20px 14px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>Sua Jornada de Configuração</p>
-        <span style={{ fontSize: 12, fontWeight: 600, color: D.gold }}>{completedCount}/{steps.length}</span>
+    <div style={{ background: D.card, borderRadius: 10, padding: '22px 22px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>Configuração do Hub</p>
+        <span style={{ fontFamily: D.serif, fontSize: 20, fontWeight: 600, color: D.gold, letterSpacing: '-0.02em' }}>{completedCount}/{steps.length}</span>
       </div>
       <div style={{ height: 4, background: D.surface2, borderRadius: 3, overflow: 'hidden', marginBottom: 14 }}>
         <div style={{ height: '100%', width: `${progressPct}%`, background: D.gold, borderRadius: 3, transition: 'width 0.4s ease' }} />
@@ -985,72 +994,118 @@ interface StatusJornadaProps {
 }
 function StatusJornada({ okrs, tarefas, progOkrs, feitasCount, totalTarefas, bloqueadas, emAndamento }: StatusJornadaProps) {
   const pctTarefas = totalTarefas > 0 ? Math.round((feitasCount / totalTarefas) * 100) : 0
-  const pendentes  = tarefas.filter(t => t.status === 'pendente').length
+
+  /* Build a journey phase list from OKRs */
+  const phases = [
+    { label: 'Identidade',  done: true  },
+    { label: 'Pilares',     done: okrs.some(o => o.categoria === 'Autoridade') },
+    { label: 'Metas',       done: okrs.length > 0 },
+    { label: 'Marketing',   done: false },
+    { label: 'Indicadores', done: false },
+  ]
+  const currentPhaseIdx = phases.findLastIndex(p => p.done)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 10, padding: '18px 20px' }}>
-        <p style={{ fontSize: 11, fontWeight: 600, color: D.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 14px' }}>Progresso OKRs</p>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 10 }}>
-          <span style={{ fontSize: 36, fontWeight: 700, color: D.gold, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{progOkrs}%</span>
-          <span style={{ fontSize: 11, color: D.textSub, marginBottom: 4 }}>{okrs.length} objetivo{okrs.length !== 1 ? 's' : ''}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+      {/* Score block */}
+      <div style={{ background: D.card, borderRadius: 10, padding: '22px 22px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
+        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 8px' }}>Progresso Geral</p>
+        <p style={{ fontFamily: D.serif, fontSize: 56, fontWeight: 600, lineHeight: 1, letterSpacing: '-0.03em', color: D.text, margin: 0, fontVariantNumeric: 'tabular-nums' }}>
+          {progOkrs}<span style={{ fontSize: 20, color: D.textMuted, fontWeight: 400 }}>%</span>
+        </p>
+        <div style={{ marginTop: 12, height: 3, background: D.surface2, borderRadius: 2, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${progOkrs}%`, background: `linear-gradient(90deg, ${D.gold}, #D4B896)`, borderRadius: 2, transition: 'width 0.5s ease' }} />
         </div>
-        <div style={{ height: 5, background: D.surface2, borderRadius: 3, overflow: 'hidden', marginBottom: 12 }}>
-          <div style={{ height: '100%', width: `${progOkrs}%`, background: D.gold, borderRadius: 3, transition: 'width 0.4s ease' }} />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {okrs.slice(0, 3).map(o => (
-            <div key={o.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', flexShrink: 0, background: catColor[o.categoria] ?? D.gold }} />
-              <span style={{ fontSize: 11, color: D.textMid, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.titulo}</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: catColor[o.categoria] ?? D.gold, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{objPct(o)}%</span>
-            </div>
-          ))}
+        <p style={{ fontSize: 11, color: D.textMuted, marginTop: 7 }}>{okrs.length} objetivo{okrs.length !== 1 ? 's' : ''} · {tarefas.filter(t => t.status === 'em_andamento').length} tarefas em andamento</p>
+      </div>
+
+      {/* Vertical journey timeline */}
+      <div style={{ background: D.card, borderRadius: 10, padding: '20px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
+        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 18px' }}>Sua Jornada</p>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {phases.map((phase, i) => {
+            const isActive = i === currentPhaseIdx + 1
+            const isDone   = phase.done
+            const isFuture = !isDone && !isActive
+            const isLast   = i === phases.length - 1
+            return (
+              <div key={phase.label} style={{ display: 'grid', gridTemplateColumns: '20px 1fr', gap: 14, paddingBottom: isLast ? 0 : 20, position: 'relative' }}>
+                {/* Connector line */}
+                {!isLast && (
+                  <div style={{
+                    position: 'absolute', left: 7, top: 14, bottom: 0, width: 1,
+                    background: isDone ? `rgba(197,168,128,0.35)` : 'rgba(138,134,128,0.15)',
+                  }} />
+                )}
+                {/* Dot */}
+                <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 3 }}>
+                  <div style={{
+                    width: isDone ? 10 : (isActive ? 10 : 8),
+                    height: isDone ? 10 : (isActive ? 10 : 8),
+                    borderRadius: '50%', flexShrink: 0,
+                    background: isDone ? D.gold : (isActive ? D.gold : 'rgba(138,134,128,0.2)'),
+                    border: isFuture ? '1.5px solid rgba(138,134,128,0.25)' : 'none',
+                    boxShadow: isActive ? `0 0 0 4px rgba(197,168,128,0.18)` : 'none',
+                    zIndex: 1, position: 'relative',
+                  }} />
+                </div>
+                {/* Content */}
+                <div style={{ opacity: isFuture ? 0.45 : 1 }}>
+                  <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: isDone || isActive ? D.gold : D.textMuted, margin: '0 0 1px' }}>
+                    {isDone ? 'Concluído' : (isActive ? 'Em andamento' : 'A seguir')}
+                  </p>
+                  <p style={{ fontSize: 13, fontWeight: isDone || isActive ? 500 : 400, color: isFuture ? D.textMuted : D.text, margin: 0 }}>
+                    {phase.label}
+                  </p>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
 
-      <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 10, padding: '18px 20px' }}>
-        <p style={{ fontSize: 11, fontWeight: 600, color: D.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 12px' }}>Tarefas</p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          {[
-            { label: 'Concluídas',   value: feitasCount,  color: '#4ADE80', bg: 'rgba(34,197,94,0.12)' },
-            { label: 'Em andamento', value: emAndamento,  color: '#60A5FA', bg: 'rgba(59,130,246,0.12)' },
-            { label: 'Pendentes',    value: pendentes,    color: D.textSub,  bg: D.surface2             },
-            { label: 'Bloqueadas',   value: bloqueadas,   color: '#F87171', bg: 'rgba(239,68,68,0.12)' },
-          ].map(s => (
-            <div key={s.label} style={{ background: s.bg, borderRadius: 7, padding: '10px 12px' }}>
-              <p style={{ fontSize: 18, fontWeight: 700, color: s.color, margin: 0, fontVariantNumeric: 'tabular-nums' }}>{s.value}</p>
-              <p style={{ fontSize: 10, color: D.textMuted, margin: '2px 0 0', lineHeight: 1.3 }}>{s.label}</p>
-            </div>
-          ))}
+      {/* Tasks summary */}
+      <div style={{ background: D.card, borderRadius: 10, padding: '18px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.03)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, margin: 0 }}>Tarefas</p>
+          <span style={{ fontFamily: D.serif, fontSize: 22, fontWeight: 600, color: D.gold, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
+            {feitasCount}<span style={{ fontSize: 13, color: D.textMuted, fontWeight: 400, fontFamily: 'inherit' }}>/{totalTarefas}</span>
+          </span>
         </div>
-        <div style={{ marginTop: 10, height: 3, background: D.surface2, borderRadius: 2, overflow: 'hidden' }}>
+        <div style={{ height: 3, background: D.surface2, borderRadius: 2, overflow: 'hidden', marginBottom: 12 }}>
           <div style={{ height: '100%', width: `${pctTarefas}%`, background: '#22C55E', borderRadius: 2, transition: 'width 0.4s ease' }} />
         </div>
-        <p style={{ fontSize: 10, color: D.textMuted, margin: '6px 0 0', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{pctTarefas}% concluído</p>
+        {[
+          { label: 'Em andamento', value: emAndamento,  color: '#60A5FA' },
+          { label: 'Bloqueadas',   value: bloqueadas,   color: '#F87171' },
+        ].map(s => (
+          <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <div style={{ width: 5, height: 5, borderRadius: '50%', flexShrink: 0, background: s.color }} />
+            <span style={{ fontSize: 12, color: D.textSub, flex: 1 }}>{s.label}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: D.text, fontVariantNumeric: 'tabular-nums' }}>{s.value}</span>
+          </div>
+        ))}
       </div>
 
-      <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 10, padding: '14px 16px' }}>
-        <p style={{ fontSize: 11, fontWeight: 600, color: D.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>Acesso rápido</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {([
-            { href: '/dashboard/membro/tarefas', label: 'Ver todas as tarefas', Icon: ClipboardList },
-            { href: '/dashboard/membro/agenda',  label: 'Calendário e agenda',  Icon: Sliders       },
-            { href: '/dashboard/membro/kpis',    label: 'Indicadores',          Icon: TrendingUp    },
-          ] as { href: string; label: string; Icon: typeof ClipboardList }[]).map(item => (
-            <Link key={item.href} to={item.href} style={{ textDecoration: 'none' }}>
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 8px', borderRadius: 6, transition: 'background 0.1s' }}
-                onMouseEnter={e => { e.currentTarget.style.background = D.surface2 }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
-              >
-                <item.Icon size={13} style={{ color: D.textMuted, flexShrink: 0 }} />
-                <span style={{ fontSize: 12, color: D.textMid, flex: 1 }}>{item.label}</span>
-                <ChevronRight size={11} style={{ color: D.textFaint, flexShrink: 0 }} />
-              </div>
-            </Link>
-          ))}
-        </div>
+      {/* Quick links */}
+      <div style={{ background: D.card, borderRadius: 10, padding: '14px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+        {([
+          { href: '/dashboard/membro/tarefas', label: 'Ver todas as tarefas' },
+          { href: '/dashboard/membro/kpis',    label: 'Indicadores'          },
+          { href: '/dashboard/membro/agenda',  label: 'Agenda'               },
+        ]).map(item => (
+          <Link key={item.href} to={item.href} style={{ textDecoration: 'none', display: 'block' }}>
+            <div
+              style={{ display: 'flex', alignItems: 'center', padding: '7px 8px', borderRadius: 5, transition: 'background 0.1s' }}
+              onMouseEnter={e => { e.currentTarget.style.background = D.surface2 }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+            >
+              <span style={{ fontSize: 12.5, color: D.textSub, flex: 1 }}>{item.label}</span>
+              <ChevronRight size={11} style={{ color: D.textFaint, flexShrink: 0 }} />
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   )
@@ -1150,14 +1205,14 @@ function HomePage() {
   ]
 
   const header = (
-    <div style={{ paddingTop: 4, borderBottom: `2px solid ${D.border}`, paddingBottom: 24 }}>
-      <p style={{ fontSize: 12, color: D.textMuted, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+    <div style={{ paddingBottom: 36, borderBottom: `1px solid ${D.border}` }}>
+      <p style={{ fontSize: 10, fontWeight: 600, color: D.textMuted, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 10 }}>
         {hoje.charAt(0).toUpperCase() + hoje.slice(1)}
       </p>
-      <h1 style={{ fontSize: 32, fontWeight: 700, color: D.text, margin: 0, letterSpacing: '-0.02em', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+      <h1 style={{ fontFamily: D.serif, fontSize: 'clamp(36px, 4vw, 52px)', fontWeight: 600, color: D.text, margin: 0, letterSpacing: '-0.025em', lineHeight: 1.05 }}>
         Olá, {firstName}
       </h1>
-      <p style={{ fontSize: 16, color: D.textSub, margin: '8px 0 0 0' }}>Bem-vindo ao seu hub de inteligência e estratégia.</p>
+      <p style={{ fontSize: 15, color: D.textSub, margin: '10px 0 0', lineHeight: 1.6 }}>Seu hub de autoridade e estratégia de marca.</p>
     </div>
   )
 
@@ -1208,28 +1263,31 @@ function HomePage() {
 
       {/* Plano de Ação */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 600, color: D.text, margin: 0 }}>Meu Plano de Ação</h2>
-          <div style={{ display: 'flex', background: D.surface, padding: 4, borderRadius: 8, border: `1px solid ${D.border}`, flexShrink: 0 }}>
-            {viewButtons.map(({ key, label, Icon }) => (
-              <button
-                key={key}
-                onClick={() => setView(key)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 7,
-                  padding: '7px 14px', border: 'none', cursor: 'pointer', borderRadius: 6,
-                  background: view === key ? D.card : 'transparent',
-                  color: view === key ? D.text : D.textSub,
-                  boxShadow: view === key ? '0 1px 3px rgba(0,0,0,0.3)' : 'none',
-                  fontSize: 13, fontWeight: view === key ? 600 : 400,
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <Icon size={13} />
-                {label}
-              </button>
-            ))}
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0 }}>
+          <h2 style={{ fontFamily: D.serif, fontSize: 28, fontWeight: 600, color: D.text, margin: 0, letterSpacing: '-0.02em' }}>Plano de Ação</h2>
+        </div>
+        {/* Underline tab bar */}
+        <div style={{ display: 'flex', borderBottom: `1px solid ${D.border}`, marginTop: 20, marginBottom: 24 }}>
+          {viewButtons.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setView(key)}
+              style={{
+                padding: '9px 20px',
+                border: 'none', background: 'none', cursor: 'pointer',
+                borderBottom: view === key ? `2px solid ${D.gold}` : '2px solid transparent',
+                marginBottom: '-1px',
+                fontSize: 13, fontWeight: view === key ? 500 : 400,
+                color: view === key ? D.text : D.textMuted,
+                transition: 'all 0.12s',
+                letterSpacing: '0.01em',
+              }}
+              onMouseEnter={e => { if (view !== key) (e.currentTarget as HTMLButtonElement).style.color = D.textMid }}
+              onMouseLeave={e => { if (view !== key) (e.currentTarget as HTMLButtonElement).style.color = D.textMuted }}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
         <div style={{ minHeight: 300 }}>

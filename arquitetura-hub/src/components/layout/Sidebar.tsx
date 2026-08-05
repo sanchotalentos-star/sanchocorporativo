@@ -1,143 +1,189 @@
 import { Link, useRouterState } from '@tanstack/react-router'
-import type { LucideIcon } from 'lucide-react'
-import {
-  LayoutGrid, Target, Building2, Fingerprint, Send, Calendar,
-  TrendingUp, LogOut,
-  LayoutDashboard, Users, FileText, ListChecks, BookOpen,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { LogOut } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 
-interface NavItem {
-  label: string
-  href: string
-  icon: LucideIcon
-  badge?: string
-}
+/* ── NAV STRUCTURE ────────────────────────────────────── */
+interface NavItem  { label: string; href: string }
+interface NavGroup { section: string; items: NavItem[] }
 
-const adminNav: NavItem[] = [
-  { label: 'Visão Geral',  href: '/dashboard/admin',            icon: LayoutDashboard },
-  { label: 'Membros',      href: '/dashboard/admin/membros',    icon: Users           },
-  { label: 'Relatórios',  href: '/dashboard/admin/relatorios',  icon: FileText        },
-  { label: 'Meu Hub',      href: '/dashboard/membro',           icon: BookOpen        },
+const adminGroups: NavGroup[] = [
+  {
+    section: 'Visão Geral',
+    items: [
+      { label: 'Dashboard',  href: '/dashboard/admin'            },
+      { label: 'Membros',    href: '/dashboard/admin/membros'    },
+      { label: 'Relatórios', href: '/dashboard/admin/relatorios' },
+    ],
+  },
+  {
+    section: 'Mentoria',
+    items: [
+      { label: 'Meu Hub', href: '/dashboard/membro' },
+    ],
+  },
 ]
 
-const membroNav: NavItem[] = [
-  { label: 'Home',              href: '/dashboard/membro',                icon: LayoutGrid  },
-  { label: 'Minha Identidade',  href: '/dashboard/membro/posicionamento', icon: Fingerprint },
-  { label: 'Pilares da Marca',  href: '/dashboard/membro/pilares',        icon: Building2   },
-  { label: 'Metas de Impacto',  href: '/dashboard/membro/okr',            icon: Target      },
-  { label: 'Tarefas',           href: '/dashboard/membro/tarefas',        icon: ListChecks  },
-  { label: 'Marketing Anual',   href: '/dashboard/membro/marketing',      icon: Send        },
-  { label: 'Indicadores',       href: '/dashboard/membro/kpis',           icon: TrendingUp  },
-  { label: 'Agenda',            href: '/dashboard/membro/agenda',         icon: Calendar    },
+const membroGroups: NavGroup[] = [
+  {
+    section: 'Jornada',
+    items: [
+      { label: 'Home',             href: '/dashboard/membro'                },
+      { label: 'Minha Identidade', href: '/dashboard/membro/posicionamento' },
+      { label: 'Pilares da Marca', href: '/dashboard/membro/pilares'        },
+      { label: 'Metas de Impacto', href: '/dashboard/membro/okr'            },
+    ],
+  },
+  {
+    section: 'Execução',
+    items: [
+      { label: 'Tarefas',         href: '/dashboard/membro/tarefas'   },
+      { label: 'Marketing Anual', href: '/dashboard/membro/marketing' },
+    ],
+  },
+  {
+    section: 'Medição',
+    items: [
+      { label: 'Indicadores', href: '/dashboard/membro/kpis'   },
+      { label: 'Agenda',      href: '/dashboard/membro/agenda' },
+    ],
+  },
 ]
 
+/* ── COMPONENT ───────────────────────────────────────── */
 export function Sidebar() {
   const { user, logout } = useAuth()
   const routerState = useRouterState()
   const pathname = routerState.location.pathname
-  const nav = user?.role === 'admin' ? adminNav : membroNav
+  const groups = user?.role === 'admin' ? adminGroups : membroGroups
+
+  function isActive(href: string) {
+    return pathname === href || (
+      href !== '/dashboard/admin' &&
+      href !== '/dashboard/membro' &&
+      pathname.startsWith(href)
+    )
+  }
 
   return (
-    <aside style={{ display: 'flex', flexDirection: 'column', width: 220, minHeight: '100vh', background: '#0D0C0B', borderRight: '1px solid rgba(255,255,255,0.07)' }}>
+    <aside style={{
+      display: 'flex', flexDirection: 'column',
+      width: 212, minHeight: '100vh',
+      background: '#0F0E0D',
+      borderRight: '1px solid rgba(255,255,255,0.05)',
+    }}>
 
       {/* Logo */}
-      <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 20, height: 1, background: '#C5A880' }} />
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#EFECE6', letterSpacing: '0.12em', textTransform: 'uppercase', margin: 0 }}>
-            Hub de Relevância
-          </p>
-        </div>
-        <p style={{ fontSize: 10, fontWeight: 400, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.04em', lineHeight: 1.4, marginTop: 4 }}>
-          Arquitetura de Marca
+      <div style={{ padding: '22px 20px 18px' }}>
+        <p style={{
+          fontSize: 11, fontWeight: 700,
+          letterSpacing: '0.14em', textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.88)', margin: 0,
+        }}>
+          AR.
+        </p>
+        <p style={{
+          fontSize: 9, fontWeight: 400,
+          color: 'rgba(255,255,255,0.2)',
+          letterSpacing: '0.04em', marginTop: 3,
+        }}>
+          Arquitetura de Relevância
         </p>
       </div>
 
-      {/* User */}
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{
-          width: 28, height: 28, borderRadius: '50%',
-          background: '#2A2420', border: '1px solid rgba(197,168,128,0.3)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 11, fontWeight: 600, color: '#C5A880', flexShrink: 0,
-        }}>
-          {user?.full_name?.charAt(0) ?? 'U'}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 12, fontWeight: 500, color: '#EFECE6', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {user?.full_name}
-          </p>
-          <p style={{ fontSize: 10, color: '#75716B', marginTop: 1 }}>
-            {user?.role === 'admin' ? 'Mentor' : 'Mentorado'}
-          </p>
-        </div>
-      </div>
-
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '8px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 1 }}>
-        {nav.map((item) => {
-          const active =
-            pathname === item.href || (
-              item.href !== '/dashboard/admin' &&
-              item.href !== '/dashboard/membro' &&
-              pathname.startsWith(item.href)
-            )
+      <nav style={{ flex: 1, padding: '4px 10px 8px', overflowY: 'auto' }}>
+        {groups.map((group, gi) => (
+          <div key={group.section} style={{ marginTop: gi === 0 ? 4 : 20 }}>
+            <p style={{
+              fontSize: 9, fontWeight: 700,
+              letterSpacing: '0.18em', textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.18)',
+              padding: '0 10px', margin: '0 0 3px',
+            }}>
+              {group.section}
+            </p>
 
-          return (
-            <Link key={item.href} to={item.href} style={{ textDecoration: 'none' }}>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '7px 12px',
-                borderRadius: 4,
-                cursor: 'pointer',
-                background: active ? 'rgba(197,168,128,0.1)' : 'transparent',
-                borderLeft: active ? '2px solid #C5A880' : '2px solid transparent',
-                transition: 'all 0.1s',
-              }}
-              onMouseEnter={e => { if (!active) (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.04)' }}
-              onMouseLeave={e => { if (!active) (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
-              >
-                <item.icon
-                  size={14}
-                  strokeWidth={active ? 2 : 1.75}
-                  style={{ flexShrink: 0, color: active ? '#C5A880' : 'rgba(255,255,255,0.3)' }}
-                />
-                <span style={{
-                  fontSize: 13, flex: 1,
-                  color: active ? '#EFECE6' : 'rgba(255,255,255,0.4)',
-                  fontWeight: active ? 500 : 400,
-                  letterSpacing: active ? '0.01em' : '0',
-                }}>
-                  {item.label}
-                </span>
-                {item.badge && (
-                  <span style={{ fontSize: 9, fontWeight: 600, background: 'rgba(197,168,128,0.15)', color: '#C5A880', padding: '2px 5px', borderRadius: 3 }}>
-                    {item.badge}
-                  </span>
-                )}
-              </div>
-            </Link>
-          )
-        })}
+            {group.items.map(item => {
+              const active = isActive(item.href)
+              return (
+                <Link key={item.href} to={item.href} style={{ textDecoration: 'none', display: 'block' }}>
+                  <div
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 9,
+                      padding: '6px 10px', borderRadius: 4,
+                      cursor: 'pointer',
+                      transition: 'background 0.1s',
+                    }}
+                    onMouseEnter={e => {
+                      if (!active) (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.04)'
+                    }}
+                    onMouseLeave={e => {
+                      if (!active) (e.currentTarget as HTMLDivElement).style.background = 'transparent'
+                    }}
+                  >
+                    <div style={{
+                      width: 5, height: 5, borderRadius: '50%', flexShrink: 0,
+                      background: active ? '#C5A880' : 'rgba(255,255,255,0.1)',
+                      boxShadow: active ? '0 0 0 3px rgba(197,168,128,0.16)' : 'none',
+                      transition: 'all 0.15s',
+                    }} />
+                    <span style={{
+                      fontSize: 12.5, flex: 1,
+                      color: active ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.35)',
+                      fontWeight: active ? 500 : 400,
+                      letterSpacing: '0.01em',
+                      transition: 'color 0.1s',
+                    }}>
+                      {item.label}
+                    </span>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        ))}
       </nav>
 
-      {/* Logout */}
-      <div style={{ padding: '8px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+      {/* User + Logout */}
+      <div style={{ padding: '10px 10px 12px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '6px 10px', marginBottom: 1 }}>
+          <div style={{
+            width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
+            background: 'rgba(197,168,128,0.12)',
+            border: '1px solid rgba(197,168,128,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 10, fontWeight: 600, color: '#C5A880',
+          }}>
+            {user?.full_name?.charAt(0) ?? 'U'}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{
+              fontSize: 12, fontWeight: 500,
+              color: 'rgba(255,255,255,0.7)',
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              lineHeight: 1.3, margin: 0,
+            }}>
+              {user?.full_name}
+            </p>
+            <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', marginTop: 2 }}>
+              {user?.role === 'admin' ? 'Mentor' : 'Mentorado'}
+            </p>
+          </div>
+        </div>
+
         <button
           onClick={() => void logout()}
           style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            padding: '7px 12px', width: '100%',
+            display: 'flex', alignItems: 'center', gap: 9,
+            padding: '6px 10px', width: '100%',
             background: 'none', border: 'none', borderRadius: 4,
-            fontSize: 13, color: 'rgba(255,255,255,0.25)',
+            fontSize: 12, color: 'rgba(255,255,255,0.2)',
             cursor: 'pointer', transition: 'color 0.1s',
           }}
           onMouseEnter={e => (e.currentTarget.style.color = '#EF4444')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.25)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.2)')}
         >
-          <LogOut size={14} />
+          <LogOut size={13} />
           Sair
         </button>
       </div>
