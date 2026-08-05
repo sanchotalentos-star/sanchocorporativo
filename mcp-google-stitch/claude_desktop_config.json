@@ -1,0 +1,23 @@
+{
+  "_comentario": "Cole o bloco 'mcpServers' dentro do seu arquivo claude_desktop_config.json existente.",
+  "_caminhos": {
+    "macOS":   "~/Library/Application Support/Claude/claude_desktop_config.json",
+    "Windows": "%APPDATA%\\Claude\\claude_desktop_config.json",
+    "Linux":   "~/.config/Claude/claude_desktop_config.json"
+  },
+
+  "mcpServers": {
+    "google-stitch": {
+      "command": "node",
+      "args": [
+        "/caminho/absoluto/para/mcp-google-stitch/mcp-server.js"
+      ],
+      "env": {
+        "GCP_PROJECT_ID": "seu-projeto",
+        "GCP_DATASET_ID": "stitch_data",
+        "GOOGLE_APPLICATION_CREDENTIALS": "/caminho/para/sua-service-account-key.json",
+        "STITCH_API_TOKEN": "seu-stitch-api-token-aqui"
+      }
+    }
+  }
+}

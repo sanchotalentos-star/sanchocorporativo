@@ -1,0 +1,22 @@
+{
+  "name": "mcp-google-stitch",
+  "version": "1.0.0",
+  "description": "Servidor MCP para integração do Google Stitch (BigQuery + Stitch ETL) com o Claude",
+  "type": "module",
+  "main": "mcp-server.js",
+  "scripts": {
+    "start": "node mcp-server.js",
+    "dev": "node --watch mcp-server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.0",
+    "@google-cloud/bigquery": "^7.9.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.7.0",
+    "dotenv": "^16.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}
