@@ -1,5 +1,5 @@
 {
-  "projectId": "seu-projeto",
+  "projectId": "sancho-talentos",
   "location": "us-central1",
   "bigquery": {
     "datasetId": "stitch_data",
