@@ -394,9 +394,9 @@ function KrBar({ kr }: { kr: OkrKr }) {
       </div>
       <div className="flex items-center gap-2">
         <div className="flex-1 h-1 bg-gray-100">
-          <div className="h-full bg-[#7B2FBE] transition-all" style={{ width: `${pct}%` }} />
+          <div className="h-full bg-[#C5A880] transition-all" style={{ width: `${pct}%` }} />
         </div>
-        <span className="text-[10px] font-bold text-[#7B2FBE] w-8 text-right tabular-nums">{pct}%</span>
+        <span className="text-[10px] font-bold text-[#C5A880] w-8 text-right tabular-nums">{pct}%</span>
       </div>
     </div>
   )
@@ -704,15 +704,21 @@ function MembrosPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div style={{ maxWidth: 960, padding: '48px 0 80px', display: 'flex', flexDirection: 'column', gap: 0 }}>
 
-      <div>
-        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Programa</p>
-        <h1 className="text-2xl font-black text-gray-900">Mentorados</h1>
-        <p className="text-sm text-gray-500 mt-1">{mockMembers.length} participante{mockMembers.length !== 1 ? 's' : ''} ativo{mockMembers.length !== 1 ? 's' : ''}</p>
+      <div style={{ marginBottom: 40 }}>
+        <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C5A880', marginBottom: 8 }}>
+          Programa
+        </p>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 42, fontWeight: 400, lineHeight: 1.1, color: '#1A1916', margin: 0 }}>
+          Mentorados
+        </h1>
+        <p style={{ fontSize: 14, color: '#6B6560', marginTop: 8 }}>
+          {mockMembers.length} participante{mockMembers.length !== 1 ? 's' : ''} ativo{mockMembers.length !== 1 ? 's' : ''}
+        </p>
       </div>
 
-      <div className="space-y-px bg-gray-200">
+      <div className="space-y-px bg-gray-100">
         {mockMembers.map((member: Member) => {
           const ctrl        = controls[member.id]
           const isOpen      = expanded === member.id
@@ -735,7 +741,7 @@ function MembrosPage() {
                 onClick={() => setExpanded(isOpen ? null : member.id)}
                 className="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50/70 transition-colors text-left"
               >
-                <div className="w-9 h-9 bg-[#7B2FBE] flex items-center justify-center text-white font-black text-sm flex-shrink-0">
+                <div className="w-9 h-9 flex items-center justify-center font-black text-sm flex-shrink-0" style={{ background: '#2A2420', border: '1px solid rgba(197,168,128,0.3)', color: '#C5A880' }}>
                   {member.full_name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -796,7 +802,7 @@ function MembrosPage() {
                             className={cn(
                               'flex items-center gap-1.5 px-4 py-3 text-[11px] font-bold uppercase tracking-wider border-b-2 transition-all',
                               ctrl.activeTab === t.id
-                                ? 'border-[#7B2FBE] text-[#7B2FBE] bg-white'
+                                ? 'border-[#C5A880] text-[#C5A880] bg-white'
                                 : 'border-transparent text-gray-400 hover:text-gray-600'
                             )}
                           >
@@ -806,7 +812,7 @@ function MembrosPage() {
                         ))}
                       </div>
 
-                      <div className="p-5 space-y-5 bg-[#F7F6FA]">
+                      <div className="p-5 space-y-5 bg-[#FAFAF9]">
 
                         {/* ════ VISÃO GERAL ════ */}
                         {ctrl.activeTab === 'overview' && (
@@ -847,13 +853,13 @@ function MembrosPage() {
                                         >
                                           <div className={cn(
                                             'w-8 h-8 flex items-center justify-center text-xs font-black border-2 bg-white transition-all',
-                                            isActive ? 'bg-[#7B2FBE] border-[#7B2FBE] text-white' :
-                                            isPast   ? 'bg-[#7B2FBE]/10 border-[#7B2FBE]/30 text-[#7B2FBE]' :
+                                            isActive ? 'bg-[#C5A880] border-[#C5A880] text-white' :
+                                            isPast   ? 'bg-[#C5A880]/10 border-[#C5A880]/30 text-[#C5A880]' :
                                                        'border-gray-200 text-gray-400'
                                           )}>
                                             {isPast ? <Check size={12} /> : fase.num}
                                           </div>
-                                          <p className={cn('text-[10px] font-bold text-center leading-tight uppercase tracking-wide', isActive ? 'text-[#7B2FBE]' : 'text-gray-400')}>
+                                          <p className={cn('text-[10px] font-bold text-center leading-tight uppercase tracking-wide', isActive ? 'text-[#C5A880]' : 'text-gray-400')}>
                                             {fase.label}
                                           </p>
                                         </button>
@@ -870,7 +876,7 @@ function MembrosPage() {
                               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                                 <SectionLabel>Identidade de Marca</SectionLabel>
                                 <div className="flex items-center gap-2 mb-3">
-                                  <span className="text-[9px] font-bold text-[#7B2FBE] uppercase tracking-wider border border-[#7B2FBE]/30 px-2 py-0.5">{filled}/5 preenchidos</span>
+                                  <span className="text-[9px] font-bold text-[#C5A880] uppercase tracking-wider border border-[#C5A880]/30 px-2 py-0.5">{filled}/5 preenchidos</span>
                                   <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider border border-emerald-200 px-2 py-0.5">{constructed} construídos</span>
                                 </div>
                               </div>
@@ -906,7 +912,7 @@ function MembrosPage() {
                                             <p className="text-xs text-gray-300 italic">Não preenchido ainda</p>
                                           )}
                                           {bs.analise.trim() && (
-                                            <p className="text-[11px] text-[#7B2FBE] italic mt-1 border-t border-[#7B2FBE]/10 pt-1">
+                                            <p className="text-[11px] text-[#C5A880] italic mt-1 border-t border-[#C5A880]/10 pt-1">
                                               Síntese: {bs.analise}
                                             </p>
                                           )}
@@ -920,7 +926,7 @@ function MembrosPage() {
                               <div className="px-4 py-3 border-t border-gray-100">
                                 <button
                                   onClick={() => upd(member.id, { activeTab: 'identidade' })}
-                                  className="text-[10px] font-bold text-[#7B2FBE] uppercase tracking-wider flex items-center gap-1 hover:underline"
+                                  className="text-[10px] font-bold text-[#C5A880] uppercase tracking-wider flex items-center gap-1 hover:underline"
                                 >
                                   Abrir para análise e construção <ChevronRight size={10} />
                                 </button>
@@ -1057,7 +1063,7 @@ function MembrosPage() {
                                                 onChange={e => setEditPilarFieldVal(e.target.value)}
                                                 onBlur={() => { initPilaresCustom(member.id, sugestoes); updPilarField(member.id, s.id, 'nome', editPilarFieldVal); setEditingPilarField(null) }}
                                                 onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') { initPilaresCustom(member.id, sugestoes); updPilarField(member.id, s.id, 'nome', editPilarFieldVal); setEditingPilarField(null) } }}
-                                                className="w-full text-sm font-black text-gray-900 bg-[#7B2FBE]/5 border border-[#7B2FBE]/30 px-2 py-0.5 focus:outline-none"
+                                                className="w-full text-sm font-black text-gray-900 bg-[#C5A880]/5 border border-[#C5A880]/30 px-2 py-0.5 focus:outline-none"
                                               />
                                             ) : (
                                               <p
@@ -1074,7 +1080,7 @@ function MembrosPage() {
                                                 onChange={e => setEditPilarFieldVal(e.target.value)}
                                                 onBlur={() => { initPilaresCustom(member.id, sugestoes); updPilarField(member.id, s.id, 'descricao', editPilarFieldVal); setEditingPilarField(null) }}
                                                 onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') { initPilaresCustom(member.id, sugestoes); updPilarField(member.id, s.id, 'descricao', editPilarFieldVal); setEditingPilarField(null) } }}
-                                                className="w-full text-[11px] text-gray-500 bg-[#7B2FBE]/5 border border-[#7B2FBE]/30 px-2 py-0.5 focus:outline-none"
+                                                className="w-full text-[11px] text-gray-500 bg-[#C5A880]/5 border border-[#C5A880]/30 px-2 py-0.5 focus:outline-none"
                                               />
                                             ) : (
                                               <p
@@ -1101,7 +1107,7 @@ function MembrosPage() {
                                                       onChange={e => setEditAcaoVal(e.target.value)}
                                                       onBlur={() => { initPilaresCustom(member.id, sugestoes); updPilarAcao(member.id, s.id, i, editAcaoVal); setEditingAcao(null) }}
                                                       onKeyDown={e => { if (e.key === 'Escape') { initPilaresCustom(member.id, sugestoes); updPilarAcao(member.id, s.id, i, editAcaoVal); setEditingAcao(null) } }}
-                                                      className="flex-1 text-xs text-gray-700 bg-[#7B2FBE]/5 border border-[#7B2FBE]/30 px-2 py-1 focus:outline-none resize-none"
+                                                      className="flex-1 text-xs text-gray-700 bg-[#C5A880]/5 border border-[#C5A880]/30 px-2 py-1 focus:outline-none resize-none"
                                                     />
                                                     <button onClick={() => { initPilaresCustom(member.id, sugestoes); updPilarAcao(member.id, s.id, i, editAcaoVal); setEditingAcao(null) }} className="p-0.5 text-emerald-500 mt-0.5 flex-shrink-0">
                                                       <Check size={12} />
@@ -1133,7 +1139,7 @@ function MembrosPage() {
                                         <div className="px-4 py-2 border-t border-gray-100">
                                           <button
                                             onClick={() => { initPilaresCustom(member.id, sugestoes); addPilarAcao(member.id, s.id) }}
-                                            className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider hover:text-[#7B2FBE] transition-colors"
+                                            className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider hover:text-[#C5A880] transition-colors"
                                           >
                                             <Plus size={10} /> Adicionar ação
                                           </button>
@@ -1174,7 +1180,7 @@ function MembrosPage() {
                                       onClick={() => toggleConstruido(member.id, bloco.id)}
                                       className={cn(
                                         'flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 transition-all flex-shrink-0',
-                                        bs.construido ? 'bg-[#7B2FBE] text-white' : 'bg-gray-100 text-gray-500 hover:bg-[#7B2FBE]/10 hover:text-[#7B2FBE]'
+                                        bs.construido ? 'bg-[#C5A880] text-white' : 'bg-gray-100 text-gray-500 hover:bg-[#C5A880]/10 hover:text-[#C5A880]'
                                       )}
                                     >
                                       {bs.construido ? <><Check size={10} /> Construído</> : 'Marcar construído'}
@@ -1182,7 +1188,7 @@ function MembrosPage() {
                                   </div>
 
                                   <div className="px-4 py-3 border-b border-gray-100">
-                                    <p className="text-[9px] font-bold text-[#7B2FBE] uppercase tracking-widest mb-2">Resposta do mentorado</p>
+                                    <p className="text-[9px] font-bold text-[#C5A880] uppercase tracking-widest mb-2">Resposta do mentorado</p>
                                     {hasCont ? (
                                       Array.isArray(content) ? (
                                         <div className="space-y-1.5 pl-3 border-l-2 border-gray-100">
@@ -1207,12 +1213,12 @@ function MembrosPage() {
                                       onChange={e => updBloco(member.id, bloco.id, { analise: e.target.value })}
                                       placeholder={bloco.placeholder}
                                       rows={3}
-                                      className="w-full bg-gray-50 border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] resize-none"
+                                      className="w-full bg-gray-50 border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#C5A880] resize-none"
                                     />
                                     {bs.analise.trim() && (
                                       <button
                                         onClick={() => { saveSintese(member.id, bloco.id, bs.analise); toast.success('Síntese salva e visível ao mentorado') }}
-                                        className="text-[10px] font-bold text-[#7B2FBE] uppercase tracking-wider hover:underline mt-1"
+                                        className="text-[10px] font-bold text-[#C5A880] uppercase tracking-wider hover:underline mt-1"
                                       >
                                         Salvar síntese →
                                       </button>
@@ -1245,11 +1251,11 @@ function MembrosPage() {
                             {okrSugestoes.length > 0 && (
                               <div className="bg-white border border-gray-200 overflow-hidden">
                                 <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
-                                  <Sparkles size={12} className="text-[#7B2FBE]" />
+                                  <Sparkles size={12} className="text-[#C5A880]" />
                                   <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest flex-1">
                                     Sugestões de OKR · geradas da identidade do mentorado
                                   </p>
-                                  <span className="text-[9px] font-bold text-[#7B2FBE] border border-[#7B2FBE]/30 px-2 py-0.5">
+                                  <span className="text-[9px] font-bold text-[#C5A880] border border-[#C5A880]/30 px-2 py-0.5">
                                     {okrSugestoes.length} objetivos
                                   </span>
                                 </div>
@@ -1356,7 +1362,7 @@ function MembrosPage() {
                                                       onChange={e => setEditKrDescVal(e.target.value)}
                                                       onBlur={commitKrDescEdit}
                                                       onKeyDown={e => { if (e.key === 'Enter') commitKrDescEdit(); if (e.key === 'Escape') setEditingKrDesc(null) }}
-                                                      className="flex-1 text-xs text-gray-700 bg-[#7B2FBE]/5 border border-[#7B2FBE]/30 px-2 py-1 focus:outline-none"
+                                                      className="flex-1 text-xs text-gray-700 bg-[#C5A880]/5 border border-[#C5A880]/30 px-2 py-1 focus:outline-none"
                                                       placeholder="Descrição do Key Result..."
                                                     />
                                                   ) : (
@@ -1377,7 +1383,7 @@ function MembrosPage() {
                                                           value={editKrVal}
                                                           onChange={e => setEditKrVal(e.target.value)}
                                                           onKeyDown={e => { if (e.key === 'Enter') commitKrEdit(); if (e.key === 'Escape') setEditingKr(null) }}
-                                                          className="w-14 text-right border border-[#7B2FBE] px-1.5 py-0.5 text-[11px] font-bold bg-white text-gray-900 focus:outline-none"
+                                                          className="w-14 text-right border border-[#C5A880] px-1.5 py-0.5 text-[11px] font-bold bg-white text-gray-900 focus:outline-none"
                                                         />
                                                         <button onClick={commitKrEdit} className="p-0.5 text-emerald-500"><Check size={11} /></button>
                                                         <button onClick={() => setEditingKr(null)} className="p-0.5 text-red-400"><X size={11} /></button>
@@ -1385,7 +1391,7 @@ function MembrosPage() {
                                                     ) : (
                                                       <button
                                                         onClick={() => { setEditingKr({ memberId: member.id, okrId: okr.id, krIdx: i }); setEditKrVal(String(kr.atual)) }}
-                                                        className="flex items-center gap-0.5 text-[10px] font-bold text-gray-400 hover:text-[#7B2FBE] tabular-nums"
+                                                        className="flex items-center gap-0.5 text-[10px] font-bold text-gray-400 hover:text-[#C5A880] tabular-nums"
                                                       >
                                                         <span>{kr.atual}/{kr.meta}{kr.unit ? ` ${kr.unit}` : ''}</span>
                                                         <Pencil size={9} className="opacity-0 group-hover:opacity-100 transition-opacity ml-0.5" />
@@ -1402,14 +1408,14 @@ function MembrosPage() {
                                                       type="number"
                                                       value={editKrMetaVal}
                                                       onChange={e => setEditKrMetaVal(e.target.value)}
-                                                      className="w-16 text-xs border border-gray-200 px-1.5 py-0.5 text-gray-800 focus:outline-none focus:border-[#7B2FBE]"
+                                                      className="w-16 text-xs border border-gray-200 px-1.5 py-0.5 text-gray-800 focus:outline-none focus:border-[#C5A880]"
                                                     />
                                                     <input
                                                       value={editKrUnitVal}
                                                       onChange={e => setEditKrUnitVal(e.target.value)}
                                                       onKeyDown={e => { if (e.key === 'Enter') commitKrMetaEdit(); if (e.key === 'Escape') setEditingKrMeta(null) }}
                                                       placeholder="unidade"
-                                                      className="w-20 text-xs border border-gray-200 px-1.5 py-0.5 text-gray-800 focus:outline-none focus:border-[#7B2FBE]"
+                                                      className="w-20 text-xs border border-gray-200 px-1.5 py-0.5 text-gray-800 focus:outline-none focus:border-[#C5A880]"
                                                     />
                                                     <button onClick={commitKrMetaEdit} className="text-emerald-500"><Check size={12} /></button>
                                                     <button onClick={() => setEditingKrMeta(null)} className="text-gray-300"><X size={12} /></button>
@@ -1443,7 +1449,7 @@ function MembrosPage() {
                                           )}
                                           <button
                                             onClick={() => addKrToOkr(member.id, okr.id)}
-                                            className="flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider hover:text-[#7B2FBE] transition-colors"
+                                            className="flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider hover:text-[#C5A880] transition-colors"
                                           >
                                             <Plus size={10} /> Adicionar KR
                                           </button>
@@ -1462,16 +1468,16 @@ function MembrosPage() {
 
                             {/* Header + progresso */}
                             <div className="bg-white border border-gray-200 px-4 py-3 flex items-center gap-3">
-                              <Megaphone size={14} className="text-[#7B2FBE] flex-shrink-0" />
+                              <Megaphone size={14} className="text-[#C5A880] flex-shrink-0" />
                               <div className="flex-1 min-w-0">
                                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Agenda de Marketing Anual</p>
                                 {marketing.length > 0 && (
                                   <div className="flex items-center gap-2">
                                     <div className="flex-1 h-1.5 bg-gray-100">
-                                      <div className="h-full bg-[#7B2FBE] transition-all"
+                                      <div className="h-full bg-[#C5A880] transition-all"
                                         style={{ width: `${Math.round((marketing.filter(a => a.concluida).length / marketing.length) * 100)}%` }} />
                                     </div>
-                                    <span className="text-[10px] font-bold text-[#7B2FBE] tabular-nums flex-shrink-0">
+                                    <span className="text-[10px] font-bold text-[#C5A880] tabular-nums flex-shrink-0">
                                       {marketing.filter(a => a.concluida).length}/{marketing.length} ações
                                     </span>
                                   </div>
@@ -1488,7 +1494,7 @@ function MembrosPage() {
 
                             {/* Add form */}
                             {showAddMkt && (
-                              <div className="bg-white border border-[#7B2FBE]/30 p-4 space-y-3">
+                              <div className="bg-white border border-[#C5A880]/30 p-4 space-y-3">
                                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Nova Ação de Marketing</p>
                                 <input
                                   autoFocus
@@ -1497,7 +1503,7 @@ function MembrosPage() {
                                   onChange={e => setMktNovaForm(f => ({ ...f, titulo: e.target.value }))}
                                   onKeyDown={e => e.key === 'Enter' && addMktAcao(member.id)}
                                   placeholder="Título da ação..."
-                                  className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#7B2FBE]"
+                                  className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C5A880]"
                                 />
                                 <div className="grid grid-cols-3 gap-2">
                                   <div>
@@ -1505,7 +1511,7 @@ function MembrosPage() {
                                     <select
                                       value={mktNovaForm.canal}
                                       onChange={e => setMktNovaForm(f => ({ ...f, canal: e.target.value }))}
-                                      className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:border-[#7B2FBE]"
+                                      className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:border-[#C5A880]"
                                     >
                                       {['LinkedIn','Instagram','YouTube','Podcast','Email','Blog','Live','Evento Próprio','Evento Parceiro'].map(c => <option key={c}>{c}</option>)}
                                     </select>
@@ -1515,7 +1521,7 @@ function MembrosPage() {
                                     <select
                                       value={mktNovaForm.frequencia}
                                       onChange={e => setMktNovaForm(f => ({ ...f, frequencia: e.target.value }))}
-                                      className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:border-[#7B2FBE]"
+                                      className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:border-[#C5A880]"
                                     >
                                       {['Diário','Semanal','Quinzenal','Mensal','Trimestral','Anual'].map(f => <option key={f}>{f}</option>)}
                                     </select>
@@ -1525,7 +1531,7 @@ function MembrosPage() {
                                     <select
                                       value={mktNovaForm.mes}
                                       onChange={e => setMktNovaForm(f => ({ ...f, mes: Number(e.target.value) }))}
-                                      className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:border-[#7B2FBE]"
+                                      className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:border-[#C5A880]"
                                     >
                                       {['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].map((m, i) => <option key={m} value={i+1}>{m}</option>)}
                                     </select>
@@ -1550,13 +1556,13 @@ function MembrosPage() {
                               <div className="flex gap-1 overflow-x-auto pb-1">
                                 <button onClick={() => setMktMesFiltro(null)}
                                   className={cn('flex-shrink-0 text-[10px] font-bold px-2.5 py-1 uppercase tracking-wider transition-colors',
-                                    mktMesFiltro === null ? 'bg-[#7B2FBE] text-white' : 'bg-gray-100 text-gray-400 hover:text-gray-700')}>
+                                    mktMesFiltro === null ? 'bg-[#C5A880] text-white' : 'bg-gray-100 text-gray-400 hover:text-gray-700')}>
                                   Todos
                                 </button>
                                 {['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].map((m, i) => (
                                   <button key={m} onClick={() => setMktMesFiltro(mktMesFiltro === i+1 ? null : i+1)}
                                     className={cn('flex-shrink-0 text-[10px] font-bold px-2.5 py-1 uppercase tracking-wider transition-colors',
-                                      mktMesFiltro === i+1 ? 'bg-[#7B2FBE] text-white' : 'bg-gray-100 text-gray-400 hover:text-gray-700')}>
+                                      mktMesFiltro === i+1 ? 'bg-[#C5A880] text-white' : 'bg-gray-100 text-gray-400 hover:text-gray-700')}>
                                     {m}
                                   </button>
                                 ))}
@@ -1589,7 +1595,7 @@ function MembrosPage() {
                                           {acao.titulo}
                                         </p>
                                         <div className="flex items-center gap-2 mt-0.5">
-                                          <span className="text-[10px] font-bold text-[#7B2FBE] uppercase tracking-wide">{acao.canal}</span>
+                                          <span className="text-[10px] font-bold text-[#C5A880] uppercase tracking-wide">{acao.canal}</span>
                                           <span className="text-[10px] text-gray-300">·</span>
                                           <span className="text-[10px] text-gray-400">{acao.frequencia}</span>
                                           <span className="text-[10px] text-gray-300">·</span>
@@ -1663,7 +1669,7 @@ function MembrosPage() {
                                 </button>
                               </div>
                               {showAddKpi && (
-                                <div className="p-4 border-b border-gray-100 bg-[#7B2FBE]/[0.02] space-y-3">
+                                <div className="p-4 border-b border-gray-100 bg-[#C5A880]/[0.02] space-y-3">
                                   <input
                                     autoFocus
                                     type="text"
@@ -1671,14 +1677,14 @@ function MembrosPage() {
                                     onChange={e => setKpiForm(f => ({ ...f, kpi_name: e.target.value }))}
                                     onKeyDown={e => e.key === 'Enter' && addKpi(member.id)}
                                     placeholder="Nome do indicador..."
-                                    className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#7B2FBE]"
+                                    className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#C5A880]"
                                   />
                                   <div className="grid grid-cols-3 gap-2">
                                     <div>
                                       <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Categoria</p>
                                       <select value={kpiForm.category}
                                         onChange={e => setKpiForm(f => ({ ...f, category: e.target.value as KpiCategory }))}
-                                        className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:border-[#7B2FBE]">
+                                        className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:border-[#C5A880]">
                                         {(['Conteúdo','Conversão','Autoridade','Mídia','Rede','Receita'] as KpiCategory[]).map(c => <option key={c}>{c}</option>)}
                                       </select>
                                     </div>
@@ -1687,14 +1693,14 @@ function MembrosPage() {
                                       <input type="number" value={kpiForm.meta}
                                         onChange={e => setKpiForm(f => ({ ...f, meta: e.target.value }))}
                                         placeholder="Ex: 12"
-                                        className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-[#7B2FBE]" />
+                                        className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-[#C5A880]" />
                                     </div>
                                     <div>
                                       <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Unidade</p>
                                       <input type="text" value={kpiForm.unit}
                                         onChange={e => setKpiForm(f => ({ ...f, unit: e.target.value }))}
                                         placeholder="posts, leads..."
-                                        className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-[#7B2FBE]" />
+                                        className="w-full border border-gray-200 px-2 py-1.5 text-xs text-gray-900 focus:outline-none focus:border-[#C5A880]" />
                                     </div>
                                   </div>
                                   <div className="flex gap-2">
@@ -1771,7 +1777,7 @@ function MembrosPage() {
                                     return (
                                       <div key={sem} className="bg-white border border-gray-200 overflow-hidden">
                                         <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
-                                          <Target size={12} className="text-[#7B2FBE]" />
+                                          <Target size={12} className="text-[#C5A880]" />
                                           <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest flex-1">Semana {sem}: OKRs</p>
                                           <span className="text-[10px] text-gray-400">{semItems.length} ações</span>
                                         </div>
@@ -1807,7 +1813,7 @@ function MembrosPage() {
                                     return (
                                       <div key={mes} className="bg-white border border-gray-200 overflow-hidden">
                                         <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
-                                          <Megaphone size={12} className="text-[#7B2FBE]" />
+                                          <Megaphone size={12} className="text-[#C5A880]" />
                                           <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest flex-1">{mes}: Marketing</p>
                                           <span className="text-[10px] text-gray-400">{mesItems.length} ações</span>
                                         </div>
@@ -1819,7 +1825,7 @@ function MembrosPage() {
                                                 : <Circle       size={13} className="text-gray-300 flex-shrink-0"     />}
                                               <div className="flex-1 min-w-0">
                                                 <p className={cn('text-xs leading-snug', item.status === 'feito' ? 'line-through text-gray-300' : 'text-gray-800')}>{item.titulo}</p>
-                                                {item.canal && <p className="text-[10px] text-[#7B2FBE] mt-0.5 font-bold">{item.canal}</p>}
+                                                {item.canal && <p className="text-[10px] text-[#C5A880] mt-0.5 font-bold">{item.canal}</p>}
                                               </div>
                                               <span className={cn('text-[9px] font-bold px-1.5 py-0.5 flex-shrink-0 uppercase tracking-wide',
                                                 item.status === 'feito' ? 'text-emerald-700 bg-emerald-50' : 'text-gray-500 bg-gray-100')}>
@@ -1845,7 +1851,7 @@ function MembrosPage() {
                             {/* Pauta sugerida */}
                             <div className="bg-white border border-gray-200">
                               <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
-                                <Sparkles size={12} className="text-[#7B2FBE]" />
+                                <Sparkles size={12} className="text-[#C5A880]" />
                                 <SectionLabel>Pauta Sugerida para Próxima Sessão</SectionLabel>
                               </div>
                               <div className="p-4 space-y-2">
@@ -1863,14 +1869,14 @@ function MembrosPage() {
                                   </div>
                                 ))}
                                 {okrs.length > 0 && (
-                                  <div className="flex items-center gap-3 px-3 py-2 border-l-2 border-[#7B2FBE]">
-                                    <Target size={12} className="text-[#7B2FBE] flex-shrink-0" />
+                                  <div className="flex items-center gap-3 px-3 py-2 border-l-2 border-[#C5A880]">
+                                    <Target size={12} className="text-[#C5A880] flex-shrink-0" />
                                     <p className="text-xs text-gray-700">Revisar progresso dos <strong>{okrs.length} OKRs</strong> definidos</p>
                                   </div>
                                 )}
                                 {marketing.length > 0 && (
-                                  <div className="flex items-center gap-3 px-3 py-2 border-l-2 border-[#7B2FBE]">
-                                    <Calendar size={12} className="text-[#7B2FBE] flex-shrink-0" />
+                                  <div className="flex items-center gap-3 px-3 py-2 border-l-2 border-[#C5A880]">
+                                    <Calendar size={12} className="text-[#C5A880] flex-shrink-0" />
                                     <p className="text-xs text-gray-700">Revisar <strong>{marketing.length} ações</strong> do plano de marketing</p>
                                   </div>
                                 )}
@@ -1900,7 +1906,7 @@ function MembrosPage() {
                                   onChange={e => upd(member.id, { sessionNotes: e.target.value })}
                                   placeholder="Anote os principais pontos da sessão de hoje..."
                                   rows={5}
-                                  className="w-full bg-gray-50 border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] resize-none"
+                                  className="w-full bg-gray-50 border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#C5A880] resize-none"
                                 />
                                 <p className="text-[9px] text-gray-400 mt-1">Salvo automaticamente</p>
                               </div>
@@ -1919,7 +1925,7 @@ function MembrosPage() {
                                   <div key={step.id} className="flex items-center gap-3">
                                     <button onClick={() => toggleStep(member.id, step.id)}
                                       className={cn('w-4 h-4 border-2 flex items-center justify-center flex-shrink-0 transition-all',
-                                        step.done ? 'bg-[#7B2FBE] border-[#7B2FBE]' : 'border-gray-300'
+                                        step.done ? 'bg-[#C5A880] border-[#C5A880]' : 'border-gray-300'
                                       )}>
                                       {step.done && <Check size={9} className="text-white" />}
                                     </button>
@@ -1934,10 +1940,10 @@ function MembrosPage() {
                                   onChange={e => upd(member.id, { newStepInput: e.target.value })}
                                   onKeyDown={e => e.key === 'Enter' && addNextStep(member.id)}
                                   placeholder="Adicionar próximo passo..."
-                                  className="flex-1 bg-gray-50 border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#7B2FBE] transition-colors"
+                                  className="flex-1 bg-gray-50 border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#C5A880] transition-colors"
                                 />
                                 <button onClick={() => addNextStep(member.id)}
-                                  className="w-9 h-9 bg-[#7B2FBE] flex items-center justify-center text-white hover:bg-[#6a27a5] transition-colors flex-shrink-0">
+                                  className="w-9 h-9 bg-[#C5A880] flex items-center justify-center text-white hover:bg-[#6a27a5] transition-colors flex-shrink-0">
                                   <Plus size={14} />
                                 </button>
                               </div>
