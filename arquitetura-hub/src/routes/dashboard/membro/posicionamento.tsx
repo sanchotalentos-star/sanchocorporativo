@@ -423,7 +423,7 @@ function PosicionamentoPage() {
   const pct         = Math.round((comReflexao / total) * 100)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, maxWidth: 780, paddingBottom: 80 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0, maxWidth: 780, padding: '48px 0 80px' }}>
 
       {/* ── Heading ── */}
       <div style={{ paddingBottom: 32, display: 'flex', flexDirection: 'column', gap: 12 }}>

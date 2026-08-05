@@ -34,7 +34,7 @@ export function DashboardShell({ children, title }: DashboardShellProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} title={title} />
-        <main className="flex-1 overflow-auto" style={{ backgroundColor: '#F8F7F5' }}>
+        <main className="flex-1 overflow-auto" style={{ backgroundColor: '#F8F7F5', padding: '0 32px' }}>
           {children}
         </main>
       </div>

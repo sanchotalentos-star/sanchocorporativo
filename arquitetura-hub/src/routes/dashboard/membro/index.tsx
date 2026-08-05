@@ -876,7 +876,7 @@ function HomePage() {
   ]
 
   return (
-    <div style={{ maxWidth: 860, padding: '48px 32px 80px', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ maxWidth: 860, padding: '48px 0 80px', display: 'flex', flexDirection: 'column' }}>
 
       {/* ── DATE ── */}
       <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 14px' }}>
