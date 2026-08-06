@@ -25,8 +25,8 @@ interface DashboardData {
 }
 
 export default function DashboardPage() {
-  const [data,      setData]      = useState<DashboardData | null>(null);
-  const [loading,   setLoading]   = useState(true);
+  const [data,        setData]        = useState<DashboardData | null>(null);
+  const [loading,     setLoading]     = useState(true);
   const [stageFilter, setStageFilter] = useState("all");
 
   const fetchData = useCallback(async (filter?: string) => {
@@ -62,82 +62,143 @@ export default function DashboardPage() {
     void fetchData();
   }, [fetchData]);
 
-  // stageFilter state kept for future filter wiring
   void setStageFilter;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "var(--sancho-bg)" }}>
-      {/* Header fixo */}
-      <Header
-        updatedAt={data?.updatedAt ?? null}
-        onRefresh={() => void fetchData(stageFilter)}
-        isLoading={loading}
-      />
+    <>
+      {/* ── Background — dark + pink glow (21st.dev pattern) ── */}
+      <div
+        className="fixed inset-0 -z-10"
+        style={{ backgroundColor: "#080808" }}
+        aria-hidden="true"
+      >
+        {/* Pink radial glow at the top */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(233,30,140,0.18), transparent)",
+          }}
+        />
+        {/* Subtle grid */}
+        <div
+          className="absolute inset-0 opacity-[0.025]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(to right, rgba(255,255,255,1) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+          }}
+        />
+      </div>
 
-      {/* Conteúdo principal */}
-      <main className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-
-        {/* Mock indicator */}
-        {data?.isMock && (
-          <div
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium"
-            style={{ backgroundColor: "var(--sancho-pink-bg)", color: "var(--sancho-pink)" }}
-            role="alert"
-          >
-            <AlertCircle size={15} aria-hidden="true" />
-            Dados de demonstração — conecte ao RD Station CRM configurando{" "}
-            <code className="font-mono text-xs bg-white px-1 rounded">RDCRM_TOKEN</code>
-          </div>
-        )}
-
-        {/* Bloco 1 — KPIs */}
-        <KpiCards data={data?.kpis} isLoading={loading} />
-
-        {/* Bloco 2 + 5 — Metas e Checklist */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <MetasMensais
-            revenue={data?.revenue}
-            events={data?.events}
-            isLoading={loading}
-          />
-          <ChecklistOperacional />
-        </div>
-
-        {/* Bloco 3 + 4 — Pipeline e Evolução Semanal */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <PipelineChart data={data?.pipeline} isLoading={loading} />
-          <EvolucaoSemanal data={data?.weekly} isLoading={loading} />
-        </div>
-
-        {/* Bloco 6 — Tabela de negociações */}
-        <NegociacoesTable
-          data={data?.deals}
-          stages={data?.stages}
+      <div className="min-h-screen">
+        {/* Fixed header */}
+        <Header
+          updatedAt={data?.updatedAt ?? null}
+          onRefresh={() => void fetchData(stageFilter)}
           isLoading={loading}
         />
-      </main>
 
-      {/* Footer */}
-      <footer
-        className="mt-12 py-6 border-t text-center text-xs"
-        style={{ borderColor: "var(--sancho-border)", color: "var(--sancho-gray-mid)" }}
-      >
-        <p>
-          Sancho Gestão de Carreiras — Dashboard Comercial &copy; {new Date().getFullYear()}
-        </p>
-        <p className="mt-1">
-          Dados via{" "}
-          <a
-            href="https://crm.rdstation.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:opacity-80 transition-opacity"
-            style={{ color: "var(--sancho-pink)" }}
-          >
-            RD Station CRM
-          </a>
-        </p>
-      </footer>
-    </div>
+        {/* Main content */}
+        <main className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+
+          {/* Page title */}
+          <div className="flex items-end justify-between flex-wrap gap-3 pt-1">
+            <div>
+              <h1 className="text-lg font-bold" style={{ color: "var(--sancho-black)" }}>
+                Dashboard Comercial
+              </h1>
+              <p className="text-xs mt-0.5" style={{ color: "var(--sancho-gray-mid)" }}>
+                Agosto 2026 · RD Station CRM
+              </p>
+            </div>
+            <div
+              className="flex items-center gap-2 text-xs font-semibold rounded-full px-3 py-1.5 border"
+              style={{
+                color:           "var(--sancho-won)",
+                backgroundColor: "rgba(16,185,129,.08)",
+                borderColor:     "rgba(16,185,129,.2)",
+              }}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full animate-pulse"
+                style={{ backgroundColor: "var(--sancho-won)" }}
+              />
+              Dados ao vivo
+            </div>
+          </div>
+
+          {/* Mock indicator */}
+          {data?.isMock && (
+            <div
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium border"
+              style={{
+                backgroundColor: "rgba(251,191,36,.06)",
+                borderColor:     "rgba(251,191,36,.2)",
+                color:           "#FBBF24",
+              }}
+              role="alert"
+            >
+              <AlertCircle size={14} aria-hidden="true" />
+              Dados de demonstração — conecte ao RD Station CRM configurando{" "}
+              <code
+                className="font-mono text-[10px] px-1 rounded"
+                style={{ backgroundColor: "rgba(255,255,255,.08)" }}
+              >
+                RDCRM_TOKEN
+              </code>
+            </div>
+          )}
+
+          {/* KPI cards */}
+          <KpiCards data={data?.kpis} isLoading={loading} />
+
+          {/* Metas + Checklist */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <MetasMensais
+              revenue={data?.revenue}
+              events={data?.events}
+              isLoading={loading}
+            />
+            <ChecklistOperacional />
+          </div>
+
+          {/* Pipeline + Evolução */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <PipelineChart data={data?.pipeline} isLoading={loading} />
+            <EvolucaoSemanal data={data?.weekly} isLoading={loading} />
+          </div>
+
+          {/* Deals table */}
+          <NegociacoesTable
+            data={data?.deals}
+            stages={data?.stages}
+            isLoading={loading}
+          />
+        </main>
+
+        {/* Footer */}
+        <footer
+          className="mt-12 py-5 border-t text-center text-xs"
+          style={{
+            borderColor: "rgba(255,255,255,.06)",
+            color:       "var(--sancho-gray-mid)",
+          }}
+        >
+          <p>Sancho Gestão de Carreiras — Dashboard Comercial &copy; {new Date().getFullYear()}</p>
+          <p className="mt-1">
+            Dados via{" "}
+            <a
+              href="https://crm.rdstation.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:opacity-80 transition-opacity"
+              style={{ color: "var(--sancho-pink)" }}
+            >
+              RD Station CRM
+            </a>
+          </p>
+        </footer>
+      </div>
+    </>
   );
 }

@@ -2,36 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ──────────────────────────────────────────
-   CSS Variables — Design System Sancho
-─────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────
+   Design System Sancho — Dark Theme
+────────────────────────────────────────────────────────────── */
 :root {
-  /* Cores primárias */
+  /* Brand */
   --sancho-pink:        #E91E8C;
   --sancho-pink-light:  #F472B6;
-  --sancho-pink-bg:     #FDF0F7;
+  --sancho-pink-bg:     rgba(233, 30, 140, 0.10);
+  --sancho-pink-glow:   rgba(233, 30, 140, 0.18);
 
-  /* Neutros */
-  --sancho-black:       #1A1A1A;
-  --sancho-gray-dark:   #4A4A4A;
-  --sancho-gray-mid:    #9CA3AF;
-  --sancho-bg:          #F2F2F2;
-  --sancho-white:       #FFFFFF;
+  /* Surfaces */
+  --sancho-bg:          #080808;
+  --sancho-surface:     rgba(255, 255, 255, 0.035);
+  --sancho-surface-2:   rgba(255, 255, 255, 0.06);
 
-  /* Semânticas */
-  --sancho-won:         #16A34A;
-  --sancho-lost:        #DC2626;
-  --sancho-pending:     #D97706;
-  --sancho-border:      #E5E7EB;
+  /* Text  */
+  --sancho-black:       #F1F5F9;    /* primary text on dark */
+  --sancho-gray-dark:   #CBD5E1;
+  --sancho-gray-mid:    #64748B;
+  --sancho-white:       #080808;    /* repurposed as bg ref */
+
+  /* Borders */
+  --sancho-border:      rgba(255, 255, 255, 0.08);
+  --sancho-border-2:    rgba(255, 255, 255, 0.14);
+
+  /* Semantic */
+  --sancho-won:         #10B981;
+  --sancho-lost:        #F87171;
+  --sancho-pending:     #FBBF24;
+
+  /* Charts */
+  --chart-1: #E91E8C;
+  --chart-2: #10B981;
+  --chart-3: #60A5FA;
+  --chart-4: #FBBF24;
+  --chart-5: #C084FC;
 }
 
-/* ──────────────────────────────────────────
-   Base
-─────────────────────────────────────────── */
-* {
+/* ── Base ───────────────────────────────────────────────────── */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html {
+  color-scheme: dark;
 }
 
 body {
@@ -40,39 +57,29 @@ body {
   font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
 }
 
-/* ──────────────────────────────────────────
-   Utilitários de marca
-─────────────────────────────────────────── */
-
-/* Bolinhas decorativas 2×4 da Sancho */
-.sancho-dots {
-  display: grid;
-  grid-template-columns: repeat(4, 6px);
-  grid-template-rows: repeat(2, 6px);
-  gap: 4px;
-}
-.sancho-dots span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: var(--sancho-pink-light);
-  display: block;
+/* ── Card dark glass ────────────────────────────────────────── */
+.glass-card {
+  background: var(--sancho-surface);
+  border: 1px solid var(--sancho-border);
+  border-radius: 1rem;
+  backdrop-filter: blur(12px);
 }
 
-/* Borda left accent rosa */
+/* ── Left accent ────────────────────────────────────────────── */
 .card-accent-left {
-  border-left: 4px solid var(--sancho-pink);
+  border-left: 3px solid var(--sancho-pink);
 }
 
-/* Shimmer para skeleton */
+/* ── Shimmer (dark) ─────────────────────────────────────────── */
 .shimmer {
   background: linear-gradient(
     90deg,
-    #e8e8e8 25%,
-    #fce8f3 50%,
-    #e8e8e8 75%
+    rgba(255,255,255,.04) 25%,
+    rgba(233,30,140,.10)  50%,
+    rgba(255,255,255,.04) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -83,10 +90,29 @@ body {
   100% { background-position:  200% 0; }
 }
 
-/* ──────────────────────────────────────────
-   Scrollbar custom
-─────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #f1f1f1; }
-::-webkit-scrollbar-thumb { background: var(--sancho-pink-light); border-radius: 3px; }
+/* ── Sancho dots ────────────────────────────────────────────── */
+.sancho-dots {
+  display: grid;
+  grid-template-columns: repeat(4, 5px);
+  grid-template-rows: repeat(2, 5px);
+  gap: 3px;
+}
+.sancho-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--sancho-pink-light);
+  display: block;
+  opacity: 0.5;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,.03); }
+::-webkit-scrollbar-thumb { background: rgba(233,30,140,.3); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--sancho-pink); }
+
+/* ── Select dark ────────────────────────────────────────────── */
+select {
+  color-scheme: dark;
+}

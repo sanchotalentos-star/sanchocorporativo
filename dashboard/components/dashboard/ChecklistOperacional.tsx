@@ -18,103 +18,103 @@ const items: ChecklistItem[] = [
     label: "Prospecções",
     meta:  METAS_MENSAIS.operacional.prospeccoesporDia,
     unit:  "por dia",
-    icon:  <Search size={16} aria-hidden="true" />,
+    icon:  <Search size={15} aria-hidden="true" />,
   },
   {
     label: "Contatos WhatsApp / E-mail",
     meta:  METAS_MENSAIS.operacional.contatosDiarios,
     unit:  "por dia",
-    icon:  <MessageSquare size={16} aria-hidden="true" />,
+    icon:  <MessageSquare size={15} aria-hidden="true" />,
   },
   {
     label: "Agendamentos",
     meta:  METAS_MENSAIS.operacional.agendamentosPorSemana,
     unit:  "por semana",
-    icon:  <CalendarCheck size={16} aria-hidden="true" />,
+    icon:  <CalendarCheck size={15} aria-hidden="true" />,
   },
   {
     label: "Fechamentos",
     meta:  METAS_MENSAIS.operacional.fechamentosPorSemana,
     unit:  "por semana",
-    icon:  <Handshake size={16} aria-hidden="true" />,
+    icon:  <Handshake size={15} aria-hidden="true" />,
   },
   {
     label: "Reuniões Comerciais",
     meta:  METAS_MENSAIS.operacional.reunioesComercaisPorSemana,
     unit:  "por semana",
-    icon:  <Users size={16} aria-hidden="true" />,
+    icon:  <Users size={15} aria-hidden="true" />,
   },
   {
     label: "Propostas Fechadas",
     meta:  METAS_MENSAIS.operacional.propostasFechadasPorSemana,
     unit:  "por semana",
-    icon:  <FileCheck size={16} aria-hidden="true" />,
+    icon:  <FileCheck size={15} aria-hidden="true" />,
   },
   {
     label: "Novos Clientes",
     meta:  METAS_MENSAIS.operacional.novosClientesPorMes,
     unit:  "por mês",
-    icon:  <UserPlus size={16} aria-hidden="true" />,
+    icon:  <UserPlus size={15} aria-hidden="true" />,
   },
 ];
 
 export function ChecklistOperacional() {
   return (
     <section
-      className="bg-white rounded-2xl p-5 shadow-card"
+      className="rounded-2xl p-5"
+      style={{
+        background: "rgba(255,255,255,0.03)",
+        border:     "1px solid rgba(255,255,255,0.07)",
+      }}
       aria-labelledby="checklist-heading"
     >
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-5">
-        <span
-          className="text-xs font-bold uppercase px-3 py-1 rounded-full text-white"
-          style={{ backgroundColor: "var(--sancho-pink)" }}
-        >
-          Eixo 1 — Operacional
-        </span>
+      <div className="mb-5">
         <h2
           id="checklist-heading"
-          className="text-base font-bold"
+          className="text-sm font-semibold"
           style={{ color: "var(--sancho-black)" }}
         >
-          Cadência Diária
+          Cadência Operacional
         </h2>
+        <p className="text-xs mt-0.5" style={{ color: "var(--sancho-gray-mid)" }}>
+          Eixo 1 do Playbook — metas de rotina
+        </p>
       </div>
 
-      {/* Grid */}
-      <ul
-        className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-        role="list"
-      >
+      <ul className="flex flex-col gap-1" role="list">
         {items.map((item) => (
           <li
             key={item.label}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors"
-            style={{ borderColor: "var(--sancho-border)" }}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
+            style={{ borderBottom: "1px solid rgba(255,255,255,.05)" }}
           >
+            {/* Icon */}
             <span
-              className="flex-shrink-0 p-2 rounded-lg"
-              style={{ backgroundColor: "var(--sancho-pink-bg)" }}
+              className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{
+                backgroundColor: "rgba(233,30,140,.10)",
+                color:           "var(--sancho-pink)",
+              }}
             >
-              <span style={{ color: "var(--sancho-pink)" }}>
-                {item.icon}
-              </span>
+              {item.icon}
             </span>
 
-            <div className="min-w-0">
+            {/* Label */}
+            <div className="min-w-0 flex-1">
               <p
-                className="text-sm font-medium leading-tight truncate"
+                className="text-xs font-medium leading-tight truncate"
                 style={{ color: "var(--sancho-gray-dark)" }}
               >
                 {item.label}
               </p>
-              <p className="text-xs mt-0.5" style={{ color: "var(--sancho-gray-mid)" }}>
+              <p className="text-[10px] mt-0.5" style={{ color: "var(--sancho-gray-mid)" }}>
                 {item.unit}
               </p>
             </div>
 
+            {/* Target number */}
             <span
-              className="ml-auto text-2xl font-extrabold flex-shrink-0"
+              className="ml-auto text-2xl font-black flex-shrink-0 tabular-nums"
               style={{ color: "var(--sancho-pink)" }}
               aria-label={`Meta: ${item.meta} ${item.unit}`}
             >

@@ -4,10 +4,10 @@ import { TrendingUp, CheckCircle, XCircle, Target } from "lucide-react";
 import type { KpiData } from "@/lib/dashboard";
 
 interface KpiCardProps {
-  label:    string;
-  value:    string;
-  icon:     React.ReactNode;
-  color:    string;
+  label:     string;
+  value:     string;
+  icon:      React.ReactNode;
+  color:     string;
   subtitle?: string;
   isLoading?: boolean;
 }
@@ -15,7 +15,12 @@ interface KpiCardProps {
 function KpiCard({ label, value, icon, color, subtitle, isLoading }: KpiCardProps) {
   return (
     <div
-      className="bg-white rounded-2xl p-5 card-accent-left flex flex-col gap-3 shadow-card"
+      className="rounded-2xl p-5 flex flex-col gap-3"
+      style={{
+        background:   "rgba(255,255,255,0.03)",
+        border:       "1px solid rgba(255,255,255,0.07)",
+        borderLeft:   `3px solid ${color}`,
+      }}
       role="region"
       aria-label={label}
     >
@@ -28,8 +33,8 @@ function KpiCard({ label, value, icon, color, subtitle, isLoading }: KpiCardProp
         <>
           <div className="flex items-center justify-between">
             <span
-              className="text-sm font-medium"
-              style={{ color: "var(--sancho-gray-dark)" }}
+              className="text-xs font-semibold uppercase tracking-wider"
+              style={{ color: "var(--sancho-gray-mid)" }}
             >
               {label}
             </span>
@@ -44,14 +49,14 @@ function KpiCard({ label, value, icon, color, subtitle, isLoading }: KpiCardProp
 
           <div>
             <span
-              className="text-3xl sm:text-4xl font-extrabold block"
+              className="text-4xl font-black block leading-none tracking-tight"
               style={{ color }}
             >
               {value}
             </span>
             {subtitle && (
               <span
-                className="text-xs mt-1 block"
+                className="text-xs mt-1.5 block"
                 style={{ color: "var(--sancho-gray-mid)" }}
               >
                 {subtitle}
@@ -76,13 +81,7 @@ export function KpiCards({ data, isLoading = false }: KpiCardsProps) {
 
   return (
     <section aria-labelledby="kpi-heading">
-      <h2
-        id="kpi-heading"
-        className="text-lg font-bold mb-4 sr-only"
-      >
-        KPIs do mês
-      </h2>
-
+      <h2 id="kpi-heading" className="sr-only">KPIs do mês</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <KpiCard
           label="Negócios Abertos"

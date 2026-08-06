@@ -8,24 +8,22 @@ import type { DealRow } from "@/lib/dashboard";
 type SortKey   = keyof Pick<DealRow, "name" | "stage" | "value" | "daysOpen">;
 type SortOrder = "asc" | "desc";
 
-interface StageBadgeProps { stage: string }
-
-const STAGE_COLORS: Record<string, string> = {
-  "Abordado":          "#9CA3AF",
-  "Respondeu":         "#60A5FA",
-  "Em conversa":       "#D97706",
-  "Proposta enviada":  "#7C3AED",
-  "Fechado":           "#16A34A",
-  "Pós-evento":        "#0EA5E9",
-  "Reativação":        "#E91E8C",
+const STAGE_STYLES: Record<string, { color: string; bg: string }> = {
+  "Abordado":          { color: "#94A3B8", bg: "rgba(148,163,184,.12)" },
+  "Respondeu":         { color: "#60A5FA", bg: "rgba(96,165,250,.12)"  },
+  "Em conversa":       { color: "#FBBF24", bg: "rgba(251,191,36,.10)"  },
+  "Proposta enviada":  { color: "#C084FC", bg: "rgba(192,132,252,.12)" },
+  "Fechado":           { color: "#10B981", bg: "rgba(16,185,129,.12)"  },
+  "Pós-evento":        { color: "#38BDF8", bg: "rgba(56,189,248,.10)"  },
+  "Reativação":        { color: "#E91E8C", bg: "rgba(233,30,140,.12)"  },
 };
 
-function StageBadge({ stage }: StageBadgeProps) {
-  const color = STAGE_COLORS[stage] ?? "var(--sancho-gray-mid)";
+function StageBadge({ stage }: { stage: string }) {
+  const s = STAGE_STYLES[stage] ?? { color: "#94A3B8", bg: "rgba(148,163,184,.12)" };
   return (
     <span
-      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium text-white"
-      style={{ backgroundColor: color }}
+      className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold"
+      style={{ color: s.color, backgroundColor: s.bg }}
     >
       {stage}
     </span>
@@ -39,8 +37,8 @@ interface NegociacoesTableProps {
 }
 
 export function NegociacoesTable({ data = [], stages = [], isLoading = false }: NegociacoesTableProps) {
-  const [sortKey,    setSortKey]    = useState<SortKey>("daysOpen");
-  const [sortOrder,  setSortOrder]  = useState<SortOrder>("desc");
+  const [sortKey,     setSortKey]     = useState<SortKey>("daysOpen");
+  const [sortOrder,   setSortOrder]   = useState<SortOrder>("desc");
   const [stageFilter, setStageFilter] = useState<string>("all");
 
   const handleSort = (key: SortKey) => {
@@ -74,39 +72,43 @@ export function NegociacoesTable({ data = [], stages = [], isLoading = false }: 
 
   return (
     <section
-      className="bg-white rounded-2xl p-5 shadow-card"
+      className="rounded-2xl p-5"
+      style={{
+        background: "rgba(255,255,255,0.03)",
+        border:     "1px solid rgba(255,255,255,0.07)",
+      }}
       aria-labelledby="negociacoes-heading"
     >
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-        <div className="flex items-center gap-3">
-          <span
-            className="text-xs font-bold uppercase px-3 py-1 rounded-full text-white"
-            style={{ backgroundColor: "var(--sancho-pink)" }}
-          >
-            Pipeline Ativo
-          </span>
+        <div>
           <h2
             id="negociacoes-heading"
-            className="text-base font-bold"
+            className="text-sm font-semibold"
             style={{ color: "var(--sancho-black)" }}
           >
             Negociações em Andamento
           </h2>
+          <p className="text-xs mt-0.5" style={{ color: "var(--sancho-gray-mid)" }}>
+            {sorted.length} negócios ativos no funil
+          </p>
         </div>
 
-        {/* Filtro de etapa */}
         {stages.length > 0 && (
-          <label className="flex items-center gap-2 text-sm" style={{ color: "var(--sancho-gray-dark)" }}>
-            <Filter size={14} aria-hidden="true" />
+          <label
+            className="flex items-center gap-2 text-xs"
+            style={{ color: "var(--sancho-gray-mid)" }}
+          >
+            <Filter size={13} aria-hidden="true" />
             <span className="sr-only">Filtrar por etapa</span>
             <select
               value={stageFilter}
               onChange={(e) => setStageFilter(e.target.value)}
-              className="border rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2"
+              className="rounded-lg px-2 py-1 text-xs focus:outline-none focus-visible:ring-1 focus-visible:ring-pink-500"
               style={{
-                borderColor: "var(--sancho-border)",
-                color:       "var(--sancho-gray-dark)",
+                backgroundColor: "rgba(255,255,255,.06)",
+                border:          "1px solid rgba(255,255,255,.10)",
+                color:           "var(--sancho-gray-dark)",
               }}
               aria-label="Filtrar por etapa do funil"
             >
@@ -132,21 +134,24 @@ export function NegociacoesTable({ data = [], stages = [], isLoading = false }: 
         </p>
       ) : (
         <div className="overflow-x-auto -mx-5 px-5">
-          <table className="w-full min-w-[640px] text-sm" aria-label="Tabela de negociações ativas">
+          <table
+            className="w-full min-w-[640px] text-sm"
+            aria-label="Tabela de negociações ativas"
+          >
             <thead>
-              <tr style={{ borderBottom: `2px solid var(--sancho-border)` }}>
+              <tr style={{ borderBottom: "1px solid rgba(255,255,255,.08)" }}>
                 {[
-                  { key: "name"     as SortKey, label: "Negócio"     },
-                  { key: null,                  label: "Contato"      },
-                  { key: "stage"    as SortKey, label: "Etapa"        },
-                  { key: "value"    as SortKey, label: "Valor"        },
-                  { key: null,                  label: "Criado em"    },
-                  { key: "daysOpen" as SortKey, label: "Dias aberto"  },
+                  { key: "name"     as SortKey, label: "Negócio"    },
+                  { key: null,                  label: "Contato"     },
+                  { key: "stage"    as SortKey, label: "Etapa"       },
+                  { key: "value"    as SortKey, label: "Valor"       },
+                  { key: null,                  label: "Criado em"   },
+                  { key: "daysOpen" as SortKey, label: "Dias aberto" },
                 ].map(({ key, label }) => (
                   <th
                     key={label}
-                    className="text-left py-2 pr-4 font-semibold whitespace-nowrap"
-                    style={{ color: "var(--sancho-gray-dark)" }}
+                    className="text-left py-2 pr-4 text-[10.5px] font-bold uppercase tracking-wider whitespace-nowrap"
+                    style={{ color: "var(--sancho-gray-mid)" }}
                   >
                     {key ? (
                       <button
@@ -166,38 +171,54 @@ export function NegociacoesTable({ data = [], stages = [], isLoading = false }: 
               {sorted.map((row) => (
                 <tr
                   key={row.id}
-                  className="border-b transition-colors hover:bg-gray-50"
+                  className="border-b transition-colors"
                   style={{
-                    borderColor:     "var(--sancho-border)",
-                    backgroundColor: row.isStale ? "#FEF2F2" : undefined,
+                    borderColor:     "rgba(255,255,255,.05)",
+                    backgroundColor: row.isStale
+                      ? "rgba(248,113,113,.04)"
+                      : undefined,
                   }}
                 >
-                  <td className="py-3 pr-4 font-medium max-w-[200px] truncate" style={{ color: "var(--sancho-black)" }}>
+                  <td
+                    className="py-3 pr-4 font-semibold max-w-[200px] truncate"
+                    style={{ color: "var(--sancho-black)" }}
+                  >
                     {row.name}
                   </td>
-                  <td className="py-3 pr-4 max-w-[140px] truncate" style={{ color: "var(--sancho-gray-dark)" }}>
+                  <td
+                    className="py-3 pr-4 max-w-[140px] truncate text-xs"
+                    style={{ color: "var(--sancho-gray-mid)" }}
+                  >
                     {row.contact}
                   </td>
                   <td className="py-3 pr-4">
                     <StageBadge stage={row.stage} />
                   </td>
-                  <td className="py-3 pr-4 font-semibold whitespace-nowrap" style={{ color: "var(--sancho-black)" }}>
+                  <td
+                    className="py-3 pr-4 font-semibold whitespace-nowrap tabular-nums"
+                    style={{ color: "var(--sancho-black)" }}
+                  >
                     {row.value > 0 ? formatBRL(row.value) : "—"}
                   </td>
-                  <td className="py-3 pr-4 whitespace-nowrap" style={{ color: "var(--sancho-gray-mid)" }}>
+                  <td
+                    className="py-3 pr-4 whitespace-nowrap text-xs"
+                    style={{ color: "var(--sancho-gray-mid)" }}
+                  >
                     {formatDate(row.createdAt)}
                   </td>
                   <td className="py-3">
                     <span
-                      className="font-bold"
-                      style={{ color: row.isStale ? "var(--sancho-lost)" : "var(--sancho-gray-dark)" }}
+                      className="font-bold text-xs"
+                      style={{
+                        color: row.isStale
+                          ? "var(--sancho-lost)"
+                          : "var(--sancho-gray-mid)",
+                      }}
                       title={row.isStale ? "Mais de 15 dias sem movimento" : undefined}
                     >
                       {row.daysOpen}d
                       {row.isStale && (
-                        <span className="ml-1 text-xs" aria-label="Alerta: mais de 15 dias sem movimento">
-                          ⚠️
-                        </span>
+                        <span className="ml-1 text-[10px]" aria-label="Alerta">↑</span>
                       )}
                     </span>
                   </td>
@@ -208,10 +229,9 @@ export function NegociacoesTable({ data = [], stages = [], isLoading = false }: 
         </div>
       )}
 
-      {/* Legenda stale */}
       {!isLoading && sorted.some((r) => r.isStale) && (
         <p className="mt-3 text-xs" style={{ color: "var(--sancho-lost)" }}>
-          ⚠️ Linhas em vermelho = mais de 15 dias sem movimento
+          ↑ Linhas com fundo: mais de 15 dias sem movimento
         </p>
       )}
     </section>
