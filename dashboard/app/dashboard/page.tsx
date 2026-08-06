@@ -12,6 +12,22 @@ import { EvolucaoSemanal }      from "@/components/dashboard/EvolucaoSemanal";
 import { NegociacoesTable }     from "@/components/dashboard/NegociacoesTable";
 import type { KpiData, StageCount, WeeklyPoint, DealRow, RevenueByArea, EventsByArea } from "@/lib/dashboard";
 
+interface DbMetas {
+  palestras_eventos?:      number;
+  palestras_valor?:        number;
+  apresentacoes_eventos?:  number;
+  apresentacoes_valor?:    number;
+  publicidades_contratos?: number;
+  publicidades_valor?:     number;
+  prospeccoes_dia?:        number;
+  contatos_dia?:           number;
+  agendamentos_semana?:    number;
+  fechamentos_semana?:     number;
+  reunioes_semana?:        number;
+  propostas_semana?:       number;
+  novos_clientes_mes?:     number;
+}
+
 interface DashboardData {
   kpis:       KpiData;
   pipeline:   StageCount[];
@@ -24,10 +40,37 @@ interface DashboardData {
   isMock?:    boolean;
 }
 
+// Builds "2026-08" for the current month
+function currentMonthKey() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
+// Builds "Agosto 2026" for the current month
+function currentMonthLabel() {
+  return new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+    .replace(/^\w/, (c) => c.toUpperCase());
+}
+
 export default function DashboardPage() {
   const [data,        setData]        = useState<DashboardData | null>(null);
   const [loading,     setLoading]     = useState(true);
   const [stageFilter, setStageFilter] = useState("all");
+  const [logoUrl,     setLogoUrl]     = useState<string | null>(null);
+  const [dbMetas,     setDbMetas]     = useState<DbMetas | null>(null);
+
+  // Load config (logo) and metas once on mount — these change rarely
+  useEffect(() => {
+    void fetch("/api/config")
+      .then((r) => r.json())
+      .then((d: { logo_url?: string | null }) => { if (d.logo_url) setLogoUrl(d.logo_url); })
+      .catch(() => null);
+
+    void fetch(`/api/metas/${currentMonthKey()}`)
+      .then((r) => r.json())
+      .then((d: DbMetas) => { setDbMetas(d); })
+      .catch(() => null);
+  }, []);
 
   const fetchData = useCallback(async (filter?: string) => {
     setLoading(true);
@@ -96,6 +139,7 @@ export default function DashboardPage() {
           updatedAt={data?.updatedAt ?? null}
           onRefresh={() => void fetchData(stageFilter)}
           isLoading={loading}
+          logoUrl={logoUrl}
         />
 
         {/* Main content */}
@@ -108,7 +152,7 @@ export default function DashboardPage() {
                 Dashboard Comercial
               </h1>
               <p className="text-xs mt-0.5" style={{ color: "var(--sancho-gray-mid)" }}>
-                Agosto 2026 · RD Station CRM
+                {currentMonthLabel()} · RD Station CRM
               </p>
             </div>
             <div
@@ -157,9 +201,11 @@ export default function DashboardPage() {
             <MetasMensais
               revenue={data?.revenue}
               events={data?.events}
+              dbMetas={dbMetas ?? undefined}
+              mesLabel={currentMonthLabel()}
               isLoading={loading}
             />
-            <ChecklistOperacional />
+            <ChecklistOperacional metas={dbMetas ?? undefined} />
           </div>
 
           {/* Pipeline + Evolução */}

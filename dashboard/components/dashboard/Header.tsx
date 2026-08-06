@@ -49,9 +49,10 @@ interface HeaderProps {
   updatedAt:  string | null;
   onRefresh:  () => void;
   isLoading?: boolean;
+  logoUrl?:   string | null;
 }
 
-export function Header({ updatedAt, onRefresh, isLoading = false }: HeaderProps) {
+export function Header({ updatedAt, onRefresh, isLoading = false, logoUrl }: HeaderProps) {
   const timestamp = updatedAt
     ? formatUpdateTimestamp(new Date(updatedAt))
     : "Carregando...";
@@ -67,8 +68,16 @@ export function Header({ updatedAt, onRefresh, isLoading = false }: HeaderProps)
       }}
     >
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
-        {/* Logo */}
-        <SanchoWordmark />
+        {/* Logo — usa imagem do banco se disponível, senão mostra wordmark */}
+        {logoUrl ? (
+          <img
+            src={logoUrl}
+            alt="Sancho Gestão de Carreira"
+            className="h-10 w-auto object-contain"
+          />
+        ) : (
+          <SanchoWordmark />
+        )}
 
         {/* Nav (desktop) */}
         <nav className="hidden md:flex items-center gap-1" aria-label="Navegação">

@@ -106,20 +106,51 @@ function ProgressRow({
   );
 }
 
+/** Subset of metas_mensais columns relevant to this component (comes from /api/metas/[mes]) */
+interface DbMetas {
+  palestras_eventos?:      number;
+  palestras_valor?:        number;
+  apresentacoes_eventos?:  number;
+  apresentacoes_valor?:    number;
+  publicidades_contratos?: number;
+  publicidades_valor?:     number;
+}
+
 interface MetasMensaisProps {
   revenue?:   RevenueByArea;
   events?:    EventsByArea;
+  dbMetas?:   DbMetas;
+  mesLabel?:  string;
   isLoading?: boolean;
 }
 
-export function MetasMensais({ revenue, events, isLoading = false }: MetasMensaisProps) {
+export function MetasMensais({
+  revenue, events, dbMetas, mesLabel, isLoading = false,
+}: MetasMensaisProps) {
+  // Merge DB values with static fallbacks
+  const palestrasEventosMeta   = dbMetas?.palestras_eventos      ?? METAS_MENSAIS.palestras.metaEventos;
+  const palestrasValorMeta     = dbMetas?.palestras_valor         ?? METAS_MENSAIS.palestras.faturamentoEsperado;
+  const apresentacoesEventosMeta = dbMetas?.apresentacoes_eventos ?? METAS_MENSAIS.apresentacoes.metaEventos;
+  const apresentacoesValorMeta = dbMetas?.apresentacoes_valor     ?? METAS_MENSAIS.apresentacoes.faturamentoEsperado;
+  const publicidadesContratosMeta = dbMetas?.publicidades_contratos ?? METAS_MENSAIS.publicidades.metaContratos;
+  const publicidadesValorMeta  = dbMetas?.publicidades_valor      ?? METAS_MENSAIS.publicidades.faturamentoEsperado;
+
+  const totalMetaVal = palestrasValorMeta + apresentacoesValorMeta + publicidadesValorMeta;
+
   const totalRevenue = revenue
     ? revenue.palestras + revenue.apresentacoes + revenue.publicidades
     : 0;
 
-  const pctTotal = METAS_MENSAIS.total.faturamentoMeta > 0
-    ? Math.min((totalRevenue / METAS_MENSAIS.total.faturamentoMeta) * 100, 100)
+  const pctTotal = totalMetaVal > 0
+    ? Math.min((totalRevenue / totalMetaVal) * 100, 100)
     : 0;
+
+  // Build a label like "Agosto 2026" from "2026-08"
+  const currentLabel = mesLabel ?? (() => {
+    const now = new Date();
+    return now.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+      .replace(/^\w/, (c) => c.toUpperCase());
+  })();
 
   return (
     <section
@@ -139,7 +170,7 @@ export function MetasMensais({ revenue, events, isLoading = false }: MetasMensai
           Metas Mensais
         </h2>
         <p className="text-xs mt-0.5" style={{ color: "var(--sancho-gray-mid)" }}>
-          Agosto 2026 — meta total: {formatBRL(METAS_MENSAIS.total.faturamentoMeta)}
+          {currentLabel} — meta total: {formatBRL(totalMetaVal)}
         </p>
       </div>
 
@@ -147,30 +178,30 @@ export function MetasMensais({ revenue, events, isLoading = false }: MetasMensai
         <ProgressRow
           label="Palestras"
           current={events?.palestras ?? 0}
-          meta={METAS_MENSAIS.palestras.metaEventos}
+          meta={palestrasEventosMeta}
           label2="Eventos"
           currentVal={revenue?.palestras ?? 0}
-          metaVal={METAS_MENSAIS.palestras.faturamentoEsperado}
+          metaVal={palestrasValorMeta}
           color={AREA_COLORS[0]}
           isLoading={isLoading}
         />
         <ProgressRow
           label="Apresentações"
           current={events?.apresentacoes ?? 0}
-          meta={METAS_MENSAIS.apresentacoes.metaEventos}
+          meta={apresentacoesEventosMeta}
           label2="Eventos"
           currentVal={revenue?.apresentacoes ?? 0}
-          metaVal={METAS_MENSAIS.apresentacoes.faturamentoEsperado}
+          metaVal={apresentacoesValorMeta}
           color={AREA_COLORS[1]}
           isLoading={isLoading}
         />
         <ProgressRow
           label="Publicidades"
           current={events?.publicidades ?? 0}
-          meta={METAS_MENSAIS.publicidades.metaContratos}
+          meta={publicidadesContratosMeta}
           label2="Contratos"
           currentVal={revenue?.publicidades ?? 0}
-          metaVal={METAS_MENSAIS.publicidades.faturamentoEsperado}
+          metaVal={publicidadesValorMeta}
           color={AREA_COLORS[2]}
           isLoading={isLoading}
         />
@@ -187,7 +218,7 @@ export function MetasMensais({ revenue, events, isLoading = false }: MetasMensai
               Total Mensal
             </span>
             <span className="text-xs" style={{ color: "var(--sancho-gray-mid)" }}>
-              Meta: {formatBRL(METAS_MENSAIS.total.faturamentoMeta)}
+              Meta: {formatBRL(totalMetaVal)}
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -197,7 +228,7 @@ export function MetasMensais({ revenue, events, isLoading = false }: MetasMensai
               role="progressbar"
               aria-valuenow={totalRevenue}
               aria-valuemin={0}
-              aria-valuemax={METAS_MENSAIS.total.faturamentoMeta}
+              aria-valuemax={totalMetaVal}
             >
               <div
                 className="h-full rounded-full transition-all duration-700"
@@ -218,7 +249,7 @@ export function MetasMensais({ revenue, events, isLoading = false }: MetasMensai
           <p className="text-xs mt-1.5" style={{ color: "var(--sancho-gray-mid)" }}>
             <strong style={{ color: "var(--sancho-pink)" }}>{formatBRL(totalRevenue)}</strong>
             {" de "}
-            {formatBRL(METAS_MENSAIS.total.faturamentoMeta)}
+            {formatBRL(totalMetaVal)}
           </p>
         </div>
       )}

@@ -6,59 +6,71 @@ import {
 } from "lucide-react";
 import { METAS_MENSAIS } from "@/config/metas";
 
-interface ChecklistItem {
-  label:  string;
-  meta:   number;
-  unit:   string;
-  icon:   React.ReactNode;
+interface CadenciaMetas {
+  prospeccoes_dia?:     number;
+  contatos_dia?:        number;
+  agendamentos_semana?: number;
+  fechamentos_semana?:  number;
+  reunioes_semana?:     number;
+  propostas_semana?:    number;
+  novos_clientes_mes?:  number;
 }
 
-const items: ChecklistItem[] = [
-  {
-    label: "Prospecções",
-    meta:  METAS_MENSAIS.operacional.prospeccoesporDia,
-    unit:  "por dia",
-    icon:  <Search size={15} aria-hidden="true" />,
-  },
-  {
-    label: "Contatos WhatsApp / E-mail",
-    meta:  METAS_MENSAIS.operacional.contatosDiarios,
-    unit:  "por dia",
-    icon:  <MessageSquare size={15} aria-hidden="true" />,
-  },
-  {
-    label: "Agendamentos",
-    meta:  METAS_MENSAIS.operacional.agendamentosPorSemana,
-    unit:  "por semana",
-    icon:  <CalendarCheck size={15} aria-hidden="true" />,
-  },
-  {
-    label: "Fechamentos",
-    meta:  METAS_MENSAIS.operacional.fechamentosPorSemana,
-    unit:  "por semana",
-    icon:  <Handshake size={15} aria-hidden="true" />,
-  },
-  {
-    label: "Reuniões Comerciais",
-    meta:  METAS_MENSAIS.operacional.reunioesComercaisPorSemana,
-    unit:  "por semana",
-    icon:  <Users size={15} aria-hidden="true" />,
-  },
-  {
-    label: "Propostas Fechadas",
-    meta:  METAS_MENSAIS.operacional.propostasFechadasPorSemana,
-    unit:  "por semana",
-    icon:  <FileCheck size={15} aria-hidden="true" />,
-  },
-  {
-    label: "Novos Clientes",
-    meta:  METAS_MENSAIS.operacional.novosClientesPorMes,
-    unit:  "por mês",
-    icon:  <UserPlus size={15} aria-hidden="true" />,
-  },
-];
+interface ChecklistOperacionalProps {
+  metas?: CadenciaMetas;
+}
 
-export function ChecklistOperacional() {
+function buildItems(metas?: CadenciaMetas) {
+  const m = metas ?? {};
+  return [
+    {
+      label: "Prospecções",
+      meta:  m.prospeccoes_dia     ?? METAS_MENSAIS.operacional.prospeccoesporDia,
+      unit:  "por dia",
+      icon:  <Search size={15} aria-hidden="true" />,
+    },
+    {
+      label: "Contatos WhatsApp / E-mail",
+      meta:  m.contatos_dia        ?? METAS_MENSAIS.operacional.contatosDiarios,
+      unit:  "por dia",
+      icon:  <MessageSquare size={15} aria-hidden="true" />,
+    },
+    {
+      label: "Agendamentos",
+      meta:  m.agendamentos_semana ?? METAS_MENSAIS.operacional.agendamentosPorSemana,
+      unit:  "por semana",
+      icon:  <CalendarCheck size={15} aria-hidden="true" />,
+    },
+    {
+      label: "Fechamentos",
+      meta:  m.fechamentos_semana  ?? METAS_MENSAIS.operacional.fechamentosPorSemana,
+      unit:  "por semana",
+      icon:  <Handshake size={15} aria-hidden="true" />,
+    },
+    {
+      label: "Reuniões Comerciais",
+      meta:  m.reunioes_semana     ?? METAS_MENSAIS.operacional.reunioesComercaisPorSemana,
+      unit:  "por semana",
+      icon:  <Users size={15} aria-hidden="true" />,
+    },
+    {
+      label: "Propostas Fechadas",
+      meta:  m.propostas_semana    ?? METAS_MENSAIS.operacional.propostasFechadasPorSemana,
+      unit:  "por semana",
+      icon:  <FileCheck size={15} aria-hidden="true" />,
+    },
+    {
+      label: "Novos Clientes",
+      meta:  m.novos_clientes_mes  ?? METAS_MENSAIS.operacional.novosClientesPorMes,
+      unit:  "por mês",
+      icon:  <UserPlus size={15} aria-hidden="true" />,
+    },
+  ];
+}
+
+export function ChecklistOperacional({ metas }: ChecklistOperacionalProps = {}) {
+  const items = buildItems(metas);
+
   return (
     <section
       className="rounded-2xl p-5"
