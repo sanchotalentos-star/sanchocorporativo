@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ──────────────────────────────────────────
+   CSS Variables — Design System Sancho
+─────────────────────────────────────────── */
+:root {
+  /* Cores primárias */
+  --sancho-pink:        #E91E8C;
+  --sancho-pink-light:  #F472B6;
+  --sancho-pink-bg:     #FDF0F7;
+
+  /* Neutros */
+  --sancho-black:       #1A1A1A;
+  --sancho-gray-dark:   #4A4A4A;
+  --sancho-gray-mid:    #9CA3AF;
+  --sancho-bg:          #F2F2F2;
+  --sancho-white:       #FFFFFF;
+
+  /* Semânticas */
+  --sancho-won:         #16A34A;
+  --sancho-lost:        #DC2626;
+  --sancho-pending:     #D97706;
+  --sancho-border:      #E5E7EB;
+}
+
+/* ──────────────────────────────────────────
+   Base
+─────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--sancho-bg);
+  color: var(--sancho-black);
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ──────────────────────────────────────────
+   Utilitários de marca
+─────────────────────────────────────────── */
+
+/* Bolinhas decorativas 2×4 da Sancho */
+.sancho-dots {
+  display: grid;
+  grid-template-columns: repeat(4, 6px);
+  grid-template-rows: repeat(2, 6px);
+  gap: 4px;
+}
+.sancho-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--sancho-pink-light);
+  display: block;
+}
+
+/* Borda left accent rosa */
+.card-accent-left {
+  border-left: 4px solid var(--sancho-pink);
+}
+
+/* Shimmer para skeleton */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #e8e8e8 25%,
+    #fce8f3 50%,
+    #e8e8e8 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* ──────────────────────────────────────────
+   Scrollbar custom
+─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: var(--sancho-pink-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--sancho-pink); }
