@@ -28,6 +28,7 @@ export interface DealRow {
   id:          string;
   name:        string;
   contact:     string;
+  responsible: string;  // agente responsável (user.name no RD CRM)
   stage:       string;
   value:       number;
   createdAt:   string | null;
@@ -160,14 +161,15 @@ export function buildDealRows(deals: Deal[]): DealRow[] {
       "—";
 
     return {
-      id:        d._id,
-      name:      d.name,
+      id:          d._id,
+      name:        d.name,
       contact,
-      stage:     d.deal_stage?.name ?? "Sem etapa",
+      responsible: d.user?.name ?? "—",
+      stage:       d.deal_stage?.name ?? "Sem etapa",
       value,
       createdAt,
       daysOpen,
-      isStale:   daysOpen > 15,
+      isStale:     daysOpen > 15,
     };
   });
 }

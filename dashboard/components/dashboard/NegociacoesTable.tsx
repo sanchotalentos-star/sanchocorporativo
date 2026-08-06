@@ -142,8 +142,9 @@ export function NegociacoesTable({ data = [], stages = [], isLoading = false }: 
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,.08)" }}>
                 {[
                   { key: "name"     as SortKey, label: "Negócio"    },
-                  { key: null,                  label: "Contato"     },
-                  { key: "stage"    as SortKey, label: "Etapa"       },
+                  { key: null,                  label: "Contato"      },
+                  { key: null,                  label: "Responsável"  },
+                  { key: "stage"    as SortKey, label: "Etapa"        },
                   { key: "value"    as SortKey, label: "Valor"       },
                   { key: null,                  label: "Criado em"   },
                   { key: "daysOpen" as SortKey, label: "Dias aberto" },
@@ -190,6 +191,12 @@ export function NegociacoesTable({ data = [], stages = [], isLoading = false }: 
                     style={{ color: "var(--sancho-gray-mid)" }}
                   >
                     {row.contact}
+                  </td>
+                  <td
+                    className="py-3 pr-4 max-w-[120px] truncate text-xs font-medium"
+                    style={{ color: "var(--sancho-gray-dark)" }}
+                  >
+                    {row.responsible}
                   </td>
                   <td className="py-3 pr-4">
                     <StageBadge stage={row.stage} />

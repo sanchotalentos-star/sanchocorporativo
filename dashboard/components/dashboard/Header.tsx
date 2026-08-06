@@ -4,82 +4,43 @@ import { RefreshCw } from "lucide-react";
 import { formatUpdateTimestamp } from "@/lib/formatters";
 
 // ── Sancho Logo ────────────────────────────────────────────────
-// Approximates the brand wordmark: bold condensed SANCHO + pen-in-O mark
-function SanchoWordmark({ compact = false }: { compact?: boolean }) {
-  if (compact) {
-    return (
-      <div className="flex items-center gap-2.5">
-        {/* Icon mark */}
-        <div
-          className="flex items-center justify-center rounded-lg flex-shrink-0"
-          style={{
-            width: 30,
-            height: 30,
-            background: "var(--sancho-pink)",
-          }}
-          aria-hidden="true"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M2 14L5 11L11 5L13 3L14 2L14 4L8 10L5 13L3 14L2 14Z" fill="white"/>
-            <path d="M11 2L14 5L12.5 6.5L9.5 3.5L11 2Z" fill="white" fillOpacity=".7"/>
-          </svg>
-        </div>
-        {/* Text */}
-        <div className="flex flex-col leading-none">
-          <span
-            className="font-black tracking-tight text-white"
-            style={{ fontSize: 17, letterSpacing: "-0.03em" }}
-          >
-            SANCHO
-          </span>
-          <span
-            className="font-semibold uppercase tracking-widest text-white/40"
-            style={{ fontSize: 7.5, letterSpacing: "0.2em" }}
-          >
-            Gestão de Carreira
-          </span>
-        </div>
-      </div>
-    );
-  }
-
+// Reproduz o wordmark real do site sanchocorporativo.com.br:
+// "SAN" / "CHO" empilhados em bold condensed + "gestão de carreira"
+function SanchoWordmark() {
   return (
-    <div className="flex items-center gap-3">
-      {/* Full SVG logo approximation */}
-      <svg
-        width="140"
-        height="44"
-        viewBox="0 0 140 44"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-label="Sancho Gestão de Carreira"
+    <div
+      className="flex flex-col leading-none select-none"
+      aria-label="Sancho Gestão de Carreira"
+    >
+      {/* SAN / CHO empilhados — mesma proporção do site */}
+      <div
+        style={{
+          fontFamily: "'Arial Black', 'Arial Bold', Impact, 'Helvetica Neue', sans-serif",
+          fontWeight: 900,
+          fontSize: "22px",
+          lineHeight: 0.92,
+          letterSpacing: "-0.02em",
+          color: "#FFFFFF",
+          textTransform: "uppercase",
+        }}
       >
-        {/* SANCHO wordmark — each letter as a rounded-rect placeholder */}
-        {/* We render this as text with a pseudo-black weight */}
-        <text
-          x="0" y="30"
-          fontFamily="-apple-system,'Arial Black','Helvetica Neue',sans-serif"
-          fontWeight="900"
-          fontSize="32"
-          fill="#E91E8C"
-          letterSpacing="-1.5"
-        >
-          SANCHO
-        </text>
-        {/* Pen mark inside the O — small diagonal slash */}
-        <line x1="118" y1="9" x2="126" y2="29" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-        {/* Subtitle */}
-        <text
-          x="1" y="43"
-          fontFamily="-apple-system,'Helvetica Neue',sans-serif"
-          fontWeight="700"
-          fontSize="7"
-          fill="rgba(255,255,255,0.35)"
-          letterSpacing="2.5"
-        >
-          GESTÃO DE CARREIRA
-        </text>
-      </svg>
+        <div>SAN</div>
+        <div>CHO</div>
+      </div>
+      {/* Subtítulo */}
+      <div
+        style={{
+          fontFamily: "system-ui, sans-serif",
+          fontWeight: 600,
+          fontSize: "7px",
+          letterSpacing: "0.18em",
+          color: "rgba(255,255,255,0.40)",
+          textTransform: "lowercase",
+          marginTop: "3px",
+        }}
+      >
+        gestão de carreira
+      </div>
     </div>
   );
 }
@@ -107,7 +68,7 @@ export function Header({ updatedAt, onRefresh, isLoading = false }: HeaderProps)
     >
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
         {/* Logo */}
-        <SanchoWordmark compact />
+        <SanchoWordmark />
 
         {/* Nav (desktop) */}
         <nav className="hidden md:flex items-center gap-1" aria-label="Navegação">

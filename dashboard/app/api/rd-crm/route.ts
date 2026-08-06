@@ -98,30 +98,32 @@ function getMockData() {
   ];
 
   const weekly = [
-    { label: "07/07", abertos: 6,  ganhos: 2 },
-    { label: "14/07", abertos: 8,  ganhos: 3 },
-    { label: "21/07", abertos: 10, ganhos: 2 },
-    { label: "28/07", abertos: 7,  ganhos: 4 },
-    { label: "04/08", abertos: 9,  ganhos: 3 },
+    { label: "07/07", abertos: 6,  ganhos: 0 },
+    { label: "14/07", abertos: 8,  ganhos: 0 },
+    { label: "21/07", abertos: 10, ganhos: 0 },
+    { label: "28/07", abertos: 7,  ganhos: 0 },
+    { label: "04/08", abertos: 9,  ganhos: 0 },
   ];
 
+  // Deals ativos no funil (nenhum fechado ainda em agosto/2026)
   const deals = [
-    { id: "1", name: "[Palestra] Tech Summit 2026",      contact: "Ana Lima",       stage: "Proposta enviada", value: 18000, createdAt: "2026-07-10T10:00:00Z", daysOpen: 27, isStale: true  },
-    { id: "2", name: "[Apresentação] Fórum RH Nacional", contact: "Carlos Mendes",  stage: "Em conversa",      value: 12000, createdAt: "2026-07-22T14:00:00Z", daysOpen: 15, isStale: false },
-    { id: "3", name: "[Publicidade] Marca Viva Moda",    contact: "Fernanda Costa", stage: "Abordado",         value:  8000, createdAt: "2026-07-28T09:00:00Z", daysOpen:  9, isStale: false },
-    { id: "4", name: "[Palestra] Liderança Feminina",    contact: "Julia Torres",   stage: "Respondeu",        value: 22000, createdAt: "2026-07-30T11:00:00Z", daysOpen:  7, isStale: false },
-    { id: "5", name: "[Apresentação] Awards Night",      contact: "Pedro Alves",    stage: "Em conversa",      value: 15000, createdAt: "2026-08-01T15:00:00Z", daysOpen:  5, isStale: false },
-    { id: "6", name: "[Creator] Campanha Verão 2027",    contact: "Mariana Ramos",  stage: "Proposta enviada", value: 11000, createdAt: "2026-07-18T08:00:00Z", daysOpen: 19, isStale: true  },
-    { id: "7", name: "[Palestra] Congresso Educação",    contact: "Ricardo Pinto",  stage: "Reativação",       value:  9500, createdAt: "2026-06-20T16:00:00Z", daysOpen: 47, isStale: true  },
+    { id: "1", name: "[Palestra] Tech Summit 2026",      contact: "Ana Lima",       responsible: "Configure RDCRM_TOKEN", stage: "Proposta enviada", value: 18000, createdAt: "2026-07-10T10:00:00Z", daysOpen: 27, isStale: true  },
+    { id: "2", name: "[Apresentação] Fórum RH Nacional", contact: "Carlos Mendes",  responsible: "Configure RDCRM_TOKEN", stage: "Em conversa",      value: 12000, createdAt: "2026-07-22T14:00:00Z", daysOpen: 15, isStale: false },
+    { id: "3", name: "[Publicidade] Marca Viva Moda",    contact: "Fernanda Costa", responsible: "Configure RDCRM_TOKEN", stage: "Abordado",         value:  8000, createdAt: "2026-07-28T09:00:00Z", daysOpen:  9, isStale: false },
+    { id: "4", name: "[Palestra] Liderança Feminina",    contact: "Julia Torres",   responsible: "Configure RDCRM_TOKEN", stage: "Respondeu",        value: 22000, createdAt: "2026-07-30T11:00:00Z", daysOpen:  7, isStale: false },
+    { id: "5", name: "[Apresentação] Awards Night",      contact: "Pedro Alves",    responsible: "Configure RDCRM_TOKEN", stage: "Em conversa",      value: 15000, createdAt: "2026-08-01T15:00:00Z", daysOpen:  5, isStale: false },
+    { id: "6", name: "[Creator] Campanha Verão 2027",    contact: "Mariana Ramos",  responsible: "Configure RDCRM_TOKEN", stage: "Proposta enviada", value: 11000, createdAt: "2026-07-18T08:00:00Z", daysOpen: 19, isStale: true  },
+    { id: "7", name: "[Palestra] Congresso Educação",    contact: "Ricardo Pinto",  responsible: "Configure RDCRM_TOKEN", stage: "Reativação",       value:  9500, createdAt: "2026-06-20T16:00:00Z", daysOpen: 47, isStale: true  },
   ];
 
   return {
-    kpis: { abertos: 57, ganhos: 14, perdidos: 8, conversao: 0.197 },
+    // Nenhum fechamento realizado — kpis refletem apenas o funil ativo
+    kpis:     { abertos: 57, ganhos: 0, perdidos: 0, conversao: 0 },
     pipeline,
     weekly,
     deals,
-    revenue:   { palestras: 38000, apresentacoes: 26000, publicidades: 32000 },
-    events:    { palestras: 3, apresentacoes: 2, publicidades: 2 },
+    revenue:  { palestras: 0, apresentacoes: 0, publicidades: 0 },
+    events:   { palestras: 0, apresentacoes: 0, publicidades: 0 },
     stages,
     updatedAt: new Date().toISOString(),
     isMock:    true,
