@@ -1,6 +1,6 @@
 // lib/supabase-server.ts
-// Client Supabase com service_role — usar APENAS em Route Handlers e Server Components
-// ⚠️  NUNCA importar no client-side — expõe a chave de serviço
+// Client Supabase — usar APENAS em Route Handlers e Server Components
+// Usa service_role se disponível, senão anon key (admin sem auth por enquanto)
 
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
@@ -13,11 +13,13 @@ function getServerClient(): AnyClient {
   if (_client) return _client;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
     throw new Error(
-      "Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY no .env.local"
+      "Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY no .env.local"
     );
   }
 
