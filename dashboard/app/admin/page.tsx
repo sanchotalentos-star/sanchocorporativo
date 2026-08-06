@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Settings, Users, Target, BarChart2, ArrowLeft } from "lucide-react";
+import { Settings, Users, Target, BarChart2, ArrowLeft, ImageIcon } from "lucide-react";
 import { LogoUpload }      from "./components/LogoUpload";
 import { MetasEditor }     from "./components/MetasEditor";
 import { MembrosEditor }   from "./components/MembrosEditor";
@@ -10,11 +10,11 @@ import { HistoricoEditor } from "./components/HistoricoEditor";
 
 type Tab = "config" | "metas" | "membros" | "historico";
 
-const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
-  { id: "config",    label: "Logo & Empresa",      icon: <Settings size={14} /> },
-  { id: "metas",     label: "Metas Mensais",        icon: <Target   size={14} /> },
-  { id: "membros",   label: "Membros da Equipe",    icon: <Users    size={14} /> },
-  { id: "historico", label: "Histórico Real",        icon: <BarChart2 size={14} /> },
+const TABS: { id: Tab; label: string; icon: React.ReactNode; hint: string }[] = [
+  { id: "config",    label: "Logo",           icon: <ImageIcon size={14} />,  hint: "Faça upload da logo da Sancho" },
+  { id: "metas",     label: "Metas",          icon: <Target    size={14} />,  hint: "Defina as metas por mês" },
+  { id: "membros",   label: "Membros",        icon: <Users     size={14} />,  hint: "Cadastre a equipe comercial" },
+  { id: "historico", label: "Histórico",      icon: <BarChart2 size={14} />,  hint: "Registre resultados reais" },
 ];
 
 export default function AdminPage() {
@@ -116,7 +116,15 @@ export default function AdminPage() {
                   aria-current={tab === t.id ? "page" : undefined}
                 >
                   {t.icon}
-                  <span className="hidden sm:inline">{t.label}</span>
+                  <div className="hidden sm:block text-left">
+                    <div>{t.label}</div>
+                    <div
+                      className="text-[10px] font-normal mt-0.5 leading-tight"
+                      style={{ color: tab === t.id ? "rgba(233,30,140,.6)" : "rgba(255,255,255,.2)" }}
+                    >
+                      {t.hint}
+                    </div>
+                  </div>
                 </button>
               ))}
             </nav>
@@ -132,11 +140,11 @@ export default function AdminPage() {
               {tab === "config" && (
                 <section>
                   <h2 className="text-sm font-bold mb-1" style={{ color: "var(--sancho-black)" }}>
-                    Logo da Empresa
+                    Logo da Sancho
                   </h2>
                   <p className="text-xs mb-5" style={{ color: "var(--sancho-gray-mid)" }}>
-                    Faça upload do arquivo PNG, JPG ou SVG da logo da Sancho.
-                    Ela aparecerá no cabeçalho do dashboard.
+                    Arraste ou clique para fazer upload do arquivo PNG ou SVG.
+                    Recomendado: PNG com fundo transparente, versão branca ou rosa.
                   </p>
                   <LogoUpload
                     currentUrl={logoUrl}
@@ -148,11 +156,11 @@ export default function AdminPage() {
               {tab === "metas" && (
                 <section>
                   <h2 className="text-sm font-bold mb-1" style={{ color: "var(--sancho-black)" }}>
-                    Metas Mensais
+                    Metas por Mês
                   </h2>
                   <p className="text-xs mb-5" style={{ color: "var(--sancho-gray-mid)" }}>
-                    Defina as metas de receita e cadência para cada mês.
-                    Selecione o mês para editar ou ver meses anteriores.
+                    Selecione o mês e ajuste as metas de receita e cadência.
+                    Salve — o dashboard reflete as alterações imediatamente.
                   </p>
                   <MetasEditor />
                 </section>
@@ -161,11 +169,11 @@ export default function AdminPage() {
               {tab === "membros" && (
                 <section>
                   <h2 className="text-sm font-bold mb-1" style={{ color: "var(--sancho-black)" }}>
-                    Membros da Equipe
+                    Equipe Comercial
                   </h2>
                   <p className="text-xs mb-5" style={{ color: "var(--sancho-gray-mid)" }}>
-                    Cadastre os agentes comerciais. O ID no RD CRM vincula cada membro
-                    às negociações na tabela do dashboard.
+                    Adicione cada agente com o ID do RD CRM para vincular às negociações.
+                    Encontre o ID em: RD Station CRM → Configurações → Usuários.
                   </p>
                   <MembrosEditor />
                 </section>
@@ -177,8 +185,8 @@ export default function AdminPage() {
                     Histórico de Resultados
                   </h2>
                   <p className="text-xs mb-5" style={{ color: "var(--sancho-gray-mid)" }}>
-                    Registre os resultados reais de cada mês para comparar
-                    com as metas e acompanhar a evolução ao longo do tempo.
+                    Registre os números reais de cada mês fechado — ganhos, perdidos,
+                    faturamento por área e eventos realizados.
                   </p>
                   <HistoricoEditor />
                 </section>

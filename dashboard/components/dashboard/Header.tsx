@@ -1,46 +1,45 @@
 "use client";
 
-import { RefreshCw } from "lucide-react";
+import Link from "next/link";
+import { RefreshCw, Settings } from "lucide-react";
 import { formatUpdateTimestamp } from "@/lib/formatters";
 
-// ── Sancho Logo ────────────────────────────────────────────────
-// Reproduz o wordmark real do site sanchocorporativo.com.br:
-// "SAN" / "CHO" empilhados em bold condensed + "gestão de carreira"
+// ── Sancho Logo Wordmark ────────────────────────────────────────
+// Fallback enquanto a logo real não está carregada do Storage.
+// Usa a versão rosa (sobre fundo escuro do dashboard).
+// Formato: "SANCHO" numa linha + "GESTÃO DE CARREIRA" abaixo.
 function SanchoWordmark() {
   return (
     <div
       className="flex flex-col leading-none select-none"
       aria-label="Sancho Gestão de Carreira"
     >
-      {/* SAN / CHO empilhados — mesma proporção do site */}
-      <div
+      <span
         style={{
           fontFamily: "'Arial Black', 'Arial Bold', Impact, 'Helvetica Neue', sans-serif",
           fontWeight: 900,
-          fontSize: "22px",
-          lineHeight: 0.92,
-          letterSpacing: "-0.02em",
-          color: "#FFFFFF",
+          fontSize: "26px",
+          lineHeight: 1,
+          letterSpacing: "-0.03em",
+          color: "var(--sancho-pink)",
           textTransform: "uppercase",
         }}
       >
-        <div>SAN</div>
-        <div>CHO</div>
-      </div>
-      {/* Subtítulo */}
-      <div
+        SANCHO
+      </span>
+      <span
         style={{
           fontFamily: "system-ui, sans-serif",
-          fontWeight: 600,
+          fontWeight: 700,
           fontSize: "7px",
-          letterSpacing: "0.18em",
-          color: "rgba(255,255,255,0.40)",
-          textTransform: "lowercase",
+          letterSpacing: "0.22em",
+          color: "rgba(255,255,255,0.45)",
+          textTransform: "uppercase",
           marginTop: "3px",
         }}
       >
-        gestão de carreira
-      </div>
+        GESTÃO DE CARREIRA
+      </span>
     </div>
   );
 }
@@ -68,43 +67,45 @@ export function Header({ updatedAt, onRefresh, isLoading = false, logoUrl }: Hea
       }}
     >
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
+
         {/* Logo — usa imagem do banco se disponível, senão mostra wordmark */}
         {logoUrl ? (
           <img
             src={logoUrl}
             alt="Sancho Gestão de Carreira"
-            className="h-10 w-auto object-contain"
+            className="h-9 w-auto object-contain"
           />
         ) : (
           <SanchoWordmark />
         )}
 
-        {/* Nav (desktop) */}
-        <nav className="hidden md:flex items-center gap-1" aria-label="Navegação">
-          {["Visão Geral", "Pipeline", "Membros", "Relatórios"].map((item, i) => (
-            <button
-              key={item}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
-              style={{
-                color: i === 0 ? "var(--sancho-black)" : "var(--sancho-gray-mid)",
-                backgroundColor: i === 0 ? "rgba(255,255,255,.06)" : "transparent",
-              }}
-            >
-              {item}
-            </button>
-          ))}
-        </nav>
+        {/* Timestamp (desktop) — centro */}
+        <span
+          className="hidden sm:block text-xs"
+          style={{ color: "var(--sancho-gray-mid)" }}
+          aria-live="polite"
+        >
+          {timestamp}
+        </span>
 
-        {/* Right side */}
-        <div className="flex items-center gap-3">
-          {/* Timestamp (desktop) */}
-          <span
-            className="hidden sm:block text-xs"
-            style={{ color: "var(--sancho-gray-mid)" }}
-            aria-live="polite"
+        {/* Ações */}
+        <div className="flex items-center gap-2">
+
+          {/* Admin */}
+          <Link
+            href="/admin"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
+            style={{
+              color:           "var(--sancho-gray-mid)",
+              backgroundColor: "rgba(255,255,255,.05)",
+              border:          "1px solid rgba(255,255,255,.08)",
+            }}
+            aria-label="Administrar dashboard"
+            title="Logo, metas e membros"
           >
-            {timestamp}
-          </span>
+            <Settings size={13} aria-hidden="true" />
+            <span className="hidden sm:inline">Admin</span>
+          </Link>
 
           {/* Refresh */}
           <button

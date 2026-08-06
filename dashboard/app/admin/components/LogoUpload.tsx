@@ -78,29 +78,37 @@ export function LogoUpload({ currentUrl, onSaved }: LogoUploadProps) {
 
   return (
     <div className="space-y-4">
-      {/* Preview */}
-      <div
-        className="flex items-center justify-center rounded-2xl border-2 border-dashed overflow-hidden"
-        style={{
-          borderColor:     "rgba(233,30,140,.25)",
-          backgroundColor: "rgba(233,30,140,.04)",
-          height:          140,
-        }}
-      >
-        {preview ? (
-          <img
-            src={preview}
-            alt="Logo atual"
-            className="max-h-24 max-w-full object-contain"
-          />
-        ) : (
-          <div className="flex flex-col items-center gap-2 text-center px-4">
-            <Upload size={28} style={{ color: "var(--sancho-pink)" }} />
-            <p className="text-xs" style={{ color: "var(--sancho-gray-mid)" }}>
-              Nenhuma logo cadastrada
-            </p>
-          </div>
-        )}
+      {/* Preview — simula o fundo escuro do dashboard */}
+      <div>
+        <p className="text-xs mb-1.5" style={{ color: "var(--sancho-gray-mid)" }}>
+          Preview (como aparece no dashboard)
+        </p>
+        <div
+          className="flex items-center justify-center rounded-2xl overflow-hidden px-6"
+          style={{
+            backgroundColor: "#080808",
+            border:          "1px solid rgba(255,255,255,.08)",
+            height:          120,
+          }}
+        >
+          {preview ? (
+            <img
+              src={preview}
+              alt="Logo atual"
+              className="max-h-16 max-w-full object-contain"
+            />
+          ) : (
+            <div className="flex flex-col items-center gap-1.5 text-center">
+              <Upload size={24} style={{ color: "var(--sancho-pink)" }} />
+              <p className="text-xs" style={{ color: "rgba(255,255,255,.3)" }}>
+                Nenhuma logo carregada
+              </p>
+            </div>
+          )}
+        </div>
+        <p className="text-xs mt-1.5" style={{ color: "rgba(255,255,255,.25)" }}>
+          💡 Para melhor resultado, use um arquivo PNG com fundo transparente — versão branca ou rosa.
+        </p>
       </div>
 
       {/* Drop / click area */}
