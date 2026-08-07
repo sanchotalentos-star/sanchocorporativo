@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  Cell, CartesianGrid,
+  Cell, CartesianGrid, Legend,
 } from 'recharts'
 import { useAuth } from '@/context/AuthContext'
 import { memberKey } from '@/lib/memberStorage'
@@ -144,7 +144,7 @@ const WORKFLOWS: Workflow[] = [
 
 /* ─── EXTRA TYPES ─── */
 interface KpiItem { id: string; kpi_name: string; atual: number; meta: number; unidade?: string }
-interface AcaoMarketing { id: string; titulo: string; mes: number; concluida: boolean }
+interface AcaoMarketing { id: string; titulo: string; canal?: string; mes: number; concluida: boolean }
 
 type BriefingPriority = 'urgente' | 'foco' | 'atencao'
 interface BriefingItem { prioridade: BriefingPriority; mensagem: string; submensagem?: string; href: string }
@@ -866,6 +866,7 @@ function HomePage() {
   const [kpisData,            setKpisData]           = useState<KpiItem[]>([])
   const [marketingTotal,      setMarketingTotal]     = useState(0)
   const [marketingConcluidas, setMarketingConcluidas] = useState(0)
+  const [marketingRaw,        setMarketingRaw]       = useState<AcaoMarketing[]>([])
   const [agendaPendentes,     setAgendaPendentes]    = useState<Array<{ id: string; titulo: string; objetivo: string; tipo: 'okr' | 'marketing' }>>([])
 
   useEffect(() => {
@@ -875,9 +876,11 @@ function HomePage() {
       const mRaw = localStorage.getItem(memberKey('marketing_store_v1'))
       const mArr = mRaw ? JSON.parse(mRaw) : []
       if (Array.isArray(mArr)) {
-        setHasMarketing(mArr.length > 0)
-        setMarketingTotal(mArr.length)
-        setMarketingConcluidas((mArr as AcaoMarketing[]).filter(a => a.concluida).length)
+        const mkt = mArr as AcaoMarketing[]
+        setHasMarketing(mkt.length > 0)
+        setMarketingTotal(mkt.length)
+        setMarketingConcluidas(mkt.filter(a => a.concluida).length)
+        setMarketingRaw(mkt)
       }
     } catch {}
     try {
@@ -999,6 +1002,17 @@ function HomePage() {
   /* ── Dashboard metrics ── */
   const avgKpiPct      = kpisData.length ? Math.round(kpisData.reduce((s, k) => s + pct(k.atual, k.meta), 0) / kpisData.length) : 0
   const marketingPct   = marketingTotal > 0 ? Math.round((marketingConcluidas / marketingTotal) * 100) : 0
+  const marketingByCanal = Object.entries(
+    marketingRaw.reduce<Record<string, { total: number; feitas: number }>>((acc, a) => {
+      const canal = a.canal || 'Outros'
+      if (!acc[canal]) acc[canal] = { total: 0, feitas: 0 }
+      acc[canal].total += 1
+      if (a.concluida) acc[canal].feitas += 1
+      return acc
+    }, {})
+  ).map(([canal, { total, feitas }]) => ({ canal: canal.slice(0, 12), total, feitas }))
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 6)
   const tarefasPct     = tarefas.length > 0 ? Math.round((feitasCount / tarefas.length) * 100) : 0
 
   const metrics = [
@@ -1256,157 +1270,188 @@ function HomePage() {
 
         <HR />
 
-        {/* ── DASHBOARD ── */}
+        {/* ══ DASHBOARD MACRO ══ */}
         <div style={{ padding: '36px 0' }}>
-          <SectionLabel>Dashboard · Acompanhamento</SectionLabel>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', marginTop: 20, borderTop: `1px solid ${D.border}`, borderBottom: `1px solid ${D.border}` }}>
-            {metrics.map((m, i) => (
-              <Link key={m.label} to={m.href} style={{ textDecoration: 'none', display: 'block' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 16 }}>
+            <SectionLabel>Dashboard</SectionLabel>
+            <span style={{ fontSize: 9, color: D.textFaint, letterSpacing: '0.05em' }}>visão macro dos seus números</span>
+          </div>
+
+          {/* ── ROW 1: 6 stat tiles ── */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 1, background: D.border2, border: `1px solid ${D.border2}`, marginBottom: 12 }}>
+            {[
+              { label: 'Total Missões',  value: String(tarefas.length || '—'),   sub: 'no plano',             color: D.text,                                                                          href: '/dashboard/membro/tarefas'  as const },
+              { label: 'Concluídas',    value: String(feitasCount || '—'),       sub: `${tarefas.length > 0 ? Math.round(feitasCount/tarefas.length*100) : 0}% do total`, color: '#22C55E',          href: '/dashboard/membro/tarefas'  as const },
+              { label: 'Em andamento',  value: String(emAndamento || '—'),       sub: 'em execução',          color: '#3B82F6',                                                                       href: '/dashboard/membro/tarefas'  as const },
+              { label: 'Bloqueadas',    value: String(bloqueadas || '—'),        sub: 'travadas',             color: bloqueadas > 0 ? '#EF4444' : D.textFaint,                                        href: '/dashboard/membro/tarefas'  as const },
+              { label: 'Prog. OKRs',   value: okrs.length > 0 ? `${progOkrs}%` : '—',   sub: `${okrs.length} objetivo${okrs.length !== 1 ? 's' : ''}`,  color: progOkrs >= 70 ? '#22C55E' : progOkrs >= 40 ? D.gold : (okrs.length > 0 ? '#F87171' : D.textFaint),  href: '/dashboard/membro/okr'       as const },
+              { label: 'Score KPIs',   value: kpisData.length > 0 ? `${avgKpiPct}%` : '—', sub: `${kpisData.length} indicador${kpisData.length !== 1 ? 'es' : ''}`, color: avgKpiPct >= 75 ? '#22C55E' : avgKpiPct >= 40 ? D.gold : (kpisData.length > 0 ? '#F87171' : D.textFaint), href: '/dashboard/membro/kpis'  as const },
+            ].map((s) => (
+              <Link key={s.label} to={s.href} style={{ textDecoration: 'none', display: 'block' }}>
                 <div
-                  style={{ padding: '22px 20px 22px 0', paddingLeft: i > 0 ? 20 : 0, borderLeft: i > 0 ? `1px solid ${D.border}` : 'none', transition: 'opacity 0.12s' }}
-                  onMouseEnter={e => { e.currentTarget.style.opacity = '0.72' }}
-                  onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
+                  style={{ background: D.card, padding: '16px 14px', cursor: 'pointer', transition: 'background 0.1s' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = D.surface }}
+                  onMouseLeave={e => { e.currentTarget.style.background = D.card }}
                 >
-                  <p style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, marginBottom: 8 }}>{m.label}</p>
-                  <p style={{ fontFamily: D.serif, fontSize: 36, fontWeight: 400, color: m.color, lineHeight: 1, fontVariantNumeric: 'tabular-nums', margin: '0 0 8px' }}>{m.value}</p>
-                  {m.pct > 0 && (
-                    <div style={{ height: 2, background: D.surface2, borderRadius: 1, overflow: 'hidden', marginBottom: 8 }}>
-                      <div style={{ height: '100%', width: `${m.pct}%`, background: m.color, borderRadius: 1, transition: 'width 0.5s ease' }} />
-                    </div>
-                  )}
-                  <p style={{ fontSize: 10, color: D.textMuted, margin: 0 }}>{m.sub}</p>
+                  <p style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 8px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</p>
+                  <p style={{ fontFamily: D.serif, fontSize: 30, fontWeight: 400, color: s.color, margin: '0 0 4px', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{s.value}</p>
+                  <p style={{ fontSize: 9, color: D.textFaint, margin: 0 }}>{s.sub}</p>
                 </div>
               </Link>
             ))}
           </div>
 
-          {/* ── CHARTS ── */}
-          {(tarefas.length > 0 || okrs.length > 0) && (
-            <div style={{ marginTop: 32, display: 'grid', gridTemplateColumns: okrs.length > 0 && tarefas.length > 0 ? '1fr 1fr' : '1fr', gap: 20 }}>
+          {/* ── ROW 2: 3 gráficos lado a lado ── */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, background: D.border2, marginBottom: 1 }}>
 
-              {/* Missões por status */}
-              {tarefas.length > 0 && (() => {
-                const data = [
-                  { name: 'Pendente',     value: tarefas.filter(t => t.status === 'pendente').length,     fill: '#9E9A94' },
-                  { name: 'Andamento',    value: tarefas.filter(t => t.status === 'em_andamento').length, fill: '#3B82F6' },
-                  { name: 'Concluída',    value: tarefas.filter(t => t.status === 'feita').length,        fill: '#22C55E' },
-                  { name: 'Bloqueada',    value: tarefas.filter(t => t.status === 'bloqueada').length,    fill: '#EF4444' },
-                ]
-                return (
-                  <div style={{ background: D.card, border: `1px solid ${D.border}`, padding: '18px 20px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                      <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted }}>Missões por Status</span>
-                      <Link to="/dashboard/membro/tarefas" style={{ textDecoration: 'none', fontSize: 10, color: D.gold, fontWeight: 600 }}>Ver todas →</Link>
-                    </div>
-                    <ResponsiveContainer width="100%" height={140}>
-                      <BarChart data={data} barSize={28} margin={{ top: 0, right: 0, left: -24, bottom: 0 }}>
-                        <CartesianGrid vertical={false} stroke={D.border} strokeDasharray="0" />
-                        <XAxis dataKey="name" tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} allowDecimals={false} />
-                        <Tooltip
-                          cursor={{ fill: 'rgba(0,0,0,0.03)' }}
-                          contentStyle={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 4, fontSize: 12 }}
-                          labelStyle={{ color: D.textMid, fontWeight: 600 }}
-                        />
-                        <Bar dataKey="value" name="Missões" radius={[3, 3, 0, 0]}>
-                          {data.map((d, i) => <Cell key={i} fill={d.fill} fillOpacity={0.85} />)}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                )
-              })()}
-
-              {/* OKRs por categoria */}
-              {okrs.length > 0 && (() => {
-                const catData = Object.entries(
-                  okrs.reduce<Record<string, { total: number; count: number }>>((acc, o) => {
-                    const p = objPct(o)
-                    if (!acc[o.categoria]) acc[o.categoria] = { total: 0, count: 0 }
-                    acc[o.categoria].total += p
-                    acc[o.categoria].count += 1
-                    return acc
-                  }, {})
-                ).map(([cat, { total, count }]) => ({
-                  name: cat,
-                  value: Math.round(total / count),
-                  fill: catColor[cat] ?? D.gold,
-                }))
-                return (
-                  <div style={{ background: D.card, border: `1px solid ${D.border}`, padding: '18px 20px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                      <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted }}>OKRs por Categoria (%)</span>
-                      <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none', fontSize: 10, color: D.gold, fontWeight: 600 }}>Ver todos →</Link>
-                    </div>
-                    <ResponsiveContainer width="100%" height={140}>
-                      <BarChart data={catData} barSize={36} margin={{ top: 0, right: 0, left: -24, bottom: 0 }}>
-                        <CartesianGrid vertical={false} stroke={D.border} strokeDasharray="0" />
-                        <XAxis dataKey="name" tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} />
-                        <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} />
-                        <Tooltip
-                          cursor={{ fill: 'rgba(0,0,0,0.03)' }}
-                          contentStyle={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 4, fontSize: 12 }}
-                          formatter={(v: number) => [`${v}%`, 'Progresso']}
-                          labelStyle={{ color: D.textMid, fontWeight: 600 }}
-                        />
-                        <Bar dataKey="value" name="Progresso" radius={[3, 3, 0, 0]}>
-                          {catData.map((d, i) => <Cell key={i} fill={d.fill} fillOpacity={0.85} />)}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                )
-              })()}
-
-            </div>
-          )}
-
-          {kpisData.length > 0 && (
-            <div style={{ marginTop: 24 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted }}>Indicadores-Chave</span>
-                <Link to="/dashboard/membro/kpis" style={{ textDecoration: 'none', fontSize: 10, color: D.gold, fontWeight: 600 }}>Ver todos →</Link>
+            {/* Missões por Status */}
+            <div style={{ background: D.card, padding: '14px 16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                <p style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: D.textMuted, margin: 0 }}>Missões por Status</p>
+                <Link to="/dashboard/membro/tarefas" style={{ textDecoration: 'none', fontSize: 9, color: D.gold, fontWeight: 600 }}>Ver →</Link>
               </div>
-              {/* KPI bar chart */}
-              <div style={{ marginBottom: 16 }}>
-                <ResponsiveContainer width="100%" height={120}>
-                  <BarChart
-                    data={kpisData.slice(0, 6).map(k => ({ name: k.kpi_name.length > 14 ? k.kpi_name.slice(0, 14) + '…' : k.kpi_name, value: pct(k.atual, k.meta), fill: pct(k.atual, k.meta) >= 80 ? '#22C55E' : pct(k.atual, k.meta) >= 50 ? D.gold : '#F87171' }))}
-                    barSize={20} margin={{ top: 0, right: 0, left: -24, bottom: 0 }}
-                  >
-                    <CartesianGrid vertical={false} stroke={D.border} strokeDasharray="0" />
-                    <XAxis dataKey="name" tick={{ fontSize: 9, fill: D.textMuted }} axisLine={false} tickLine={false} />
-                    <YAxis domain={[0, 100]} tick={{ fontSize: 9, fill: D.textMuted }} axisLine={false} tickLine={false} />
-                    <Tooltip
-                      cursor={{ fill: 'rgba(0,0,0,0.03)' }}
-                      contentStyle={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 4, fontSize: 12 }}
-                      formatter={(v: number) => [`${v}%`, 'Resultado']}
-                      labelStyle={{ color: D.textMid, fontWeight: 600 }}
-                    />
-                    <Bar dataKey="value" name="KPI" radius={[3, 3, 0, 0]}>
+              <p style={{ fontSize: 10, color: D.textFaint, margin: '0 0 10px' }}>{tarefas.length} missões cadastradas</p>
+              <ResponsiveContainer width="100%" height={150}>
+                <BarChart barSize={22} margin={{ top: 2, right: 0, left: -28, bottom: 0 }}
+                  data={[
+                    { name: 'Pendente',   value: tarefas.filter(t => t.status === 'pendente').length },
+                    { name: 'Andamento',  value: tarefas.filter(t => t.status === 'em_andamento').length },
+                    { name: 'Concluída',  value: tarefas.filter(t => t.status === 'feita').length },
+                    { name: 'Bloqueada', value: tarefas.filter(t => t.status === 'bloqueada').length },
+                  ]}>
+                  <CartesianGrid vertical={false} stroke={D.border} />
+                  <XAxis dataKey="name" tick={{ fontSize: 8, fill: D.textMuted }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 8, fill: D.textMuted }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip cursor={{ fill: 'rgba(0,0,0,0.03)' }} contentStyle={{ background: D.card, border: `1px solid ${D.border}`, fontSize: 11 }} labelStyle={{ color: D.textMid, fontWeight: 600 }} />
+                  <Bar dataKey="value" name="Qtd" radius={[2,2,0,0]}>
+                    {[
+                      { fill: '#9E9A94' }, { fill: '#3B82F6' }, { fill: '#22C55E' }, { fill: '#EF4444' },
+                    ].map((d, i) => <Cell key={i} fill={d.fill} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Missões por Prioridade */}
+            <div style={{ background: D.card, padding: '14px 16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                <p style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: D.textMuted, margin: 0 }}>Missões por Prioridade</p>
+              </div>
+              <p style={{ fontSize: 10, color: D.textFaint, margin: '0 0 10px' }}>distribuição por urgência</p>
+              <ResponsiveContainer width="100%" height={150}>
+                <BarChart layout="vertical" barSize={18} margin={{ top: 2, right: 10, left: 0, bottom: 0 }}
+                  data={[
+                    { name: 'Alta',  value: tarefas.filter(t => t.prioridade === 'alta').length,  feitas: tarefas.filter(t => t.prioridade === 'alta'  && t.status === 'feita').length },
+                    { name: 'Média', value: tarefas.filter(t => t.prioridade === 'media').length, feitas: tarefas.filter(t => t.prioridade === 'media' && t.status === 'feita').length },
+                    { name: 'Baixa', value: tarefas.filter(t => t.prioridade === 'baixa').length, feitas: tarefas.filter(t => t.prioridade === 'baixa' && t.status === 'feita').length },
+                  ]}>
+                  <CartesianGrid horizontal={false} stroke={D.border} />
+                  <XAxis type="number" tick={{ fontSize: 8, fill: D.textMuted }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: D.textMuted }} axisLine={false} tickLine={false} width={36} />
+                  <Tooltip cursor={{ fill: 'rgba(0,0,0,0.03)' }} contentStyle={{ background: D.card, border: `1px solid ${D.border}`, fontSize: 11 }} />
+                  <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 9, paddingTop: 6, color: D.textMuted }} />
+                  <Bar dataKey="value" name="Total" fill={D.gold} fillOpacity={0.7} radius={[0,2,2,0]} />
+                  <Bar dataKey="feitas" name="Concluídas" fill="#22C55E" fillOpacity={0.85} radius={[0,2,2,0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* OKRs por Categoria */}
+            <div style={{ background: D.card, padding: '14px 16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                <p style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: D.textMuted, margin: 0 }}>OKRs por Categoria</p>
+                <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none', fontSize: 9, color: D.gold, fontWeight: 600 }}>Ver →</Link>
+              </div>
+              <p style={{ fontSize: 10, color: D.textFaint, margin: '0 0 10px' }}>progresso médio por eixo (%)</p>
+              <ResponsiveContainer width="100%" height={150}>
+                <BarChart barSize={28} margin={{ top: 2, right: 0, left: -28, bottom: 0 }}
+                  data={Object.entries(
+                    okrs.reduce<Record<string, { total: number; count: number }>>((acc, o) => {
+                      const p = objPct(o)
+                      if (!acc[o.categoria]) acc[o.categoria] = { total: 0, count: 0 }
+                      acc[o.categoria].total += p; acc[o.categoria].count += 1
+                      return acc
+                    }, {})
+                  ).map(([cat, { total, count }]) => ({ name: cat, value: Math.round(total / count) }))}>
+                  <CartesianGrid vertical={false} stroke={D.border} />
+                  <XAxis dataKey="name" tick={{ fontSize: 8, fill: D.textMuted }} axisLine={false} tickLine={false} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 8, fill: D.textMuted }} axisLine={false} tickLine={false} />
+                  <Tooltip cursor={{ fill: 'rgba(0,0,0,0.03)' }} contentStyle={{ background: D.card, border: `1px solid ${D.border}`, fontSize: 11 }} formatter={(v: number) => [`${v}%`, 'Prog.']} labelStyle={{ color: D.textMid, fontWeight: 600 }} />
+                  <Bar dataKey="value" name="Prog. %" radius={[2,2,0,0]}>
+                    {okrs.reduce<Record<string, { total: number; count: number }>>((acc, o) => {
+                      if (!acc[o.categoria]) acc[o.categoria] = { total: 0, count: 0 }
+                      acc[o.categoria].total += objPct(o); acc[o.categoria].count += 1
+                      return acc
+                    }, {}) && Object.keys(
+                      okrs.reduce<Record<string, boolean>>((acc, o) => { acc[o.categoria] = true; return acc }, {})
+                    ).map((cat, i) => <Cell key={i} fill={catColor[cat] ?? D.gold} fillOpacity={0.85} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+          </div>
+
+          {/* ── ROW 3: KPIs horizontal + Marketing por Canal ── */}
+          <div style={{ display: 'grid', gridTemplateColumns: kpisData.length > 0 && marketingByCanal.length > 0 ? '3fr 2fr' : '1fr', gap: 1, background: D.border2, marginTop: 1 }}>
+
+            {/* KPIs vs Meta — barra horizontal */}
+            {kpisData.length > 0 && (
+              <div style={{ background: D.card, padding: '14px 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                  <p style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: D.textMuted, margin: 0 }}>Indicadores-Chave · Atual vs Meta</p>
+                  <Link to="/dashboard/membro/kpis" style={{ textDecoration: 'none', fontSize: 9, color: D.gold, fontWeight: 600 }}>Ver →</Link>
+                </div>
+                <p style={{ fontSize: 10, color: D.textFaint, margin: '0 0 10px' }}>{kpisData.length} KPI{kpisData.length !== 1 ? 's' : ''} · score médio {avgKpiPct}%</p>
+                <ResponsiveContainer width="100%" height={Math.max(120, kpisData.slice(0, 6).length * 32 + 20)}>
+                  <BarChart layout="vertical" barSize={10} barGap={2}
+                    margin={{ top: 0, right: 20, left: 0, bottom: 0 }}
+                    data={kpisData.slice(0, 6).map(k => ({
+                      name: k.kpi_name.length > 18 ? k.kpi_name.slice(0, 18) + '…' : k.kpi_name,
+                      Atual: k.atual, Meta: k.meta,
+                    }))}>
+                    <CartesianGrid horizontal={false} stroke={D.border} />
+                    <XAxis type="number" tick={{ fontSize: 8, fill: D.textMuted }} axisLine={false} tickLine={false} />
+                    <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: D.textMuted }} axisLine={false} tickLine={false} width={120} />
+                    <Tooltip cursor={{ fill: 'rgba(0,0,0,0.03)' }} contentStyle={{ background: D.card, border: `1px solid ${D.border}`, fontSize: 11 }} />
+                    <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 9, paddingTop: 4, color: D.textMuted }} />
+                    <Bar dataKey="Meta" fill={D.surface2} radius={[0,2,2,0]} />
+                    <Bar dataKey="Atual" radius={[0,2,2,0]}>
                       {kpisData.slice(0, 6).map((k, i) => {
                         const p = pct(k.atual, k.meta)
-                        return <Cell key={i} fill={p >= 80 ? '#22C55E' : p >= 50 ? D.gold : '#F87171'} fillOpacity={0.85} />
+                        return <Cell key={i} fill={p >= 80 ? '#22C55E' : p >= 50 ? D.gold : '#F87171'} />
                       })}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              {kpisData.slice(0, 5).map((kpi, i) => {
-                const p   = pct(kpi.atual, kpi.meta)
-                const col = p >= 80 ? '#22C55E' : p >= 50 ? D.gold : '#F87171'
-                return (
-                  <div key={kpi.id} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 44px', alignItems: 'center', gap: 14, padding: '8px 0', borderTop: i === 0 ? `1px solid ${D.border}` : 'none', borderBottom: `1px solid ${D.border}` }}>
-                    <span style={{ fontSize: 13, color: D.textMid, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kpi.kpi_name}</span>
-                    <div style={{ height: 3, background: D.surface2, borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${p}%`, background: col, borderRadius: 2, transition: 'width 0.5s ease' }} />
-                    </div>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: col, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{p}%</span>
-                  </div>
-                )
-              })}
-            </div>
-          )}
+            )}
+
+            {/* Marketing por Canal */}
+            {marketingByCanal.length > 0 && (
+              <div style={{ background: D.card, padding: '14px 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                  <p style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: D.textMuted, margin: 0 }}>Marketing por Canal</p>
+                  <Link to="/dashboard/membro/marketing" style={{ textDecoration: 'none', fontSize: 9, color: D.gold, fontWeight: 600 }}>Ver →</Link>
+                </div>
+                <p style={{ fontSize: 10, color: D.textFaint, margin: '0 0 10px' }}>{marketingTotal} ações · {marketingPct}% concluídas</p>
+                <ResponsiveContainer width="100%" height={Math.max(120, marketingByCanal.length * 28 + 20)}>
+                  <BarChart layout="vertical" barSize={10} barGap={2}
+                    margin={{ top: 0, right: 10, left: 0, bottom: 0 }}
+                    data={marketingByCanal.map(d => ({ name: d.canal, Total: d.total, Feitas: d.feitas }))}>
+                    <CartesianGrid horizontal={false} stroke={D.border} />
+                    <XAxis type="number" tick={{ fontSize: 8, fill: D.textMuted }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <YAxis type="category" dataKey="name" tick={{ fontSize: 9, fill: D.textMuted }} axisLine={false} tickLine={false} width={64} />
+                    <Tooltip cursor={{ fill: 'rgba(0,0,0,0.03)' }} contentStyle={{ background: D.card, border: `1px solid ${D.border}`, fontSize: 11 }} />
+                    <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: 9, paddingTop: 4, color: D.textMuted }} />
+                    <Bar dataKey="Total" fill="rgba(197,168,128,0.35)" radius={[0,2,2,0]} />
+                    <Bar dataKey="Feitas" fill="#22C55E" fillOpacity={0.85} radius={[0,2,2,0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
+          </div>
         </div>
 
         <HR />
