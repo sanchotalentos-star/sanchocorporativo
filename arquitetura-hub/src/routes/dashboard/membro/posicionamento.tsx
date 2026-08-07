@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { Lock, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { IDENTIDADE_KEY } from '@/lib/identidade'
+import { JornadaPanorama } from '@/components/membro/JornadaPanorama'
 
 export const Route = createFileRoute('/dashboard/membro/posicionamento')({
   component: PosicionamentoPage,
@@ -424,6 +425,9 @@ function PosicionamentoPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0, maxWidth: 780, padding: '48px 0 80px' }}>
+
+      {/* ── Panorama ── */}
+      <JornadaPanorama atual="Identidade" />
 
       {/* ── Heading ── */}
       <div style={{ paddingBottom: 32, display: 'flex', flexDirection: 'column', gap: 12 }}>

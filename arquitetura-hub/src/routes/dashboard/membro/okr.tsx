@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { staggerContainer, fadeInUp } from '@/lib/motion'
 import { getIdentidade } from '@/lib/identidade'
+import { JornadaPanorama } from '@/components/membro/JornadaPanorama'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/dashboard/membro/okr')({
@@ -770,6 +771,9 @@ function OkrPage() {
 
   return (
     <div style={{ maxWidth: 860, padding: '48px 0 80px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+      {/* ── Panorama da Jornada ── */}
+      <JornadaPanorama atual="Metas" />
 
       {/* ── Breadcrumb + Heading ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>

@@ -4,6 +4,7 @@ import { Megaphone, Plus, Calendar, Instagram, Youtube, Mic, FileText, Video, Ma
 import { cn } from '@/lib/utils'
 import { getIdentidade } from '@/lib/identidade'
 import { memberKey } from '@/lib/memberStorage'
+import { JornadaPanorama } from '@/components/membro/JornadaPanorama'
 
 const MARKETING_KEY = 'marketing_store_v1'
 
@@ -262,8 +263,12 @@ function MarketingPage() {
 
   return (
     <div style={{ maxWidth: 960, paddingBottom: 80, display: 'flex', flexDirection: 'column', gap: 24 }}>
+      {/* ── Panorama da Jornada ── */}
+      <div style={{ paddingTop: 48 }}>
+        <JornadaPanorama atual="Marketing" />
+      </div>
       {/* ── Breadcrumb + Heading ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 0, paddingTop: 48 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {/* Breadcrumb */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' as const }}>
           {([

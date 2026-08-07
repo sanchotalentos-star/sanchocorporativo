@@ -4,6 +4,7 @@ import { ChevronRight, Layers, ChevronDown, ChevronUp } from 'lucide-react'
 import { PilarAccordion } from '@/components/membro/PilarAccordion'
 import { mockPilares } from '@/lib/mocks/pilares'
 import { getIdentidade, PILAR_LABELS } from '@/lib/identidade'
+import { JornadaPanorama } from '@/components/membro/JornadaPanorama'
 import type { Pilar } from '@/types'
 
 export const Route = createFileRoute('/dashboard/membro/pilares')({
@@ -282,6 +283,9 @@ function PilaresPage() {
 
   return (
     <div style={{ maxWidth: 860, padding: '48px 0 80px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+
+      {/* ── Panorama da Jornada ── */}
+      <JornadaPanorama atual="Pilares" />
 
       {/* ── Breadcrumb ── */}
       <Breadcrumb active="Pilares" />

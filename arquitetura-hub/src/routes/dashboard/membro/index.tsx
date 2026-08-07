@@ -866,6 +866,7 @@ function HomePage() {
   const [kpisData,            setKpisData]           = useState<KpiItem[]>([])
   const [marketingTotal,      setMarketingTotal]     = useState(0)
   const [marketingConcluidas, setMarketingConcluidas] = useState(0)
+  const [agendaPendentes,     setAgendaPendentes]    = useState<Array<{ id: string; titulo: string; objetivo: string; tipo: 'okr' | 'marketing' }>>([])
 
   useEffect(() => {
     try { const s = localStorage.getItem(memberKey(OKR_KEY)); if (s) setOkrs(JSON.parse(s) ?? []) } catch {}
@@ -886,6 +887,23 @@ function HomePage() {
         setHasKpis(kArr.length > 0)
         setKpisData(kArr as KpiItem[])
       }
+    } catch {}
+    try {
+      /* Agenda: ações pendentes de OKR (PDCA) + marketing deste mês */
+      const okrRaw = localStorage.getItem(memberKey(OKR_KEY))
+      const okrArr: any[] = okrRaw ? JSON.parse(okrRaw) : []
+      const okrItems = okrArr.flatMap((o: any) =>
+        (o.pdca?.acoes ?? [])
+          .filter((a: any) => a.status === 'pendente' || a.status === 'em_andamento' || !a.status)
+          .map((a: any) => ({ id: `okr-${a.id}`, titulo: a.descricao || a.entrega || '—', objetivo: o.titulo || '', tipo: 'okr' as const }))
+      )
+      const mktRaw = localStorage.getItem(memberKey('marketing_store_v1'))
+      const mktArr: any[] = mktRaw ? JSON.parse(mktRaw) : []
+      const mesAtual = new Date().getMonth() + 1
+      const mktItems = mktArr
+        .filter((a: any) => !a.concluida && (!a.mes || a.mes === mesAtual))
+        .map((a: any) => ({ id: `mkt-${a.id}`, titulo: a.titulo || '—', objetivo: a.canal || 'Marketing', tipo: 'marketing' as const }))
+      setAgendaPendentes([...okrItems, ...mktItems].slice(0, 4))
     } catch {}
   }, [])
 
@@ -1003,7 +1021,7 @@ function HomePage() {
       <p style={{ fontSize: 15, color: D.textSub, margin: '10px 0 0', lineHeight: 1.7, maxWidth: 480 }}>
         {firstName ? `Olá, ${firstName}. ` : ''}
         {ativas.length > 0
-          ? `Você tem ${ativas.length} missão${ativas.length !== 1 ? 'ões' : ''} ativa${ativas.length !== 1 ? 's' : ''} — veja o que priorizar hoje.`
+          ? `Você tem ${ativas.length} ${ativas.length !== 1 ? 'missões' : 'missão'} ativa${ativas.length !== 1 ? 's' : ''} — veja o que priorizar hoje.`
           : 'Seu hub de autoridade e estratégia de marca.'
         }
       </p>
@@ -1102,6 +1120,40 @@ function HomePage() {
                   </div>
                 )
               })}
+            </div>
+          )}
+
+          {/* ── Agenda pendente ── */}
+          {agendaPendentes.length > 0 && (
+            <div style={{ borderTop: `1px solid ${D.border}` }}>
+              <div style={{
+                padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                background: D.surface,
+              }}>
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted }}>
+                  Na agenda — ações planejadas
+                </span>
+                <Link to="/dashboard/membro/agenda" style={{ textDecoration: 'none', fontSize: 10, color: D.gold, fontWeight: 600 }}>
+                  Ver agenda →
+                </Link>
+              </div>
+              {agendaPendentes.map((item, i) => (
+                <div key={item.id} style={{
+                  display: 'flex', alignItems: 'center', gap: 12, padding: '10px 24px',
+                  borderBottom: i < agendaPendentes.length - 1 ? `1px solid ${D.border}` : 'none',
+                }}>
+                  <div style={{
+                    width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
+                    background: item.tipo === 'marketing' ? '#3B82F6' : D.gold,
+                  }} />
+                  <p style={{ fontSize: 13, color: D.textMid, margin: 0, flex: 1, lineHeight: 1.45, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {item.titulo}
+                  </p>
+                  <span style={{ fontSize: 9, fontWeight: 600, color: D.textMuted, letterSpacing: '0.06em', textTransform: 'uppercase', flexShrink: 0 }}>
+                    {item.objetivo}
+                  </span>
+                </div>
+              ))}
             </div>
           )}
 

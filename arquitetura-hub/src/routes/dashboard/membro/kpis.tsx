@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { CheckCircle, AlertCircle, XCircle, ChevronRight } from 'lucide-react'
 import { KpiTable } from '@/components/membro/KpiTable'
 import { getPercent, getStatusColor } from '@/lib/utils'
+import { JornadaPanorama } from '@/components/membro/JornadaPanorama'
 import type { KpiEntry } from '@/types'
 
 export const Route = createFileRoute('/dashboard/membro/kpis')({
@@ -82,6 +83,9 @@ function KpisPage() {
 
   return (
     <div style={{ maxWidth: 860, padding: '48px 0 80px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+
+      {/* ── Panorama da Jornada ── */}
+      <JornadaPanorama atual="Indicadores" />
 
       {/* ── Breadcrumb ── */}
       <Breadcrumb active="Resultados" />
