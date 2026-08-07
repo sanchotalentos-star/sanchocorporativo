@@ -220,7 +220,7 @@ function gerarBriefingCoach(
     if (p < 40 && itens.length < 4) {
       itens.push({
         prioridade: 'atencao',
-        mensagem: `"${kpi.kpi_name}" precisa de atenção — está em ${p}%`,
+        mensagem: `"${kpi.kpi_name}" precisa de atenção: ${p}%`,
         submensagem: `Atual: ${kpi.atual} · Meta: ${kpi.meta}${kpi.unidade ? ' ' + kpi.unidade : ''}`,
         href: '/dashboard/membro/kpis',
       })
@@ -898,14 +898,14 @@ function HomePage() {
       const okrItems = okrArr.flatMap((o: any) =>
         (o.pdca?.acoes ?? [])
           .filter((a: any) => a.status === 'pendente' || a.status === 'em_andamento' || !a.status)
-          .map((a: any) => ({ id: `okr-${a.id}`, titulo: a.descricao || a.entrega || '—', objetivo: o.titulo || '', tipo: 'okr' as const }))
+          .map((a: any) => ({ id: `okr-${a.id}`, titulo: a.descricao || a.entrega || 'Sem título', objetivo: o.titulo || '', tipo: 'okr' as const }))
       )
       const mktRaw = localStorage.getItem(memberKey('marketing_store_v1'))
       const mktArr: any[] = mktRaw ? JSON.parse(mktRaw) : []
       const mesAtual = new Date().getMonth() + 1
       const mktItems = mktArr
         .filter((a: any) => !a.concluida && (!a.mes || a.mes === mesAtual))
-        .map((a: any) => ({ id: `mkt-${a.id}`, titulo: a.titulo || '—', objetivo: a.canal || 'Marketing', tipo: 'marketing' as const }))
+        .map((a: any) => ({ id: `mkt-${a.id}`, titulo: a.titulo || 'Sem título', objetivo: a.canal || 'Marketing', tipo: 'marketing' as const }))
       setAgendaPendentes([...okrItems, ...mktItems].slice(0, 4))
     } catch {}
   }, [])
@@ -1037,10 +1037,10 @@ function HomePage() {
   const tarefasPct     = tarefas.length > 0 ? Math.round((feitasCount / tarefas.length) * 100) : 0
 
   const metrics = [
-    { label: 'OKRs',        value: okrs.length > 0 ? `${progOkrs}%` : '—',          sub: okrs.length > 0 ? `${okrs.length} objetivo${okrs.length !== 1 ? 's' : ''}` : 'Sem metas',                                                       color: progOkrs >= 75 ? '#22C55E' : progOkrs >= 40 ? D.gold : '#F87171',     pct: progOkrs,      href: '/dashboard/membro/okr'       },
-    { label: 'Missões',     value: tarefas.length > 0 ? `${feitasCount}/${tarefas.length}` : '—', sub: emAndamento > 0 ? `${emAndamento} em andamento` : (bloqueadas > 0 ? `${bloqueadas} bloqueada${bloqueadas !== 1 ? 's' : ''}` : 'Nenhuma ativa'), color: tarefasPct >= 70 ? '#22C55E' : tarefasPct >= 40 ? D.gold : D.textMuted, pct: tarefasPct,    href: '/dashboard/membro/tarefas'   },
-    { label: 'Marketing',   value: marketingTotal > 0 ? `${marketingPct}%` : '—',    sub: marketingTotal > 0 ? `${marketingConcluidas} de ${marketingTotal} ações` : 'Sem plano',                                                        color: marketingPct >= 70 ? '#22C55E' : marketingPct >= 40 ? D.gold : D.textMuted, pct: marketingPct, href: '/dashboard/membro/marketing' },
-    { label: 'Indicadores', value: kpisData.length > 0 ? `${avgKpiPct}%` : '—',     sub: kpisData.length > 0 ? `${kpisData.length} KPI${kpisData.length !== 1 ? 's' : ''}` : 'Sem KPIs',                                               color: avgKpiPct >= 75 ? '#22C55E' : avgKpiPct >= 40 ? D.gold : '#F87171',   pct: avgKpiPct,     href: '/dashboard/membro/kpis'      },
+    { label: 'OKRs',        value: okrs.length > 0 ? `${progOkrs}%` : '0%',         sub: okrs.length > 0 ? `${okrs.length} objetivo${okrs.length !== 1 ? 's' : ''}` : 'Sem metas',                                                       color: progOkrs >= 75 ? '#22C55E' : progOkrs >= 40 ? D.gold : '#F87171',     pct: progOkrs,      href: '/dashboard/membro/okr'       },
+    { label: 'Missões',     value: tarefas.length > 0 ? `${feitasCount}/${tarefas.length}` : '0', sub: emAndamento > 0 ? `${emAndamento} em andamento` : (bloqueadas > 0 ? `${bloqueadas} bloqueada${bloqueadas !== 1 ? 's' : ''}` : 'Nenhuma ativa'), color: tarefasPct >= 70 ? '#22C55E' : tarefasPct >= 40 ? D.gold : D.textMuted, pct: tarefasPct,    href: '/dashboard/membro/tarefas'   },
+    { label: 'Marketing',   value: marketingTotal > 0 ? `${marketingPct}%` : '0%',   sub: marketingTotal > 0 ? `${marketingConcluidas} de ${marketingTotal} ações` : 'Sem plano',                                                        color: marketingPct >= 70 ? '#22C55E' : marketingPct >= 40 ? D.gold : D.textMuted, pct: marketingPct, href: '/dashboard/membro/marketing' },
+    { label: 'Indicadores', value: kpisData.length > 0 ? `${avgKpiPct}%` : '0%',    sub: kpisData.length > 0 ? `${kpisData.length} KPI${kpisData.length !== 1 ? 's' : ''}` : 'Sem KPIs',                                               color: avgKpiPct >= 75 ? '#22C55E' : avgKpiPct >= 40 ? D.gold : '#F87171',   pct: avgKpiPct,     href: '/dashboard/membro/kpis'      },
   ]
 
   return (
@@ -1056,7 +1056,7 @@ function HomePage() {
       <p style={{ fontSize: 15, color: D.textSub, margin: '10px 0 0', lineHeight: 1.7, maxWidth: 480 }}>
         {firstName ? `Olá, ${firstName}. ` : ''}
         {ativas.length > 0
-          ? `Você tem ${ativas.length} ${ativas.length !== 1 ? 'missões' : 'missão'} ativa${ativas.length !== 1 ? 's' : ''} — veja o que priorizar hoje.`
+          ? `Você tem ${ativas.length} ${ativas.length !== 1 ? 'missões' : 'missão'} ativa${ativas.length !== 1 ? 's' : ''}. Veja o que priorizar hoje.`
           : 'Seu hub de autoridade e estratégia de marca.'
         }
       </p>
@@ -1075,7 +1075,7 @@ function HomePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: ativas.length > 0 ? '#22C55E' : D.textFaint, flexShrink: 0 }} />
               <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMid }}>
-                Missões do dia — semana {weekOfMonth}/4 do mês
+                Missões do dia · semana {weekOfMonth}/4 do mês
               </span>
             </div>
             <Link to="/dashboard/membro/tarefas" style={{ textDecoration: 'none' }}>
@@ -1153,7 +1153,7 @@ function HomePage() {
                 </div>
               ) : (
                 <p style={{ fontSize: 13, color: D.textSub, margin: 0 }}>
-                  Todas as missões concluídas — excelente ritmo!
+                  Todas as missões concluídas. Excelente ritmo!
                 </p>
               )}
             </div>
@@ -1293,7 +1293,7 @@ function HomePage() {
                 </p>
                 <p style={{ fontFamily: D.serif, fontSize: 32, fontWeight: 400, margin: '0 0 4px', lineHeight: 1, fontVariantNumeric: 'tabular-nums',
                   color: ritmoGap < -10 ? '#F87171' : ritmoGap >= 0 ? '#22C55E' : D.gold }}>
-                  {okrs.length > 0 ? `${progOkrs}%` : '—'}
+                  {okrs.length > 0 ? `${progOkrs}%` : '0%'}
                 </p>
                 <p style={{ fontSize: 10, color: D.textMuted, margin: 0 }}>
                   {okrs.length > 0
@@ -1377,12 +1377,12 @@ function HomePage() {
           {/* ── ROW 1: 6 stat tiles ── */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 1, background: D.border2, border: `1px solid ${D.border2}`, marginBottom: 12 }}>
             {[
-              { label: 'Total Missões',  value: String(tarefas.length || '—'),   sub: 'no plano',             color: D.text,                                                                          href: '/dashboard/membro/tarefas'  as const },
-              { label: 'Concluídas',    value: String(feitasCount || '—'),       sub: `${tarefas.length > 0 ? Math.round(feitasCount/tarefas.length*100) : 0}% do total`, color: '#22C55E',          href: '/dashboard/membro/tarefas'  as const },
-              { label: 'Em andamento',  value: String(emAndamento || '—'),       sub: 'em execução',          color: '#3B82F6',                                                                       href: '/dashboard/membro/tarefas'  as const },
-              { label: 'Bloqueadas',    value: String(bloqueadas || '—'),        sub: 'travadas',             color: bloqueadas > 0 ? '#EF4444' : D.textFaint,                                        href: '/dashboard/membro/tarefas'  as const },
-              { label: 'Prog. OKRs',   value: okrs.length > 0 ? `${progOkrs}%` : '—',   sub: `${okrs.length} objetivo${okrs.length !== 1 ? 's' : ''}`,  color: progOkrs >= 70 ? '#22C55E' : progOkrs >= 40 ? D.gold : (okrs.length > 0 ? '#F87171' : D.textFaint),  href: '/dashboard/membro/okr'       as const },
-              { label: 'Score KPIs',   value: kpisData.length > 0 ? `${avgKpiPct}%` : '—', sub: `${kpisData.length} indicador${kpisData.length !== 1 ? 'es' : ''}`, color: avgKpiPct >= 75 ? '#22C55E' : avgKpiPct >= 40 ? D.gold : (kpisData.length > 0 ? '#F87171' : D.textFaint), href: '/dashboard/membro/kpis'  as const },
+              { label: 'Total Missões',  value: String(tarefas.length),           sub: 'no plano',             color: D.text,                                                                          href: '/dashboard/membro/tarefas'  as const },
+              { label: 'Concluídas',    value: String(feitasCount),              sub: `${tarefas.length > 0 ? Math.round(feitasCount/tarefas.length*100) : 0}% do total`, color: '#22C55E',          href: '/dashboard/membro/tarefas'  as const },
+              { label: 'Em andamento',  value: String(emAndamento),              sub: 'em execução',          color: '#3B82F6',                                                                       href: '/dashboard/membro/tarefas'  as const },
+              { label: 'Bloqueadas',    value: String(bloqueadas),               sub: 'travadas',             color: bloqueadas > 0 ? '#EF4444' : D.textFaint,                                        href: '/dashboard/membro/tarefas'  as const },
+              { label: 'Prog. OKRs',   value: okrs.length > 0 ? `${progOkrs}%` : '0%',  sub: `${okrs.length} objetivo${okrs.length !== 1 ? 's' : ''}`,  color: progOkrs >= 70 ? '#22C55E' : progOkrs >= 40 ? D.gold : (okrs.length > 0 ? '#F87171' : D.textFaint),  href: '/dashboard/membro/okr'       as const },
+              { label: 'Score KPIs',   value: kpisData.length > 0 ? `${avgKpiPct}%` : '0%', sub: `${kpisData.length} indicador${kpisData.length !== 1 ? 'es' : ''}`, color: avgKpiPct >= 75 ? '#22C55E' : avgKpiPct >= 40 ? D.gold : (kpisData.length > 0 ? '#F87171' : D.textFaint), href: '/dashboard/membro/kpis'  as const },
             ].map((s) => (
               <Link key={s.label} to={s.href} style={{ textDecoration: 'none', display: 'block' }}>
                 <div

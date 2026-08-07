@@ -338,7 +338,7 @@ const STEPS = [
 ]
 
 const PROFILES = [
-  { tag: 'ESPECIALISTAS', title: 'Especialistas e consultores',  desc: 'Profissionais de alta performance que dominam o que fazem — mas ainda não são vistos como a referência que já são.' },
+  { tag: 'ESPECIALISTAS', title: 'Especialistas e consultores',  desc: 'Profissionais de alta performance que dominam o que fazem, mas ainda não são vistos como a referência que já são.' },
   { tag: 'LIDERANÇAS',    title: 'Líderes e executivos',         desc: 'Com trajetória sólida e resultados comprovados, mas sem o posicionamento externo que reflita seu nível de influência real.' },
   { tag: 'EMPREENDEDORES', title: 'Empreendedores e fundadores', desc: 'Que constroem negócios excepcionais, mas ainda dependem de indicação porque o mercado não enxerga sua autoridade.' },
 ]
@@ -532,7 +532,7 @@ export default function LandingPage() {
               margin: '34px auto 0',
             }}
           >
-            Arquitetura de Relevância é para quem já chegou longe — profissionais
+            Arquitetura de Relevância é para quem já chegou longe: profissionais
             excepcionalmente competentes que ainda não ocupam o espaço de autoridade
             e reconhecimento que sua expertise merece.
           </motion.p>
@@ -562,6 +562,26 @@ export default function LandingPage() {
           </div>
 
         </div>
+
+        {/* ── Rodapé do hero: ligação com a imagem de montanhas ── */}
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          transition={{ duration: 1.2, delay: 0.7 }}
+          style={{
+            position: 'absolute', bottom: 28, left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 10,
+            display: 'flex', alignItems: 'center', gap: 14,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <div style={{ width: 28, height: 1, background: BORDER_MID }} />
+          <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 500, letterSpacing: '0.18em', textTransform: 'uppercase', color: TEXT_DIM }}>
+            Cada altitude tem o seu caminho
+          </span>
+          <div style={{ width: 28, height: 1, background: BORDER_MID }} />
+        </motion.div>
+
       </section>
 
       {/* ════════════════════════════════════════════════════════════
@@ -667,7 +687,7 @@ export default function LandingPage() {
             </h2>
             <p style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.85, color: 'rgba(245,242,236,0.42)', maxWidth: 540, marginBottom: 72 }}>
               A Arquitetura de Relevância não é para quem quer parecer o que não é.
-              É para quem já chegou longe pela competência — mas ainda não ocupa o
+              É para quem já chegou longe pela competência, mas ainda não ocupa o
               espaço de autoridade e visibilidade que esse caminho merece.
             </p>
           </FadeUp>
