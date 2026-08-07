@@ -985,6 +985,27 @@ function HomePage() {
   const journeyPct      = Math.round((completedCount / journeyPhases.length) * 100)
   const currentPhaseIdx = journeyPhases.reduce((last, p, i) => p.done ? i : last, -1)
 
+  /* ── Meta do mês / ritmo ── */
+  const _now          = new Date()
+  const dayOfMonth    = _now.getDate()
+  const daysInMonth   = new Date(_now.getFullYear(), _now.getMonth() + 1, 0).getDate()
+  const weekOfMonth   = Math.min(4, Math.ceil(dayOfMonth / 7))
+  const expectedPct   = Math.round((dayOfMonth / daysInMonth) * 100) // % esperada do mês
+  const ritmoGap      = progOkrs - expectedPct // positivo = na frente; negativo = atrás
+
+  /* ── Mapa KR → OKR (para contexto por missão) ── */
+  const krToOkr = okrs.reduce<Record<string, { titulo: string; pct: number }>>((acc, o) => {
+    o.keyResults.forEach(kr => { acc[kr.id] = { titulo: o.titulo, pct: objPct(o) } })
+    return acc
+  }, {})
+
+  /* ── OKR mais atrasado em relação ao ritmo esperado ── */
+  const okrMaisAtrasado = okrs.reduce<{ titulo: string; pct: number } | null>((acc, o) => {
+    const p = objPct(o)
+    if (!acc || p < acc.pct) return { titulo: o.titulo, pct: p }
+    return acc
+  }, null)
+
   const viewTabs = [
     { key: 'lista'  as ViewMode, label: 'Lista'  },
     { key: 'kanban' as ViewMode, label: 'Kanban' },
@@ -1043,10 +1064,10 @@ function HomePage() {
       {/* ── MAIN SECTIONS ── */}
       <div style={{ marginTop: 44, display: 'flex', flexDirection: 'column' }}>
 
-        {/* ══ HOJE: O QUE FAZER AGORA ══ */}
+        {/* ══ MISSÕES DIÁRIAS ══ */}
         <div style={{ marginBottom: 40, border: `1.5px solid ${D.border2}`, background: D.card }}>
 
-          {/* Cabeçalho do card */}
+          {/* ── Header ── */}
           <div style={{
             padding: '13px 24px', borderBottom: `1px solid ${D.border}`, background: D.surface,
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -1054,53 +1075,110 @@ function HomePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: ativas.length > 0 ? '#22C55E' : D.textFaint, flexShrink: 0 }} />
               <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMid }}>
-                Missões prioritárias de hoje
+                Missões do dia — semana {weekOfMonth}/4 do mês
               </span>
             </div>
             <Link to="/dashboard/membro/tarefas" style={{ textDecoration: 'none' }}>
-              <span style={{ fontSize: 10, color: D.gold, fontWeight: 600, transition: 'opacity 0.1s' }}>
+              <span style={{ fontSize: 10, color: D.gold, fontWeight: 600 }}>
                 {ativas.length} ativas no total →
               </span>
             </Link>
           </div>
 
-          {/* Lista de missões */}
+          {/* ── Ritmo do mês ── */}
+          {okrs.length > 0 && (
+            <div style={{ padding: '14px 24px', borderBottom: `1px solid ${D.border}`, background: '#FFFEF9' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted }}>
+                    Ritmo do mês
+                  </span>
+                  <span style={{
+                    fontSize: 9, fontWeight: 600, padding: '2px 8px',
+                    background: ritmoGap < -10 ? 'rgba(248,113,113,0.12)' : ritmoGap >= 0 ? 'rgba(34,197,94,0.12)' : 'rgba(197,168,128,0.12)',
+                    color:      ritmoGap < -10 ? '#DC2626'               : ritmoGap >= 0 ? '#16A34A'               : '#92710A',
+                  }}>
+                    {ritmoGap < -10 ? `${Math.abs(ritmoGap)}% abaixo do esperado` : ritmoGap >= 5 ? `${ritmoGap}% à frente` : 'No ritmo'}
+                  </span>
+                </div>
+                <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none', fontSize: 9, color: D.gold, fontWeight: 600 }}>
+                  Ver metas →
+                </Link>
+              </div>
+
+              {/* Barra dupla: progresso real vs esperado */}
+              <div style={{ position: 'relative', height: 6, background: D.surface2, borderRadius: 3, overflow: 'visible' }}>
+                {/* Barra de progresso real */}
+                <div style={{
+                  position: 'absolute', left: 0, top: 0, height: '100%',
+                  width: `${Math.min(100, progOkrs)}%`,
+                  background: ritmoGap < -10 ? '#F87171' : ritmoGap >= 0 ? '#22C55E' : D.gold,
+                  borderRadius: 3, transition: 'width 0.6s ease',
+                }} />
+                {/* Marcador do esperado */}
+                <div style={{
+                  position: 'absolute', left: `${expectedPct}%`, top: -3, bottom: -3,
+                  width: 2, background: D.textFaint, borderRadius: 1,
+                }} />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+                <span style={{ fontSize: 9, color: D.textMuted }}>
+                  Real: <strong style={{ color: D.textMid }}>{progOkrs}%</strong>
+                </span>
+                <span style={{ fontSize: 9, color: D.textFaint }}>
+                  Esperado dia {dayOfMonth}/{daysInMonth}: {expectedPct}%
+                </span>
+              </div>
+
+              {okrMaisAtrasado && okrMaisAtrasado.pct < expectedPct && (
+                <p style={{ fontSize: 11, color: D.textMuted, margin: '8px 0 0', lineHeight: 1.5 }}>
+                  Foco hoje: <span style={{ color: D.textMid, fontWeight: 500 }}>
+                    {okrMaisAtrasado.titulo.length > 70 ? okrMaisAtrasado.titulo.slice(0, 70) + '…' : okrMaisAtrasado.titulo}
+                  </span>
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* ── Lista de missões diárias ── */}
           {topMissions.length === 0 ? (
             <div style={{ padding: '28px 24px', textAlign: 'center' }}>
               {okrs.length === 0 ? (
                 <div>
-                  <p style={{ fontSize: 14, fontWeight: 500, color: D.textMid, margin: '0 0 6px' }}>Nenhuma missão criada ainda</p>
+                  <p style={{ fontSize: 14, fontWeight: 500, color: D.textMid, margin: '0 0 6px' }}>Nenhuma missão para hoje</p>
                   <p style={{ fontSize: 13, color: D.textSub, lineHeight: 1.6, margin: '0 0 18px' }}>
-                    Crie seus OKRs em <Link to="/dashboard/membro/okr" style={{ color: D.gold, textDecoration: 'none', fontWeight: 600 }}>Metas de Impacto</Link> para gerar missões automaticamente.
+                    Crie seus OKRs em <Link to="/dashboard/membro/okr" style={{ color: D.gold, textDecoration: 'none', fontWeight: 600 }}>Metas de Impacto</Link> para gerar missões diárias automaticamente.
                   </p>
                 </div>
               ) : (
                 <p style={{ fontSize: 13, color: D.textSub, margin: 0 }}>
-                  Todas as missões concluídas — excelente trabalho!
+                  Todas as missões concluídas — excelente ritmo!
                 </p>
               )}
             </div>
           ) : (
             <div>
               {topMissions.map((m, i) => {
-                const scfg = statusConfig[m.status]
-                const pcfg = prioridadeConfig[m.prioridade]
+                const scfg   = statusConfig[m.status]
+                const pcfg   = prioridadeConfig[m.prioridade]
+                const okrCtx = krToOkr[m.krId]
                 return (
                   <div key={m.id}
                     style={{
-                      display: 'flex', alignItems: 'flex-start', gap: 14, padding: '14px 24px',
+                      display: 'flex', alignItems: 'flex-start', gap: 14, padding: '13px 24px',
                       borderBottom: i < topMissions.length - 1 ? `1px solid ${D.border}` : 'none',
                       transition: 'background 0.1s', cursor: 'default',
                     }}
                     onMouseEnter={e => { e.currentTarget.style.background = D.surface }}
                     onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                   >
-                    {/* Círculo de status (clicável) */}
+                    {/* Círculo de status clicável */}
                     <button
                       onClick={() => cycleStatus(m.id)}
                       title="Clique para avançar o status"
                       style={{
-                        width: 20, height: 20, borderRadius: '50%', flexShrink: 0, marginTop: 1,
+                        width: 20, height: 20, borderRadius: '50%', flexShrink: 0, marginTop: 2,
                         border: `2px solid ${scfg.dot}`,
                         background: m.status === 'feita' ? scfg.dot : 'transparent',
                         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -1111,23 +1189,37 @@ function HomePage() {
                       {m.status === 'em_andamento' && <span style={{ width: 7, height: 7, borderRadius: '50%', background: scfg.dot, display: 'block' }} />}
                     </button>
 
-                    {/* Descrição */}
-                    <p style={{
-                      fontSize: 14, color: m.status === 'feita' ? D.textMuted : D.textMid,
-                      margin: 0, lineHeight: 1.55, flex: 1,
-                      textDecoration: m.status === 'feita' ? 'line-through' : 'none',
-                    }}>
-                      {m.descricao}
-                    </p>
+                    {/* Descrição + contexto OKR */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{
+                        fontSize: 13, color: m.status === 'feita' ? D.textMuted : D.textMid,
+                        margin: 0, lineHeight: 1.5,
+                        textDecoration: m.status === 'feita' ? 'line-through' : 'none',
+                      }}>
+                        {m.descricao}
+                      </p>
+                      {okrCtx && (
+                        <p style={{ fontSize: 10, color: D.textFaint, margin: '3px 0 0' }}>
+                          Meta: <span style={{ color: D.textMuted }}>{okrCtx.titulo.length > 55 ? okrCtx.titulo.slice(0, 55) + '…' : okrCtx.titulo}</span>
+                          {' '}
+                          <span style={{
+                            fontWeight: 600,
+                            color: okrCtx.pct >= 70 ? '#22C55E' : okrCtx.pct >= 40 ? D.gold : '#F87171',
+                          }}>
+                            {okrCtx.pct}%
+                          </span>
+                        </p>
+                      )}
+                    </div>
 
                     {/* Badges */}
-                    <div style={{ display: 'flex', gap: 5, flexShrink: 0, alignItems: 'center', marginTop: 2 }}>
+                    <div style={{ display: 'flex', gap: 5, flexShrink: 0, alignItems: 'flex-start', marginTop: 2 }}>
                       {m.status === 'em_andamento' && (
-                        <span style={{ fontSize: 9, fontWeight: 600, padding: '3px 8px', background: scfg.bg, color: scfg.text, whiteSpace: 'nowrap' }}>
+                        <span style={{ fontSize: 9, fontWeight: 600, padding: '2px 7px', background: scfg.bg, color: scfg.text, whiteSpace: 'nowrap' }}>
                           Em andamento
                         </span>
                       )}
-                      <span style={{ fontSize: 9, fontWeight: 600, padding: '3px 8px', background: pcfg.bg, color: pcfg.text }}>
+                      <span style={{ fontSize: 9, fontWeight: 600, padding: '2px 7px', background: pcfg.bg, color: pcfg.text }}>
                         {pcfg.label}
                       </span>
                     </div>
@@ -1137,7 +1229,7 @@ function HomePage() {
             </div>
           )}
 
-          {/* ── Agenda pendente ── */}
+          {/* ── Agenda desta semana (ações planejadas) ── */}
           {agendaPendentes.length > 0 && (
             <div style={{ borderTop: `1px solid ${D.border}` }}>
               <div style={{
@@ -1145,33 +1237,35 @@ function HomePage() {
                 background: D.surface,
               }}>
                 <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted }}>
-                  Na agenda — ações planejadas
+                  Agenda desta semana
                 </span>
                 <Link to="/dashboard/membro/agenda" style={{ textDecoration: 'none', fontSize: 10, color: D.gold, fontWeight: 600 }}>
-                  Ver agenda →
+                  Ver agenda completa →
                 </Link>
               </div>
               {agendaPendentes.map((item, i) => (
                 <div key={item.id} style={{
-                  display: 'flex', alignItems: 'center', gap: 12, padding: '10px 24px',
+                  display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 24px',
                   borderBottom: i < agendaPendentes.length - 1 ? `1px solid ${D.border}` : 'none',
                 }}>
                   <div style={{
-                    width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
+                    width: 6, height: 6, borderRadius: '50%', flexShrink: 0, marginTop: 4,
                     background: item.tipo === 'marketing' ? '#3B82F6' : D.gold,
                   }} />
-                  <p style={{ fontSize: 13, color: D.textMid, margin: 0, flex: 1, lineHeight: 1.45, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {item.titulo}
-                  </p>
-                  <span style={{ fontSize: 9, fontWeight: 600, color: D.textMuted, letterSpacing: '0.06em', textTransform: 'uppercase', flexShrink: 0 }}>
-                    {item.objetivo}
-                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 12, color: D.textMid, margin: 0, lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {item.titulo}
+                    </p>
+                    <p style={{ fontSize: 10, color: D.textFaint, margin: '1px 0 0' }}>
+                      {item.tipo === 'okr' ? 'OKR' : 'Marketing'} · {item.objetivo}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
           )}
 
-          {/* ── Faixa de métricas rápidas ── */}
+          {/* ── Stats rápidas ── */}
           <div style={{ borderTop: `1px solid ${D.border}`, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
 
             <Link to="/dashboard/membro/tarefas" style={{ textDecoration: 'none' }}>
@@ -1179,7 +1273,7 @@ function HomePage() {
                 onMouseEnter={e => { e.currentTarget.style.background = D.surface }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}>
                 <p style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 6px' }}>
-                  Missões ativas
+                  Missões de hoje
                 </p>
                 <p style={{ fontFamily: D.serif, fontSize: 32, fontWeight: 400, color: D.text, margin: '0 0 4px', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                   {ativas.length}
@@ -1195,13 +1289,16 @@ function HomePage() {
                 onMouseEnter={e => { e.currentTarget.style.background = D.surface }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}>
                 <p style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 6px' }}>
-                  Progresso OKRs
+                  Meta do mês
                 </p>
-                <p style={{ fontFamily: D.serif, fontSize: 32, fontWeight: 400, margin: '0 0 4px', lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: progOkrs >= 70 ? '#22C55E' : progOkrs >= 40 ? D.gold : (okrs.length > 0 ? '#F87171' : D.textMuted) }}>
+                <p style={{ fontFamily: D.serif, fontSize: 32, fontWeight: 400, margin: '0 0 4px', lineHeight: 1, fontVariantNumeric: 'tabular-nums',
+                  color: ritmoGap < -10 ? '#F87171' : ritmoGap >= 0 ? '#22C55E' : D.gold }}>
                   {okrs.length > 0 ? `${progOkrs}%` : '—'}
                 </p>
                 <p style={{ fontSize: 10, color: D.textMuted, margin: 0 }}>
-                  {okrs.length > 0 ? `${okrs.length} objetivo${okrs.length !== 1 ? 's' : ''}` : 'Sem metas criadas'}
+                  {okrs.length > 0
+                    ? (ritmoGap < 0 ? `${Math.abs(ritmoGap)}% abaixo do ritmo` : `esperado ${expectedPct}%`)
+                    : 'Sem metas criadas'}
                 </p>
               </div>
             </Link>
@@ -1211,7 +1308,7 @@ function HomePage() {
                 onMouseEnter={e => { e.currentTarget.style.background = D.surface }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}>
                 <p style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 6px' }}>
-                  Próxima sessão
+                  Sessão com mentor
                 </p>
                 <p style={{ fontFamily: D.serif, fontSize: 32, fontWeight: 400, color: D.gold, margin: '0 0 4px', lineHeight: 1 }}>
                   Agenda
