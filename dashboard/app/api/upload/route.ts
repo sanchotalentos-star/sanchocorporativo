@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { bucket, filename, contentType } = parsed.data;
+  const { bucket, filename } = parsed.data;
 
   // Sanitiza o nome do arquivo e adiciona timestamp para evitar colisões
   const ext      = filename.split(".").pop() ?? "png";

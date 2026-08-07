@@ -57,8 +57,7 @@ export async function GET(
     if (error) throw error;
     if (!data) return NextResponse.json(defaultMetas(mes));
     return NextResponse.json(data);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Erro ao buscar metas";
+  } catch {
     // Em caso de erro (ex: Supabase não configurado), retorna defaults
     return NextResponse.json(defaultMetas(mes));
   }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Settings, Users, Target, BarChart2, ArrowLeft, ImageIcon } from "lucide-react";
+import { Users, Target, BarChart2, ArrowLeft, ImageIcon } from "lucide-react";
 import { LogoUpload }      from "./components/LogoUpload";
 import { MetasEditor }     from "./components/MetasEditor";
 import { MembrosEditor }   from "./components/MembrosEditor";
