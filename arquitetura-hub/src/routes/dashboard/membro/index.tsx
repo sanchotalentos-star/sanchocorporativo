@@ -945,6 +945,13 @@ function HomePage() {
   const emAndamento = tarefas.filter(t => t.status === 'em_andamento').length
   const bloqueadas  = tarefas.filter(t => t.status === 'bloqueada').length
   const hoje        = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
+  const ativas      = tarefas.filter(t => t.status !== 'feita')
+  const topMissions = [
+    ...tarefas.filter(t => t.status === 'em_andamento'),
+    ...tarefas.filter(t => t.status === 'pendente' && t.prioridade === 'alta'),
+    ...tarefas.filter(t => t.status === 'pendente' && t.prioridade === 'media'),
+    ...tarefas.filter(t => t.status === 'pendente' && t.prioridade === 'baixa'),
+  ].filter((t, i, arr) => arr.findIndex(x => x.id === t.id) === i).slice(0, 5)
 
   const journeyPhases = [
     { label: 'Identidade',  done: hasIdentidade   },
@@ -995,8 +1002,8 @@ function HomePage() {
       </h1>
       <p style={{ fontSize: 15, color: D.textSub, margin: '10px 0 0', lineHeight: 1.7, maxWidth: 480 }}>
         {firstName ? `Olá, ${firstName}. ` : ''}
-        {okrs.length > 0
-          ? `Você está a ${100 - progOkrs}% de concluir seus objetivos ativos.`
+        {ativas.length > 0
+          ? `Você tem ${ativas.length} missão${ativas.length !== 1 ? 'ões' : ''} ativa${ativas.length !== 1 ? 's' : ''} — veja o que priorizar hoje.`
           : 'Seu hub de autoridade e estratégia de marca.'
         }
       </p>
@@ -1004,47 +1011,196 @@ function HomePage() {
       {/* ── MAIN SECTIONS ── */}
       <div style={{ marginTop: 44, display: 'flex', flexDirection: 'column' }}>
 
-        {/* ── PERSONAL DE RELEVÂNCIA ── */}
-        <div style={{ paddingBottom: 36 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 18 }}>
-            <SectionLabel>Personal de Relevância</SectionLabel>
-            <span style={{ fontSize: 9, color: D.textFaint, letterSpacing: '0.05em' }}>orientações personalizadas de hoje</span>
+        {/* ══ HOJE: O QUE FAZER AGORA ══ */}
+        <div style={{ marginBottom: 40, border: `1.5px solid ${D.border2}`, background: D.card }}>
+
+          {/* Cabeçalho do card */}
+          <div style={{
+            padding: '13px 24px', borderBottom: `1px solid ${D.border}`, background: D.surface,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: ativas.length > 0 ? '#22C55E' : D.textFaint, flexShrink: 0 }} />
+              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMid }}>
+                Missões prioritárias de hoje
+              </span>
+            </div>
+            <Link to="/dashboard/membro/tarefas" style={{ textDecoration: 'none' }}>
+              <span style={{ fontSize: 10, color: D.gold, fontWeight: 600, transition: 'opacity 0.1s' }}>
+                {ativas.length} ativas no total →
+              </span>
+            </Link>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {briefing.map((item, i) => {
-              const cfg = briefingConfig[item.prioridade]
-              return (
-                <Link key={i} to={item.href} style={{ textDecoration: 'none', display: 'block' }}>
-                  <div
+
+          {/* Lista de missões */}
+          {topMissions.length === 0 ? (
+            <div style={{ padding: '28px 24px', textAlign: 'center' }}>
+              {okrs.length === 0 ? (
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 500, color: D.textMid, margin: '0 0 6px' }}>Nenhuma missão criada ainda</p>
+                  <p style={{ fontSize: 13, color: D.textSub, lineHeight: 1.6, margin: '0 0 18px' }}>
+                    Crie seus OKRs em <Link to="/dashboard/membro/okr" style={{ color: D.gold, textDecoration: 'none', fontWeight: 600 }}>Metas de Impacto</Link> para gerar missões automaticamente.
+                  </p>
+                </div>
+              ) : (
+                <p style={{ fontSize: 13, color: D.textSub, margin: 0 }}>
+                  Todas as missões concluídas — excelente trabalho!
+                </p>
+              )}
+            </div>
+          ) : (
+            <div>
+              {topMissions.map((m, i) => {
+                const scfg = statusConfig[m.status]
+                const pcfg = prioridadeConfig[m.prioridade]
+                return (
+                  <div key={m.id}
                     style={{
-                      display: 'flex', alignItems: 'flex-start', gap: 14,
-                      padding: '14px 18px',
-                      border: `1px solid ${cfg.border}`,
-                      borderLeft: `3px solid ${cfg.dot}`,
-                      background: D.card,
-                      transition: 'opacity 0.12s',
+                      display: 'flex', alignItems: 'flex-start', gap: 14, padding: '14px 24px',
+                      borderBottom: i < topMissions.length - 1 ? `1px solid ${D.border}` : 'none',
+                      transition: 'background 0.1s', cursor: 'default',
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.opacity = '0.78' }}
-                    onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = D.surface }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
                   >
-                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: cfg.dot, flexShrink: 0, marginTop: 5 }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 13.5, fontWeight: 500, color: D.textMid, margin: 0, lineHeight: 1.5 }}>
-                        {item.mensagem}
-                      </p>
-                      {item.submensagem && (
-                        <p style={{ fontSize: 11, color: D.textMuted, margin: '4px 0 0' }}>{item.submensagem}</p>
+                    {/* Círculo de status (clicável) */}
+                    <button
+                      onClick={() => cycleStatus(m.id)}
+                      title="Clique para avançar o status"
+                      style={{
+                        width: 20, height: 20, borderRadius: '50%', flexShrink: 0, marginTop: 1,
+                        border: `2px solid ${scfg.dot}`,
+                        background: m.status === 'feita' ? scfg.dot : 'transparent',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {m.status === 'feita' && <span style={{ fontSize: 9, color: '#fff', fontWeight: 700 }}>✓</span>}
+                      {m.status === 'em_andamento' && <span style={{ width: 7, height: 7, borderRadius: '50%', background: scfg.dot, display: 'block' }} />}
+                    </button>
+
+                    {/* Descrição */}
+                    <p style={{
+                      fontSize: 14, color: m.status === 'feita' ? D.textMuted : D.textMid,
+                      margin: 0, lineHeight: 1.55, flex: 1,
+                      textDecoration: m.status === 'feita' ? 'line-through' : 'none',
+                    }}>
+                      {m.descricao}
+                    </p>
+
+                    {/* Badges */}
+                    <div style={{ display: 'flex', gap: 5, flexShrink: 0, alignItems: 'center', marginTop: 2 }}>
+                      {m.status === 'em_andamento' && (
+                        <span style={{ fontSize: 9, fontWeight: 600, padding: '3px 8px', background: scfg.bg, color: scfg.text, whiteSpace: 'nowrap' }}>
+                          Em andamento
+                        </span>
                       )}
+                      <span style={{ fontSize: 9, fontWeight: 600, padding: '3px 8px', background: pcfg.bg, color: pcfg.text }}>
+                        {pcfg.label}
+                      </span>
                     </div>
-                    <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: cfg.dot, flexShrink: 0, paddingTop: 3 }}>
-                      {cfg.label}
-                    </span>
                   </div>
-                </Link>
-              )
-            })}
+                )
+              })}
+            </div>
+          )}
+
+          {/* ── Faixa de métricas rápidas ── */}
+          <div style={{ borderTop: `1px solid ${D.border}`, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+
+            <Link to="/dashboard/membro/tarefas" style={{ textDecoration: 'none' }}>
+              <div style={{ padding: '16px 24px', transition: 'background 0.1s' }}
+                onMouseEnter={e => { e.currentTarget.style.background = D.surface }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}>
+                <p style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 6px' }}>
+                  Missões ativas
+                </p>
+                <p style={{ fontFamily: D.serif, fontSize: 32, fontWeight: 400, color: D.text, margin: '0 0 4px', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                  {ativas.length}
+                </p>
+                <p style={{ fontSize: 10, color: D.textMuted, margin: 0 }}>
+                  {feitasCount > 0 ? `${feitasCount} concluída${feitasCount !== 1 ? 's' : ''}` : 'Nenhuma concluída ainda'}
+                </p>
+              </div>
+            </Link>
+
+            <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none' }}>
+              <div style={{ padding: '16px 24px', borderLeft: `1px solid ${D.border}`, transition: 'background 0.1s' }}
+                onMouseEnter={e => { e.currentTarget.style.background = D.surface }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}>
+                <p style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 6px' }}>
+                  Progresso OKRs
+                </p>
+                <p style={{ fontFamily: D.serif, fontSize: 32, fontWeight: 400, margin: '0 0 4px', lineHeight: 1, fontVariantNumeric: 'tabular-nums', color: progOkrs >= 70 ? '#22C55E' : progOkrs >= 40 ? D.gold : (okrs.length > 0 ? '#F87171' : D.textMuted) }}>
+                  {okrs.length > 0 ? `${progOkrs}%` : '—'}
+                </p>
+                <p style={{ fontSize: 10, color: D.textMuted, margin: 0 }}>
+                  {okrs.length > 0 ? `${okrs.length} objetivo${okrs.length !== 1 ? 's' : ''}` : 'Sem metas criadas'}
+                </p>
+              </div>
+            </Link>
+
+            <Link to="/dashboard/membro/agenda" style={{ textDecoration: 'none' }}>
+              <div style={{ padding: '16px 24px', borderLeft: `1px solid ${D.border}`, transition: 'background 0.1s' }}
+                onMouseEnter={e => { e.currentTarget.style.background = D.surface }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}>
+                <p style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 6px' }}>
+                  Próxima sessão
+                </p>
+                <p style={{ fontFamily: D.serif, fontSize: 32, fontWeight: 400, color: D.gold, margin: '0 0 4px', lineHeight: 1 }}>
+                  Agenda
+                </p>
+                <p style={{ fontSize: 10, color: D.textMuted, margin: 0 }}>
+                  Ver cronograma de ações →
+                </p>
+              </div>
+            </Link>
+
           </div>
         </div>
+
+        {/* ── ORIENTAÇÕES ESTRATÉGICAS ── */}
+        {briefing.length > 0 && (
+          <div style={{ paddingBottom: 36 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 14 }}>
+              <SectionLabel>Orientações estratégicas</SectionLabel>
+              <span style={{ fontSize: 9, color: D.textFaint, letterSpacing: '0.05em' }}>baseadas nos seus dados de hoje</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+              {briefing.map((item, i) => {
+                const cfg = briefingConfig[item.prioridade]
+                return (
+                  <Link key={i} to={item.href} style={{ textDecoration: 'none', display: 'block' }}>
+                    <div
+                      style={{
+                        display: 'flex', alignItems: 'flex-start', gap: 12,
+                        padding: '11px 16px',
+                        border: `1px solid ${cfg.border}`,
+                        borderLeft: `3px solid ${cfg.dot}`,
+                        background: D.card,
+                        transition: 'opacity 0.12s',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.opacity = '0.75' }}
+                      onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: 13, fontWeight: 500, color: D.textMid, margin: 0, lineHeight: 1.5 }}>
+                          {item.mensagem}
+                        </p>
+                        {item.submensagem && (
+                          <p style={{ fontSize: 10, color: D.textMuted, margin: '3px 0 0' }}>{item.submensagem}</p>
+                        )}
+                      </div>
+                      <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: cfg.dot, flexShrink: 0, paddingTop: 2 }}>
+                        {cfg.label}
+                      </span>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         <HR />
 
