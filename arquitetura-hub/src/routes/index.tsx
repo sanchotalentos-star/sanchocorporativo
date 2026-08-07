@@ -338,9 +338,9 @@ const STEPS = [
 ]
 
 const PROFILES = [
-  { tag: 'ESPECIALISTAS', title: 'Especialistas e consultores',  desc: 'Que querem ser reconhecidos pelo que sabem e atrair os clientes certos com consistência.' },
-  { tag: 'TRANSIÇÃO',     title: 'Profissionais em transição',   desc: 'Reposicionando a carreira e construindo autoridade no novo nicho com método.' },
-  { tag: 'LIDERANÇAS',    title: 'Líderes e executivos',         desc: 'Que querem ampliar presença, influência e impacto além da empresa onde atuam.' },
+  { tag: 'ESPECIALISTAS', title: 'Especialistas e consultores',  desc: 'Profissionais de alta performance que dominam o que fazem — mas ainda não são vistos como a referência que já são.' },
+  { tag: 'LIDERANÇAS',    title: 'Líderes e executivos',         desc: 'Com trajetória sólida e resultados comprovados, mas sem o posicionamento externo que reflita seu nível de influência real.' },
+  { tag: 'EMPREENDEDORES', title: 'Empreendedores e fundadores', desc: 'Que constroem negócios excepcionais, mas ainda dependem de indicação porque o mercado não enxerga sua autoridade.' },
 ]
 
 function PrimaryBtn({ to, children }: { to: string; children: React.ReactNode }) {
@@ -505,15 +505,16 @@ export default function LandingPage() {
               fontFamily: SERIF,
               fontSize: 'clamp(52px,8vw,96px)',
               fontWeight: 700,
-              lineHeight: 0.92,
+              lineHeight: 0.96,
               letterSpacing: '-0.04em',
               color: WARM_WHITE,
               margin: '34px 0 0',
-              maxWidth: 760,
+              maxWidth: 820,
             }}
           >
-            Construa Sua{' '}
-            <span style={{ fontStyle: 'italic', color: GOLD }}>Relevância</span>
+            Você tem a altitude.{' '}
+            <br />
+            <span style={{ fontStyle: 'italic', color: GOLD }}>Falta a visibilidade.</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -522,16 +523,37 @@ export default function LandingPage() {
             transition={{ duration: 0.65, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             style={{
               fontFamily: SANS,
-              fontSize: 'clamp(15px,2vw,20px)',
+              fontSize: 'clamp(15px,2vw,19px)',
               fontWeight: 400,
               letterSpacing: '-0.02em',
               color: TEXT_MID,
-              lineHeight: 1.6,
-              maxWidth: 540,
+              lineHeight: 1.65,
+              maxWidth: 560,
               margin: '34px auto 0',
             }}
           >
-            Estruture sua identidade, defina seus pilares estratégicos e acompanhe cada passo da sua jornada de autoridade profissional.
+            Arquitetura de Relevância é para quem já chegou longe — profissionais
+            excepcionalmente competentes que ainda não ocupam o espaço de autoridade
+            e reconhecimento que sua expertise merece.
+          </motion.p>
+
+          {/* Eyebrow line below subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              fontFamily: SANS,
+              fontSize: 'clamp(13px,1.6vw,15px)',
+              fontWeight: 400,
+              letterSpacing: '-0.01em',
+              color: TEXT_DIM,
+              lineHeight: 1.6,
+              maxWidth: 480,
+              margin: '16px auto 0',
+            }}
+          >
+            O método transforma o que você já construiu em presença real,
+            posicionamento claro e oportunidades que chegam até você.
           </motion.p>
 
           {/* Action box */}
@@ -640,9 +662,14 @@ export default function LandingPage() {
             <p style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: GOLD, marginBottom: 24 }}>Para quem é</p>
           </FadeUp>
           <FadeUp delay={0.1}>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(36px,5.5vw,72px)', fontStyle: 'italic', fontWeight: 700, lineHeight: 1.06, letterSpacing: '-0.025em', color: WARM_WHITE, marginBottom: 72, maxWidth: 640 }}>
-              Para quem quer ser <span style={{ color: GOLD }}>referência</span>{'. Não só conhecido.'}
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(36px,5.5vw,72px)', fontStyle: 'italic', fontWeight: 700, lineHeight: 1.06, letterSpacing: '-0.025em', color: WARM_WHITE, marginBottom: 32, maxWidth: 640 }}>
+              Você já é competente.<br /><span style={{ color: GOLD }}>Ainda não é visto assim.</span>
             </h2>
+            <p style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.85, color: 'rgba(245,242,236,0.42)', maxWidth: 540, marginBottom: 72 }}>
+              A Arquitetura de Relevância não é para quem quer parecer o que não é.
+              É para quem já chegou longe pela competência — mas ainda não ocupa o
+              espaço de autoridade e visibilidade que esse caminho merece.
+            </p>
           </FadeUp>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', border: `1px solid ${BORDER_DIM}` }}>
             {PROFILES.map((p, i) => (
@@ -668,7 +695,7 @@ export default function LandingPage() {
             <FadeUp>
               <p style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: GOLD, marginBottom: 24 }}>Faça parte</p>
               <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(44px,7vw,96px)', fontStyle: 'italic', fontWeight: 700, lineHeight: 1.02, letterSpacing: '-0.03em', margin: 0, color: WARM_WHITE }}>
-                Construa autoridade<br /><span style={{ color: GOLD }}>com método.</span>
+                Sua competência<br /><span style={{ color: GOLD }}>merece ser vista.</span>
               </h2>
             </FadeUp>
             <FadeUp delay={0.15}>
