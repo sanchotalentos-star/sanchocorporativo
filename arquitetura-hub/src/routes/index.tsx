@@ -512,9 +512,9 @@ export default function LandingPage() {
               maxWidth: 820,
             }}
           >
-            Você tem a altitude.{' '}
+            Construa a sua{' '}
             <br />
-            <span style={{ fontStyle: 'italic', color: GOLD }}>Falta a visibilidade.</span>
+            <span style={{ fontStyle: 'italic', color: GOLD }}>Relevância.</span>
           </motion.h1>
 
           {/* Subtitle */}
