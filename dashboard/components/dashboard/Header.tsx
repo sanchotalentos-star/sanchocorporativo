@@ -6,34 +6,71 @@ import { formatUpdateTimestamp } from "@/lib/formatters";
 
 // ── Sancho Logo Wordmark ────────────────────────────────────────
 // Fallback enquanto a logo real não está carregada do Storage.
-// Usa a versão rosa (sobre fundo escuro do dashboard).
-// Formato: "SANCHO" numa linha + "GESTÃO DE CARREIRA" abaixo.
+// Replica a identidade visual real: SAN / CHO empilhados,
+// "O" com pena/folha diagonal, versão rosa sobre fundo escuro.
 function SanchoWordmark() {
+  const pink = "var(--sancho-pink)";
+  const fontStack = "'Arial Black', 'Arial Bold', Impact, 'Helvetica Neue', sans-serif";
+  const letterStyle: React.CSSProperties = {
+    fontFamily: fontStack,
+    fontWeight: 900,
+    fontSize: "22px",
+    lineHeight: 1,
+    letterSpacing: "-0.02em",
+    color: pink,
+    textTransform: "uppercase",
+  };
+
   return (
     <div
       className="flex flex-col leading-none select-none"
       aria-label="Sancho Gestão de Carreira"
+      style={{ gap: 1 }}
     >
-      <span
-        style={{
-          fontFamily: "'Arial Black', 'Arial Bold', Impact, 'Helvetica Neue', sans-serif",
-          fontWeight: 900,
-          fontSize: "26px",
-          lineHeight: 1,
-          letterSpacing: "-0.03em",
-          color: "var(--sancho-pink)",
-          textTransform: "uppercase",
-        }}
-      >
-        SANCHO
-      </span>
+      {/* Linha 1 — SAN */}
+      <span style={letterStyle}>SAN</span>
+
+      {/* Linha 2 — CH + O com pena */}
+      <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
+        <span style={letterStyle}>CH</span>
+        {/* O com pena diagonal em SVG inline */}
+        <svg
+          width="22" height="22"
+          viewBox="0 0 22 22"
+          fill="none"
+          aria-hidden="true"
+          style={{ marginLeft: 0, flexShrink: 0 }}
+        >
+          {/* O circular */}
+          <text
+            x="11" y="20"
+            textAnchor="middle"
+            style={{
+              fontFamily: fontStack,
+              fontWeight: 900,
+              fontSize: "22px",
+            } as React.CSSProperties}
+            fill={pink}
+          >O</text>
+          {/* Pena / folha diagonal dentro do O */}
+          <line x1="7" y1="17" x2="15" y2="5"  stroke="#080808" strokeWidth="2.2" strokeLinecap="round"/>
+          <line x1="7" y1="17" x2="15" y2="5"  stroke={pink}    strokeWidth="1"   strokeLinecap="round" opacity="0.5"/>
+          <ellipse cx="11" cy="11" rx="2.2" ry="5.5"
+            fill={pink}
+            transform="rotate(-35 11 11)"
+            opacity="0.85"
+          />
+        </svg>
+      </div>
+
+      {/* Tagline */}
       <span
         style={{
           fontFamily: "system-ui, sans-serif",
           fontWeight: 700,
-          fontSize: "7px",
-          letterSpacing: "0.22em",
-          color: "rgba(255,255,255,0.45)",
+          fontSize: "6.5px",
+          letterSpacing: "0.20em",
+          color: "rgba(255,255,255,0.40)",
           textTransform: "uppercase",
           marginTop: "3px",
         }}

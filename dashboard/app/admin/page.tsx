@@ -62,12 +62,10 @@ export default function AdminPage() {
               {logoUrl ? (
                 <img src={logoUrl} alt="Logo Sancho" className="h-8 w-auto object-contain" />
               ) : (
-                <div
-                  className="flex flex-col leading-none select-none"
-                  style={{ fontFamily: "'Arial Black', Impact, sans-serif" }}
-                >
-                  <span style={{ fontSize: 18, fontWeight: 900, color: "#fff", lineHeight: .9 }}>SAN</span>
-                  <span style={{ fontSize: 18, fontWeight: 900, color: "#fff", lineHeight: .9 }}>CHO</span>
+                <div className="flex flex-col leading-none select-none" style={{ gap: 1 }}>
+                  <span style={{ fontFamily: "'Arial Black', Impact, sans-serif", fontSize: 17, fontWeight: 900, color: "var(--sancho-pink)", lineHeight: 1, letterSpacing: "-0.02em" }}>SAN</span>
+                  <span style={{ fontFamily: "'Arial Black', Impact, sans-serif", fontSize: 17, fontWeight: 900, color: "var(--sancho-pink)", lineHeight: 1, letterSpacing: "-0.02em" }}>CHO</span>
+                  <span style={{ fontSize: "5.5px", fontWeight: 700, letterSpacing: "0.18em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", marginTop: 2 }}>GESTÃO DE CARREIRA</span>
                 </div>
               )}
               <div>
