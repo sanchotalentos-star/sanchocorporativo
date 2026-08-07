@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Black_Han_Sans } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
   subsets:  ["latin"],
   variable: "--font-inter",
+  display:  "swap",
+});
+
+const blackHanSans = Black_Han_Sans({
+  subsets:  ["latin"],
+  weight:   "400",          // Black Han Sans só tem 400, mas já é ultra-bold
+  variable: "--font-sancho-logo",
   display:  "swap",
 });
 
@@ -19,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={inter.variable}>
+    <html lang="pt-BR" className={`${inter.variable} ${blackHanSans.variable}`}>
       <body className={inter.className}>
         {children}
       </body>

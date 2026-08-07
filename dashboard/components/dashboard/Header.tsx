@@ -5,79 +5,67 @@ import { RefreshCw, Settings } from "lucide-react";
 import { formatUpdateTimestamp } from "@/lib/formatters";
 
 // ── Sancho Logo Wordmark ────────────────────────────────────────
-// Fallback enquanto a logo real não está carregada do Storage.
-// Replica a identidade visual real: SAN / CHO empilhados,
-// "O" com pena/folha diagonal, versão rosa sobre fundo escuro.
+// SVG inline que replica a identidade real da Sancho:
+// SAN / CHO empilhados, "O" com pena diagonal, rosa vibrante.
+// Só aparece quando não há logo salva no banco.
 function SanchoWordmark() {
-  const pink = "var(--sancho-pink)";
-  const fontStack = "'Arial Black', 'Arial Bold', Impact, 'Helvetica Neue', sans-serif";
-  const letterStyle: React.CSSProperties = {
-    fontFamily: fontStack,
-    fontWeight: 900,
-    fontSize: "22px",
-    lineHeight: 1,
-    letterSpacing: "-0.02em",
-    color: pink,
-    textTransform: "uppercase",
-  };
-
   return (
-    <div
-      className="flex flex-col leading-none select-none"
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 160 108"
+      width="80"
+      height="54"
       aria-label="Sancho Gestão de Carreira"
-      style={{ gap: 1 }}
+      style={{ display: "block", flexShrink: 0 }}
     >
-      {/* Linha 1 — SAN */}
-      <span style={letterStyle}>SAN</span>
+      {/* ── SAN ── */}
+      <text
+        x="2" y="52"
+        fontFamily="var(--font-sancho-logo), 'Arial Black', Impact, sans-serif"
+        fontSize="56"
+        fill="#E91E8C"
+        letterSpacing="-1"
+      >SAN</text>
 
-      {/* Linha 2 — CH + O com pena */}
-      <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
-        <span style={letterStyle}>CH</span>
-        {/* O com pena diagonal em SVG inline */}
-        <svg
-          width="22" height="22"
-          viewBox="0 0 22 22"
-          fill="none"
-          aria-hidden="true"
-          style={{ marginLeft: 0, flexShrink: 0 }}
-        >
-          {/* O circular */}
-          <text
-            x="11" y="20"
-            textAnchor="middle"
-            style={{
-              fontFamily: fontStack,
-              fontWeight: 900,
-              fontSize: "22px",
-            } as React.CSSProperties}
-            fill={pink}
-          >O</text>
-          {/* Pena / folha diagonal dentro do O */}
-          <line x1="7" y1="17" x2="15" y2="5"  stroke="#080808" strokeWidth="2.2" strokeLinecap="round"/>
-          <line x1="7" y1="17" x2="15" y2="5"  stroke={pink}    strokeWidth="1"   strokeLinecap="round" opacity="0.5"/>
-          <ellipse cx="11" cy="11" rx="2.2" ry="5.5"
-            fill={pink}
-            transform="rotate(-35 11 11)"
-            opacity="0.85"
-          />
-        </svg>
-      </div>
+      {/* ── CHO (sem o O, para sobrepor pena) ── */}
+      <text
+        x="2" y="104"
+        fontFamily="var(--font-sancho-logo), 'Arial Black', Impact, sans-serif"
+        fontSize="56"
+        fill="#E91E8C"
+        letterSpacing="-1"
+      >CHO</text>
 
-      {/* Tagline */}
-      <span
-        style={{
-          fontFamily: "system-ui, sans-serif",
-          fontWeight: 700,
-          fontSize: "6.5px",
-          letterSpacing: "0.20em",
-          color: "rgba(255,255,255,0.40)",
-          textTransform: "uppercase",
-          marginTop: "3px",
-        }}
-      >
-        GESTÃO DE CARREIRA
-      </span>
-    </div>
+      {/* ── Pena / folha dentro do O ──
+           O está aprox. x=103..158, y=53..104
+           Centro aprox: 130, 79  raio H≈27 raio V≈25  */}
+      {/* Elipse da pena rotacionada -38° */}
+      <ellipse
+        cx="130" cy="79"
+        rx="8" ry="21"
+        fill="#080808"
+        transform="rotate(-38 130 79)"
+      />
+      {/* Nervura central da pena */}
+      <line
+        x1="117" y1="95"
+        x2="143" y2="63"
+        stroke="#E91E8C"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        opacity="0.55"
+      />
+
+      {/* ── GESTÃO DE CARREIRA ── */}
+      <text
+        x="2" y="114"
+        fontFamily="system-ui, sans-serif"
+        fontSize="7"
+        fontWeight="700"
+        fill="rgba(255,255,255,0.38)"
+        letterSpacing="2.5"
+      >GESTÃO DE CARREIRA</text>
+    </svg>
   );
 }
 
