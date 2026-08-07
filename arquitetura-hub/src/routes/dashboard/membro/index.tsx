@@ -138,6 +138,13 @@ const WORKFLOWS: Workflow[] = [
   },
 ]
 
+/* ─── EXTRA TYPES ─── */
+interface KpiItem { id: string; kpi_name: string; atual: number; meta: number; unidade?: string }
+interface AcaoMarketing { id: string; titulo: string; mes: number; concluida: boolean }
+
+type BriefingPriority = 'urgente' | 'foco' | 'atencao'
+interface BriefingItem { prioridade: BriefingPriority; mensagem: string; submensagem?: string; href: string }
+
 /* ─── HELPERS ─── */
 function pct(atual: number, meta: number) { return !meta ? 0 : Math.min(100, Math.round((atual / meta) * 100)) }
 function objPct(obj: Objective) {
@@ -146,6 +153,86 @@ function objPct(obj: Objective) {
 }
 function hexToRgb(hex: string) {
   return `${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)}`
+}
+
+function gerarBriefingCoach(
+  okrs: Objective[],
+  tarefas: Tarefa[],
+  kpisData: KpiItem[],
+): BriefingItem[] {
+  const itens: BriefingItem[] = []
+
+  const okrsCriticos = [...okrs]
+    .map(o => ({ ...o, p: objPct(o) }))
+    .filter(o => o.p < 100 && o.keyResults.length > 0)
+    .sort((a, b) => a.p - b.p)
+
+  for (const okr of okrsCriticos.slice(0, 2)) {
+    const criticalKr = [...okr.keyResults]
+      .map(kr => ({ ...kr, p: pct(kr.atual, kr.meta), gap: kr.meta - kr.atual }))
+      .filter(kr => kr.p < 100 && kr.meta > 0)
+      .sort((a, b) => a.p - b.p)[0]
+
+    if (!criticalKr) continue
+
+    const gap  = criticalKr.gap
+    const unit = criticalKr.unit || 'unidades'
+    const desc = criticalKr.descricao.toLowerCase()
+
+    let acao = ''
+    if (desc.includes('palestra') || desc.includes('evento') || desc.includes('aparição'))
+      acao = `abrir ${Math.min(5, Math.ceil(gap * 2))} contatos com organizadores de eventos`
+    else if (desc.includes('conteúdo') || desc.includes('publicar') || desc.includes('post') || desc.includes('editorial'))
+      acao = `produzir e agendar ${Math.min(3, gap)} conteúdo${gap !== 1 ? 's' : ''}`
+    else if (desc.includes('lead') || desc.includes('prospect') || desc.includes('conversa') || desc.includes('reunião'))
+      acao = `fazer ${Math.min(5, gap)} prospecções ativas hoje`
+    else if (desc.includes('receita') || desc.includes('venda') || desc.includes('fechar') || desc.includes('proposta'))
+      acao = `avançar ${Math.min(3, gap)} proposta${gap !== 1 ? 's' : ''} em aberto`
+    else if (desc.includes('podcast') || desc.includes('entrevista'))
+      acao = `enviar ${Math.min(3, gap)} pitch${gap !== 1 ? 's' : ''} para podcasts do setor`
+    else
+      acao = `avançar ${Math.min(gap, 3)} ${unit} neste resultado`
+
+    itens.push({
+      prioridade: okr.p < 30 ? 'urgente' : 'foco',
+      mensagem: `Para atingir "${okr.titulo}", você precisa ${acao}`,
+      submensagem: `${okr.p}% concluído · Faltam ${gap} ${unit}`,
+      href: '/dashboard/membro/okr',
+    })
+  }
+
+  const urgentes = tarefas.filter(t => t.prioridade === 'alta' && t.status === 'pendente').slice(0, 2)
+  for (const t of urgentes) {
+    itens.push({
+      prioridade: 'foco',
+      mensagem: t.descricao.length > 90 ? t.descricao.slice(0, 90) + '…' : t.descricao,
+      submensagem: 'Tarefa de alta prioridade aguardando ação',
+      href: '/dashboard/membro/tarefas',
+    })
+  }
+
+  for (const kpi of kpisData) {
+    const p = pct(kpi.atual, kpi.meta)
+    if (p < 40 && itens.length < 4) {
+      itens.push({
+        prioridade: 'atencao',
+        mensagem: `"${kpi.kpi_name}" precisa de atenção — está em ${p}%`,
+        submensagem: `Atual: ${kpi.atual} · Meta: ${kpi.meta}${kpi.unidade ? ' ' + kpi.unidade : ''}`,
+        href: '/dashboard/membro/kpis',
+      })
+    }
+  }
+
+  if (itens.length === 0 && okrs.length === 0) {
+    itens.push({
+      prioridade: 'foco',
+      mensagem: 'Comece definindo seus OKRs para receber orientações personalizadas',
+      submensagem: 'Vá até Metas de Impacto e crie seus primeiros objetivos',
+      href: '/dashboard/membro/okr',
+    })
+  }
+
+  return itens.slice(0, 4)
 }
 
 function gerarTarefas(kr: KeyResult, okrId: string): Tarefa[] {
@@ -762,16 +849,19 @@ function HomePage() {
   const { user } = useAuth()
   const firstName = user?.full_name?.split(' ')[0] ?? ''
 
-  const [okrs,             setOkrs]            = useState<Objective[]>([])
-  const [tarefas,          setTarefas]          = useState<Tarefa[]>([])
-  const [expanded,         setExpanded]         = useState<Record<string, boolean>>({})
-  const [addingTo,         setAddingTo]         = useState<string | null>(null)
-  const [novaDesc,         setNovaDesc]         = useState('')
-  const [view,             setView]             = useState<ViewMode>('lista')
-  const [appliedWorkflows, setAppliedWorkflows] = useState<string[]>([])
-  const [hasIdentidade,    setHasIdentidade]    = useState(false)
-  const [hasMarketing,     setHasMarketing]     = useState(false)
-  const [hasKpis,          setHasKpis]          = useState(false)
+  const [okrs,                setOkrs]               = useState<Objective[]>([])
+  const [tarefas,             setTarefas]            = useState<Tarefa[]>([])
+  const [expanded,            setExpanded]           = useState<Record<string, boolean>>({})
+  const [addingTo,            setAddingTo]           = useState<string | null>(null)
+  const [novaDesc,            setNovaDesc]           = useState('')
+  const [view,                setView]               = useState<ViewMode>('lista')
+  const [appliedWorkflows,    setAppliedWorkflows]   = useState<string[]>([])
+  const [hasIdentidade,       setHasIdentidade]      = useState(false)
+  const [hasMarketing,        setHasMarketing]       = useState(false)
+  const [hasKpis,             setHasKpis]            = useState(false)
+  const [kpisData,            setKpisData]           = useState<KpiItem[]>([])
+  const [marketingTotal,      setMarketingTotal]     = useState(0)
+  const [marketingConcluidas, setMarketingConcluidas] = useState(0)
 
   useEffect(() => {
     try { const s = localStorage.getItem(memberKey(OKR_KEY)); if (s) setOkrs(JSON.parse(s) ?? []) } catch {}
@@ -779,12 +869,19 @@ function HomePage() {
     try {
       const mRaw = localStorage.getItem(memberKey('marketing_store_v1'))
       const mArr = mRaw ? JSON.parse(mRaw) : []
-      setHasMarketing(Array.isArray(mArr) && mArr.length > 0)
+      if (Array.isArray(mArr)) {
+        setHasMarketing(mArr.length > 0)
+        setMarketingTotal(mArr.length)
+        setMarketingConcluidas((mArr as AcaoMarketing[]).filter(a => a.concluida).length)
+      }
     } catch {}
     try {
       const kRaw = localStorage.getItem(memberKey('kpis_store_v1'))
       const kArr = kRaw ? JSON.parse(kRaw) : []
-      setHasKpis(Array.isArray(kArr) && kArr.length > 0)
+      if (Array.isArray(kArr)) {
+        setHasKpis(kArr.length > 0)
+        setKpisData(kArr as KpiItem[])
+      }
     } catch {}
   }, [])
 
@@ -843,18 +940,7 @@ function HomePage() {
   const feitasCount = tarefas.filter(t => t.status === 'feita').length
   const emAndamento = tarefas.filter(t => t.status === 'em_andamento').length
   const bloqueadas  = tarefas.filter(t => t.status === 'bloqueada').length
-  const pctGeral    = tarefas.length > 0 ? Math.round((feitasCount / tarefas.length) * 100) : 0
-  const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
-
-  /* Journey & checklist */
-  const setupSteps = [
-    { label: 'Definir identidade profissional',   done: hasIdentidade,   href: '/dashboard/membro/posicionamento' },
-    { label: 'Estruturar os pilares da marca',     done: false,           href: '/dashboard/membro/pilares'        },
-    { label: 'Criar metas e OKRs',                done: okrs.length > 0, href: '/dashboard/membro/okr'            },
-    { label: 'Planejar ações de marketing anual', done: hasMarketing,    href: '/dashboard/membro/marketing'      },
-    { label: 'Configurar indicadores-chave',      done: hasKpis,         href: '/dashboard/membro/kpis'           },
-  ]
-  const firstUnfinished = setupSteps.find(s => !s.done)
+  const hoje        = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
 
   const journeyPhases = [
     { label: 'Identidade',  done: hasIdentidade   },
@@ -863,8 +949,8 @@ function HomePage() {
     { label: 'Marketing',   done: hasMarketing    },
     { label: 'Indicadores', done: hasKpis         },
   ]
-  const completedCount = journeyPhases.filter(p => p.done).length
-  const journeyPct     = Math.round((completedCount / journeyPhases.length) * 100)
+  const completedCount  = journeyPhases.filter(p => p.done).length
+  const journeyPct      = Math.round((completedCount / journeyPhases.length) * 100)
   const currentPhaseIdx = journeyPhases.reduce((last, p, i) => p.done ? i : last, -1)
 
   const viewTabs = [
@@ -873,51 +959,136 @@ function HomePage() {
     { key: 'fluxos' as ViewMode, label: 'Fluxos' },
   ]
 
-  return (
-    <div style={{ maxWidth: 860, padding: '48px 0 80px', display: 'flex', flexDirection: 'column' }}>
+  /* ── Coach briefing ── */
+  const briefing = gerarBriefingCoach(okrs, tarefas, kpisData)
+  const briefingConfig: Record<BriefingPriority, { label: string; dot: string; border: string }> = {
+    urgente: { label: 'Urgente', dot: '#EF4444', border: 'rgba(239,68,68,0.18)'   },
+    foco:    { label: 'Foco',    dot: D.gold,    border: 'rgba(197,168,128,0.22)' },
+    atencao: { label: 'Atenção', dot: '#F59E0B', border: 'rgba(245,158,11,0.18)'  },
+  }
 
-      {/* ── DATE ── */}
+  /* ── Dashboard metrics ── */
+  const avgKpiPct      = kpisData.length ? Math.round(kpisData.reduce((s, k) => s + pct(k.atual, k.meta), 0) / kpisData.length) : 0
+  const marketingPct   = marketingTotal > 0 ? Math.round((marketingConcluidas / marketingTotal) * 100) : 0
+  const tarefasPct     = tarefas.length > 0 ? Math.round((feitasCount / tarefas.length) * 100) : 0
+
+  const metrics = [
+    { label: 'OKRs',        value: okrs.length > 0 ? `${progOkrs}%` : '—',          sub: okrs.length > 0 ? `${okrs.length} objetivo${okrs.length !== 1 ? 's' : ''}` : 'Sem metas',                                                       color: progOkrs >= 75 ? '#22C55E' : progOkrs >= 40 ? D.gold : '#F87171',     pct: progOkrs,      href: '/dashboard/membro/okr'       },
+    { label: 'Tarefas',     value: tarefas.length > 0 ? `${feitasCount}/${tarefas.length}` : '—', sub: emAndamento > 0 ? `${emAndamento} em andamento` : (bloqueadas > 0 ? `${bloqueadas} bloqueada${bloqueadas !== 1 ? 's' : ''}` : 'Nenhuma ativa'), color: tarefasPct >= 70 ? '#22C55E' : tarefasPct >= 40 ? D.gold : D.textMuted, pct: tarefasPct,    href: '/dashboard/membro/tarefas'   },
+    { label: 'Marketing',   value: marketingTotal > 0 ? `${marketingPct}%` : '—',    sub: marketingTotal > 0 ? `${marketingConcluidas} de ${marketingTotal} ações` : 'Sem plano',                                                        color: marketingPct >= 70 ? '#22C55E' : marketingPct >= 40 ? D.gold : D.textMuted, pct: marketingPct, href: '/dashboard/membro/marketing' },
+    { label: 'Indicadores', value: kpisData.length > 0 ? `${avgKpiPct}%` : '—',     sub: kpisData.length > 0 ? `${kpisData.length} KPI${kpisData.length !== 1 ? 's' : ''}` : 'Sem KPIs',                                               color: avgKpiPct >= 75 ? '#22C55E' : avgKpiPct >= 40 ? D.gold : '#F87171',   pct: avgKpiPct,     href: '/dashboard/membro/kpis'      },
+  ]
+
+  return (
+    <div style={{ maxWidth: 900, padding: '48px 0 80px', display: 'flex', flexDirection: 'column' }}>
+
+      {/* ── HEADER ── */}
       <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 14px' }}>
         {hoje.charAt(0).toUpperCase() + hoje.slice(1)}
       </p>
-
-      {/* ── GREETING ── */}
-      <h1 style={{ fontFamily: D.serif, fontSize: 'clamp(38px,4.5vw,58px)', fontWeight: 600, color: D.text, margin: 0, letterSpacing: '-0.025em', lineHeight: 1.05 }}>
-        Olá, {firstName}.
+      <h1 style={{ fontFamily: D.serif, fontSize: 'clamp(36px,4.5vw,54px)', fontWeight: 600, color: D.text, margin: 0, letterSpacing: '-0.025em', lineHeight: 1.05 }}>
+        Central de Controle
       </h1>
-
-      {/* ── STATEMENT ── */}
-      <p style={{ fontSize: 16, color: D.textSub, margin: '10px 0 0', lineHeight: 1.7, maxWidth: 500 }}>
+      <p style={{ fontSize: 15, color: D.textSub, margin: '10px 0 0', lineHeight: 1.7, maxWidth: 480 }}>
+        {firstName ? `Olá, ${firstName}. ` : ''}
         {okrs.length > 0
-          ? `Você concluiu ${progOkrs}% da construção da sua marca.`
+          ? `Você está a ${100 - progOkrs}% de concluir seus objetivos ativos.`
           : 'Seu hub de autoridade e estratégia de marca.'
         }
       </p>
 
-      {/* ── CONTINUE CTA ── */}
-      {firstUnfinished && (
-        <Link to={firstUnfinished.href} style={{ textDecoration: 'none' }}>
-          <span
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 13, color: D.gold, margin: '14px 0 0', transition: 'opacity 0.1s', cursor: 'pointer' }}
-            onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
-            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-          >
-            Continue → {firstUnfinished.label}
-          </span>
-        </Link>
-      )}
-
       {/* ── MAIN SECTIONS ── */}
       <div style={{ marginTop: 44, display: 'flex', flexDirection: 'column' }}>
 
-        {/* ── HOJE ── */}
+        {/* ── PERSONAL DE RELEVÂNCIA ── */}
         <div style={{ paddingBottom: 36 }}>
-          <SectionLabel>Hoje</SectionLabel>
-          <div style={{ marginTop: 14 }}>
-            {setupSteps.map((step, i) => (
-              <ChecklistRow key={i} done={step.done} label={step.label} href={step.href} />
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 18 }}>
+            <SectionLabel>Personal de Relevância</SectionLabel>
+            <span style={{ fontSize: 9, color: D.textFaint, letterSpacing: '0.05em' }}>orientações personalizadas de hoje</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {briefing.map((item, i) => {
+              const cfg = briefingConfig[item.prioridade]
+              return (
+                <Link key={i} to={item.href} style={{ textDecoration: 'none', display: 'block' }}>
+                  <div
+                    style={{
+                      display: 'flex', alignItems: 'flex-start', gap: 14,
+                      padding: '14px 18px',
+                      border: `1px solid ${cfg.border}`,
+                      borderLeft: `3px solid ${cfg.dot}`,
+                      background: D.card,
+                      transition: 'opacity 0.12s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.opacity = '0.78' }}
+                    onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
+                  >
+                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: cfg.dot, flexShrink: 0, marginTop: 5 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 13.5, fontWeight: 500, color: D.textMid, margin: 0, lineHeight: 1.5 }}>
+                        {item.mensagem}
+                      </p>
+                      {item.submensagem && (
+                        <p style={{ fontSize: 11, color: D.textMuted, margin: '4px 0 0' }}>{item.submensagem}</p>
+                      )}
+                    </div>
+                    <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: cfg.dot, flexShrink: 0, paddingTop: 3 }}>
+                      {cfg.label}
+                    </span>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+
+        <HR />
+
+        {/* ── DASHBOARD ── */}
+        <div style={{ padding: '36px 0' }}>
+          <SectionLabel>Dashboard · Acompanhamento</SectionLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', marginTop: 20, borderTop: `1px solid ${D.border}`, borderBottom: `1px solid ${D.border}` }}>
+            {metrics.map((m, i) => (
+              <Link key={m.label} to={m.href} style={{ textDecoration: 'none', display: 'block' }}>
+                <div
+                  style={{ padding: '22px 20px 22px 0', paddingLeft: i > 0 ? 20 : 0, borderLeft: i > 0 ? `1px solid ${D.border}` : 'none', transition: 'opacity 0.12s' }}
+                  onMouseEnter={e => { e.currentTarget.style.opacity = '0.72' }}
+                  onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
+                >
+                  <p style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, marginBottom: 8 }}>{m.label}</p>
+                  <p style={{ fontFamily: D.serif, fontSize: 36, fontWeight: 400, color: m.color, lineHeight: 1, fontVariantNumeric: 'tabular-nums', margin: '0 0 8px' }}>{m.value}</p>
+                  {m.pct > 0 && (
+                    <div style={{ height: 2, background: D.surface2, borderRadius: 1, overflow: 'hidden', marginBottom: 8 }}>
+                      <div style={{ height: '100%', width: `${m.pct}%`, background: m.color, borderRadius: 1, transition: 'width 0.5s ease' }} />
+                    </div>
+                  )}
+                  <p style={{ fontSize: 10, color: D.textMuted, margin: 0 }}>{m.sub}</p>
+                </div>
+              </Link>
             ))}
           </div>
+
+          {kpisData.length > 0 && (
+            <div style={{ marginTop: 24 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted }}>Indicadores-Chave</span>
+                <Link to="/dashboard/membro/kpis" style={{ textDecoration: 'none', fontSize: 10, color: D.gold, fontWeight: 600 }}>Ver todos →</Link>
+              </div>
+              {kpisData.slice(0, 5).map((kpi, i) => {
+                const p   = pct(kpi.atual, kpi.meta)
+                const col = p >= 80 ? '#22C55E' : p >= 50 ? D.gold : '#F87171'
+                return (
+                  <div key={kpi.id} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 44px', alignItems: 'center', gap: 14, padding: '8px 0', borderTop: i === 0 ? `1px solid ${D.border}` : 'none', borderBottom: `1px solid ${D.border}` }}>
+                    <span style={{ fontSize: 13, color: D.textMid, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kpi.kpi_name}</span>
+                    <div style={{ height: 3, background: D.surface2, borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${p}%`, background: col, borderRadius: 2, transition: 'width 0.5s ease' }} />
+                    </div>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: col, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{p}%</span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         <HR />
@@ -926,15 +1097,12 @@ function HomePage() {
         <div style={{ padding: '36px 0' }}>
           <SectionLabel>Sua Jornada</SectionLabel>
           <div style={{ marginTop: 18 }}>
-            {/* Progress bar */}
             <div style={{ height: 3, background: D.surface2, borderRadius: 2, overflow: 'hidden', maxWidth: 340 }}>
               <div style={{ height: '100%', width: `${Math.max(2, journeyPct)}%`, background: D.gold, borderRadius: 2, transition: 'width 0.6s ease' }} />
             </div>
             <p style={{ fontSize: 12, color: D.textSub, margin: '8px 0 0' }}>
               {journeyPct}% concluído · Fase {journeyPhases[Math.min(currentPhaseIdx + 1, journeyPhases.length - 1)]?.label ?? 'Completa'}
             </p>
-
-            {/* Phase dots */}
             <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: 28, overflowX: 'auto', paddingBottom: 4 }}>
               {journeyPhases.map((phase, i) => {
                 const isDone   = phase.done
@@ -944,25 +1112,11 @@ function HomePage() {
                 return (
                   <div key={phase.label} style={{ display: 'flex', alignItems: 'flex-start', flexShrink: 0 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                      <div style={{
-                        width: isDone || isActive ? 10 : 8,
-                        height: isDone || isActive ? 10 : 8,
-                        borderRadius: '50%',
-                        background: isDone ? D.gold : (isActive ? D.gold : 'transparent'),
-                        border: isFuture ? `1.5px solid ${D.textFaint}` : 'none',
-                        boxShadow: isActive ? `0 0 0 4px rgba(197,168,128,0.22)` : 'none',
-                        flexShrink: 0, marginTop: isFuture ? 1 : 0,
-                      }} />
-                      <span style={{ fontSize: 11, color: isFuture ? D.textFaint : (isActive ? D.text : D.textSub), fontWeight: isActive ? 500 : 400, whiteSpace: 'nowrap' }}>
-                        {phase.label}
-                      </span>
-                      <span style={{ fontSize: 9, color: D.textFaint, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
-                        {isDone ? 'concluído' : (isActive ? 'em andamento' : 'a seguir')}
-                      </span>
+                      <div style={{ width: isDone || isActive ? 10 : 8, height: isDone || isActive ? 10 : 8, borderRadius: '50%', background: isDone ? D.gold : (isActive ? D.gold : 'transparent'), border: isFuture ? `1.5px solid ${D.textFaint}` : 'none', boxShadow: isActive ? `0 0 0 4px rgba(197,168,128,0.22)` : 'none', flexShrink: 0, marginTop: isFuture ? 1 : 0 }} />
+                      <span style={{ fontSize: 11, color: isFuture ? D.textFaint : (isActive ? D.text : D.textSub), fontWeight: isActive ? 500 : 400, whiteSpace: 'nowrap' }}>{phase.label}</span>
+                      <span style={{ fontSize: 9, color: D.textFaint, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>{isDone ? 'concluído' : (isActive ? 'em andamento' : 'a seguir')}</span>
                     </div>
-                    {!isLast && (
-                      <div style={{ width: 40, height: 1, background: isDone ? 'rgba(197,168,128,0.4)' : D.border, margin: '5px 6px 0', flexShrink: 0 }} />
-                    )}
+                    {!isLast && <div style={{ width: 40, height: 1, background: isDone ? 'rgba(197,168,128,0.4)' : D.border, margin: '5px 6px 0', flexShrink: 0 }} />}
                   </div>
                 )
               })}

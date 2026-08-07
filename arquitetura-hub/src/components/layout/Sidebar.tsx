@@ -26,14 +26,14 @@ const adminGroups: NavGroup[] = [
 ]
 
 const membroNav: NavItem[] = [
-  { label: 'Home',             href: '/dashboard/membro'                },
-  { label: 'Minha Identidade', href: '/dashboard/membro/posicionamento' },
-  { label: 'Pilares da Marca', href: '/dashboard/membro/pilares'        },
-  { label: 'Metas de Impacto', href: '/dashboard/membro/okr'            },
-  { label: 'Tarefas',          href: '/dashboard/membro/tarefas'        },
-  { label: 'Marketing Anual',  href: '/dashboard/membro/marketing'      },
-  { label: 'Indicadores',      href: '/dashboard/membro/kpis'           },
-  { label: 'Agenda',           href: '/dashboard/membro/agenda'         },
+  { label: 'Central de Controle', href: '/dashboard/membro'                },
+  { label: 'Minha Identidade',    href: '/dashboard/membro/posicionamento' },
+  { label: 'Pilares da Marca',    href: '/dashboard/membro/pilares'        },
+  { label: 'Metas de Impacto',    href: '/dashboard/membro/okr'            },
+  { label: 'Tarefas',             href: '/dashboard/membro/tarefas'        },
+  { label: 'Marketing Anual',     href: '/dashboard/membro/marketing'      },
+  { label: 'Indicadores',         href: '/dashboard/membro/kpis'           },
+  { label: 'Agenda',              href: '/dashboard/membro/agenda'         },
 ]
 
 /* ── HELPERS ────────────────────────────────────────────── */
@@ -154,6 +154,15 @@ export function Sidebar() {
 
         {/* ── Logo strip ── */}
         <LogoBlock />
+
+        {/* ── NAV (top, primary navigation) ── */}
+        <nav style={{ padding: '2px 10px 8px' }}>
+          {membroNav.map(item => (
+            <NavRow key={item.href} href={item.href} label={item.label} active={isActive(item.href)} />
+          ))}
+        </nav>
+
+        <Divider />
 
         {/* ── USER + SCORE BLOCK ── */}
         <div style={block}>
@@ -315,15 +324,6 @@ export function Sidebar() {
           </div>
         )}
 
-        {/* ── NAV (compact, bottom) ── */}
-        <div style={{ marginTop: 'auto' }}>
-          <Divider />
-          <nav style={{ padding: '4px 10px 4px' }}>
-            {membroNav.map(item => (
-              <NavRow key={item.href} href={item.href} label={item.label} active={isActive(item.href)} />
-            ))}
-          </nav>
-        </div>
       </div>
 
       <UserFooter user={user} logout={logout} />
