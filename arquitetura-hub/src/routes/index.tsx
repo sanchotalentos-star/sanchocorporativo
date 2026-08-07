@@ -1,98 +1,278 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowUpRight, X } from 'lucide-react'
+import {
+  ChevronDown, Sparkles, BookOpen, Layers, Target,
+  ArrowUpRight, ArrowRight, X,
+} from 'lucide-react'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
 })
 
-// ── AR design tokens ─────────────────────────────────────────────
+// ── AR Design System ──────────────────────────────────────────────
 const GOLD       = '#C5A880'
+const GOLD_DEEP  = '#A88B62'
 const WARM_WHITE = '#F5F2EC'
 const WARM_BLACK = '#0A0907'
-const DARK_BORDER = 'rgba(255,255,255,0.08)'
-const serif = { fontFamily: "'Cormorant Garamond', Georgia, serif" } as React.CSSProperties
+const TEXT_DIM   = 'rgba(245,242,236,0.55)'
+const TEXT_MID   = 'rgba(245,242,236,0.75)'
+const BORDER_DIM = 'rgba(245,242,236,0.09)'
+const BORDER_MID = 'rgba(245,242,236,0.18)'
 
-// ── Framer Motion variants ────────────────────────────────────────
-const fadeDown = {
-  initial: { opacity: 0, y: -20 },
-  animate: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] as const },
-  }),
-}
+// Font family strings
+const SERIF = "'Cormorant Garamond', Georgia, serif"
+const SANS  = "'Outfit', system-ui, -apple-system, sans-serif"
 
-const fadeUp = {
-  initial: { opacity: 0, y: 32 },
-  animate: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] as const },
-  }),
-}
+// ── RAF-based video fade (no CSS transitions) ─────────────────────
+function VideoBackground() {
+  const videoRef     = useRef<HTMLVideoElement>(null)
+  const rafRef       = useRef<number | null>(null)
+  const fadingOutRef = useRef(false)
 
-// ── AR Logo — anel dourado + ponto interior ──────────────────────
-function ARLogo({ size = 32 }: { size?: number }) {
+  const cancelRaf = useCallback(() => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current)
+      rafRef.current = null
+    }
+  }, [])
+
+  const fadeIn = useCallback((video: HTMLVideoElement) => {
+    cancelRaf()
+    const start        = performance.now()
+    const startOpacity = parseFloat(video.style.opacity || '0')
+    const DURATION     = 250
+
+    const step = (now: number) => {
+      const t = Math.min((now - start) / DURATION, 1)
+      video.style.opacity = String(startOpacity + (1 - startOpacity) * t)
+      if (t < 1) rafRef.current = requestAnimationFrame(step)
+      else rafRef.current = null
+    }
+    rafRef.current = requestAnimationFrame(step)
+  }, [cancelRaf])
+
+  const fadeOut = useCallback((video: HTMLVideoElement, onDone: () => void) => {
+    cancelRaf()
+    const start        = performance.now()
+    const startOpacity = parseFloat(video.style.opacity || '1')
+    const DURATION     = 250
+
+    const step = (now: number) => {
+      const t = Math.min((now - start) / DURATION, 1)
+      video.style.opacity = String(startOpacity * (1 - t))
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(step)
+      } else {
+        video.style.opacity = '0'
+        rafRef.current = null
+        onDone()
+      }
+    }
+    rafRef.current = requestAnimationFrame(step)
+  }, [cancelRaf])
+
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    v.style.opacity = '0'
+
+    const onCanPlay = () => fadeIn(v)
+
+    const onTimeUpdate = () => {
+      if (!v.duration) return
+      const remaining = v.duration - v.currentTime
+      if (remaining <= 0.55 && !fadingOutRef.current) {
+        fadingOutRef.current = true
+        fadeOut(v, () => { /* ended handles restart */ })
+      }
+    }
+
+    const onEnded = () => {
+      fadingOutRef.current = false
+      v.style.opacity = '0'
+      cancelRaf()
+      setTimeout(() => {
+        v.currentTime = 0
+        v.play().then(() => fadeIn(v)).catch(() => {})
+      }, 100)
+    }
+
+    v.addEventListener('canplay', onCanPlay)
+    v.addEventListener('timeupdate', onTimeUpdate)
+    v.addEventListener('ended', onEnded)
+
+    return () => {
+      cancelRaf()
+      v.removeEventListener('canplay', onCanPlay)
+      v.removeEventListener('timeupdate', onTimeUpdate)
+      v.removeEventListener('ended', onEnded)
+    }
+  }, [fadeIn, fadeOut, cancelRaf])
+
   return (
-    <div style={{
-      width: size, height: size,
-      borderRadius: '50%',
-      border: `2px solid ${GOLD}`,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      flexShrink: 0,
-    }}>
-      <div style={{ width: size * 0.3, height: size * 0.3, borderRadius: '50%', background: GOLD }} />
-    </div>
+    <video
+      ref={videoRef}
+      muted
+      playsInline
+      autoPlay
+      src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260329_050842_be71947f-f16e-4a14-810c-06e83d23ddb5.mp4"
+      style={{
+        position: 'absolute',
+        width: '115%', height: '115%',
+        objectFit: 'cover', objectPosition: 'center top',
+        left: '50%', top: 0,
+        transform: 'translateX(-50%)',
+        opacity: 0,
+        zIndex: 0,
+      }}
+    />
   )
 }
 
-// ── Stats ─────────────────────────────────────────────────────────
-const STATS = [
-  { prefix: '+', value: '5',    label: 'CAMADAS DE\nCONSTRUÇÃO', custom: 2 },
-  { prefix: '',  value: '360°', label: 'VISÃO DE\nAUTORIDADE',   custom: 3 },
-  { prefix: '',  value: '1:1',  label: 'MENTORIA\nINDIVIDUAL',   custom: 4 },
-]
-
-function StatItem({ prefix, value, label, custom }: typeof STATS[number]) {
+// ── Compound badge (dark pill + light label) ──────────────────────
+function HeroBadge() {
   return (
-    <motion.div custom={custom} variants={fadeUp} initial="initial" animate="animate"
-      style={{ textAlign: 'right' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 1 }}>
-        {prefix && (
-          <span style={{ color: GOLD, fontWeight: 600, fontSize: '0.5em', lineHeight: 1 }}>{prefix}</span>
-        )}
-        <span style={{
-          fontSize: 'clamp(1.5rem, 5vw, 3.5rem)', fontWeight: 600,
-          color: WARM_WHITE, lineHeight: 1,
-          fontFamily: "'Inter', system-ui, sans-serif",
-        }}>
-          {value}
+    <motion.div
+      initial={{ opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      style={{
+        display: 'inline-flex', alignItems: 'center',
+        borderRadius: 9999,
+        background: 'rgba(10,9,7,0.72)',
+        backdropFilter: 'blur(8px)',
+        border: `1px solid ${BORDER_MID}`,
+        padding: '4px 4px 4px 12px',
+        gap: 0,
+        boxShadow: '0 2px 16px rgba(0,0,0,0.24)',
+      }}
+    >
+      {/* Dark pill */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        background: WARM_BLACK,
+        borderRadius: 9999, padding: '5px 12px',
+        marginRight: 10,
+      }}>
+        <Sparkles size={11} color={GOLD} strokeWidth={2} />
+        <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: GOLD, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          AR
         </span>
       </div>
-      <p style={{
-        fontSize: 'clamp(9px, 1.2vw, 13px)', fontWeight: 600,
-        letterSpacing: '0.12em', textTransform: 'uppercase',
-        color: 'rgba(245,242,236,0.55)',
-        whiteSpace: 'pre-line', lineHeight: 1.3, textAlign: 'right',
-        margin: '5px 0 0',
-      }}>
-        {label}
-      </p>
+      {/* Label */}
+      <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 400, color: TEXT_MID, paddingRight: 8, letterSpacing: '0.01em' }}>
+        5 camadas para construir sua relevância
+      </span>
     </motion.div>
   )
 }
 
-// ── Nav links ─────────────────────────────────────────────────────
-const NAV_LINKS = [
-  { label: 'Método',    href: '#metodo',    external: true },
-  { label: 'Jornada',   href: '#metodo',    external: true },
-  { label: 'Para Quem', href: '#para-quem', external: true },
-  { label: 'Acesso',    href: '/auth',      external: false },
-]
+// ── Action input box (adapted AR entry point) ─────────────────────
+function HeroActionBox() {
+  const [inputValue, setInputValue] = useState('')
 
-// ── Below-fold FadeUp ─────────────────────────────────────────────
+  const CHIPS = [
+    { label: 'Identidade', icon: <BookOpen size={12} strokeWidth={2} /> },
+    { label: 'Pilares',    icon: <Layers    size={12} strokeWidth={2} /> },
+    { label: 'Metas',      icon: <Target    size={12} strokeWidth={2} /> },
+  ]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.36, ease: [0.22, 1, 0.36, 1] }}
+      style={{
+        width: '100%', maxWidth: 728,
+        borderRadius: 18,
+        background: 'rgba(10,9,7,0.34)',
+        backdropFilter: 'blur(16px)',
+        border: `1px solid ${BORDER_MID}`,
+        padding: '14px 14px 12px',
+        display: 'flex', flexDirection: 'column', gap: 12,
+        boxShadow: '0 8px 40px rgba(0,0,0,0.32)',
+      }}
+    >
+      {/* ── Top row ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 500, color: TEXT_MID, letterSpacing: '0.04em' }}>
+          Sua Jornada AR
+        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Sparkles size={12} color={GOLD} strokeWidth={2} />
+          <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 500, color: TEXT_MID, letterSpacing: '0.02em' }}>
+            Mentoria 1:1
+          </span>
+        </div>
+      </div>
+
+      {/* ── Input area ── */}
+      <div style={{
+        background: 'rgba(245,242,236,0.96)',
+        borderRadius: 12,
+        padding: '14px 14px 14px 18px',
+        display: 'flex', alignItems: 'center', gap: 12,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
+      }}>
+        <input
+          value={inputValue}
+          onChange={e => setInputValue(e.target.value)}
+          placeholder="Por onde você quer começar?"
+          style={{
+            flex: 1,
+            background: 'transparent', border: 'none', outline: 'none',
+            fontFamily: SANS, fontSize: 16, fontWeight: 400,
+            color: WARM_BLACK,
+          }}
+        />
+        <Link to="/auth" style={{ textDecoration: 'none' }}>
+          <button style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: GOLD, border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0, transition: 'background 0.15s',
+          }}
+            onMouseEnter={e => (e.currentTarget.style.background = GOLD_DEEP)}
+            onMouseLeave={e => (e.currentTarget.style.background = GOLD)}
+          >
+            <ArrowRight size={16} color={WARM_BLACK} strokeWidth={2.5} />
+          </button>
+        </Link>
+      </div>
+
+      {/* ── Bottom row ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {CHIPS.map(chip => (
+            <Link key={chip.label} to="/auth" style={{ textDecoration: 'none' }}>
+              <button style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                background: 'rgba(245,242,236,0.12)',
+                border: `1px solid ${BORDER_MID}`,
+                borderRadius: 6, padding: '6px 10px',
+                cursor: 'pointer', transition: 'background 0.15s',
+              }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(197,168,128,0.2)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,242,236,0.12)')}
+              >
+                <span style={{ color: TEXT_MID }}>{chip.icon}</span>
+                <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 500, color: TEXT_MID, letterSpacing: '0.04em' }}>
+                  {chip.label}
+                </span>
+              </button>
+            </Link>
+          ))}
+        </div>
+        <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 400, color: TEXT_DIM, letterSpacing: '0.02em' }}>
+          5 etapas · método AR
+        </span>
+      </div>
+    </motion.div>
+  )
+}
+
+// ── Below-fold scroll reveal ──────────────────────────────────────
 function FadeUp({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return (
     <motion.div
@@ -106,6 +286,15 @@ function FadeUp({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   )
 }
 
+// ── Nav links data ────────────────────────────────────────────────
+const NAV_CENTER = [
+  { label: 'Metodologia',  href: '#metodo',    dropdown: false },
+  { label: 'Jornada',      href: '#metodo',    dropdown: true  },
+  { label: 'Para Quem',    href: '#para-quem', dropdown: false },
+  { label: 'Mentores',     href: '#metodo',    dropdown: false },
+]
+
+// ── Below-fold content data ───────────────────────────────────────
 const STEPS = [
   { n: '01', label: 'Identidade',  desc: 'Quem você é, para quem fala e o que entrega de diferente.' },
   { n: '02', label: 'Pilares',     desc: 'As frentes estratégicas de presença e autoridade no mercado.' },
@@ -115,21 +304,9 @@ const STEPS = [
 ]
 
 const PROFILES = [
-  {
-    tag: 'ESPECIALISTAS',
-    title: 'Especialistas e consultores',
-    desc: 'Que querem ser reconhecidos pelo que sabem e atrair os clientes certos com consistência.',
-  },
-  {
-    tag: 'TRANSIÇÃO',
-    title: 'Profissionais em transição',
-    desc: 'Reposicionando a carreira e construindo autoridade no novo nicho com método.',
-  },
-  {
-    tag: 'LIDERANÇAS',
-    title: 'Líderes e executivos',
-    desc: 'Que querem ampliar presença, influência e impacto além da empresa onde atuam.',
-  },
+  { tag: 'ESPECIALISTAS', title: 'Especialistas e consultores',  desc: 'Que querem ser reconhecidos pelo que sabem e atrair os clientes certos com consistência.' },
+  { tag: 'TRANSIÇÃO',     title: 'Profissionais em transição',   desc: 'Reposicionando a carreira e construindo autoridade no novo nicho com método.' },
+  { tag: 'LIDERANÇAS',    title: 'Líderes e executivos',         desc: 'Que querem ampliar presença, influência e impacto além da empresa onde atuam.' },
 ]
 
 function PrimaryBtn({ to, children }: { to: string; children: React.ReactNode }) {
@@ -138,12 +315,12 @@ function PrimaryBtn({ to, children }: { to: string; children: React.ReactNode })
       <button
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 10,
-          padding: '15px 30px', background: GOLD, color: '#1A1208',
-          border: 'none', cursor: 'pointer',
+          padding: '14px 28px', background: GOLD, color: WARM_BLACK,
+          border: 'none', cursor: 'pointer', fontFamily: SANS,
           fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
           transition: 'opacity 0.15s',
         }}
-        onMouseEnter={e => (e.currentTarget.style.opacity = '0.84')}
+        onMouseEnter={e => (e.currentTarget.style.opacity = '0.82')}
         onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
       >
         {children}
@@ -157,197 +334,190 @@ export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <div style={{
-      fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-      background: WARM_BLACK, color: WARM_WHITE,
-      WebkitFontSmoothing: 'antialiased',
-    } as React.CSSProperties}>
+    <div style={{ fontFamily: SANS, background: WARM_BLACK, color: WARM_WHITE, WebkitFontSmoothing: 'antialiased' } as React.CSSProperties}>
 
-      {/* Fonts */}
+      {/* ── Fonts: Cormorant Garamond (serif display) + Outfit (premium sans) ── */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-      {/* ══════════════════════════════════════════════════════════
-          HERO
-          ══════════════════════════════════════════════════════════ */}
-      <section style={{ position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* ════════════════════════════════════════════════════════════
+          HERO SECTION — video full-screen + centered content
+          ════════════════════════════════════════════════════════════ */}
+      <section style={{ position: 'relative', minHeight: '100svh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
 
-        {/* Background video */}
-        <video
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
-          autoPlay loop muted playsInline
-          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260517_222138_3e3205be-3364-417b-a64a-bfe087acbec4.mp4"
-        />
-        {/* Dark overlay */}
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(8,7,5,0.54)', zIndex: 1 }} />
+        {/* Video background with RAF fade */}
+        <VideoBackground />
 
-        {/* ── Navbar ── */}
+        {/* Dark overlay — warm-tinted for AR feel */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(10,9,7,0.58) 0%, rgba(10,9,7,0.44) 50%, rgba(10,9,7,0.68) 100%)', zIndex: 1 }} />
+
+        {/* ── Navigation ── */}
         <nav style={{
           position: 'relative', zIndex: 10,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: 'clamp(20px,3.5vw,24px) clamp(20px,5vw,48px)',
+          padding: '16px clamp(24px,8vw,120px)',
         }}>
+
           {/* Logo */}
-          <motion.div custom={0} variants={fadeDown} initial="initial" animate="animate">
-            <ARLogo size={32} />
+          <motion.div
+            initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', border: `2px solid ${GOLD}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: GOLD }} />
+              </div>
+              <span style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 600, color: WARM_WHITE, letterSpacing: '-0.02em' }}>
+                Arquitetura de Relevância
+              </span>
+            </Link>
           </motion.div>
 
-          {/* Desktop nav — hidden on mobile */}
-          <div className="hidden md:flex items-center" style={{ gap: 40 }}>
-            {NAV_LINKS.map(({ label, href, external }, i) => (
-              <motion.div key={label} custom={i + 1} variants={fadeDown} initial="initial" animate="animate">
-                {external ? (
-                  <a href={href} style={{ textDecoration: 'none' }}>
-                    <span style={{
-                      fontSize: 14, fontWeight: 600, letterSpacing: '0.1em',
-                      textTransform: 'uppercase', color: WARM_WHITE,
-                      cursor: 'pointer', transition: 'color 0.15s',
-                    }}
-                      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = GOLD)}
-                      onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = WARM_WHITE)}
-                    >
-                      {label}
-                    </span>
-                  </a>
-                ) : (
-                  <Link to={href as any} style={{ textDecoration: 'none' }}>
-                    <span style={{
-                      fontSize: 14, fontWeight: 600, letterSpacing: '0.1em',
-                      textTransform: 'uppercase', color: WARM_WHITE,
-                      cursor: 'pointer', transition: 'color 0.15s',
-                    }}
-                      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = GOLD)}
-                      onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = WARM_WHITE)}
-                    >
-                      {label}
-                    </span>
-                  </Link>
-                )}
+          {/* Desktop nav links — hidden on mobile */}
+          <div className="hidden md:flex items-center" style={{ gap: 36 }}>
+            {NAV_CENTER.map(({ label, href, dropdown }, i) => (
+              <motion.div key={label}
+                initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: (i + 1) * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <a href={href} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ fontFamily: SANS, fontSize: 15, fontWeight: 500, color: TEXT_MID, letterSpacing: '-0.01em', transition: 'color 0.15s' }}
+                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = WARM_WHITE)}
+                    onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = TEXT_MID)}
+                  >
+                    {label}
+                  </span>
+                  {dropdown && <ChevronDown size={13} color={TEXT_DIM} strokeWidth={2} />}
+                </a>
               </motion.div>
             ))}
           </div>
 
-          {/* Hamburger */}
-          <motion.button
-            custom={5} variants={fadeDown} initial="initial" animate="animate"
-            onClick={() => setMenuOpen(true)}
-            style={{
-              width: 36, height: 36, borderRadius: '50%',
-              background: WARM_WHITE, border: 'none', cursor: 'pointer',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
-            }}
-            aria-label="Abrir menu"
-          >
-            <span style={{ width: 16, height: 2, background: WARM_BLACK, display: 'block', borderRadius: 1 }} />
-            <span style={{ width: 16, height: 2, background: WARM_BLACK, display: 'block', borderRadius: 1 }} />
-            <span style={{ width: 16, height: 2, background: WARM_BLACK, display: 'block', borderRadius: 1 }} />
-          </motion.button>
-        </nav>
-
-        {/* ── Stats row — vertically centered, right-aligned ── */}
-        <div style={{
-          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-          position: 'relative', zIndex: 10,
-          padding: 'clamp(32px,5vw,0px) clamp(20px,5vw,48px)',
-        }}>
-          <div style={{ display: 'flex', gap: 'clamp(20px,4vw,40px)' }}>
-            {STATS.map(s => <StatItem key={s.value} {...s} />)}
-          </div>
-        </div>
-
-        {/* ── Bottom content ── */}
-        <div style={{
-          position: 'relative', zIndex: 10,
-          display: 'flex', flexDirection: 'column',
-          gap: 'clamp(24px,4vw,48px)',
-          padding: '0 clamp(20px,5vw,48px) clamp(32px,5vw,48px)',
-        }}>
-
-          {/* Row A: tagline + CTA */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-            <motion.p custom={5} variants={fadeUp} initial="initial" animate="animate"
-              style={{
-                fontSize: 'clamp(9px,1.4vw,13px)', fontWeight: 600,
-                letterSpacing: '0.12em', textTransform: 'uppercase',
-                color: 'rgba(245,242,236,0.7)',
-                maxWidth: 'clamp(130px,20vw,280px)', lineHeight: 1.6, margin: 0,
-              }}>
-              Autoridade Real /<br />Com Método /<br />Para Você
-            </motion.p>
-
-            <motion.div custom={6} variants={fadeUp} initial="initial" animate="animate">
-              <Link to="/auth" style={{ textDecoration: 'none' }}>
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  color: GOLD,
-                  fontSize: 'clamp(16px,2.5vw,24px)',
-                  fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
-                  whiteSpace: 'nowrap', transition: 'opacity 0.15s',
+          {/* Right: CTA buttons + hamburger */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <motion.div
+              initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.44, ease: [0.22, 1, 0.36, 1] }}
+              className="hidden md:flex items-center"
+              style={{ gap: 8 }}
+            >
+              <Link to="/auth">
+                <button style={{
+                  fontFamily: SANS, fontSize: 14, fontWeight: 500,
+                  color: TEXT_MID, background: 'transparent',
+                  border: `1px solid ${BORDER_MID}`, borderRadius: 9999,
+                  padding: '8px 22px', cursor: 'pointer', transition: 'border-color 0.15s, color 0.15s',
+                  letterSpacing: '-0.01em',
                 }}
-                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '0.7')}
-                  onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = WARM_WHITE; e.currentTarget.style.color = WARM_WHITE }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER_MID; e.currentTarget.style.color = TEXT_MID }}
                 >
-                  Acessar Plataforma
-                  <ArrowUpRight size={22} />
-                </span>
+                  Solicitar Acesso
+                </button>
+              </Link>
+              <Link to="/auth">
+                <button style={{
+                  fontFamily: SANS, fontSize: 14, fontWeight: 600,
+                  color: WARM_BLACK, background: GOLD,
+                  border: 'none', borderRadius: 9999,
+                  padding: '8px 22px', cursor: 'pointer', transition: 'opacity 0.15s',
+                  letterSpacing: '-0.01em',
+                }}
+                  onMouseEnter={e => (e.currentTarget.style.opacity = '0.82')}
+                  onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                >
+                  Acessar
+                </button>
               </Link>
             </motion.div>
+
+            {/* Hamburger */}
+            <motion.button
+              initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.52, ease: [0.22, 1, 0.36, 1] }}
+              onClick={() => setMenuOpen(true)}
+              style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: WARM_WHITE, border: 'none', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
+                flexShrink: 0,
+              }}
+              aria-label="Abrir menu"
+            >
+              <span style={{ width: 15, height: 1.5, background: WARM_BLACK, display: 'block', borderRadius: 1 }} />
+              <span style={{ width: 15, height: 1.5, background: WARM_BLACK, display: 'block', borderRadius: 1 }} />
+              <span style={{ width: 15, height: 1.5, background: WARM_BLACK, display: 'block', borderRadius: 1 }} />
+            </motion.button>
+          </div>
+        </nav>
+
+        {/* ── Hero content (60px below nav, shifted up 50px) ── */}
+        <div style={{
+          flex: 1, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          position: 'relative', zIndex: 10,
+          paddingTop: 10,         /* 60px gap − 50px shift = 10px */
+          paddingBottom: 'clamp(32px,5vw,64px)',
+          padding: '10px clamp(24px,5vw,80px) clamp(32px,5vw,64px)',
+          textAlign: 'center',
+        }}>
+
+          {/* Badge */}
+          <HeroBadge />
+
+          {/* Headline — Cormorant Garamond: the AR serif */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              fontFamily: SERIF,
+              fontSize: 'clamp(52px,8vw,96px)',
+              fontWeight: 700,
+              lineHeight: 0.92,
+              letterSpacing: '-0.04em',
+              color: WARM_WHITE,
+              margin: '34px 0 0',
+              maxWidth: 760,
+            }}
+          >
+            Construa Sua{' '}
+            <span style={{ fontStyle: 'italic', color: GOLD }}>Relevância</span>
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              fontFamily: SANS,
+              fontSize: 'clamp(15px,2vw,20px)',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              color: TEXT_MID,
+              lineHeight: 1.6,
+              maxWidth: 540,
+              margin: '34px auto 0',
+            }}
+          >
+            Estruture sua identidade, defina seus pilares estratégicos e acompanhe cada passo da sua jornada de autoridade profissional.
+          </motion.p>
+
+          {/* Action box */}
+          <div style={{ marginTop: 44, width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <HeroActionBox />
           </div>
 
-          {/* Row B: description + main heading */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 'clamp(12px,3vw,16px)' }}>
-
-            {/* Description block */}
-            <motion.div custom={7} variants={fadeUp} initial="initial" animate="animate"
-              style={{ width: 'clamp(120px,20vw,280px)', flexShrink: 0 }}>
-              <p style={{
-                fontSize: 'clamp(8px,1.1vw,13px)', fontWeight: 600,
-                letterSpacing: '0.1em', textTransform: 'uppercase',
-                color: 'rgba(245,242,236,0.45)', lineHeight: 1.65, margin: 0,
-                textAlign: 'right',
-              }}>
-                Metodologia Estruturada Para Construir Sua Autoridade e Presença Real no Mercado
-              </p>
-            </motion.div>
-
-            {/* Main heading — slide-up clip reveal */}
-            <div style={{ textAlign: 'right' }}>
-              {(['Construa', 'Sua', 'Relevância'] as const).map((word, i) => (
-                <div key={word} style={{ overflow: 'hidden' }}>
-                  <motion.div
-                    initial={{ y: '110%' }}
-                    animate={{ y: 0 }}
-                    transition={{ duration: 0.7, delay: 0.4 + i * 0.14, ease: [0.22, 1, 0.36, 1] }}
-                    style={{
-                      fontSize: 'clamp(2rem,9vw,9rem)',
-                      fontWeight: 600,
-                      lineHeight: 0.88,
-                      textTransform: 'uppercase',
-                      color: i === 2 ? GOLD : WARM_WHITE,
-                      fontFamily: "'Inter', system-ui, sans-serif",
-                      letterSpacing: '-0.03em',
-                    }}
-                  >
-                    {word}
-                  </motion.div>
-                </div>
-              ))}
-            </div>
-
-          </div>
         </div>
       </section>
 
-      {/* ════════════════════════════════════════════════════════
+      {/* ════════════════════════════════════════════════════════════
           MOBILE MENU OVERLAY
-          ════════════════════════════════════════════════════════ */}
+          ════════════════════════════════════════════════════════════ */}
       {menuOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          transition={{ duration: 0.18 }}
           style={{
             position: 'fixed', inset: 0, zIndex: 50,
             background: WARM_BLACK,
@@ -355,70 +525,57 @@ export default function LandingPage() {
             padding: 'clamp(20px,4vw,24px) clamp(20px,5vw,48px)',
           }}
         >
-          {/* Top row */}
+          {/* Top */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <ARLogo size={32} />
-            <button
-              onClick={() => setMenuOpen(false)}
-              style={{
-                width: 36, height: 36, borderRadius: '50%',
-                background: WARM_WHITE, border: 'none', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-              aria-label="Fechar menu"
-            >
-              <X size={18} color={WARM_BLACK} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', border: `2px solid ${GOLD}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: GOLD }} />
+              </div>
+              <span style={{ fontFamily: SERIF, fontSize: 16, fontWeight: 600, color: WARM_WHITE, letterSpacing: '-0.02em' }}>AR</span>
+            </div>
+            <button onClick={() => setMenuOpen(false)} aria-label="Fechar menu"
+              style={{ width: 36, height: 36, borderRadius: '50%', background: WARM_WHITE, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <X size={16} color={WARM_BLACK} strokeWidth={2.5} />
             </button>
           </div>
 
           {/* Links */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 32, marginTop: 64 }}>
-            {NAV_LINKS.map(({ label, href, external }) =>
-              external ? (
-                <a key={label} href={href} onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none' }}>
-                  <span style={{ fontSize: 'clamp(28px,8vw,48px)', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: WARM_WHITE }}>
-                    {label}
-                  </span>
-                </a>
-              ) : (
-                <Link key={label} to={href as any} onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none' }}>
-                  <span style={{ fontSize: 'clamp(28px,8vw,48px)', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: WARM_WHITE }}>
-                    {label}
-                  </span>
-                </Link>
-              )
-            )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 28, marginTop: 56 }}>
+            {NAV_CENTER.map(({ label, href }) => (
+              <a key={label} href={href} onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none' }}>
+                <span style={{ fontFamily: SERIF, fontSize: 'clamp(32px,8vw,52px)', fontWeight: 600, letterSpacing: '-0.03em', fontStyle: 'italic', color: WARM_WHITE }}>
+                  {label}
+                </span>
+              </a>
+            ))}
           </div>
 
           {/* Mobile CTA */}
-          <div style={{ marginTop: 'auto' }}>
+          <div style={{ marginTop: 'auto', paddingBottom: 8 }}>
             <Link to="/auth" onClick={() => setMenuOpen(false)} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
-              <span style={{
-                color: GOLD, fontSize: 'clamp(20px,5vw,28px)',
-                fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em',
-              }}>
+              <span style={{ fontFamily: SANS, fontSize: 'clamp(16px,4vw,22px)', fontWeight: 600, letterSpacing: '-0.01em', color: GOLD }}>
                 Acessar Plataforma
               </span>
-              <ArrowUpRight size={24} color={GOLD} />
+              <ArrowUpRight size={22} color={GOLD} />
             </Link>
           </div>
         </motion.div>
       )}
 
-      {/* ════════════════════════════════════════════════════════
+      {/* ════════════════════════════════════════════════════════════
           METODOLOGIA
-          ════════════════════════════════════════════════════════ */}
-      <section id="metodo" style={{ background: WARM_BLACK, borderTop: `1px solid ${DARK_BORDER}` }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '120px 40px' }}>
+          ════════════════════════════════════════════════════════════ */}
+      <section id="metodo" style={{ background: WARM_BLACK, borderTop: `1px solid ${BORDER_DIM}` }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '120px clamp(24px,5vw,40px)' }}>
           <FadeUp>
-            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: GOLD, marginBottom: 24 }}>Método</p>
+            <p style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: GOLD, marginBottom: 24 }}>Método</p>
           </FadeUp>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 80, alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 80, alignItems: 'start' }}>
             <FadeUp delay={0.1}>
-              <h2 style={{ ...serif, fontSize: 'clamp(42px,6vw,80px)', fontWeight: 700, lineHeight: 1.04, letterSpacing: '-0.03em', margin: 0, color: WARM_WHITE }}>
-                Cinco camadas<br /><span style={{ fontStyle: 'italic', color: GOLD }}>de construção.</span>
+              <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(42px,6vw,80px)', fontStyle: 'italic', fontWeight: 700, lineHeight: 1.04, letterSpacing: '-0.03em', margin: 0, color: WARM_WHITE }}>
+                Cinco camadas<br /><span style={{ color: GOLD }}>de construção.</span>
               </h2>
-              <p style={{ fontSize: 15, lineHeight: 1.85, color: 'rgba(245,242,236,0.42)', marginTop: 32, maxWidth: 380 }}>
+              <p style={{ fontFamily: SANS, fontSize: 15, lineHeight: 1.85, color: 'rgba(245,242,236,0.42)', marginTop: 32, maxWidth: 380 }}>
                 Cada participante evolui dentro de um hub individual, com visão clara do que construir semana a semana.
               </p>
               <div style={{ marginTop: 40 }}>
@@ -427,12 +584,12 @@ export default function LandingPage() {
             </FadeUp>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {STEPS.map((s, i) => (
-                <FadeUp key={s.n} delay={0.15 + i * 0.07}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '56px 1fr', gap: 20, padding: '28px 0', borderBottom: i < STEPS.length - 1 ? `1px solid ${DARK_BORDER}` : 'none', alignItems: 'start' }}>
-                    <span style={{ ...serif, fontSize: 32, fontWeight: 700, color: GOLD, lineHeight: 1, letterSpacing: '-0.02em' }}>{s.n}</span>
+                <FadeUp key={s.n} delay={0.12 + i * 0.07}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '52px 1fr', gap: 20, padding: '26px 0', borderBottom: i < STEPS.length - 1 ? `1px solid ${BORDER_DIM}` : 'none', alignItems: 'start' }}>
+                    <span style={{ fontFamily: SERIF, fontSize: 30, fontStyle: 'italic', fontWeight: 700, color: GOLD, lineHeight: 1, letterSpacing: '-0.02em' }}>{s.n}</span>
                     <div>
-                      <p style={{ fontSize: 15, fontWeight: 600, color: WARM_WHITE, marginBottom: 5 }}>{s.label}</p>
-                      <p style={{ fontSize: 13, lineHeight: 1.75, color: 'rgba(245,242,236,0.38)' }}>{s.desc}</p>
+                      <p style={{ fontFamily: SANS, fontSize: 14, fontWeight: 600, color: WARM_WHITE, marginBottom: 5, letterSpacing: '-0.01em' }}>{s.label}</p>
+                      <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.75, color: 'rgba(245,242,236,0.38)' }}>{s.desc}</p>
                     </div>
                   </div>
                 </FadeUp>
@@ -442,27 +599,27 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ════════════════════════════════════════════════════════
+      {/* ════════════════════════════════════════════════════════════
           PARA QUEM
-          ════════════════════════════════════════════════════════ */}
-      <section id="para-quem" style={{ background: '#060504', borderTop: `1px solid ${DARK_BORDER}` }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '120px 40px' }}>
+          ════════════════════════════════════════════════════════════ */}
+      <section id="para-quem" style={{ background: '#060504', borderTop: `1px solid ${BORDER_DIM}` }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '120px clamp(24px,5vw,40px)' }}>
           <FadeUp>
-            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: GOLD, marginBottom: 24 }}>Para quem é</p>
+            <p style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: GOLD, marginBottom: 24 }}>Para quem é</p>
           </FadeUp>
           <FadeUp delay={0.1}>
-            <h2 style={{ ...serif, fontSize: 'clamp(38px,5.5vw,72px)', fontWeight: 700, lineHeight: 1.06, letterSpacing: '-0.025em', color: WARM_WHITE, marginBottom: 72, maxWidth: 680 }}>
-              Para quem quer ser <span style={{ fontStyle: 'italic', color: GOLD }}>referência</span>{'. Não só conhecido.'}
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(36px,5.5vw,72px)', fontStyle: 'italic', fontWeight: 700, lineHeight: 1.06, letterSpacing: '-0.025em', color: WARM_WHITE, marginBottom: 72, maxWidth: 640 }}>
+              Para quem quer ser <span style={{ color: GOLD }}>referência</span>{'. Não só conhecido.'}
             </h2>
           </FadeUp>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', border: `1px solid ${DARK_BORDER}` }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', border: `1px solid ${BORDER_DIM}` }}>
             {PROFILES.map((p, i) => (
               <FadeUp key={i} delay={0.1 + i * 0.09}>
-                <div style={{ padding: '48px 36px', borderRight: i < 2 ? `1px solid ${DARK_BORDER}` : 'none', height: '100%' }}>
-                  <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: GOLD, marginBottom: 24 }}>{p.tag}</p>
-                  <div style={{ width: 24, height: 1, background: GOLD, marginBottom: 24, opacity: 0.5 }} />
-                  <p style={{ fontSize: 16, fontWeight: 600, color: WARM_WHITE, marginBottom: 14, lineHeight: 1.35 }}>{p.title}</p>
-                  <p style={{ fontSize: 13, lineHeight: 1.8, color: 'rgba(245,242,236,0.38)' }}>{p.desc}</p>
+                <div style={{ padding: '44px 32px', borderRight: i < 2 ? `1px solid ${BORDER_DIM}` : 'none', height: '100%' }}>
+                  <p style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: GOLD, marginBottom: 20 }}>{p.tag}</p>
+                  <div style={{ width: 20, height: 1, background: GOLD, marginBottom: 20, opacity: 0.5 }} />
+                  <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 600, color: WARM_WHITE, marginBottom: 12, lineHeight: 1.35, letterSpacing: '-0.01em' }}>{p.title}</p>
+                  <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.8, color: 'rgba(245,242,236,0.38)' }}>{p.desc}</p>
                 </div>
               </FadeUp>
             ))}
@@ -470,37 +627,36 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ════════════════════════════════════════════════════════
+      {/* ════════════════════════════════════════════════════════════
           CTA
-          ════════════════════════════════════════════════════════ */}
-      <section style={{ background: '#0D0B09', borderTop: `1px solid ${DARK_BORDER}` }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '140px 40px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 60, alignItems: 'end' }}>
+          ════════════════════════════════════════════════════════════ */}
+      <section style={{ background: '#0D0B09', borderTop: `1px solid ${BORDER_DIM}` }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '140px clamp(24px,5vw,40px)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 60, alignItems: 'end' }}>
             <FadeUp>
-              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: GOLD, marginBottom: 28 }}>Faça parte</p>
-              <h2 style={{ ...serif, fontSize: 'clamp(44px,7vw,96px)', fontWeight: 700, lineHeight: 1.02, letterSpacing: '-0.03em', margin: 0, color: WARM_WHITE }}>
-                Construa autoridade<br /><span style={{ fontStyle: 'italic', color: GOLD }}>com método.</span>
+              <p style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: GOLD, marginBottom: 24 }}>Faça parte</p>
+              <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(44px,7vw,96px)', fontStyle: 'italic', fontWeight: 700, lineHeight: 1.02, letterSpacing: '-0.03em', margin: 0, color: WARM_WHITE }}>
+                Construa autoridade<br /><span style={{ color: GOLD }}>com método.</span>
               </h2>
             </FadeUp>
             <FadeUp delay={0.15}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, alignItems: 'flex-start' }}>
                 <PrimaryBtn to="/auth">Acessar a plataforma <ArrowUpRight size={13} /></PrimaryBtn>
                 <Link to="/auth">
-                  <button
-                    style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 10,
-                      padding: '14px 30px', background: 'transparent', color: WARM_WHITE,
-                      border: `1px solid ${DARK_BORDER}`, cursor: 'pointer',
-                      fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
-                      whiteSpace: 'nowrap', transition: 'border-color 0.15s',
-                    }}
-                    onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.28)')}
-                    onMouseLeave={e => (e.currentTarget.style.borderColor = DARK_BORDER)}
+                  <button style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 10,
+                    padding: '13px 28px', background: 'transparent', color: WARM_WHITE,
+                    border: `1px solid ${BORDER_MID}`, cursor: 'pointer', fontFamily: SANS,
+                    fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase',
+                    whiteSpace: 'nowrap', transition: 'border-color 0.15s',
+                  }}
+                    onMouseEnter={e => (e.currentTarget.style.borderColor = BORDER_MID.replace('0.18', '0.4'))}
+                    onMouseLeave={e => (e.currentTarget.style.borderColor = BORDER_MID)}
                   >
                     Solicitar acesso
                   </button>
                 </Link>
-                <p style={{ fontSize: 11, color: 'rgba(245,242,236,0.28)', lineHeight: 1.6, maxWidth: 200 }}>
+                <p style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(245,242,236,0.28)', lineHeight: 1.6, maxWidth: 200 }}>
                   Acesso restrito aos participantes ativos do programa.
                 </p>
               </div>
@@ -509,18 +665,20 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ════════════════════════════════════════════════════════
+      {/* ════════════════════════════════════════════════════════════
           FOOTER
-          ════════════════════════════════════════════════════════ */}
-      <footer style={{ background: WARM_BLACK, borderTop: `1px solid ${DARK_BORDER}`, padding: '28px 40px' }}>
+          ════════════════════════════════════════════════════════════ */}
+      <footer style={{ background: WARM_BLACK, borderTop: `1px solid ${BORDER_DIM}`, padding: '24px clamp(24px,5vw,40px)' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <ARLogo size={24} />
-            <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(245,242,236,0.28)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 20, height: 20, borderRadius: '50%', border: `1.5px solid ${GOLD}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: GOLD }} />
+            </div>
+            <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 500, letterSpacing: '0.04em', color: 'rgba(245,242,236,0.3)' }}>
               Arquitetura de Relevância
             </span>
           </div>
-          <p style={{ fontSize: 11, color: 'rgba(245,242,236,0.18)', letterSpacing: '0.02em' }}>
+          <p style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(245,242,236,0.18)', letterSpacing: '0.02em' }}>
             © {new Date().getFullYear()} Sancho Gestão de Carreiras
           </p>
         </div>
