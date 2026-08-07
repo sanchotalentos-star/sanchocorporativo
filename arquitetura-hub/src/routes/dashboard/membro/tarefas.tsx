@@ -278,7 +278,7 @@ function TarefasPage() {
         <div>
           <p className="text-sm font-medium text-gray-500">Nenhum objetivo definido ainda.</p>
           <p className="text-xs text-gray-400 mt-1">
-            Crie seus OKRs em <strong className="text-gray-500">Metas de Impacto</strong> para gerar tarefas automaticamente.
+            Crie seus OKRs em <strong className="text-gray-500">Metas de Impacto</strong> para gerar missões automaticamente.
           </p>
         </div>
       </div>
@@ -296,9 +296,9 @@ function TarefasPage() {
           margin: 0,
           lineHeight: 1.1,
           letterSpacing: '-0.01em',
-        }}>Tarefas</h1>
+        }}>Missões</h1>
         <p style={{ fontSize: 14, color: '#6B6560', margin: '8px 0 0', lineHeight: 1.6 }}>
-          Ações concretas para avançar nos seus objetivos.
+          Cada missão é um passo concreto na sua jornada de autoridade.
         </p>
       </div>
 
@@ -469,7 +469,7 @@ function TarefasPage() {
                   {okr.categoria} · {okr.trimestre}
                   {okrTarefas.length > 0 && (
                     <span className="ml-2 font-medium" style={{ color: cor }}>
-                      {okrFeitas}/{okrTarefas.length} tarefas
+                      {okrFeitas}/{okrTarefas.length} missões
                     </span>
                   )}
                 </p>
@@ -487,7 +487,7 @@ function TarefasPage() {
                 <div className="grid items-center px-5 py-2 bg-gray-50 border-b border-gray-100"
                   style={{ gridTemplateColumns: '1fr 120px 80px 28px' }}
                 >
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Tarefa</p>
+                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Missão</p>
                   <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Status</p>
                   <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Prioridade</p>
                   <span />
@@ -567,7 +567,7 @@ function TarefasPage() {
                               if (e.key === 'Enter') addTarefa(kr.id, okr.id)
                               if (e.key === 'Escape') { setAddingTo(null); setNovaDesc('') }
                             }}
-                            placeholder="Descreva a tarefa e pressione Enter..."
+                            placeholder="Descreva a missão e pressione Enter..."
                             className="text-sm text-gray-700 bg-transparent focus:outline-none placeholder:text-gray-300 pr-4"
                           />
                           <div className="flex items-center gap-1.5">
@@ -591,7 +591,7 @@ function TarefasPage() {
                           className="flex items-center gap-2 px-5 py-2.5 border-t border-gray-50 w-full text-left text-xs text-gray-400 hover:text-[#7B2FBE] hover:bg-gray-50/30 transition-all"
                         >
                           <Plus size={12} />
-                          Adicionar tarefa
+                          Adicionar missão
                         </button>
                       )}
                     </div>

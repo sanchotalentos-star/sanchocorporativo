@@ -4,6 +4,10 @@ import {
   Plus, X, Trash2, ChevronDown, ChevronUp,
   ChevronRight, ChevronLeft, Zap,
 } from 'lucide-react'
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  Cell, CartesianGrid,
+} from 'recharts'
 import { useAuth } from '@/context/AuthContext'
 import { memberKey } from '@/lib/memberStorage'
 import { cn } from '@/lib/utils'
@@ -206,7 +210,7 @@ function gerarBriefingCoach(
     itens.push({
       prioridade: 'foco',
       mensagem: t.descricao.length > 90 ? t.descricao.slice(0, 90) + '…' : t.descricao,
-      submensagem: 'Tarefa de alta prioridade aguardando ação',
+      submensagem: 'Missão de alta prioridade aguardando ação',
       href: '/dashboard/membro/tarefas',
     })
   }
@@ -447,7 +451,7 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
               <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                 {cards.length === 0 && addingCol !== col.key ? (
                   <div style={{ background: D.surface, border: `1px dashed ${D.border}`, borderTop: 'none', padding: '16px 12px', textAlign: 'center' }}>
-                    <p style={{ fontSize: 11, color: D.textFaint, margin: 0 }}>Sem tarefas</p>
+                    <p style={{ fontSize: 11, color: D.textFaint, margin: 0 }}>Sem missões</p>
                   </div>
                 ) : cards.map((tarefa, ci) => {
                   const okr = okrMap[tarefa.okrId]
@@ -518,7 +522,7 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
                     autoFocus value={addDesc}
                     onChange={e => setAddDesc(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') handleAdd(); if (e.key === 'Escape') { setAddingCol(null); setAddDesc(''); setAddKr('') } }}
-                    placeholder="Descreva a tarefa..."
+                    placeholder="Descreva a missão..."
                     style={{ width: '100%', fontSize: 11, border: `1px solid ${D.border2}`, borderRadius: 4, padding: '4px 8px', outline: 'none', marginBottom: 4, boxSizing: 'border-box', background: D.surface2, color: D.text }}
                   />
                   <select value={addKr} onChange={e => setAddKr(e.target.value)}
@@ -538,7 +542,7 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
                   onMouseEnter={e => { e.currentTarget.style.color = D.textSub; e.currentTarget.style.borderColor = D.border2 }}
                   onMouseLeave={e => { e.currentTarget.style.color = D.textFaint; e.currentTarget.style.borderColor = D.border }}
                 >
-                  <Plus size={11} /> Adicionar tarefa
+                  <Plus size={11} /> Adicionar missão
                 </button>
               )}
             </div>
@@ -546,7 +550,7 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
         })}
       </div>
       <p style={{ fontSize: 10, color: D.textFaint, marginTop: 10, textAlign: 'center' }}>
-        ← → para mover status · duplo clique na tarefa para editar · clique na prioridade para alterar
+        ← → para mover status · duplo clique na missão para editar · clique na prioridade para alterar
       </p>
     </div>
   )
@@ -598,7 +602,7 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
                 <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{okr.titulo}</p>
                 <p style={{ fontSize: 10, color: D.textMuted, margin: '2px 0 0' }}>
                   {okr.categoria} · {okr.trimestre}
-                  {okrTarefas.length > 0 && <span style={{ marginLeft: 8, fontWeight: 500, color: cor }}>{okrFeitas}/{okrTarefas.length} tarefas</span>}
+                  {okrTarefas.length > 0 && <span style={{ marginLeft: 8, fontWeight: 500, color: cor }}>{okrFeitas}/{okrTarefas.length} missões</span>}
                 </p>
               </div>
               {isExpanded ? <ChevronUp size={13} style={{ color: D.textFaint, flexShrink: 0 }} /> : <ChevronDown size={13} style={{ color: D.textFaint, flexShrink: 0 }} />}
@@ -607,7 +611,7 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
             {isExpanded && (
               <div>
                 <div className="grid items-center px-5 py-2 border-b" style={{ gridTemplateColumns: '1fr 120px 80px 52px', borderColor: D.border, backgroundColor: D.surface }}>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: D.textMuted }}>Tarefa</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: D.textMuted }}>Missão</p>
                   <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: D.textMuted }}>Status</p>
                   <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: D.textMuted }}>Prioridade</p>
                   <span />
@@ -680,7 +684,7 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
                         <div className="grid items-center px-5 py-2.5 border-t" style={{ gridTemplateColumns: '1fr 120px 80px 52px', borderColor: D.border, backgroundColor: 'rgba(197,168,128,0.04)' }}>
                           <input autoFocus value={novaDesc} onChange={e => setNovaDesc(e.target.value)}
                             onKeyDown={e => { if (e.key === 'Enter') addTarefa(kr.id, okr.id); if (e.key === 'Escape') { setAddingTo(null); setNovaDesc('') } }}
-                            placeholder="Descreva a tarefa e pressione Enter..."
+                            placeholder="Descreva a missão e pressione Enter..."
                             style={{ fontSize: 13, color: D.text, background: 'transparent', outline: 'none', border: 'none', paddingRight: 16 }}
                           />
                           <div className="flex items-center gap-1.5">
@@ -741,7 +745,7 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
         <div>
           <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>Fluxos de Trabalho</p>
           <p style={{ fontSize: 11, color: D.textSub, margin: '2px 0 0', lineHeight: 1.5 }}>
-            Escolha um fluxo pré-construído, selecione o Resultado-Chave e aplique tarefas organizadas por fases diretamente no seu plano.
+            Escolha um fluxo pré-construído, selecione o Resultado-Chave e aplique missões organizadas por fases diretamente no seu plano.
           </p>
         </div>
       </div>
@@ -777,7 +781,7 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
                   <span key={fase} style={{ fontSize: 9, fontWeight: 500, color: wf.cor, background: `rgba(${hexToRgb(wf.cor)},0.12)`, padding: '2px 6px', borderRadius: 3 }}>{fase}</span>
                 ))}
               </div>
-              <p style={{ fontSize: 10, color: D.textMuted, margin: 0 }}>{wf.tarefas.length} tarefas</p>
+              <p style={{ fontSize: 10, color: D.textMuted, margin: 0 }}>{wf.tarefas.length} missões</p>
             </button>
           )
         })}
@@ -974,7 +978,7 @@ function HomePage() {
 
   const metrics = [
     { label: 'OKRs',        value: okrs.length > 0 ? `${progOkrs}%` : '—',          sub: okrs.length > 0 ? `${okrs.length} objetivo${okrs.length !== 1 ? 's' : ''}` : 'Sem metas',                                                       color: progOkrs >= 75 ? '#22C55E' : progOkrs >= 40 ? D.gold : '#F87171',     pct: progOkrs,      href: '/dashboard/membro/okr'       },
-    { label: 'Tarefas',     value: tarefas.length > 0 ? `${feitasCount}/${tarefas.length}` : '—', sub: emAndamento > 0 ? `${emAndamento} em andamento` : (bloqueadas > 0 ? `${bloqueadas} bloqueada${bloqueadas !== 1 ? 's' : ''}` : 'Nenhuma ativa'), color: tarefasPct >= 70 ? '#22C55E' : tarefasPct >= 40 ? D.gold : D.textMuted, pct: tarefasPct,    href: '/dashboard/membro/tarefas'   },
+    { label: 'Missões',     value: tarefas.length > 0 ? `${feitasCount}/${tarefas.length}` : '—', sub: emAndamento > 0 ? `${emAndamento} em andamento` : (bloqueadas > 0 ? `${bloqueadas} bloqueada${bloqueadas !== 1 ? 's' : ''}` : 'Nenhuma ativa'), color: tarefasPct >= 70 ? '#22C55E' : tarefasPct >= 40 ? D.gold : D.textMuted, pct: tarefasPct,    href: '/dashboard/membro/tarefas'   },
     { label: 'Marketing',   value: marketingTotal > 0 ? `${marketingPct}%` : '—',    sub: marketingTotal > 0 ? `${marketingConcluidas} de ${marketingTotal} ações` : 'Sem plano',                                                        color: marketingPct >= 70 ? '#22C55E' : marketingPct >= 40 ? D.gold : D.textMuted, pct: marketingPct, href: '/dashboard/membro/marketing' },
     { label: 'Indicadores', value: kpisData.length > 0 ? `${avgKpiPct}%` : '—',     sub: kpisData.length > 0 ? `${kpisData.length} KPI${kpisData.length !== 1 ? 's' : ''}` : 'Sem KPIs',                                               color: avgKpiPct >= 75 ? '#22C55E' : avgKpiPct >= 40 ? D.gold : '#F87171',   pct: avgKpiPct,     href: '/dashboard/membro/kpis'      },
   ]
@@ -1068,11 +1072,117 @@ function HomePage() {
             ))}
           </div>
 
+          {/* ── CHARTS ── */}
+          {(tarefas.length > 0 || okrs.length > 0) && (
+            <div style={{ marginTop: 32, display: 'grid', gridTemplateColumns: okrs.length > 0 && tarefas.length > 0 ? '1fr 1fr' : '1fr', gap: 20 }}>
+
+              {/* Missões por status */}
+              {tarefas.length > 0 && (() => {
+                const data = [
+                  { name: 'Pendente',     value: tarefas.filter(t => t.status === 'pendente').length,     fill: '#9E9A94' },
+                  { name: 'Andamento',    value: tarefas.filter(t => t.status === 'em_andamento').length, fill: '#3B82F6' },
+                  { name: 'Concluída',    value: tarefas.filter(t => t.status === 'feita').length,        fill: '#22C55E' },
+                  { name: 'Bloqueada',    value: tarefas.filter(t => t.status === 'bloqueada').length,    fill: '#EF4444' },
+                ]
+                return (
+                  <div style={{ background: D.card, border: `1px solid ${D.border}`, padding: '18px 20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                      <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted }}>Missões por Status</span>
+                      <Link to="/dashboard/membro/tarefas" style={{ textDecoration: 'none', fontSize: 10, color: D.gold, fontWeight: 600 }}>Ver todas →</Link>
+                    </div>
+                    <ResponsiveContainer width="100%" height={140}>
+                      <BarChart data={data} barSize={28} margin={{ top: 0, right: 0, left: -24, bottom: 0 }}>
+                        <CartesianGrid vertical={false} stroke={D.border} strokeDasharray="0" />
+                        <XAxis dataKey="name" tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} allowDecimals={false} />
+                        <Tooltip
+                          cursor={{ fill: 'rgba(0,0,0,0.03)' }}
+                          contentStyle={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 4, fontSize: 12 }}
+                          labelStyle={{ color: D.textMid, fontWeight: 600 }}
+                        />
+                        <Bar dataKey="value" name="Missões" radius={[3, 3, 0, 0]}>
+                          {data.map((d, i) => <Cell key={i} fill={d.fill} fillOpacity={0.85} />)}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )
+              })()}
+
+              {/* OKRs por categoria */}
+              {okrs.length > 0 && (() => {
+                const catData = Object.entries(
+                  okrs.reduce<Record<string, { total: number; count: number }>>((acc, o) => {
+                    const p = objPct(o)
+                    if (!acc[o.categoria]) acc[o.categoria] = { total: 0, count: 0 }
+                    acc[o.categoria].total += p
+                    acc[o.categoria].count += 1
+                    return acc
+                  }, {})
+                ).map(([cat, { total, count }]) => ({
+                  name: cat,
+                  value: Math.round(total / count),
+                  fill: catColor[cat] ?? D.gold,
+                }))
+                return (
+                  <div style={{ background: D.card, border: `1px solid ${D.border}`, padding: '18px 20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                      <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted }}>OKRs por Categoria (%)</span>
+                      <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none', fontSize: 10, color: D.gold, fontWeight: 600 }}>Ver todos →</Link>
+                    </div>
+                    <ResponsiveContainer width="100%" height={140}>
+                      <BarChart data={catData} barSize={36} margin={{ top: 0, right: 0, left: -24, bottom: 0 }}>
+                        <CartesianGrid vertical={false} stroke={D.border} strokeDasharray="0" />
+                        <XAxis dataKey="name" tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} />
+                        <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: D.textMuted }} axisLine={false} tickLine={false} />
+                        <Tooltip
+                          cursor={{ fill: 'rgba(0,0,0,0.03)' }}
+                          contentStyle={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 4, fontSize: 12 }}
+                          formatter={(v: number) => [`${v}%`, 'Progresso']}
+                          labelStyle={{ color: D.textMid, fontWeight: 600 }}
+                        />
+                        <Bar dataKey="value" name="Progresso" radius={[3, 3, 0, 0]}>
+                          {catData.map((d, i) => <Cell key={i} fill={d.fill} fillOpacity={0.85} />)}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )
+              })()}
+
+            </div>
+          )}
+
           {kpisData.length > 0 && (
             <div style={{ marginTop: 24 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted }}>Indicadores-Chave</span>
                 <Link to="/dashboard/membro/kpis" style={{ textDecoration: 'none', fontSize: 10, color: D.gold, fontWeight: 600 }}>Ver todos →</Link>
+              </div>
+              {/* KPI bar chart */}
+              <div style={{ marginBottom: 16 }}>
+                <ResponsiveContainer width="100%" height={120}>
+                  <BarChart
+                    data={kpisData.slice(0, 6).map(k => ({ name: k.kpi_name.length > 14 ? k.kpi_name.slice(0, 14) + '…' : k.kpi_name, value: pct(k.atual, k.meta), fill: pct(k.atual, k.meta) >= 80 ? '#22C55E' : pct(k.atual, k.meta) >= 50 ? D.gold : '#F87171' }))}
+                    barSize={20} margin={{ top: 0, right: 0, left: -24, bottom: 0 }}
+                  >
+                    <CartesianGrid vertical={false} stroke={D.border} strokeDasharray="0" />
+                    <XAxis dataKey="name" tick={{ fontSize: 9, fill: D.textMuted }} axisLine={false} tickLine={false} />
+                    <YAxis domain={[0, 100]} tick={{ fontSize: 9, fill: D.textMuted }} axisLine={false} tickLine={false} />
+                    <Tooltip
+                      cursor={{ fill: 'rgba(0,0,0,0.03)' }}
+                      contentStyle={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 4, fontSize: 12 }}
+                      formatter={(v: number) => [`${v}%`, 'Resultado']}
+                      labelStyle={{ color: D.textMid, fontWeight: 600 }}
+                    />
+                    <Bar dataKey="value" name="KPI" radius={[3, 3, 0, 0]}>
+                      {kpisData.slice(0, 6).map((k, i) => {
+                        const p = pct(k.atual, k.meta)
+                        return <Cell key={i} fill={p >= 80 ? '#22C55E' : p >= 50 ? D.gold : '#F87171'} fillOpacity={0.85} />
+                      })}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
               {kpisData.slice(0, 5).map((kpi, i) => {
                 const p   = pct(kpi.atual, kpi.meta)
@@ -1146,8 +1256,8 @@ function HomePage() {
           </h2>
           <p style={{ fontSize: 13, color: D.textSub, margin: '6px 0 0', lineHeight: 1.6 }}>
             {tarefas.length > 0
-              ? `${feitasCount} de ${tarefas.length} tarefas concluídas · ${emAndamento} em andamento${bloqueadas > 0 ? ` · ${bloqueadas} bloqueadas` : ''}`
-              : 'Crie OKRs para gerar tarefas automaticamente.'
+              ? `${feitasCount} de ${tarefas.length} missões concluídas · ${emAndamento} em andamento${bloqueadas > 0 ? ` · ${bloqueadas} bloqueadas` : ''}`
+              : 'Crie OKRs para gerar missões automaticamente.'
             }
           </p>
 
@@ -1175,7 +1285,7 @@ function HomePage() {
             <div style={{ padding: '40px 0', textAlign: 'center' }}>
               <p style={{ fontSize: 14, fontWeight: 500, color: D.textMid, margin: '0 0 6px' }}>Nenhum objetivo criado ainda</p>
               <p style={{ fontSize: 13, color: D.textSub, lineHeight: 1.6, margin: '0 0 24px' }}>
-                Vá até <strong style={{ color: D.textMid }}>Metas de Impacto</strong> para criar seus primeiros OKRs.
+                Vá até <strong style={{ color: D.textMid }}>Metas de Impacto</strong> para criar seus primeiros OKRs e gerar missões automaticamente.
               </p>
               <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none' }}>
                 <span style={{

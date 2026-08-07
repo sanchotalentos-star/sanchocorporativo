@@ -30,7 +30,7 @@ const membroNav: NavItem[] = [
   { label: 'Minha Identidade',    href: '/dashboard/membro/posicionamento' },
   { label: 'Pilares da Marca',    href: '/dashboard/membro/pilares'        },
   { label: 'Metas de Impacto',    href: '/dashboard/membro/okr'            },
-  { label: 'Tarefas',             href: '/dashboard/membro/tarefas'        },
+  { label: 'Missões',              href: '/dashboard/membro/tarefas'        },
   { label: 'Marketing Anual',     href: '/dashboard/membro/marketing'      },
   { label: 'Indicadores',         href: '/dashboard/membro/kpis'           },
   { label: 'Agenda',              href: '/dashboard/membro/agenda'         },
@@ -217,7 +217,7 @@ export function Sidebar() {
           <SectionLabel>Hoje</SectionLabel>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginTop: 6 }}>
             {[
-              { dot: pending > 0 ? '#F59E0B' : '#22C55E', text: `${pending} tarefa${pending !== 1 ? 's' : ''} pendente${pending !== 1 ? 's' : ''}` },
+              { dot: pending > 0 ? '#F59E0B' : '#22C55E', text: `${pending} ${pending !== 1 ? 'missões' : 'missão'} pendente${pending !== 1 ? 's' : ''}` },
               { dot: 'rgba(255,255,255,0.15)', text: 'Sessão com mentor' },
               { dot: kpis.length > 0 ? '#22C55E' : 'rgba(255,255,255,0.15)', text: `${kpis.length} indicador${kpis.length !== 1 ? 'es' : ''} monitorado${kpis.length !== 1 ? 's' : ''}` },
             ].map((item, i) => (
