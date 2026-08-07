@@ -1,24 +1,38 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import {
-  Plus, X, Trash2, ChevronDown, ChevronUp, ClipboardList,
-  LayoutDashboard, Kanban, LayoutList, ChevronRight, ChevronLeft, Zap, Rocket,
+  Plus, X, Trash2, ChevronDown, ChevronUp,
+  ChevronRight, ChevronLeft, Zap,
 } from 'lucide-react'
-import {
-  BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer,
-  Tooltip, CartesianGrid, PieChart, Pie,
-} from 'recharts'
 import { useAuth } from '@/context/AuthContext'
+import { memberKey } from '@/lib/memberStorage'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/dashboard/membro/')({ component: HomePage })
 
+/* ─── PALETTE ─── */
+const D = {
+  bg:        '#FAFAF9',
+  card:      '#FFFFFF',
+  surface:   '#F5F4F2',
+  surface2:  '#EEECEA',
+  border:    'rgba(26,25,22,0.07)',
+  border2:   'rgba(26,25,22,0.12)',
+  text:      '#1A1916',
+  textMid:   '#3A3530',
+  textSub:   '#6B6560',
+  textMuted: '#8A8680',
+  textFaint: '#C5C0BA',
+  gold:      '#C5A880',
+  serif:     "'Cormorant Garamond', Georgia, serif",
+}
+
 /* ─── TYPES ─── */
 interface KeyResult { id: string; descricao: string; meta: number; atual: number; unit: string }
-interface Objective { id: string; titulo: string; categoria: string; trimestre: string; keyResults: KeyResult[] }
+interface Objective  { id: string; titulo: string; categoria: string; trimestre: string; keyResults: KeyResult[] }
 type TarefaStatus = 'pendente' | 'em_andamento' | 'feita' | 'bloqueada'
 type Prioridade   = 'alta' | 'media' | 'baixa'
-type ViewMode     = 'dashboard' | 'kanban' | 'lista' | 'fluxos'
+type ViewMode     = 'lista' | 'kanban' | 'fluxos'
 interface Tarefa  { id: string; descricao: string; krId: string; okrId: string; status: TarefaStatus; prioridade: Prioridade; auto: boolean }
 interface WorkflowTask { descricao: string; prioridade: Prioridade; fase: string }
 interface Workflow { id: string; nome: string; descricao: string; cor: string; emoji: string; tarefas: WorkflowTask[] }
@@ -27,32 +41,34 @@ interface Workflow { id: string; nome: string; descricao: string; cor: string; e
 const OKR_KEY     = 'okr_store_v1'
 const TAREFAS_KEY = 'tarefas_store_v1'
 
-const catColor: Record<string, string> = { Autoridade: '#7B2FBE', Receita: '#10B981', Alcance: '#3B82F6', Produto: '#F59E0B' }
-const catBg:    Record<string, string> = {
-  Autoridade: 'rgba(123,47,190,0.09)', Receita: 'rgba(16,185,129,0.09)',
-  Alcance: 'rgba(59,130,246,0.09)',    Produto: 'rgba(245,158,11,0.09)',
+const catColor: Record<string, string> = {
+  Autoridade: '#C5A880', Receita: '#10B981', Alcance: '#3B82F6', Produto: '#F59E0B',
+}
+const catBg: Record<string, string> = {
+  Autoridade: 'rgba(197,168,128,0.12)', Receita: 'rgba(16,185,129,0.12)',
+  Alcance: 'rgba(59,130,246,0.12)',     Produto: 'rgba(245,158,11,0.12)',
 }
 
 const statusCycle: TarefaStatus[]   = ['pendente', 'em_andamento', 'feita', 'bloqueada']
 const prioridadeCycle: Prioridade[] = ['alta', 'media', 'baixa']
 
 const statusConfig: Record<TarefaStatus, { label: string; bg: string; text: string; dot: string }> = {
-  pendente:     { label: 'Pendente',     bg: '#F9FAFB', text: '#6B7280', dot: '#D1D5DB' },
-  em_andamento: { label: 'Em andamento', bg: '#EFF6FF', text: '#2563EB', dot: '#3B82F6' },
-  feita:        { label: 'Feita',        bg: '#F0FDF4', text: '#16A34A', dot: '#22C55E' },
-  bloqueada:    { label: 'Bloqueada',    bg: '#FEF2F2', text: '#DC2626', dot: '#EF4444' },
+  pendente:     { label: 'Pendente',     bg: 'rgba(0,0,0,0.05)',       text: '#6B6560', dot: '#9E9A94' },
+  em_andamento: { label: 'Em andamento', bg: 'rgba(59,130,246,0.10)',  text: '#2563EB', dot: '#3B82F6' },
+  feita:        { label: 'Feita',        bg: 'rgba(16,185,129,0.10)',  text: '#059669', dot: '#10B981' },
+  bloqueada:    { label: 'Bloqueada',    bg: 'rgba(239,68,68,0.10)',   text: '#DC2626', dot: '#EF4444' },
 }
 const prioridadeConfig: Record<Prioridade, { label: string; bg: string; text: string }> = {
-  alta:  { label: 'Alta',  bg: '#FEF2F2', text: '#DC2626' },
-  media: { label: 'Média', bg: '#FFFBEB', text: '#D97706' },
-  baixa: { label: 'Baixa', bg: '#F0FDF4', text: '#16A34A' },
+  alta:  { label: 'Alta',  bg: 'rgba(239,68,68,0.10)',  text: '#DC2626' },
+  media: { label: 'Média', bg: 'rgba(245,158,11,0.10)', text: '#D97706' },
+  baixa: { label: 'Baixa', bg: 'rgba(16,185,129,0.10)', text: '#059669' },
 }
 
 const WORKFLOWS: Workflow[] = [
   {
     id: 'calendario-conteudo', nome: 'Calendário de Conteúdo', emoji: '📅',
     descricao: 'Planejamento, produção e publicação de conteúdo semanal com consistência',
-    cor: '#7B2FBE',
+    cor: '#C5A880',
     tarefas: [
       { fase: 'Planejamento', descricao: 'Definir os temas e formatos dos conteúdos da semana', prioridade: 'alta' },
       { fase: 'Planejamento', descricao: 'Criar calendário editorial com datas, canais e chamadas para ação', prioridade: 'alta' },
@@ -67,14 +83,14 @@ const WORKFLOWS: Workflow[] = [
     descricao: 'Da prospecção ao fechamento com etapas claras de qualificação',
     cor: '#10B981',
     tarefas: [
-      { fase: 'Prospecção',  descricao: 'Mapear e listar 10 leads qualificados dentro do perfil de cliente ideal', prioridade: 'alta' },
-      { fase: 'Prospecção',  descricao: 'Enviar mensagem de conexão personalizada para 5 leads da lista', prioridade: 'alta' },
+      { fase: 'Prospecção',   descricao: 'Mapear e listar 10 leads qualificados dentro do perfil de cliente ideal', prioridade: 'alta' },
+      { fase: 'Prospecção',   descricao: 'Enviar mensagem de conexão personalizada para 5 leads da lista', prioridade: 'alta' },
       { fase: 'Qualificação', descricao: 'Agendar conversa de descoberta com os leads que responderam', prioridade: 'alta' },
       { fase: 'Qualificação', descricao: 'Identificar dor, orçamento e urgência em cada conversa', prioridade: 'alta' },
-      { fase: 'Proposta',    descricao: 'Elaborar proposta personalizada para o lead mais qualificado', prioridade: 'alta' },
-      { fase: 'Proposta',    descricao: 'Apresentar a proposta, tirar dúvidas e responder objeções', prioridade: 'alta' },
-      { fase: 'Fechamento',  descricao: 'Fazer follow-up com quem recebeu proposta e ainda não respondeu', prioridade: 'media' },
-      { fase: 'Fechamento',  descricao: 'Enviar contrato e confirmar início do projeto com o cliente', prioridade: 'alta' },
+      { fase: 'Proposta',     descricao: 'Elaborar proposta personalizada para o lead mais qualificado', prioridade: 'alta' },
+      { fase: 'Proposta',     descricao: 'Apresentar a proposta, tirar dúvidas e responder objeções', prioridade: 'alta' },
+      { fase: 'Fechamento',   descricao: 'Fazer follow-up com quem recebeu proposta e ainda não respondeu', prioridade: 'media' },
+      { fase: 'Fechamento',   descricao: 'Enviar contrato e confirmar início do projeto com o cliente', prioridade: 'alta' },
     ],
   },
   {
@@ -122,6 +138,13 @@ const WORKFLOWS: Workflow[] = [
   },
 ]
 
+/* ─── EXTRA TYPES ─── */
+interface KpiItem { id: string; kpi_name: string; atual: number; meta: number; unidade?: string }
+interface AcaoMarketing { id: string; titulo: string; mes: number; concluida: boolean }
+
+type BriefingPriority = 'urgente' | 'foco' | 'atencao'
+interface BriefingItem { prioridade: BriefingPriority; mensagem: string; submensagem?: string; href: string }
+
 /* ─── HELPERS ─── */
 function pct(atual: number, meta: number) { return !meta ? 0 : Math.min(100, Math.round((atual / meta) * 100)) }
 function objPct(obj: Objective) {
@@ -132,22 +155,101 @@ function hexToRgb(hex: string) {
   return `${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)}`
 }
 
-interface TarefaSugestao { descricao: string; prioridade: Prioridade }
+function gerarBriefingCoach(
+  okrs: Objective[],
+  tarefas: Tarefa[],
+  kpisData: KpiItem[],
+): BriefingItem[] {
+  const itens: BriefingItem[] = []
+
+  const okrsCriticos = [...okrs]
+    .map(o => ({ ...o, p: objPct(o) }))
+    .filter(o => o.p < 100 && o.keyResults.length > 0)
+    .sort((a, b) => a.p - b.p)
+
+  for (const okr of okrsCriticos.slice(0, 2)) {
+    const criticalKr = [...okr.keyResults]
+      .map(kr => ({ ...kr, p: pct(kr.atual, kr.meta), gap: kr.meta - kr.atual }))
+      .filter(kr => kr.p < 100 && kr.meta > 0)
+      .sort((a, b) => a.p - b.p)[0]
+
+    if (!criticalKr) continue
+
+    const gap  = criticalKr.gap
+    const unit = criticalKr.unit || 'unidades'
+    const desc = criticalKr.descricao.toLowerCase()
+
+    let acao = ''
+    if (desc.includes('palestra') || desc.includes('evento') || desc.includes('aparição'))
+      acao = `abrir ${Math.min(5, Math.ceil(gap * 2))} contatos com organizadores de eventos`
+    else if (desc.includes('conteúdo') || desc.includes('publicar') || desc.includes('post') || desc.includes('editorial'))
+      acao = `produzir e agendar ${Math.min(3, gap)} conteúdo${gap !== 1 ? 's' : ''}`
+    else if (desc.includes('lead') || desc.includes('prospect') || desc.includes('conversa') || desc.includes('reunião'))
+      acao = `fazer ${Math.min(5, gap)} prospecções ativas hoje`
+    else if (desc.includes('receita') || desc.includes('venda') || desc.includes('fechar') || desc.includes('proposta'))
+      acao = `avançar ${Math.min(3, gap)} proposta${gap !== 1 ? 's' : ''} em aberto`
+    else if (desc.includes('podcast') || desc.includes('entrevista'))
+      acao = `enviar ${Math.min(3, gap)} pitch${gap !== 1 ? 's' : ''} para podcasts do setor`
+    else
+      acao = `avançar ${Math.min(gap, 3)} ${unit} neste resultado`
+
+    itens.push({
+      prioridade: okr.p < 30 ? 'urgente' : 'foco',
+      mensagem: `Para atingir "${okr.titulo}", você precisa ${acao}`,
+      submensagem: `${okr.p}% concluído · Faltam ${gap} ${unit}`,
+      href: '/dashboard/membro/okr',
+    })
+  }
+
+  const urgentes = tarefas.filter(t => t.prioridade === 'alta' && t.status === 'pendente').slice(0, 2)
+  for (const t of urgentes) {
+    itens.push({
+      prioridade: 'foco',
+      mensagem: t.descricao.length > 90 ? t.descricao.slice(0, 90) + '…' : t.descricao,
+      submensagem: 'Tarefa de alta prioridade aguardando ação',
+      href: '/dashboard/membro/tarefas',
+    })
+  }
+
+  for (const kpi of kpisData) {
+    const p = pct(kpi.atual, kpi.meta)
+    if (p < 40 && itens.length < 4) {
+      itens.push({
+        prioridade: 'atencao',
+        mensagem: `"${kpi.kpi_name}" precisa de atenção — está em ${p}%`,
+        submensagem: `Atual: ${kpi.atual} · Meta: ${kpi.meta}${kpi.unidade ? ' ' + kpi.unidade : ''}`,
+        href: '/dashboard/membro/kpis',
+      })
+    }
+  }
+
+  if (itens.length === 0 && okrs.length === 0) {
+    itens.push({
+      prioridade: 'foco',
+      mensagem: 'Comece definindo seus OKRs para receber orientações personalizadas',
+      submensagem: 'Vá até Metas de Impacto e crie seus primeiros objetivos',
+      href: '/dashboard/membro/okr',
+    })
+  }
+
+  return itens.slice(0, 4)
+}
+
 function gerarTarefas(kr: KeyResult, okrId: string): Tarefa[] {
   const desc = kr.descricao.toLowerCase()
-  let s: TarefaSugestao[]
+  let s: { descricao: string; prioridade: Prioridade }[]
 
   if (desc.includes('publicar') || desc.includes('conteúdo') || desc.includes('posicionamento') || desc.includes('editorial'))
     s = [
-      { descricao: 'Definir os 4 temas de conteúdo do mês e o formato de cada um (post, vídeo, artigo)', prioridade: 'alta' },
+      { descricao: 'Definir os 4 temas de conteúdo do mês e o formato de cada um', prioridade: 'alta' },
       { descricao: 'Produzir e publicar o conteúdo desta semana conforme o calendário', prioridade: 'alta' },
       { descricao: 'Registrar o engajamento e anotar o que performou melhor para repetir', prioridade: 'media' },
     ]
-  else if (desc.includes('aparição') || desc.includes('evento') || desc.includes('podcast') || desc.includes('convidado') || desc.includes('entrevista'))
+  else if (desc.includes('aparição') || desc.includes('evento') || desc.includes('podcast'))
     s = [
-      { descricao: 'Pesquisar e listar 10 eventos, podcasts ou programas do seu setor com contato do responsável', prioridade: 'alta' },
-      { descricao: 'Escrever um pitch de apresentação de 5 linhas destacando sua expertise e o tema que pode trazer', prioridade: 'alta' },
-      { descricao: 'Entrar em contato com 3 organizadores da lista esta semana com o pitch personalizado', prioridade: 'alta' },
+      { descricao: 'Pesquisar e listar 10 eventos, podcasts ou programas do seu setor', prioridade: 'alta' },
+      { descricao: 'Escrever um pitch de apresentação de 5 linhas destacando sua expertise', prioridade: 'alta' },
+      { descricao: 'Entrar em contato com 3 organizadores da lista esta semana', prioridade: 'alta' },
       { descricao: 'Fazer follow-up com quem não respondeu após 5 dias úteis', prioridade: 'media' },
     ]
   else if (desc.includes('conversa') || desc.includes('descoberta') || desc.includes('reunião'))
@@ -162,7 +264,6 @@ function gerarTarefas(kr: KeyResult, okrId: string): Tarefa[] {
       { descricao: 'Identificar os 3 leads mais qualificados e prontos para receber uma proposta', prioridade: 'alta' },
       { descricao: 'Escrever uma proposta comercial personalizada para o lead principal', prioridade: 'alta' },
       { descricao: 'Enviar a proposta e agendar uma conversa de apresentação em até 48h', prioridade: 'alta' },
-      { descricao: 'Fazer follow-up com quem recebeu proposta e ainda não respondeu após 3 dias', prioridade: 'media' },
     ]
   else if (desc.includes('fechar') || desc.includes('cliente') || desc.includes('contrato'))
     s = [
@@ -170,34 +271,15 @@ function gerarTarefas(kr: KeyResult, okrId: string): Tarefa[] {
       { descricao: 'Preparar e enviar proposta para o lead mais avançado no processo', prioridade: 'alta' },
       { descricao: 'Fazer follow-up com quem recebeu proposta há mais de 3 dias sem retorno', prioridade: 'media' },
     ]
-  else if (desc.includes('depoimento') || desc.includes('indicação') || desc.includes('referência'))
+  else if (desc.includes('depoimento') || desc.includes('indicação'))
     s = [
-      { descricao: 'Selecionar os 5 clientes mais satisfeitos e pedir um depoimento por escrito ou vídeo', prioridade: 'alta' },
+      { descricao: 'Selecionar os 5 clientes mais satisfeitos e pedir um depoimento', prioridade: 'alta' },
       { descricao: 'Publicar o depoimento recebido com a autorização do cliente', prioridade: 'alta' },
-      { descricao: 'Pedir indicações ativas para os 3 melhores clientes atendidos no trimestre', prioridade: 'media' },
-    ]
-  else if (desc.includes('sessão') || desc.includes('demo') || desc.includes('produto'))
-    s = [
-      { descricao: 'Criar um roteiro de 30 minutos para a sessão de descoberta ou demo do produto', prioridade: 'alta' },
-      { descricao: 'Agendar 3 sessões de descoberta ou demos esta semana com leads ou clientes', prioridade: 'alta' },
-      { descricao: 'Enviar um formulário de feedback estruturado após cada sessão realizada', prioridade: 'media' },
-    ]
-  else if (desc.includes('feedback') || desc.includes('melhoria') || desc.includes('iteração'))
-    s = [
-      { descricao: 'Criar um formulário de feedback com 5 perguntas objetivas sobre o produto ou serviço', prioridade: 'alta' },
-      { descricao: 'Enviar o formulário para os últimos 10 clientes atendidos', prioridade: 'alta' },
-      { descricao: 'Analisar os feedbacks recebidos e listar as 3 principais melhorias a implementar', prioridade: 'alta' },
-      { descricao: 'Implementar a melhoria de maior impacto identificada no feedback', prioridade: 'media' },
-    ]
-  else if (desc.includes('contato') || desc.includes('conexão') || desc.includes('alcance'))
-    s = [
-      { descricao: 'Interagir com comentários e publicações de 10 perfis do público-alvo esta semana', prioridade: 'alta' },
-      { descricao: 'Publicar um conteúdo focado em atrair conexões qualificadas', prioridade: 'alta' },
-      { descricao: 'Enviar convite de conexão personalizado para 5 potenciais parceiros ou clientes', prioridade: 'media' },
+      { descricao: 'Pedir indicações ativas para os 3 melhores clientes atendidos', prioridade: 'media' },
     ]
   else
     s = [
-      { descricao: `Definir os próximos passos concretos e mensuráveis para: ${kr.descricao}`, prioridade: 'alta' },
+      { descricao: `Definir os próximos passos concretos para: ${kr.descricao}`, prioridade: 'alta' },
       { descricao: 'Estabelecer uma rotina semanal de 30 minutos para avançar neste resultado', prioridade: 'media' },
       { descricao: 'Revisar o progresso deste KR com o mentor na próxima sessão', prioridade: 'baixa' },
     ]
@@ -231,179 +313,75 @@ function PrioridadeChip({ prioridade, onClick }: { prioridade: Prioridade; onCli
   )
 }
 
-/* ─── RECHARTS TOOLTIPS ─── */
-function OkrTip({ active, payload }: any) {
-  if (!active || !payload?.length) return null
-  const d = payload[0].payload
+/* ─── MINI COMPONENTS ─── */
+function HR() {
+  return <hr style={{ border: 'none', borderTop: `1px solid ${D.border}`, margin: 0 }} />
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 6, padding: '8px 12px', fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', maxWidth: 260 }}>
-      <p style={{ fontWeight: 600, color: '#111827', marginBottom: 2, lineHeight: 1.4 }}>{d.fullName}</p>
-      <p style={{ color: d.color, margin: 0, fontWeight: 600 }}>{d.value}% concluído</p>
-    </div>
+    <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: D.textMuted, margin: 0 }}>
+      {children}
+    </p>
   )
 }
-function KrTip({ active, payload }: any) {
-  if (!active || !payload?.length) return null
-  const d = payload[0].payload
+
+function ChecklistRow({ done, label, href }: { done: boolean; label: string; href: string }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 6, padding: '8px 12px', fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', maxWidth: 260 }}>
-      <p style={{ fontWeight: 600, color: '#111827', marginBottom: 2, lineHeight: 1.4 }}>{d.fullLabel}</p>
-      <p style={{ color: '#6B7280', margin: 0 }}>
-        {d.atual} / {d.meta} {d.unit} · <span style={{ color: d.color, fontWeight: 600 }}>{d.value}%</span>
-      </p>
-    </div>
+    <Link to={href} style={{ textDecoration: 'none', display: 'block' }}>
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '8px 0', transition: 'opacity 0.12s' }}
+        onMouseEnter={e => { if (!done) e.currentTarget.style.opacity = '0.65' }}
+        onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
+      >
+        {done ? (
+          <div style={{ width: 15, height: 15, borderRadius: '50%', background: D.gold, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: 8, color: '#fff', fontWeight: 700, lineHeight: 1 }}>✓</span>
+          </div>
+        ) : (
+          <div style={{ width: 15, height: 15, borderRadius: '50%', border: `1.5px solid ${D.textFaint}`, flexShrink: 0 }} />
+        )}
+        <span style={{ fontSize: 14, flex: 1, color: done ? D.textMuted : D.textMid, textDecoration: done ? 'line-through' : 'none', lineHeight: 1.4 }}>
+          {label}
+        </span>
+        {!done && <ChevronRight size={13} style={{ color: D.textFaint, flexShrink: 0 }} />}
+      </div>
+    </Link>
   )
 }
-function StatusTip({ active, payload }: any) {
-  if (!active || !payload?.length) return null
-  const d = payload[0].payload
+
+function OkrRow({ okr }: { okr: Objective }) {
+  const p   = objPct(okr)
+  const col = catColor[okr.categoria] ?? D.gold
   return (
-    <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 6, padding: '8px 12px', fontSize: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-      <p style={{ fontWeight: 600, color: d.color, margin: 0 }}>{d.name}: {d.value}</p>
-    </div>
+    <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none', display: 'block' }}>
+      <div
+        style={{ display: 'grid', gridTemplateColumns: '96px 1fr 140px 44px', alignItems: 'center', gap: 16, padding: '9px 0', transition: 'opacity 0.1s' }}
+        onMouseEnter={e => e.currentTarget.style.opacity = '0.68'}
+        onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+      >
+        <span style={{ fontSize: 10, fontWeight: 600, color: col, textTransform: 'uppercase', letterSpacing: '0.07em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {okr.categoria}
+        </span>
+        <span style={{ fontSize: 13, color: D.textMid, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {okr.titulo}
+        </span>
+        <div style={{ height: 2, background: D.surface2, borderRadius: 1, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${p}%`, background: col, borderRadius: 1, transition: 'width 0.5s ease' }} />
+        </div>
+        <span style={{
+          fontSize: 12, fontWeight: 600, fontVariantNumeric: 'tabular-nums', textAlign: 'right',
+          color: p >= 75 ? '#22C55E' : (p >= 40 ? D.gold : D.textMuted),
+        }}>
+          {p}%
+        </span>
+      </div>
+    </Link>
   )
 }
 
 /* ═══════════════════════════════════════════
-   VIEW 1 — DASHBOARD
-═══════════════════════════════════════════ */
-interface DashProps {
-  okrs: Objective[]; tarefas: Tarefa[]
-  totalKrs: number; progOkrs: number
-  feitasCount: number; emAndamento: number; bloqueadas: number; pctGeral: number
-}
-function DashboardView({ okrs, tarefas, totalKrs, progOkrs, feitasCount, emAndamento, bloqueadas, pctGeral }: DashProps) {
-  const totalTarefas = tarefas.length
-  const okrBarData   = okrs.map(o => ({
-    name: o.titulo.length > 32 ? o.titulo.slice(0, 32) + '…' : o.titulo,
-    fullName: o.titulo, value: objPct(o), color: catColor[o.categoria] ?? '#7B2FBE',
-  }))
-  const allKrs = okrs.flatMap(o => o.keyResults.map(kr => ({
-    label: kr.descricao.length > 20 ? kr.descricao.slice(0, 20) + '…' : kr.descricao,
-    fullLabel: kr.descricao, value: pct(kr.atual, kr.meta),
-    atual: kr.atual, meta: kr.meta, unit: kr.unit,
-    color: catColor[o.categoria] ?? '#7B2FBE',
-  })))
-  const statusData = [
-    { name: 'Feita',        value: feitasCount, color: '#22C55E' },
-    { name: 'Em andamento', value: emAndamento,  color: '#3B82F6' },
-    { name: 'Pendente',     value: tarefas.filter(t => t.status === 'pendente').length, color: '#D1D5DB' },
-    { name: 'Bloqueada',    value: bloqueadas,   color: '#EF4444' },
-  ].filter(d => d.value > 0)
-  const prioData = [
-    { name: 'Alta',  value: tarefas.filter(t => t.prioridade === 'alta').length,  color: '#DC2626' },
-    { name: 'Média', value: tarefas.filter(t => t.prioridade === 'media').length, color: '#D97706' },
-    { name: 'Baixa', value: tarefas.filter(t => t.prioridade === 'baixa').length, color: '#16A34A' },
-  ]
-  const categoriasPresentes = Array.from(new Set(okrs.map(o => o.categoria)))
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-        {[
-          { label: 'OKRs ativos',        value: okrs.length,    color: '#111827' },
-          { label: 'Resultados-chave',   value: totalKrs,       color: '#111827' },
-          { label: 'Progresso OKRs',     value: `${progOkrs}%`, color: '#7B2FBE' },
-          { label: 'Tarefas concluídas', value: `${feitasCount}/${totalTarefas}`, color: '#16A34A' },
-        ].map(t => (
-          <div key={t.label} style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '14px 18px' }}>
-            <p style={{ fontSize: 10, fontWeight: 500, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>{t.label}</p>
-            <p style={{ fontSize: 26, fontWeight: 600, color: t.color, margin: '6px 0 0', fontVariantNumeric: 'tabular-nums' }}>{t.value}</p>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '16px 20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: 0 }}>Progresso dos Objetivos</p>
-          <div style={{ display: 'flex', gap: 12 }}>
-            {categoriasPresentes.map(cat => (
-              <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <div style={{ width: 8, height: 8, background: catColor[cat], borderRadius: 2, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, color: '#6B7280' }}>{cat}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <ResponsiveContainer width="100%" height={okrs.length * 44 + 16}>
-          <BarChart data={okrBarData} layout="vertical" margin={{ top: 0, right: 48, left: 0, bottom: 0 }} barSize={16}>
-            <CartesianGrid horizontal={false} stroke="#F3F4F6" />
-            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
-            <YAxis type="category" dataKey="name" width={200} tick={{ fontSize: 11, fill: '#374151' }} axisLine={false} tickLine={false} />
-            <Tooltip content={<OkrTip />} cursor={{ fill: '#F9FAFB' }} />
-            <Bar dataKey="value" radius={[0, 3, 3, 0]} label={{ position: 'right', fontSize: 11, fontWeight: 600, fill: '#6B7280', formatter: (v: number) => `${v}%` }}>
-              {okrBarData.map((e, i) => <Cell key={i} fill={e.color} />)}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '16px 20px' }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: '0 0 12px' }}>Status das Tarefas</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <ResponsiveContainer width={120} height={120}>
-              <PieChart>
-                <Pie data={statusData} cx="50%" cy="50%" innerRadius={36} outerRadius={55} dataKey="value" paddingAngle={2}>
-                  {statusData.map((e, i) => <Cell key={i} fill={e.color} />)}
-                </Pie>
-                <Tooltip content={<StatusTip />} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
-              {statusData.map(s => (
-                <div key={s.name} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
-                  <span style={{ fontSize: 11, color: '#374151', flex: 1 }}>{s.name}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#111827', fontVariantNumeric: 'tabular-nums' }}>{s.value}</span>
-                </div>
-              ))}
-              <div style={{ marginTop: 4, paddingTop: 8, borderTop: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 11, color: '#374151' }}>Conclusão</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#7B2FBE', fontVariantNumeric: 'tabular-nums' }}>{pctGeral}%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '16px 20px' }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: '0 0 12px' }}>Distribuição por Prioridade</p>
-          <ResponsiveContainer width="100%" height={120}>
-            <BarChart data={prioData} margin={{ top: 0, right: 4, left: -24, bottom: 0 }} barSize={36}>
-              <CartesianGrid vertical={false} stroke="#F3F4F6" />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6B7280' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-              <Tooltip content={<StatusTip />} cursor={{ fill: '#F9FAFB' }} />
-              <Bar dataKey="value" radius={[3, 3, 0, 0]} label={{ position: 'top', fontSize: 11, fontWeight: 600, fill: '#374151' }}>
-                {prioData.map((e, i) => <Cell key={i} fill={e.color} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {allKrs.length > 0 && (
-        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '16px 20px' }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: '#111827', margin: '0 0 12px' }}>Comparativo de Resultados-Chave</p>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={allKrs} margin={{ top: 4, right: 4, left: -24, bottom: 52 }} barSize={20}>
-              <CartesianGrid vertical={false} stroke="#F3F4F6" />
-              <XAxis dataKey="label" tick={{ fontSize: 9, fill: '#9CA3AF' }} axisLine={false} tickLine={false} angle={-35} textAnchor="end" interval={0} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
-              <Tooltip content={<KrTip />} cursor={{ fill: '#F9FAFB' }} />
-              <Bar dataKey="value" radius={[3, 3, 0, 0]}>
-                {allKrs.map((e, i) => <Cell key={i} fill={e.color} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-    </div>
-  )
-}
-
-/* ═══════════════════════════════════════════
-   VIEW 2 — KANBAN (back button + edit + add)
+   KANBAN VIEW
 ═══════════════════════════════════════════ */
 interface KanbanProps {
   okrs: Objective[]; tarefas: Tarefa[]
@@ -415,11 +393,11 @@ interface KanbanProps {
   onAddTask: (desc: string, krId: string, okrId: string, status: TarefaStatus) => void
 }
 function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePrioridade, onDelete, onUpdateDesc, onAddTask }: KanbanProps) {
-  const [editingId, setEditingId]   = useState<string | null>(null)
-  const [editDesc,  setEditDesc]    = useState('')
-  const [addingCol, setAddingCol]   = useState<TarefaStatus | null>(null)
-  const [addDesc,   setAddDesc]     = useState('')
-  const [addKr,     setAddKr]       = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editDesc,  setEditDesc]  = useState('')
+  const [addingCol, setAddingCol] = useState<TarefaStatus | null>(null)
+  const [addDesc,   setAddDesc]   = useState('')
+  const [addKr,     setAddKr]     = useState('')
 
   const allKrOptions = okrs.flatMap(o => o.keyResults.map(kr => ({
     value: `${o.id}::${kr.id}`,
@@ -432,7 +410,6 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
     setEditingId(null); setEditDesc('')
   }
   function cancelEdit() { setEditingId(null); setEditDesc('') }
-
   function handleAdd() {
     if (!addDesc.trim() || !addKr) return
     const [okrId, krId] = addKr.split('::')
@@ -440,74 +417,67 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
     setAddingCol(null); setAddDesc(''); setAddKr('')
   }
 
-  const cols: { key: TarefaStatus; label: string; dot: string; border: string }[] = [
-    { key: 'pendente',     label: 'Pendente',     dot: '#D1D5DB', border: '#E5E7EB' },
-    { key: 'em_andamento', label: 'Em andamento', dot: '#3B82F6', border: '#BFDBFE' },
-    { key: 'feita',        label: 'Feita',        dot: '#22C55E', border: '#BBF7D0' },
-    { key: 'bloqueada',    label: 'Bloqueada',    dot: '#EF4444', border: '#FECACA' },
+  const cols: { key: TarefaStatus; label: string; dot: string; topColor: string }[] = [
+    { key: 'pendente',     label: 'Pendente',     dot: D.textMuted,  topColor: D.textMuted  },
+    { key: 'em_andamento', label: 'Em andamento', dot: '#3B82F6',    topColor: '#3B82F6'    },
+    { key: 'feita',        label: 'Feita',        dot: '#22C55E',    topColor: '#22C55E'    },
+    { key: 'bloqueada',    label: 'Bloqueada',    dot: '#EF4444',    topColor: '#EF4444'    },
   ]
   const okrMap: Record<string, Objective> = {}
   okrs.forEach(o => { okrMap[o.id] = o })
 
   return (
     <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(220px, 1fr))', gap: 12, minWidth: 880 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(220px, 1fr))', gap: 10, minWidth: 880 }}>
         {cols.map(col => {
           const cards = tarefas.filter(t => t.status === col.key)
           return (
             <div key={col.key} style={{ display: 'flex', flexDirection: 'column' }}>
-              {/* Column header */}
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px',
-                background: '#fff', border: `1px solid ${col.border}`,
-                borderRadius: '8px 8px 0 0', borderBottom: `2px solid ${col.dot}`,
+                background: D.surface, border: `1px solid ${D.border}`,
+                borderRadius: '8px 8px 0 0', borderBottom: `2px solid ${col.topColor}`,
               }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: col.dot, flexShrink: 0 }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#374151', flex: 1 }}>{col.label}</span>
-                <span style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', background: '#F3F4F6', padding: '1px 6px', borderRadius: 10, fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ width: 7, height: 7, borderRadius: '50%', background: col.dot, flexShrink: 0 }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: D.textMid, flex: 1 }}>{col.label}</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: D.textMuted, background: D.surface2, padding: '1px 6px', borderRadius: 10, fontVariantNumeric: 'tabular-nums' }}>
                   {cards.length}
                 </span>
               </div>
-
-              {/* Cards */}
               <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                 {cards.length === 0 && addingCol !== col.key ? (
-                  <div style={{ background: '#FAFAFA', border: '1px dashed #E5E7EB', borderTop: 'none', padding: '16px 12px', textAlign: 'center' }}>
-                    <p style={{ fontSize: 11, color: '#D1D5DB', margin: 0 }}>Sem tarefas</p>
+                  <div style={{ background: D.surface, border: `1px dashed ${D.border}`, borderTop: 'none', padding: '16px 12px', textAlign: 'center' }}>
+                    <p style={{ fontSize: 11, color: D.textFaint, margin: 0 }}>Sem tarefas</p>
                   </div>
                 ) : cards.map((tarefa, ci) => {
                   const okr = okrMap[tarefa.okrId]
-                  const cor = catColor[okr?.categoria ?? ''] ?? '#7B2FBE'
+                  const cor = catColor[okr?.categoria ?? ''] ?? D.gold
                   const isEditing = editingId === tarefa.id
                   return (
                     <div key={tarefa.id} style={{
-                      background: '#fff', border: '1px solid #E5E7EB', borderTop: 'none',
+                      background: D.card, border: `1px solid ${D.border}`, borderTop: 'none',
                       borderLeft: `3px solid ${cor}`, padding: '10px 12px',
                       borderRadius: ci === cards.length - 1 && addingCol !== col.key ? '0 0 0 0' : 0,
                     }}>
                       {isEditing ? (
                         <div style={{ marginBottom: 8 }}>
                           <textarea
-                            autoFocus
-                            value={editDesc}
+                            autoFocus value={editDesc}
                             onChange={e => setEditDesc(e.target.value)}
                             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveEdit() } if (e.key === 'Escape') cancelEdit() }}
                             rows={3}
-                            style={{ width: '100%', fontSize: 12, color: '#374151', resize: 'none', border: '1px solid #7B2FBE', borderRadius: 4, padding: '4px 6px', outline: 'none', lineHeight: 1.5, boxSizing: 'border-box' }}
+                            style={{ width: '100%', fontSize: 12, color: D.text, background: D.surface2, resize: 'none', border: `1px solid ${D.gold}`, borderRadius: 4, padding: '4px 6px', outline: 'none', lineHeight: 1.5, boxSizing: 'border-box' }}
                           />
                           <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
-                            <button onClick={saveEdit} style={{ flex: 1, fontSize: 10, padding: '3px 0', background: '#7B2FBE', color: '#fff', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 600 }}>Salvar</button>
-                            <button onClick={cancelEdit} style={{ fontSize: 10, padding: '3px 8px', background: '#F3F4F6', color: '#6B7280', border: 'none', borderRadius: 3, cursor: 'pointer' }}>Cancelar</button>
+                            <button onClick={saveEdit} style={{ flex: 1, fontSize: 10, padding: '3px 0', background: D.gold, color: '#1A1208', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 600 }}>Salvar</button>
+                            <button onClick={cancelEdit} style={{ fontSize: 10, padding: '3px 8px', background: D.surface2, color: D.textSub, border: 'none', borderRadius: 3, cursor: 'pointer' }}>Cancelar</button>
                           </div>
                         </div>
                       ) : (
                         <p
                           onDoubleClick={() => startEdit(tarefa.id, tarefa.descricao)}
                           title="Duplo clique para editar"
-                          style={{
-                            fontSize: 12, color: '#374151', lineHeight: 1.5, margin: '0 0 8px', cursor: 'text',
-                            display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                          }}
+                          style={{ fontSize: 12, color: D.textMid, lineHeight: 1.5, margin: '0 0 8px', cursor: 'text', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
                         >
                           {tarefa.descricao}
                         </p>
@@ -515,28 +485,25 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
                           {okr && (
-                            <span style={{ fontSize: 9, fontWeight: 600, color: cor, background: catBg[okr.categoria], padding: '1px 5px', borderRadius: 3, textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0 }}>
+                            <span style={{ fontSize: 9, fontWeight: 600, color: cor, background: catBg[okr.categoria] ?? 'rgba(197,168,128,0.12)', padding: '1px 5px', borderRadius: 3, textTransform: 'uppercase', letterSpacing: '0.04em', flexShrink: 0 }}>
                               {okr.categoria}
                             </span>
                           )}
                           <PrioridadeChip prioridade={tarefa.prioridade} onClick={() => onCyclePrioridade(tarefa.id)} />
                         </div>
                         <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
-                          {/* Back */}
                           <button onClick={() => onCycleBack(tarefa.id)} title="Voltar status"
-                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: 4, border: '1px solid #E5E7EB', background: '#FAFAFA', color: '#9CA3AF', cursor: 'pointer' }}>
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: 4, border: `1px solid ${D.border}`, background: D.surface2, color: D.textMuted, cursor: 'pointer' }}>
                             <ChevronLeft size={12} />
                           </button>
-                          {/* Forward */}
                           <button onClick={() => onCycleStatus(tarefa.id)} title="Avançar status"
-                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: 4, border: '1px solid #E5E7EB', background: '#FAFAFA', color: '#9CA3AF', cursor: 'pointer' }}>
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: 4, border: `1px solid ${D.border}`, background: D.surface2, color: D.textMuted, cursor: 'pointer' }}>
                             <ChevronRight size={12} />
                           </button>
-                          {/* Delete */}
                           <button onClick={() => onDelete(tarefa.id)} title="Remover"
-                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: 4, border: '1px solid #E5E7EB', background: '#FAFAFA', color: '#9CA3AF', cursor: 'pointer' }}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: 4, border: `1px solid ${D.border}`, background: D.surface2, color: D.textMuted, cursor: 'pointer' }}
                             onMouseEnter={e => (e.currentTarget.style.color = '#EF4444')}
-                            onMouseLeave={e => (e.currentTarget.style.color = '#9CA3AF')}>
+                            onMouseLeave={e => (e.currentTarget.style.color = D.textMuted)}>
                             <Trash2 size={10} />
                           </button>
                         </div>
@@ -545,37 +512,31 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
                   )
                 })}
               </div>
-
-              {/* Add task to column */}
               {addingCol === col.key ? (
-                <div style={{ border: '1px dashed #7B2FBE', borderTop: 'none', borderRadius: '0 0 8px 8px', padding: '8px 10px', background: 'rgba(123,47,190,0.02)' }}>
+                <div style={{ border: `1px dashed ${D.gold}`, borderTop: 'none', borderRadius: '0 0 8px 8px', padding: '8px 10px', background: 'rgba(197,168,128,0.04)' }}>
                   <input
-                    autoFocus
-                    value={addDesc}
+                    autoFocus value={addDesc}
                     onChange={e => setAddDesc(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') handleAdd(); if (e.key === 'Escape') { setAddingCol(null); setAddDesc(''); setAddKr('') } }}
                     placeholder="Descreva a tarefa..."
-                    style={{ width: '100%', fontSize: 11, border: '1px solid #D1D5DB', borderRadius: 4, padding: '4px 8px', outline: 'none', marginBottom: 4, boxSizing: 'border-box' }}
+                    style={{ width: '100%', fontSize: 11, border: `1px solid ${D.border2}`, borderRadius: 4, padding: '4px 8px', outline: 'none', marginBottom: 4, boxSizing: 'border-box', background: D.surface2, color: D.text }}
                   />
-                  <select
-                    value={addKr}
-                    onChange={e => setAddKr(e.target.value)}
-                    style={{ width: '100%', fontSize: 10, border: '1px solid #D1D5DB', borderRadius: 4, padding: '3px 6px', marginBottom: 6, boxSizing: 'border-box' }}
-                  >
+                  <select value={addKr} onChange={e => setAddKr(e.target.value)}
+                    style={{ width: '100%', fontSize: 10, border: `1px solid ${D.border2}`, borderRadius: 4, padding: '3px 6px', marginBottom: 6, boxSizing: 'border-box', background: D.surface2, color: D.textMid }}>
                     <option value="">Resultado-Chave...</option>
                     {allKrOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
                   <div style={{ display: 'flex', gap: 4 }}>
-                    <button onClick={handleAdd} style={{ flex: 1, fontSize: 11, padding: '4px', background: '#7B2FBE', color: '#fff', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 600 }}>Adicionar</button>
-                    <button onClick={() => { setAddingCol(null); setAddDesc(''); setAddKr('') }} style={{ fontSize: 11, padding: '4px 8px', background: '#F3F4F6', color: '#6B7280', border: 'none', borderRadius: 3, cursor: 'pointer' }}>✕</button>
+                    <button onClick={handleAdd} style={{ flex: 1, fontSize: 11, padding: '4px', background: D.gold, color: '#1A1208', border: 'none', borderRadius: 3, cursor: 'pointer', fontWeight: 600 }}>Adicionar</button>
+                    <button onClick={() => { setAddingCol(null); setAddDesc(''); setAddKr('') }} style={{ fontSize: 11, padding: '4px 8px', background: D.surface2, color: D.textSub, border: 'none', borderRadius: 3, cursor: 'pointer' }}>✕</button>
                   </div>
                 </div>
               ) : (
                 <button
                   onClick={() => { setAddingCol(col.key); setAddDesc(''); setAddKr('') }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: 'transparent', border: '1px dashed #E5E7EB', borderTop: 'none', borderRadius: '0 0 8px 8px', cursor: 'pointer', fontSize: 11, color: '#D1D5DB', width: '100%' }}
-                  onMouseEnter={e => { e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.borderColor = '#D1D5DB' }}
-                  onMouseLeave={e => { e.currentTarget.style.color = '#D1D5DB'; e.currentTarget.style.borderColor = '#E5E7EB' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: 'transparent', border: `1px dashed ${D.border}`, borderTop: 'none', borderRadius: '0 0 8px 8px', cursor: 'pointer', fontSize: 11, color: D.textFaint, width: '100%' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = D.textSub; e.currentTarget.style.borderColor = D.border2 }}
+                  onMouseLeave={e => { e.currentTarget.style.color = D.textFaint; e.currentTarget.style.borderColor = D.border }}
                 >
                   <Plus size={11} /> Adicionar tarefa
                 </button>
@@ -584,7 +545,7 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
           )
         })}
       </div>
-      <p style={{ fontSize: 10, color: '#D1D5DB', marginTop: 10, textAlign: 'center' }}>
+      <p style={{ fontSize: 10, color: D.textFaint, marginTop: 10, textAlign: 'center' }}>
         ← → para mover status · duplo clique na tarefa para editar · clique na prioridade para alterar
       </p>
     </div>
@@ -592,7 +553,7 @@ function KanbanView({ okrs, tarefas, onCycleStatus, onCycleBack, onCyclePriorida
 }
 
 /* ═══════════════════════════════════════════
-   VIEW 3 — LISTA (com edição inline)
+   LISTA VIEW
 ═══════════════════════════════════════════ */
 interface ListaProps {
   okrs: Objective[]; tarefas: Tarefa[]
@@ -618,37 +579,37 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
   function cancelEdit() { setEditingId(null); setEditDesc('') }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {okrs.map(okr => {
         const okrTarefas = tarefas.filter(t => t.okrId === okr.id)
         const okrFeitas  = okrTarefas.filter(t => t.status === 'feita').length
-        const cor        = catColor[okr.categoria] ?? '#7B2FBE'
+        const cor        = catColor[okr.categoria] ?? D.gold
         const isExpanded = expanded[okr.id] ?? true
         if (okr.keyResults.length === 0) return null
 
         return (
-          <div key={okr.id} style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden' }}>
+          <div key={okr.id} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 8, overflow: 'hidden' }}>
             <button
               onClick={() => onToggle(okr.id)}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '11px 20px', background: '#FAFAFA', border: 'none', borderBottom: isExpanded ? '1px solid #F3F4F6' : 'none', cursor: 'pointer', textAlign: 'left' }}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '11px 20px', background: D.surface, border: 'none', borderBottom: isExpanded ? `1px solid ${D.border}` : 'none', cursor: 'pointer', textAlign: 'left' }}
             >
               <div style={{ width: 3, height: 18, borderRadius: 2, background: cor, flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{okr.titulo}</p>
-                <p style={{ fontSize: 10, color: '#9CA3AF', margin: '2px 0 0' }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{okr.titulo}</p>
+                <p style={{ fontSize: 10, color: D.textMuted, margin: '2px 0 0' }}>
                   {okr.categoria} · {okr.trimestre}
                   {okrTarefas.length > 0 && <span style={{ marginLeft: 8, fontWeight: 500, color: cor }}>{okrFeitas}/{okrTarefas.length} tarefas</span>}
                 </p>
               </div>
-              {isExpanded ? <ChevronUp size={13} style={{ color: '#D1D5DB', flexShrink: 0 }} /> : <ChevronDown size={13} style={{ color: '#D1D5DB', flexShrink: 0 }} />}
+              {isExpanded ? <ChevronUp size={13} style={{ color: D.textFaint, flexShrink: 0 }} /> : <ChevronDown size={13} style={{ color: D.textFaint, flexShrink: 0 }} />}
             </button>
 
             {isExpanded && (
               <div>
-                <div className="grid items-center px-5 py-2 bg-gray-50 border-b border-gray-100" style={{ gridTemplateColumns: '1fr 120px 80px 52px' }}>
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Tarefa</p>
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Status</p>
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Prioridade</p>
+                <div className="grid items-center px-5 py-2 border-b" style={{ gridTemplateColumns: '1fr 120px 80px 52px', borderColor: D.border, backgroundColor: D.surface }}>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: D.textMuted }}>Tarefa</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: D.textMuted }}>Status</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: D.textMuted }}>Prioridade</p>
                   <span />
                 </div>
                 {okr.keyResults.map((kr, krIdx) => {
@@ -656,55 +617,59 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
                   const krFeitas  = krTarefas.filter(t => t.status === 'feita').length
                   const krPct     = kr.meta > 0 ? Math.min(100, Math.round((kr.atual / kr.meta) * 100)) : 0
                   return (
-                    <div key={kr.id} className={cn(krIdx > 0 ? 'border-t border-gray-50' : '')}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '8px 20px', background: 'rgba(249,250,251,0.6)', borderBottom: '1px solid #F9FAFB' }}>
+                    <div key={kr.id} className={cn(krIdx > 0 ? 'border-t' : '')} style={{ borderColor: D.border }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '8px 20px', background: 'rgba(22,20,18,0.6)', borderBottom: `1px solid ${D.border}` }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: cor, opacity: 0.45, flexShrink: 0 }} />
-                          <p style={{ fontSize: 11, fontWeight: 500, color: '#6B7280', margin: 0, lineHeight: 1.4 }}>{kr.descricao}</p>
+                          <div style={{ width: 5, height: 5, borderRadius: '50%', background: cor, opacity: 0.5, flexShrink: 0 }} />
+                          <p style={{ fontSize: 11, fontWeight: 500, color: D.textSub, margin: 0, lineHeight: 1.4 }}>{kr.descricao}</p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                           {kr.meta > 0 && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              <div style={{ width: 48, height: 3, background: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
+                              <div style={{ width: 48, height: 3, background: D.surface2, borderRadius: 2, overflow: 'hidden' }}>
                                 <div style={{ height: '100%', width: `${krPct}%`, background: cor, borderRadius: 2 }} />
                               </div>
-                              <span style={{ fontSize: 10, color: '#9CA3AF', fontVariantNumeric: 'tabular-nums' }}>{kr.atual}/{kr.meta} {kr.unit}</span>
+                              <span style={{ fontSize: 10, color: D.textMuted, fontVariantNumeric: 'tabular-nums' }}>{kr.atual}/{kr.meta} {kr.unit}</span>
                             </div>
                           )}
-                          {krTarefas.length > 0 && <span style={{ fontSize: 10, color: '#9CA3AF', fontVariantNumeric: 'tabular-nums' }}>{krFeitas}/{krTarefas.length}</span>}
+                          {krTarefas.length > 0 && <span style={{ fontSize: 10, color: D.textMuted, fontVariantNumeric: 'tabular-nums' }}>{krFeitas}/{krTarefas.length}</span>}
                         </div>
                       </div>
                       {krTarefas.map(tarefa => (
                         editingId === tarefa.id ? (
-                          <div key={tarefa.id} className="grid items-center px-5 py-2 border-b border-gray-50 bg-purple-50/20" style={{ gridTemplateColumns: '1fr 180px 52px' }}>
+                          <div key={tarefa.id} className="grid items-center px-5 py-2 border-b" style={{ gridTemplateColumns: '1fr 180px 52px', borderColor: D.border, backgroundColor: 'rgba(197,168,128,0.04)' }}>
                             <input
-                              autoFocus
-                              value={editDesc}
+                              autoFocus value={editDesc}
                               onChange={e => setEditDesc(e.target.value)}
                               onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit() }}
-                              className="text-sm text-gray-700 bg-transparent focus:outline-none border-b border-purple-400 pr-4"
+                              style={{ fontSize: 13, color: D.text, background: 'transparent', outline: 'none', borderBottom: `1px solid ${D.gold}`, paddingRight: 16 }}
                             />
                             <div className="flex items-center gap-2">
-                              <button onClick={saveEdit} className="text-xs font-semibold text-[#7B2FBE] hover:text-[#6a1fa8]">Salvar</button>
-                              <button onClick={cancelEdit} className="text-gray-300 hover:text-gray-500"><X size={12} /></button>
+                              <button onClick={saveEdit} style={{ fontSize: 12, fontWeight: 600, color: D.gold, background: 'none', border: 'none', cursor: 'pointer' }}>Salvar</button>
+                              <button onClick={cancelEdit} style={{ color: D.textMuted, background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}><X size={12} /></button>
                             </div>
                             <span />
                           </div>
                         ) : (
                           <div key={tarefa.id}
-                            className={cn('group grid items-center px-5 py-2.5 border-b border-gray-50 last:border-0 hover:bg-gray-50/30 transition-colors', tarefa.status === 'feita' && 'opacity-60')}
-                            style={{ gridTemplateColumns: '1fr 120px 80px 52px' }}>
+                            className={cn('group grid items-center px-5 py-2.5 border-b last:border-0 transition-colors', tarefa.status === 'feita' && 'opacity-50')}
+                            style={{ gridTemplateColumns: '1fr 120px 80px 52px', borderColor: D.border }}
+                            onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)')}
+                            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                          >
                             <p
                               onDoubleClick={() => startEdit(tarefa.id, tarefa.descricao)}
                               title="Duplo clique para editar"
-                              className={cn('text-sm leading-snug pr-4 cursor-text', tarefa.status === 'feita' ? 'text-gray-400 line-through' : 'text-gray-700')}
+                              style={{ fontSize: 13, lineHeight: 1.45, paddingRight: 16, cursor: 'text', color: tarefa.status === 'feita' ? D.textMuted : D.textMid, textDecoration: tarefa.status === 'feita' ? 'line-through' : 'none', margin: 0 }}
                             >
                               {tarefa.descricao}
                             </p>
                             <div><StatusChip status={tarefa.status} onClick={() => onCycleStatus(tarefa.id)} /></div>
                             <div><PrioridadeChip prioridade={tarefa.prioridade} onClick={() => onCyclePrioridade(tarefa.id)} /></div>
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                              <button onClick={() => onDelete(tarefa.id)} className="p-1 text-gray-300 hover:text-red-400 transition-all">
+                              <button onClick={() => onDelete(tarefa.id)} style={{ padding: 4, color: D.textFaint, background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}
+                                onMouseEnter={e => (e.currentTarget.style.color = '#EF4444')}
+                                onMouseLeave={e => (e.currentTarget.style.color = D.textFaint)}>
                                 <Trash2 size={11} />
                               </button>
                             </div>
@@ -712,19 +677,23 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
                         )
                       ))}
                       {addingTo === kr.id ? (
-                        <div className="grid items-center px-5 py-2.5 border-t border-gray-50 bg-blue-50/30" style={{ gridTemplateColumns: '1fr 120px 80px 52px' }}>
+                        <div className="grid items-center px-5 py-2.5 border-t" style={{ gridTemplateColumns: '1fr 120px 80px 52px', borderColor: D.border, backgroundColor: 'rgba(197,168,128,0.04)' }}>
                           <input autoFocus value={novaDesc} onChange={e => setNovaDesc(e.target.value)}
                             onKeyDown={e => { if (e.key === 'Enter') addTarefa(kr.id, okr.id); if (e.key === 'Escape') { setAddingTo(null); setNovaDesc('') } }}
                             placeholder="Descreva a tarefa e pressione Enter..."
-                            className="text-sm text-gray-700 bg-transparent focus:outline-none placeholder:text-gray-300 pr-4" />
+                            style={{ fontSize: 13, color: D.text, background: 'transparent', outline: 'none', border: 'none', paddingRight: 16 }}
+                          />
                           <div className="flex items-center gap-1.5">
-                            <button onClick={() => addTarefa(kr.id, okr.id)} className="text-xs font-semibold text-[#7B2FBE] hover:text-[#6a1fa8]">Salvar</button>
-                            <button onClick={() => { setAddingTo(null); setNovaDesc('') }} className="text-gray-300 hover:text-gray-500"><X size={12} /></button>
+                            <button onClick={() => addTarefa(kr.id, okr.id)} style={{ fontSize: 12, fontWeight: 600, color: D.gold, background: 'none', border: 'none', cursor: 'pointer' }}>Salvar</button>
+                            <button onClick={() => { setAddingTo(null); setNovaDesc('') }} style={{ color: D.textMuted, background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}><X size={12} /></button>
                           </div>
                         </div>
                       ) : (
                         <button onClick={() => { setAddingTo(kr.id); setNovaDesc('') }}
-                          className="flex items-center gap-2 px-5 py-2.5 border-t border-gray-50 w-full text-left text-xs text-gray-400 hover:text-[#7B2FBE] hover:bg-gray-50/30 transition-all">
+                          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 20px', width: '100%', textAlign: 'left', fontSize: 12, color: D.textFaint, background: 'transparent', border: 'none', borderTop: `1px solid ${D.border}`, cursor: 'pointer' }}
+                          onMouseEnter={e => { e.currentTarget.style.color = D.gold }}
+                          onMouseLeave={e => { e.currentTarget.style.color = D.textFaint }}
+                        >
                           <Plus size={12} /> Adicionar tarefa
                         </button>
                       )}
@@ -741,11 +710,10 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
 }
 
 /* ═══════════════════════════════════════════
-   VIEW 4 — FLUXOS DE TRABALHO
+   FLUXOS VIEW
 ═══════════════════════════════════════════ */
 interface FluxosProps {
-  okrs: Objective[]
-  appliedWorkflows: string[]
+  okrs: Objective[]; appliedWorkflows: string[]
   onApply: (workflowId: string, krId: string, okrId: string) => void
 }
 function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
@@ -767,20 +735,18 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* Banner */}
-      <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <Zap size={16} style={{ color: '#7B2FBE', flexShrink: 0 }} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 8, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <Zap size={16} style={{ color: D.gold, flexShrink: 0 }} />
         <div>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>Fluxos de Trabalho</p>
-          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0', lineHeight: 1.5 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>Fluxos de Trabalho</p>
+          <p style={{ fontSize: 11, color: D.textSub, margin: '2px 0 0', lineHeight: 1.5 }}>
             Escolha um fluxo pré-construído, selecione o Resultado-Chave e aplique tarefas organizadas por fases diretamente no seu plano.
           </p>
         </div>
       </div>
 
-      {/* Workflow grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
         {WORKFLOWS.map(wf => {
           const isSelected = selected === wf.id
           const wasApplied = appliedWorkflows.includes(wf.id)
@@ -792,47 +758,42 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
               style={{
                 display: 'flex', flexDirection: 'column', gap: 10,
                 padding: '14px 16px', borderRadius: 8, textAlign: 'left', cursor: 'pointer',
-                border: isSelected ? `2px solid ${wf.cor}` : '1px solid #E5E7EB',
-                background: isSelected ? `rgba(${hexToRgb(wf.cor)},0.03)` : '#fff',
+                border: isSelected ? `2px solid ${wf.cor}` : `1px solid ${D.border}`,
+                background: isSelected ? `rgba(${hexToRgb(wf.cor)},0.07)` : D.card,
                 transition: 'border-color 0.15s, background 0.15s',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 20 }}>{wf.emoji}</span>
-                {wasApplied && (
-                  <span style={{ fontSize: 9, fontWeight: 600, color: '#16A34A', background: '#F0FDF4', padding: '2px 6px', borderRadius: 10 }}>✓ Aplicado</span>
-                )}
-              </div>
+              {wasApplied && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <span style={{ fontSize: 9, fontWeight: 600, color: '#4ADE80', background: 'rgba(34,197,94,0.15)', padding: '2px 6px', borderRadius: 10 }}>✓ Aplicado</span>
+                </div>
+              )}
               <div>
-                <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>{wf.nome}</p>
-                <p style={{ fontSize: 11, color: '#6B7280', margin: '3px 0 0', lineHeight: 1.5 }}>{wf.descricao}</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>{wf.nome}</p>
+                <p style={{ fontSize: 11, color: D.textSub, margin: '3px 0 0', lineHeight: 1.5 }}>{wf.descricao}</p>
               </div>
               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                 {phases.map(fase => (
-                  <span key={fase} style={{ fontSize: 9, fontWeight: 500, color: wf.cor, background: `rgba(${hexToRgb(wf.cor)},0.08)`, padding: '2px 6px', borderRadius: 3 }}>{fase}</span>
+                  <span key={fase} style={{ fontSize: 9, fontWeight: 500, color: wf.cor, background: `rgba(${hexToRgb(wf.cor)},0.12)`, padding: '2px 6px', borderRadius: 3 }}>{fase}</span>
                 ))}
               </div>
-              <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>{wf.tarefas.length} tarefas</p>
+              <p style={{ fontSize: 10, color: D.textMuted, margin: 0 }}>{wf.tarefas.length} tarefas</p>
             </button>
           )
         })}
       </div>
 
-      {/* Selected workflow detail */}
       {selectedWf && (
-        <div style={{ background: '#fff', border: `1.5px solid ${selectedWf.cor}`, borderRadius: 8, overflow: 'hidden' }}>
-          <div style={{ padding: '14px 20px', borderBottom: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 20 }}>{selectedWf.emoji}</span>
+        <div style={{ background: D.card, border: `1.5px solid ${selectedWf.cor}`, borderRadius: 8, overflow: 'hidden' }}>
+          <div style={{ padding: '14px 20px', borderBottom: `1px solid ${D.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: '#111827', margin: 0 }}>{selectedWf.nome}</p>
-              <p style={{ fontSize: 11, color: '#6B7280', margin: '2px 0 0' }}>{selectedWf.descricao}</p>
+              <p style={{ fontSize: 13, fontWeight: 600, color: D.text, margin: 0 }}>{selectedWf.nome}</p>
+              <p style={{ fontSize: 11, color: D.textSub, margin: '2px 0 0' }}>{selectedWf.descricao}</p>
             </div>
-            <button onClick={() => setSelected(null)} style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
+            <button onClick={() => setSelected(null)} style={{ color: D.textMuted, background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
               <X size={14} />
             </button>
           </div>
-
-          {/* Tasks preview by phase */}
           <div style={{ padding: '12px 20px 0' }}>
             {Array.from(new Set(selectedWf.tarefas.map(t => t.fase))).map(fase => {
               const faseTarefas = selectedWf.tarefas.filter(t => t.fase === fase)
@@ -840,12 +801,12 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
                 <div key={fase} style={{ marginBottom: 12 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                     <span style={{ fontSize: 10, fontWeight: 700, color: selectedWf.cor, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{fase}</span>
-                    <div style={{ flex: 1, height: 1, background: '#F3F4F6' }} />
+                    <div style={{ flex: 1, height: 1, background: D.border }} />
                   </div>
                   {faseTarefas.map((t, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '4px 0 4px 8px' }}>
                       <div style={{ width: 4, height: 4, borderRadius: '50%', background: selectedWf.cor, flexShrink: 0, marginTop: 6 }} />
-                      <p style={{ fontSize: 12, color: '#374151', margin: 0, lineHeight: 1.5, flex: 1 }}>{t.descricao}</p>
+                      <p style={{ fontSize: 12, color: D.textMid, margin: 0, lineHeight: 1.5, flex: 1 }}>{t.descricao}</p>
                       <span style={{ fontSize: 9, fontWeight: 600, flexShrink: 0, padding: '2px 5px', borderRadius: 3, background: prioridadeConfig[t.prioridade].bg, color: prioridadeConfig[t.prioridade].text }}>
                         {prioridadeConfig[t.prioridade].label}
                       </span>
@@ -855,139 +816,25 @@ function FluxosView({ okrs, appliedWorkflows, onApply }: FluxosProps) {
               )
             })}
           </div>
-
-          {/* Apply section */}
-          <div style={{ padding: '12px 20px', borderTop: '1px solid #F3F4F6', background: '#FAFAFA', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: '#374151', flexShrink: 0 }}>Aplicar ao KR:</label>
+          <div style={{ padding: '12px 20px', borderTop: `1px solid ${D.border}`, background: D.surface, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: D.textMid, flexShrink: 0 }}>Aplicar ao KR:</label>
             {allKrOptions.length === 0 ? (
-              <span style={{ fontSize: 11, color: '#9CA3AF' }}>Crie OKRs em Metas de Impacto para poder aplicar fluxos</span>
+              <span style={{ fontSize: 11, color: D.textSub }}>Crie OKRs em Metas de Impacto para poder aplicar fluxos</span>
             ) : (
               <>
-                <select
-                  value={krTarget}
-                  onChange={e => setKrTarget(e.target.value)}
-                  style={{ flex: 1, fontSize: 11, color: '#374151', border: '1px solid #D1D5DB', borderRadius: 5, padding: '5px 8px', background: '#fff', outline: 'none' }}
-                >
+                <select value={krTarget} onChange={e => setKrTarget(e.target.value)}
+                  style={{ flex: 1, fontSize: 11, color: D.textMid, border: `1px solid ${D.border2}`, borderRadius: 5, padding: '5px 8px', background: D.surface2, outline: 'none' }}>
                   <option value="">Selecione um Resultado-Chave...</option>
                   {allKrOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                 </select>
                 <button
-                  onClick={handleApply}
-                  disabled={!krTarget}
-                  style={{
-                    padding: '6px 16px', borderRadius: 5, border: 'none', cursor: krTarget ? 'pointer' : 'default',
-                    background: krTarget ? selectedWf.cor : '#E5E7EB',
-                    color: krTarget ? '#fff' : '#9CA3AF',
-                    fontSize: 12, fontWeight: 600, flexShrink: 0, transition: 'background 0.1s',
-                  }}
+                  onClick={handleApply} disabled={!krTarget}
+                  style={{ padding: '6px 16px', borderRadius: 5, border: 'none', cursor: krTarget ? 'pointer' : 'default', background: krTarget ? selectedWf.cor : D.surface2, color: krTarget ? '#fff' : D.textMuted, fontSize: 12, fontWeight: 600, flexShrink: 0, transition: 'background 0.1s' }}
                 >
                   Aplicar fluxo
                 </button>
               </>
             )}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-/* ═══════════════════════════════════════════
-   GUIA DE BOAS-VINDAS
-═══════════════════════════════════════════ */
-const WELCOME_KEY = 'hub_welcome_v1'
-
-const GUIA_STEPS = [
-  {
-    num: 1, color: '#7B2FBE',
-    title: 'Começa pela Identidade',
-    body: 'Antes de qualquer coisa, você vai preencher quem você é como profissional. Para quem você serve, qual problema você resolve melhor do que qualquer um, o que te diferencia. Essa parte parece simples mas é a mais profunda. Não precisa estar perfeito na primeira vez, escreve o que você acredita hoje e a gente vai afinando nas reuniões. Tudo que vem depois nasce daqui.',
-  },
-  {
-    num: 2, color: '#3B82F6',
-    title: 'Depois vão os Pilares',
-    body: 'Com a identidade no lugar, você escolhe os temas que sustentam a sua autoridade. São os assuntos sobre os quais você tem profundidade real e pode falar repetidamente sem forçar. De 3 a 5 pilares. Eles vão ser o filtro de todo conteúdo que você produzir. Se não cabe em nenhum pilar, provavelmente não precisa existir.',
-  },
-  {
-    num: 3, color: '#10B981',
-    title: 'A gente define os OKRs',
-    body: 'Aqui você coloca para onde quer ir nos próximos 90 dias. Um objetivo grande e inspirador, e os números que vão mostrar se você está chegando lá. Seguidores, leads, convites, receita — o que fizer mais sentido para o seu momento. Toda semana você atualiza esses valores e a plataforma te mostra o que está no caminho certo e o que precisa de atenção. É o que a gente vai revisar juntos em cada reunião.',
-  },
-  {
-    num: 4, color: '#F59E0B',
-    title: 'Depois o plano de Marketing',
-    body: 'Com tudo isso definido, você monta o seu plano de distribuição. Quais canais vai usar, com que frequência e em qual mês. LinkedIn, lives, eventos, podcasts, o que fizer parte da sua estratégia. Conforme vai executando, você marca como concluído. Isso te ajuda a sair do achismo e ter clareza do que você realmente está fazendo.',
-  },
-  {
-    num: 5, color: '#EC4899',
-    title: 'Por último, os Indicadores',
-    body: 'Aqui entram os números que mostram se está funcionando. Alcance, leads, oportunidades, receita. Você cadastra cada um com uma meta e vai atualizando ao longo do tempo. Com isso a gente consegue ver juntos não só se você está executando, mas se a execução está gerando resultado.',
-  },
-]
-
-function WelcomeGuia({ defaultOpen = true }: { defaultOpen?: boolean }) {
-  const [open, setOpen] = useState(() => {
-    const saved = localStorage.getItem(WELCOME_KEY)
-    if (saved !== null) return saved !== 'closed'
-    return defaultOpen
-  })
-
-  function toggle() {
-    const next = !open
-    setOpen(next)
-    localStorage.setItem(WELCOME_KEY, next ? 'open' : 'closed')
-  }
-
-  return (
-    <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, overflow: 'hidden' }}>
-      <button
-        onClick={toggle}
-        style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(123,47,190,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Rocket size={14} style={{ color: '#7B2FBE' }} />
-          </div>
-          <div>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: 0 }}>Bem-vindo ao hub da sua mentoria</p>
-            <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Como funciona cada etapa da jornada</p>
-          </div>
-        </div>
-        {open
-          ? <ChevronUp size={14} style={{ color: '#9CA3AF', flexShrink: 0 }} />
-          : <ChevronDown size={14} style={{ color: '#9CA3AF', flexShrink: 0 }} />
-        }
-      </button>
-
-      {open && (
-        <div style={{ borderTop: '1px solid #F3F4F6', padding: '20px 20px 24px' }}>
-          <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.7, marginBottom: 24, marginTop: 0 }}>
-            Criei um hub exclusivo pra você acompanhar toda a sua jornada na mentoria. É aqui que a gente vai registrar sua identidade profissional, seus pilares, metas, plano de marketing e indicadores. Tudo num lugar só, organizado e fácil de acessar a qualquer hora.
-          </p>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            {GUIA_STEPS.map((step, i) => (
-              <div key={step.num} style={{ display: 'flex', gap: 16, paddingBottom: i < GUIA_STEPS.length - 1 ? 22 : 0, position: 'relative' }}>
-                {i < GUIA_STEPS.length - 1 && (
-                  <div style={{ position: 'absolute', left: 14, top: 30, bottom: 0, width: 1, background: '#F3F4F6', zIndex: 0 }} />
-                )}
-                <div style={{
-                  width: 28, height: 28, borderRadius: '50%', flexShrink: 0, zIndex: 1,
-                  background: step.color, color: '#fff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, fontWeight: 700, letterSpacing: '-0.02em',
-                }}>
-                  {step.num}
-                </div>
-                <div style={{ flex: 1, paddingTop: 3 }}>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>{step.title}</p>
-                  <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.7, margin: 0 }}>{step.body}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       )}
@@ -1002,23 +849,47 @@ function HomePage() {
   const { user } = useAuth()
   const firstName = user?.full_name?.split(' ')[0] ?? ''
 
-  const [okrs,             setOkrs]             = useState<Objective[]>([])
-  const [tarefas,          setTarefas]           = useState<Tarefa[]>([])
-  const [expanded,         setExpanded]          = useState<Record<string, boolean>>({})
-  const [addingTo,         setAddingTo]          = useState<string | null>(null)
-  const [novaDesc,         setNovaDesc]          = useState('')
-  const [view,             setView]              = useState<ViewMode>('dashboard')
-  const [appliedWorkflows, setAppliedWorkflows]  = useState<string[]>([])
+  const [okrs,                setOkrs]               = useState<Objective[]>([])
+  const [tarefas,             setTarefas]            = useState<Tarefa[]>([])
+  const [expanded,            setExpanded]           = useState<Record<string, boolean>>({})
+  const [addingTo,            setAddingTo]           = useState<string | null>(null)
+  const [novaDesc,            setNovaDesc]           = useState('')
+  const [view,                setView]               = useState<ViewMode>('lista')
+  const [appliedWorkflows,    setAppliedWorkflows]   = useState<string[]>([])
+  const [hasIdentidade,       setHasIdentidade]      = useState(false)
+  const [hasMarketing,        setHasMarketing]       = useState(false)
+  const [hasKpis,             setHasKpis]            = useState(false)
+  const [kpisData,            setKpisData]           = useState<KpiItem[]>([])
+  const [marketingTotal,      setMarketingTotal]     = useState(0)
+  const [marketingConcluidas, setMarketingConcluidas] = useState(0)
 
   useEffect(() => {
-    try { const s = localStorage.getItem(OKR_KEY); if (s) setOkrs(JSON.parse(s) ?? []) } catch {}
+    try { const s = localStorage.getItem(memberKey(OKR_KEY)); if (s) setOkrs(JSON.parse(s) ?? []) } catch {}
+    try { setHasIdentidade(!!localStorage.getItem(memberKey('identidade_marca_v1'))) } catch {}
+    try {
+      const mRaw = localStorage.getItem(memberKey('marketing_store_v1'))
+      const mArr = mRaw ? JSON.parse(mRaw) : []
+      if (Array.isArray(mArr)) {
+        setHasMarketing(mArr.length > 0)
+        setMarketingTotal(mArr.length)
+        setMarketingConcluidas((mArr as AcaoMarketing[]).filter(a => a.concluida).length)
+      }
+    } catch {}
+    try {
+      const kRaw = localStorage.getItem(memberKey('kpis_store_v1'))
+      const kArr = kRaw ? JSON.parse(kRaw) : []
+      if (Array.isArray(kArr)) {
+        setHasKpis(kArr.length > 0)
+        setKpisData(kArr as KpiItem[])
+      }
+    } catch {}
   }, [])
 
   useEffect(() => {
     if (!okrs.length) return
     let stored: Tarefa[] = []
     try {
-      const raw = JSON.parse(localStorage.getItem(TAREFAS_KEY) ?? '[]') ?? []
+      const raw = JSON.parse(localStorage.getItem(memberKey(TAREFAS_KEY)) ?? '[]') ?? []
       stored = raw.map((t: Tarefa & { done?: boolean }) => ({ ...t, status: t.status ?? (t.done ? 'feita' : 'pendente'), prioridade: t.prioridade ?? 'media' }))
     } catch {}
     const existingKrIds = new Set(stored.map(t => t.krId))
@@ -1031,7 +902,8 @@ function HomePage() {
   }, [okrs])
 
   useEffect(() => {
-    if (tarefas.length > 0 || localStorage.getItem(TAREFAS_KEY)) localStorage.setItem(TAREFAS_KEY, JSON.stringify(tarefas))
+    if (tarefas.length > 0 || localStorage.getItem(memberKey(TAREFAS_KEY)))
+      localStorage.setItem(memberKey(TAREFAS_KEY), JSON.stringify(tarefas))
   }, [tarefas])
 
   function cycleStatus(id: string) {
@@ -1044,9 +916,7 @@ function HomePage() {
     setTarefas(prev => prev.map(t => { if (t.id !== id) return t; const i = prioridadeCycle.indexOf(t.prioridade); return { ...t, prioridade: prioridadeCycle[(i + 1) % prioridadeCycle.length] } }))
   }
   function deleteTarefa(id: string) { setTarefas(prev => prev.filter(t => t.id !== id)) }
-  function updateDesc(id: string, desc: string) {
-    setTarefas(prev => prev.map(t => t.id === id ? { ...t, descricao: desc } : t))
-  }
+  function updateDesc(id: string, desc: string) { setTarefas(prev => prev.map(t => t.id === id ? { ...t, descricao: desc } : t)) }
   function addTarefa(krId: string, okrId: string) {
     const desc = novaDesc.trim(); if (!desc) return
     setTarefas(prev => [...prev, { id: `manual-${Date.now()}`, descricao: desc, krId, okrId, status: 'pendente', prioridade: 'media', auto: false }])
@@ -1066,110 +936,285 @@ function HomePage() {
     setAppliedWorkflows(prev => [...prev, workflowId])
   }
 
-  const totalKrs    = okrs.reduce((s, o) => s + o.keyResults.length, 0)
   const progOkrs    = okrs.length ? Math.round(okrs.reduce((s, o) => s + objPct(o), 0) / okrs.length) : 0
   const feitasCount = tarefas.filter(t => t.status === 'feita').length
   const emAndamento = tarefas.filter(t => t.status === 'em_andamento').length
   const bloqueadas  = tarefas.filter(t => t.status === 'bloqueada').length
-  const pctGeral    = tarefas.length > 0 ? Math.round((feitasCount / tarefas.length) * 100) : 0
   const hoje        = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
 
-  const viewButtons: { key: ViewMode; label: string; Icon: typeof LayoutDashboard }[] = [
-    { key: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
-    { key: 'kanban',    label: 'Kanban',    Icon: Kanban          },
-    { key: 'lista',     label: 'Lista',     Icon: LayoutList      },
-    { key: 'fluxos',    label: 'Fluxos',    Icon: Zap             },
+  const journeyPhases = [
+    { label: 'Identidade',  done: hasIdentidade   },
+    { label: 'Pilares',     done: false           },
+    { label: 'Metas',       done: okrs.length > 0 },
+    { label: 'Marketing',   done: hasMarketing    },
+    { label: 'Indicadores', done: hasKpis         },
+  ]
+  const completedCount  = journeyPhases.filter(p => p.done).length
+  const journeyPct      = Math.round((completedCount / journeyPhases.length) * 100)
+  const currentPhaseIdx = journeyPhases.reduce((last, p, i) => p.done ? i : last, -1)
+
+  const viewTabs = [
+    { key: 'lista'  as ViewMode, label: 'Lista'  },
+    { key: 'kanban' as ViewMode, label: 'Kanban' },
+    { key: 'fluxos' as ViewMode, label: 'Fluxos' },
   ]
 
-  if (okrs.length === 0) {
-    return (
-      <div style={{ maxWidth: 900, margin: '0 auto', paddingBottom: 48, display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div style={{ paddingTop: 4 }}>
-          <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 2 }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
-          <h1 style={{ fontSize: 22, fontWeight: 600, color: '#111827', margin: 0, letterSpacing: '-0.01em' }}>Olá, {firstName}</h1>
-        </div>
-        <WelcomeGuia defaultOpen={true} />
-        <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '32px', textAlign: 'center' }}>
-          <ClipboardList size={28} style={{ color: '#E5E7EB', margin: '0 auto 12px' }} />
-          <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 6 }}>Nenhum objetivo criado ainda.</p>
-          <p style={{ fontSize: 12, color: '#9CA3AF' }}>Vá até <strong>Metas de Impacto</strong> para criar seus primeiros OKRs e gerar o plano de tarefas automaticamente.</p>
-        </div>
-      </div>
-    )
+  /* ── Coach briefing ── */
+  const briefing = gerarBriefingCoach(okrs, tarefas, kpisData)
+  const briefingConfig: Record<BriefingPriority, { label: string; dot: string; border: string }> = {
+    urgente: { label: 'Urgente', dot: '#EF4444', border: 'rgba(239,68,68,0.18)'   },
+    foco:    { label: 'Foco',    dot: D.gold,    border: 'rgba(197,168,128,0.22)' },
+    atencao: { label: 'Atenção', dot: '#F59E0B', border: 'rgba(245,158,11,0.18)'  },
   }
 
+  /* ── Dashboard metrics ── */
+  const avgKpiPct      = kpisData.length ? Math.round(kpisData.reduce((s, k) => s + pct(k.atual, k.meta), 0) / kpisData.length) : 0
+  const marketingPct   = marketingTotal > 0 ? Math.round((marketingConcluidas / marketingTotal) * 100) : 0
+  const tarefasPct     = tarefas.length > 0 ? Math.round((feitasCount / tarefas.length) * 100) : 0
+
+  const metrics = [
+    { label: 'OKRs',        value: okrs.length > 0 ? `${progOkrs}%` : '—',          sub: okrs.length > 0 ? `${okrs.length} objetivo${okrs.length !== 1 ? 's' : ''}` : 'Sem metas',                                                       color: progOkrs >= 75 ? '#22C55E' : progOkrs >= 40 ? D.gold : '#F87171',     pct: progOkrs,      href: '/dashboard/membro/okr'       },
+    { label: 'Tarefas',     value: tarefas.length > 0 ? `${feitasCount}/${tarefas.length}` : '—', sub: emAndamento > 0 ? `${emAndamento} em andamento` : (bloqueadas > 0 ? `${bloqueadas} bloqueada${bloqueadas !== 1 ? 's' : ''}` : 'Nenhuma ativa'), color: tarefasPct >= 70 ? '#22C55E' : tarefasPct >= 40 ? D.gold : D.textMuted, pct: tarefasPct,    href: '/dashboard/membro/tarefas'   },
+    { label: 'Marketing',   value: marketingTotal > 0 ? `${marketingPct}%` : '—',    sub: marketingTotal > 0 ? `${marketingConcluidas} de ${marketingTotal} ações` : 'Sem plano',                                                        color: marketingPct >= 70 ? '#22C55E' : marketingPct >= 40 ? D.gold : D.textMuted, pct: marketingPct, href: '/dashboard/membro/marketing' },
+    { label: 'Indicadores', value: kpisData.length > 0 ? `${avgKpiPct}%` : '—',     sub: kpisData.length > 0 ? `${kpisData.length} KPI${kpisData.length !== 1 ? 's' : ''}` : 'Sem KPIs',                                               color: avgKpiPct >= 75 ? '#22C55E' : avgKpiPct >= 40 ? D.gold : '#F87171',   pct: avgKpiPct,     href: '/dashboard/membro/kpis'      },
+  ]
+
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', paddingBottom: 48, display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Header + view toggle */}
-      <div style={{ paddingTop: 4, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-        <div>
-          <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 2 }}>{hoje.charAt(0).toUpperCase() + hoje.slice(1)}</p>
-          <h1 style={{ fontSize: 22, fontWeight: 600, color: '#111827', margin: 0, letterSpacing: '-0.01em' }}>Olá, {firstName}</h1>
+    <div style={{ maxWidth: 900, padding: '48px 0 80px', display: 'flex', flexDirection: 'column' }}>
+
+      {/* ── HEADER ── */}
+      <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted, margin: '0 0 14px' }}>
+        {hoje.charAt(0).toUpperCase() + hoje.slice(1)}
+      </p>
+      <h1 style={{ fontFamily: D.serif, fontSize: 'clamp(36px,4.5vw,54px)', fontWeight: 600, color: D.text, margin: 0, letterSpacing: '-0.025em', lineHeight: 1.05 }}>
+        Central de Controle
+      </h1>
+      <p style={{ fontSize: 15, color: D.textSub, margin: '10px 0 0', lineHeight: 1.7, maxWidth: 480 }}>
+        {firstName ? `Olá, ${firstName}. ` : ''}
+        {okrs.length > 0
+          ? `Você está a ${100 - progOkrs}% de concluir seus objetivos ativos.`
+          : 'Seu hub de autoridade e estratégia de marca.'
+        }
+      </p>
+
+      {/* ── MAIN SECTIONS ── */}
+      <div style={{ marginTop: 44, display: 'flex', flexDirection: 'column' }}>
+
+        {/* ── PERSONAL DE RELEVÂNCIA ── */}
+        <div style={{ paddingBottom: 36 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 18 }}>
+            <SectionLabel>Personal de Relevância</SectionLabel>
+            <span style={{ fontSize: 9, color: D.textFaint, letterSpacing: '0.05em' }}>orientações personalizadas de hoje</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {briefing.map((item, i) => {
+              const cfg = briefingConfig[item.prioridade]
+              return (
+                <Link key={i} to={item.href} style={{ textDecoration: 'none', display: 'block' }}>
+                  <div
+                    style={{
+                      display: 'flex', alignItems: 'flex-start', gap: 14,
+                      padding: '14px 18px',
+                      border: `1px solid ${cfg.border}`,
+                      borderLeft: `3px solid ${cfg.dot}`,
+                      background: D.card,
+                      transition: 'opacity 0.12s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.opacity = '0.78' }}
+                    onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
+                  >
+                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: cfg.dot, flexShrink: 0, marginTop: 5 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 13.5, fontWeight: 500, color: D.textMid, margin: 0, lineHeight: 1.5 }}>
+                        {item.mensagem}
+                      </p>
+                      {item.submensagem && (
+                        <p style={{ fontSize: 11, color: D.textMuted, margin: '4px 0 0' }}>{item.submensagem}</p>
+                      )}
+                    </div>
+                    <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: cfg.dot, flexShrink: 0, paddingTop: 3 }}>
+                      {cfg.label}
+                    </span>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
         </div>
-        <div style={{ display: 'flex', border: '1px solid #E5E7EB', borderRadius: 6, overflow: 'hidden', flexShrink: 0 }}>
-          {viewButtons.map(({ key, label, Icon }, i) => (
-            <button
-              key={key}
-              onClick={() => setView(key)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                padding: '7px 14px', border: 'none', cursor: 'pointer',
-                background: view === key ? '#7B2FBE' : '#fff',
-                color: view === key ? '#fff' : '#6B7280',
-                fontSize: 12, fontWeight: view === key ? 600 : 400,
-                borderRight: i < viewButtons.length - 1 ? '1px solid #E5E7EB' : 'none',
-                transition: 'background 0.1s, color 0.1s',
-              }}
-            >
-              <Icon size={13} />
-              {label}
-            </button>
-          ))}
+
+        <HR />
+
+        {/* ── DASHBOARD ── */}
+        <div style={{ padding: '36px 0' }}>
+          <SectionLabel>Dashboard · Acompanhamento</SectionLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', marginTop: 20, borderTop: `1px solid ${D.border}`, borderBottom: `1px solid ${D.border}` }}>
+            {metrics.map((m, i) => (
+              <Link key={m.label} to={m.href} style={{ textDecoration: 'none', display: 'block' }}>
+                <div
+                  style={{ padding: '22px 20px 22px 0', paddingLeft: i > 0 ? 20 : 0, borderLeft: i > 0 ? `1px solid ${D.border}` : 'none', transition: 'opacity 0.12s' }}
+                  onMouseEnter={e => { e.currentTarget.style.opacity = '0.72' }}
+                  onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
+                >
+                  <p style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: D.textMuted, marginBottom: 8 }}>{m.label}</p>
+                  <p style={{ fontFamily: D.serif, fontSize: 36, fontWeight: 400, color: m.color, lineHeight: 1, fontVariantNumeric: 'tabular-nums', margin: '0 0 8px' }}>{m.value}</p>
+                  {m.pct > 0 && (
+                    <div style={{ height: 2, background: D.surface2, borderRadius: 1, overflow: 'hidden', marginBottom: 8 }}>
+                      <div style={{ height: '100%', width: `${m.pct}%`, background: m.color, borderRadius: 1, transition: 'width 0.5s ease' }} />
+                    </div>
+                  )}
+                  <p style={{ fontSize: 10, color: D.textMuted, margin: 0 }}>{m.sub}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {kpisData.length > 0 && (
+            <div style={{ marginTop: 24 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: D.textMuted }}>Indicadores-Chave</span>
+                <Link to="/dashboard/membro/kpis" style={{ textDecoration: 'none', fontSize: 10, color: D.gold, fontWeight: 600 }}>Ver todos →</Link>
+              </div>
+              {kpisData.slice(0, 5).map((kpi, i) => {
+                const p   = pct(kpi.atual, kpi.meta)
+                const col = p >= 80 ? '#22C55E' : p >= 50 ? D.gold : '#F87171'
+                return (
+                  <div key={kpi.id} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 44px', alignItems: 'center', gap: 14, padding: '8px 0', borderTop: i === 0 ? `1px solid ${D.border}` : 'none', borderBottom: `1px solid ${D.border}` }}>
+                    <span style={{ fontSize: 13, color: D.textMid, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kpi.kpi_name}</span>
+                    <div style={{ height: 3, background: D.surface2, borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${p}%`, background: col, borderRadius: 2, transition: 'width 0.5s ease' }} />
+                    </div>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: col, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{p}%</span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
+
+        <HR />
+
+        {/* ── JORNADA ── */}
+        <div style={{ padding: '36px 0' }}>
+          <SectionLabel>Sua Jornada</SectionLabel>
+          <div style={{ marginTop: 18 }}>
+            <div style={{ height: 3, background: D.surface2, borderRadius: 2, overflow: 'hidden', maxWidth: 340 }}>
+              <div style={{ height: '100%', width: `${Math.max(2, journeyPct)}%`, background: D.gold, borderRadius: 2, transition: 'width 0.6s ease' }} />
+            </div>
+            <p style={{ fontSize: 12, color: D.textSub, margin: '8px 0 0' }}>
+              {journeyPct}% concluído · Fase {journeyPhases[Math.min(currentPhaseIdx + 1, journeyPhases.length - 1)]?.label ?? 'Completa'}
+            </p>
+            <div style={{ display: 'flex', alignItems: 'flex-start', marginTop: 28, overflowX: 'auto', paddingBottom: 4 }}>
+              {journeyPhases.map((phase, i) => {
+                const isDone   = phase.done
+                const isActive = i === currentPhaseIdx + 1
+                const isFuture = !isDone && !isActive
+                const isLast   = i === journeyPhases.length - 1
+                return (
+                  <div key={phase.label} style={{ display: 'flex', alignItems: 'flex-start', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: isDone || isActive ? 10 : 8, height: isDone || isActive ? 10 : 8, borderRadius: '50%', background: isDone ? D.gold : (isActive ? D.gold : 'transparent'), border: isFuture ? `1.5px solid ${D.textFaint}` : 'none', boxShadow: isActive ? `0 0 0 4px rgba(197,168,128,0.22)` : 'none', flexShrink: 0, marginTop: isFuture ? 1 : 0 }} />
+                      <span style={{ fontSize: 11, color: isFuture ? D.textFaint : (isActive ? D.text : D.textSub), fontWeight: isActive ? 500 : 400, whiteSpace: 'nowrap' }}>{phase.label}</span>
+                      <span style={{ fontSize: 9, color: D.textFaint, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>{isDone ? 'concluído' : (isActive ? 'em andamento' : 'a seguir')}</span>
+                    </div>
+                    {!isLast && <div style={{ width: 40, height: 1, background: isDone ? 'rgba(197,168,128,0.4)' : D.border, margin: '5px 6px 0', flexShrink: 0 }} />}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        {okrs.length > 0 && (
+          <>
+            <HR />
+            {/* ── OBJETIVOS ATIVOS ── */}
+            <div style={{ padding: '36px 0' }}>
+              <SectionLabel>Objetivos Ativos</SectionLabel>
+              <div style={{ marginTop: 14 }}>
+                {okrs.map(okr => <OkrRow key={okr.id} okr={okr} />)}
+              </div>
+            </div>
+          </>
+        )}
+
+        <HR />
+
+        {/* ── PLANO DE AÇÃO ── */}
+        <div style={{ paddingTop: 36 }}>
+          <h2 style={{ fontFamily: D.serif, fontSize: 32, fontWeight: 600, color: D.text, margin: 0, letterSpacing: '-0.02em' }}>
+            Plano de Ação
+          </h2>
+          <p style={{ fontSize: 13, color: D.textSub, margin: '6px 0 0', lineHeight: 1.6 }}>
+            {tarefas.length > 0
+              ? `${feitasCount} de ${tarefas.length} tarefas concluídas · ${emAndamento} em andamento${bloqueadas > 0 ? ` · ${bloqueadas} bloqueadas` : ''}`
+              : 'Crie OKRs para gerar tarefas automaticamente.'
+            }
+          </p>
+
+          {/* Tab bar */}
+          <div style={{ display: 'flex', borderBottom: `1px solid ${D.border}`, marginTop: 20, marginBottom: 24 }}>
+            {viewTabs.map(({ key, label }) => (
+              <button key={key} onClick={() => setView(key)}
+                style={{
+                  padding: '8px 18px', border: 'none', background: 'none', cursor: 'pointer',
+                  borderBottom: view === key ? `2px solid ${D.gold}` : '2px solid transparent',
+                  marginBottom: '-1px',
+                  fontSize: 13, fontWeight: view === key ? 500 : 400,
+                  color: view === key ? D.text : D.textMuted,
+                  transition: 'color 0.1s', letterSpacing: '0.01em',
+                }}
+                onMouseEnter={e => { if (view !== key) (e.currentTarget as HTMLButtonElement).style.color = D.textMid }}
+                onMouseLeave={e => { if (view !== key) (e.currentTarget as HTMLButtonElement).style.color = D.textMuted }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {okrs.length === 0 ? (
+            <div style={{ padding: '40px 0', textAlign: 'center' }}>
+              <p style={{ fontSize: 14, fontWeight: 500, color: D.textMid, margin: '0 0 6px' }}>Nenhum objetivo criado ainda</p>
+              <p style={{ fontSize: 13, color: D.textSub, lineHeight: 1.6, margin: '0 0 24px' }}>
+                Vá até <strong style={{ color: D.textMid }}>Metas de Impacto</strong> para criar seus primeiros OKRs.
+              </p>
+              <Link to="/dashboard/membro/okr" style={{ textDecoration: 'none' }}>
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '10px 22px', background: D.gold, color: '#1A1208',
+                  fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer',
+                }}>
+                  Criar OKRs →
+                </span>
+              </Link>
+            </div>
+          ) : (
+            <div style={{ minHeight: 240 }}>
+              {view === 'lista' && (
+                <ListaView
+                  okrs={okrs} tarefas={tarefas} expanded={expanded}
+                  onToggle={id => setExpanded(p => ({ ...p, [id]: !p[id] }))}
+                  onCycleStatus={cycleStatus} onCyclePrioridade={cyclePrioridade}
+                  onDelete={deleteTarefa} onUpdateDesc={updateDesc}
+                  addingTo={addingTo} novaDesc={novaDesc}
+                  setNovaDesc={setNovaDesc} setAddingTo={setAddingTo} addTarefa={addTarefa}
+                />
+              )}
+              {view === 'kanban' && (
+                <KanbanView
+                  okrs={okrs} tarefas={tarefas}
+                  onCycleStatus={cycleStatus} onCycleBack={cycleStatusBack}
+                  onCyclePrioridade={cyclePrioridade} onDelete={deleteTarefa}
+                  onUpdateDesc={updateDesc} onAddTask={addTarefaWithStatus}
+                />
+              )}
+              {view === 'fluxos' && (
+                <FluxosView okrs={okrs} appliedWorkflows={appliedWorkflows} onApply={applyWorkflow} />
+              )}
+            </div>
+          )}
+        </div>
+
       </div>
-
-      <WelcomeGuia defaultOpen={false} />
-
-      {view === 'dashboard' && (
-        <DashboardView
-          okrs={okrs} tarefas={tarefas}
-          totalKrs={totalKrs} progOkrs={progOkrs}
-          feitasCount={feitasCount} emAndamento={emAndamento}
-          bloqueadas={bloqueadas} pctGeral={pctGeral}
-        />
-      )}
-      {view === 'kanban' && (
-        <KanbanView
-          okrs={okrs} tarefas={tarefas}
-          onCycleStatus={cycleStatus}
-          onCycleBack={cycleStatusBack}
-          onCyclePrioridade={cyclePrioridade}
-          onDelete={deleteTarefa}
-          onUpdateDesc={updateDesc}
-          onAddTask={addTarefaWithStatus}
-        />
-      )}
-      {view === 'lista' && (
-        <ListaView
-          okrs={okrs} tarefas={tarefas}
-          expanded={expanded}
-          onToggle={id => setExpanded(p => ({ ...p, [id]: !p[id] }))}
-          onCycleStatus={cycleStatus}
-          onCyclePrioridade={cyclePrioridade}
-          onDelete={deleteTarefa}
-          onUpdateDesc={updateDesc}
-          addingTo={addingTo} novaDesc={novaDesc}
-          setNovaDesc={setNovaDesc} setAddingTo={setAddingTo}
-          addTarefa={addTarefa}
-        />
-      )}
-      {view === 'fluxos' && (
-        <FluxosView
-          okrs={okrs}
-          appliedWorkflows={appliedWorkflows}
-          onApply={applyWorkflow}
-        />
-      )}
     </div>
   )
 }

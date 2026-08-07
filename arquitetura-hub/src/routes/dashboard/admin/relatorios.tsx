@@ -8,43 +8,69 @@ export const Route = createFileRoute('/dashboard/admin/relatorios')({
   component: AdminRelatorios,
 })
 
+const D = {
+  text: '#1A1916', textSub: '#6B6560', textMuted: '#8A8680',
+  border: 'rgba(26,25,22,0.07)', gold: '#C5A880',
+  serif: "'Cormorant Garamond', Georgia, serif",
+}
+
 function AdminRelatorios() {
   const totalReach = mockAggregateGrowth[mockAggregateGrowth.length - 1].alcance
   const totalLeads = mockAggregateGrowth[mockAggregateGrowth.length - 1].leads
   const growthPct = Math.round(((totalReach - mockAggregateGrowth[0].alcance) / mockAggregateGrowth[0].alcance) * 100)
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">Relatórios Globais</h1>
-        <p className="text-gray-400 mt-1 text-sm">Visão consolidada de todos os participantes</p>
+    <div style={{ maxWidth: 960, padding: '48px 0 80px', display: 'flex', flexDirection: 'column' }}>
+
+      {/* Header */}
+      <div style={{ marginBottom: 48 }}>
+        <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: D.gold, marginBottom: 8 }}>
+          Mentor · Relatórios
+        </p>
+        <h1 style={{ fontFamily: D.serif, fontSize: 42, fontWeight: 400, lineHeight: 1.1, color: D.text, margin: 0 }}>
+          Relatórios Globais
+        </h1>
+        <p style={{ fontSize: 14, color: D.textSub, marginTop: 10 }}>
+          Visão consolidada de todos os participantes
+        </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      {/* Stats row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', borderTop: `1px solid ${D.border}`, borderBottom: `1px solid ${D.border}`, marginBottom: 52 }}>
         {[
           { label: 'Alcance Total', value: `${(totalReach / 1000).toFixed(1)}k` },
-          { label: 'Leads Gerados', value: totalLeads },
+          { label: 'Leads Gerados', value: String(totalLeads) },
           { label: 'Crescimento', value: `+${growthPct}%` },
-          { label: 'Participantes', value: mockMembers.length },
-        ].map(item => (
-          <div key={item.label} className="rounded-xl bg-white border border-gray-200 shadow-sm p-5">
-            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{item.label}</p>
-            <p className="text-2xl font-semibold text-gray-900 mt-1">{item.value}</p>
+          { label: 'Participantes', value: String(mockMembers.length) },
+        ].map((item, i) => (
+          <div key={item.label} style={{ padding: '28px 24px 28px 0', paddingLeft: i > 0 ? 24 : 0, borderLeft: i > 0 ? `1px solid ${D.border}` : 'none' }}>
+            <p style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: D.textMuted, marginBottom: 10 }}>
+              {item.label}
+            </p>
+            <p style={{ fontFamily: D.serif, fontSize: 38, fontWeight: 400, color: D.text, lineHeight: 1, fontVariantNumeric: 'tabular-nums', margin: 0 }}>
+              {item.value}
+            </p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-5">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">Crescimento Agregado</h3>
+      {/* Growth chart */}
+      <div style={{ marginBottom: 52 }}>
+        <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: D.textMuted, marginBottom: 20 }}>
+          Crescimento Agregado
+        </p>
         <GlobalKpiOverview data={mockAggregateGrowth} />
       </div>
 
-      <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
-          <h3 className="text-sm font-semibold text-gray-900">Ranking Geral</h3>
-        </div>
+      {/* Ranking */}
+      <div>
+        <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: D.textMuted, marginBottom: 0 }}>
+          Ranking Geral
+        </p>
+        <hr style={{ border: 'none', borderTop: `1px solid ${D.border}`, margin: '16px 0 0' }} />
         <RankingTable members={mockMembers} />
       </div>
+
     </div>
   )
 }
