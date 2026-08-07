@@ -157,7 +157,7 @@ function HeroBadge() {
       }}>
         <Sparkles size={11} color={GOLD} strokeWidth={2} />
         <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: GOLD, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-          AR
+          Método
         </span>
       </div>
       {/* Label */}
@@ -168,14 +168,20 @@ function HeroBadge() {
   )
 }
 
-// ── Action input box (adapted AR entry point) ─────────────────────
+// ── Smooth scroll helper ──────────────────────────────────────────
+function scrollToId(id: string) {
+  const el = document.getElementById(id)
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+// ── Action input box — chips descem para a seção correspondente ───
 function HeroActionBox() {
   const [inputValue, setInputValue] = useState('')
 
-  const CHIPS = [
-    { label: 'Identidade', icon: <BookOpen size={12} strokeWidth={2} /> },
-    { label: 'Pilares',    icon: <Layers    size={12} strokeWidth={2} /> },
-    { label: 'Metas',      icon: <Target    size={12} strokeWidth={2} /> },
+  const CHIPS: { label: string; id: string; icon: React.ReactNode }[] = [
+    { label: 'Identidade', id: 'passo-identidade', icon: <BookOpen size={12} strokeWidth={2} /> },
+    { label: 'Pilares',    id: 'passo-pilares',    icon: <Layers    size={12} strokeWidth={2} /> },
+    { label: 'Metas',      id: 'passo-metas',      icon: <Target    size={12} strokeWidth={2} /> },
   ]
 
   return (
@@ -197,7 +203,7 @@ function HeroActionBox() {
       {/* ── Top row ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 500, color: TEXT_MID, letterSpacing: '0.04em' }}>
-          Sua Jornada AR
+          Sua Jornada
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <Sparkles size={12} color={GOLD} strokeWidth={2} />
@@ -241,31 +247,38 @@ function HeroActionBox() {
         </Link>
       </div>
 
-      {/* ── Bottom row ── */}
+      {/* ── Bottom row: chips que descem até a camada ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', gap: 8 }}>
           {CHIPS.map(chip => (
-            <Link key={chip.label} to="/auth" style={{ textDecoration: 'none' }}>
-              <button style={{
+            <button
+              key={chip.label}
+              onClick={() => scrollToId(chip.id)}
+              style={{
                 display: 'inline-flex', alignItems: 'center', gap: 5,
                 background: 'rgba(245,242,236,0.12)',
                 border: `1px solid ${BORDER_MID}`,
                 borderRadius: 6, padding: '6px 10px',
-                cursor: 'pointer', transition: 'background 0.15s',
+                cursor: 'pointer', transition: 'background 0.15s, border-color 0.15s',
               }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(197,168,128,0.2)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,242,236,0.12)')}
-              >
-                <span style={{ color: TEXT_MID }}>{chip.icon}</span>
-                <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 500, color: TEXT_MID, letterSpacing: '0.04em' }}>
-                  {chip.label}
-                </span>
-              </button>
-            </Link>
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'rgba(197,168,128,0.2)'
+                e.currentTarget.style.borderColor = GOLD
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'rgba(245,242,236,0.12)'
+                e.currentTarget.style.borderColor = BORDER_MID
+              }}
+            >
+              <span style={{ color: GOLD }}>{chip.icon}</span>
+              <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 500, color: TEXT_MID, letterSpacing: '0.04em' }}>
+                {chip.label}
+              </span>
+            </button>
           ))}
         </div>
         <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 400, color: TEXT_DIM, letterSpacing: '0.02em' }}>
-          5 etapas · método AR
+          5 etapas do método
         </span>
       </div>
     </motion.div>
@@ -295,12 +308,33 @@ const NAV_CENTER = [
 ]
 
 // ── Below-fold content data ───────────────────────────────────────
+// id deve coincidir com os chips do HeroActionBox (passo-<id>)
 const STEPS = [
-  { n: '01', label: 'Identidade',  desc: 'Quem você é, para quem fala e o que entrega de diferente.' },
-  { n: '02', label: 'Pilares',     desc: 'As frentes estratégicas de presença e autoridade no mercado.' },
-  { n: '03', label: 'Metas',       desc: 'OKRs trimestrais com plano de ação e ciclo de revisão.' },
-  { n: '04', label: 'Marketing',   desc: 'Agenda editorial e distribuição ao longo do ano.' },
-  { n: '05', label: 'Indicadores', desc: 'KPIs de autoridade e relatórios de evolução contínua.' },
+  {
+    n: '01', id: 'passo-identidade', label: 'Identidade',
+    desc: 'Quem você é, para quem fala e o que entrega de diferente.',
+    detail: 'Definimos juntos seu posicionamento único: nicho, proposta de valor e a narrativa que diferencia você no mercado.',
+  },
+  {
+    n: '02', id: 'passo-pilares', label: 'Pilares',
+    desc: 'As frentes estratégicas de presença e autoridade no mercado.',
+    detail: 'Mapeamos os 3 a 5 eixos temáticos pelos quais você vai construir presença consistente e se tornar referência no seu campo.',
+  },
+  {
+    n: '03', id: 'passo-metas', label: 'Metas',
+    desc: 'OKRs trimestrais com plano de ação e ciclo de revisão.',
+    detail: 'Estruturamos objetivos mensuráveis com key results claros para que cada semana de execução esteja conectada a um resultado concreto.',
+  },
+  {
+    n: '04', id: 'passo-marketing', label: 'Marketing',
+    desc: 'Agenda editorial e distribuição ao longo do ano.',
+    detail: 'Criamos um calendário de conteúdo realista e sustentável, alinhado à sua identidade e distribuído nos canais onde seu público está.',
+  },
+  {
+    n: '05', id: 'passo-indicadores', label: 'Indicadores',
+    desc: 'KPIs de autoridade e relatórios de evolução contínua.',
+    detail: 'Acompanhamos números que realmente importam para a construção de relevância: alcance, percepção e geração de oportunidades.',
+  },
 ]
 
 const PROFILES = [
@@ -359,16 +393,13 @@ export default function LandingPage() {
           padding: '16px clamp(24px,8vw,120px)',
         }}>
 
-          {/* Logo */}
+          {/* Logo — nome completo, sem ícone */}
           <motion.div
             initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 28, height: 28, borderRadius: '50%', border: `2px solid ${GOLD}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: GOLD }} />
-              </div>
-              <span style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 600, color: WARM_WHITE, letterSpacing: '-0.02em' }}>
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: WARM_WHITE, letterSpacing: '-0.02em' }}>
                 Arquitetura de Relevância
               </span>
             </Link>
@@ -527,12 +558,9 @@ export default function LandingPage() {
         >
           {/* Top */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 28, height: 28, borderRadius: '50%', border: `2px solid ${GOLD}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: GOLD }} />
-              </div>
-              <span style={{ fontFamily: SERIF, fontSize: 16, fontWeight: 600, color: WARM_WHITE, letterSpacing: '-0.02em' }}>AR</span>
-            </div>
+            <span style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 600, color: WARM_WHITE, letterSpacing: '-0.02em' }}>
+              Arquitetura de Relevância
+            </span>
             <button onClick={() => setMenuOpen(false)} aria-label="Fechar menu"
               style={{ width: 36, height: 36, borderRadius: '50%', background: WARM_WHITE, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <X size={16} color={WARM_BLACK} strokeWidth={2.5} />
@@ -585,11 +613,15 @@ export default function LandingPage() {
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {STEPS.map((s, i) => (
                 <FadeUp key={s.n} delay={0.12 + i * 0.07}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '52px 1fr', gap: 20, padding: '26px 0', borderBottom: i < STEPS.length - 1 ? `1px solid ${BORDER_DIM}` : 'none', alignItems: 'start' }}>
+                  <div
+                    id={s.id}
+                    style={{ scrollMarginTop: '20px', display: 'grid', gridTemplateColumns: '52px 1fr', gap: 20, padding: '26px 0', borderBottom: i < STEPS.length - 1 ? `1px solid ${BORDER_DIM}` : 'none', alignItems: 'start' }}
+                  >
                     <span style={{ fontFamily: SERIF, fontSize: 30, fontStyle: 'italic', fontWeight: 700, color: GOLD, lineHeight: 1, letterSpacing: '-0.02em' }}>{s.n}</span>
                     <div>
                       <p style={{ fontFamily: SANS, fontSize: 14, fontWeight: 600, color: WARM_WHITE, marginBottom: 5, letterSpacing: '-0.01em' }}>{s.label}</p>
                       <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.75, color: 'rgba(245,242,236,0.38)' }}>{s.desc}</p>
+                      <p style={{ fontFamily: SANS, fontSize: 12, lineHeight: 1.8, color: 'rgba(245,242,236,0.28)', marginTop: 8 }}>{s.detail}</p>
                     </div>
                   </div>
                 </FadeUp>
@@ -670,14 +702,9 @@ export default function LandingPage() {
           ════════════════════════════════════════════════════════════ */}
       <footer style={{ background: WARM_BLACK, borderTop: `1px solid ${BORDER_DIM}`, padding: '24px clamp(24px,5vw,40px)' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 20, height: 20, borderRadius: '50%', border: `1.5px solid ${GOLD}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: GOLD }} />
-            </div>
-            <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 500, letterSpacing: '0.04em', color: 'rgba(245,242,236,0.3)' }}>
-              Arquitetura de Relevância
-            </span>
-          </div>
+          <span style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 500, letterSpacing: '-0.01em', color: 'rgba(245,242,236,0.3)' }}>
+            Arquitetura de Relevância
+          </span>
           <p style={{ fontFamily: SANS, fontSize: 11, color: 'rgba(245,242,236,0.18)', letterSpacing: '0.02em' }}>
             © {new Date().getFullYear()} Sancho Gestão de Carreiras
           </p>
