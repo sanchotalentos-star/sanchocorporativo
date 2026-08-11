@@ -7,6 +7,7 @@ import { Header }               from "@/components/dashboard/Header";
 import { KpiCards }             from "@/components/dashboard/KpiCards";
 import { MetasMensais }         from "@/components/dashboard/MetasMensais";
 import { ChecklistOperacional } from "@/components/dashboard/ChecklistOperacional";
+import { MetasAnuais2026 }      from "@/components/dashboard/MetasAnuais2026";
 import { PipelineChart }        from "@/components/dashboard/PipelineChart";
 import { EvolucaoSemanal }      from "@/components/dashboard/EvolucaoSemanal";
 import { NegociacoesTable }     from "@/components/dashboard/NegociacoesTable";
@@ -207,6 +208,9 @@ export default function DashboardPage() {
             />
             <ChecklistOperacional metas={dbMetas ?? undefined} />
           </div>
+
+          {/* Metas Anuais 2026 */}
+          <MetasAnuais2026 />
 
           {/* Pipeline + Evolução */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

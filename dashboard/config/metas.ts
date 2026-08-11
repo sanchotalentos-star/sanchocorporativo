@@ -1,44 +1,51 @@
 // config/metas.ts
 // ─────────────────────────────────────────────────────────────────────────────
 // Metas mensais e operacionais da Sancho Gestão de Carreiras
-// Fonte: Manual do Colaborador 2026
+// Fonte: Framework Comercial 2026 — Metas Financeiras
 //
-// ⚠️  Editável manualmente — altere os números abaixo conforme atualização
-//     das metas pela diretoria. Nenhuma interface de UI altera este arquivo.
+// Meta anual: R$ 2.000.000
+//   PH Santos R$500k · Marcelo Paz R$400k · Wladson Sidney R$400k
+//   Projetos/Sebrae R$400k · Outros R$200k · Alexandre Pereira R$90k
+//   Eduardo Gomes R$70k · Felipão R$60k · Frota R$30k · Altamir R$30k
+//
+// ⚠️  Valores mensais = meta anual ÷ 12. Edite via /admin → Metas
+//     para ajustar mês a mês sem alterar este arquivo.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const METAS_MENSAIS = {
-  // ── Eixo 2 — Palestras & Apresentações de Eventos ────────────────────────
+  // ── Eixo 2 — Palestras (PH Santos, Wladson, Eduardo, Pereira, Felipão…)
+  //    Meta anual agentes de palestra: ~R$ 1.150.000 → ÷12 ≈ R$ 96.000/mês
 
-  /** Palestras: contratos de palestrantes fechados no mês */
   palestras: {
     label: "Palestras",
-    metaEventos: 4,
-    faturamentoEsperado: 50_000,
+    metaEventos: 5,
+    faturamentoEsperado: 96_000,
   },
 
-  /** Apresentações: contratos de apresentadores fechados no mês */
+  // ── Apresentações (Marcelo Paz)
+  //    Meta anual: R$ 400.000 → ÷12 ≈ R$ 33.000/mês
+
   apresentacoes: {
     label: "Apresentações",
-    metaEventos: 4,
-    faturamentoEsperado: 30_000,
+    metaEventos: 3,
+    faturamentoEsperado: 33_000,
   },
 
-  // ── Eixo 3 — Publicidade ──────────────────────────────────────────────────
+  // ── Publicidades / Projetos (Sebrae + Outros + Frota + Altamir)
+  //    Meta anual: R$ 630.000 → ÷12 ≈ R$ 52.000/mês
 
-  /** Publicidades: contratos de criadores de conteúdo/publicidade fechados */
   publicidades: {
     label: "Publicidades",
     metaContratos: 4,
-    faturamentoEsperado: 40_000,
+    faturamentoEsperado: 52_000,
   },
 
   // ── Consolidado geral ─────────────────────────────────────────────────────
 
   total: {
-    /** Soma das três áreas: 50k + 30k + 40k */
-    faturamentoMeta: 120_000,
-    /** 4 palestras + 4 apresentações + 4 publicidades */
+    /** Soma das três áreas: 96k + 33k + 52k ≈ R$ 181k/mês → R$ 2,17M/ano */
+    faturamentoMeta: 181_000,
+    /** 5 palestras + 3 apresentações + 4 publicidades */
     entregasMeta: 12,
   },
 
