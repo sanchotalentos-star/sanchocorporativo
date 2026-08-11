@@ -34,30 +34,21 @@ export function LogoUpload({ currentUrl, onSaved }: LogoUploadProps) {
     setPreview(localUrl);
 
     try {
-      // 1. Pede URL assinada ao servidor
-      const res = await fetch("/api/upload", {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({
-          bucket:      "logos",
-          filename:    file.name,
-          contentType: file.type,
-        }),
-      });
+      // 1. Envia o arquivo para o servidor (FormData)
+      const form = new FormData();
+      form.append("file",   file);
+      form.append("bucket", "logos");
 
-      if (!res.ok) throw new Error("Erro ao preparar upload");
-      const { signedUrl, publicUrl } = await res.json() as { signedUrl: string; publicUrl: string };
+      const res = await fetch("/api/upload", { method: "POST", body: form });
 
-      // 2. Upload direto para o Supabase Storage
-      const uploadRes = await fetch(signedUrl, {
-        method:  "PUT",
-        headers: { "Content-Type": file.type },
-        body:    file,
-      });
+      if (!res.ok) {
+        const { error } = await res.json() as { error?: string };
+        throw new Error(error ?? "Erro ao fazer upload");
+      }
 
-      if (!uploadRes.ok) throw new Error("Upload falhou");
+      const { publicUrl } = await res.json() as { publicUrl: string };
 
-      // 3. Salva a URL pública no banco
+      // 2. Salva a URL pública no banco
       const saveRes = await fetch("/api/config", {
         method:  "PUT",
         headers: { "Content-Type": "application/json" },

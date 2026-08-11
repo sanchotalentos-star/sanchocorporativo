@@ -1,60 +1,63 @@
 // app/api/upload/route.ts
-// POST /api/upload  — gera URL assinada para upload direto no Supabase Storage
-// Body: { bucket: "logos" | "fotos-membros", filename: string, contentType: string }
-//
-// O browser usa a URL assinada para fazer PUT direto no Storage sem passar o arquivo pelo servidor.
+// POST /api/upload  — recebe o arquivo via FormData e faz upload no servidor
+// para o Supabase Storage. Elimina a necessidade de signed URLs (que requerem
+// service_role key). O arquivo passa pelo servidor Next.js (máx 5 MB).
 
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { db } from "@/lib/supabase-server";
 
-const UploadSchema = z.object({
-  bucket:      z.enum(["logos", "fotos-membros"]),
-  filename:    z.string().min(1).max(200),
-  contentType: z.string().regex(/^image\/(png|jpeg|jpg|webp|svg\+xml)$/),
-});
+const ALLOWED_TYPES = new Set([
+  "image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg+xml",
+]);
+
+const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 
 export async function POST(request: Request) {
-  let body: unknown;
   try {
-    body = await request.json() as unknown;
-  } catch {
-    return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
-  }
+    const formData = await request.formData();
+    const file     = formData.get("file") as File | null;
+    const bucket   = formData.get("bucket") as string | null;
 
-  const parsed = UploadSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
-  }
+    if (!file)   return NextResponse.json({ error: "Arquivo ausente" }, { status: 400 });
+    if (!bucket || !["logos", "fotos-membros"].includes(bucket))
+      return NextResponse.json({ error: "Bucket inválido" }, { status: 400 });
 
-  const { bucket, filename } = parsed.data;
+    if (!ALLOWED_TYPES.has(file.type))
+      return NextResponse.json({ error: "Tipo de arquivo não permitido" }, { status: 400 });
 
-  // Sanitiza o nome do arquivo e adiciona timestamp para evitar colisões
-  const ext      = filename.split(".").pop() ?? "png";
-  const safeName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    if (file.size > MAX_SIZE)
+      return NextResponse.json({ error: "Arquivo muito grande (máx 5 MB)" }, { status: 400 });
 
-  try {
+    // Lê os bytes do arquivo
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer      = Buffer.from(arrayBuffer);
+
+    // Gera nome único
+    const ext      = file.name.split(".").pop() ?? "png";
+    const safeName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
     const client = db();
 
-    const { data, error } = await client.storage
+    // Upload direto pelo servidor
+    const { error } = await client.storage
       .from(bucket)
-      .createSignedUploadUrl(safeName);
+      .upload(safeName, buffer, {
+        contentType: file.type,
+        upsert:      false,
+      });
 
     if (error) throw error;
 
-    // URL pública final (após o upload ser concluído)
+    // URL pública
     const { data: { publicUrl } } = client.storage
       .from(bucket)
       .getPublicUrl(safeName);
 
-    return NextResponse.json({
-      signedUrl:  data.signedUrl,
-      token:      data.token,
-      path:       data.path,
-      publicUrl,
-    });
+    return NextResponse.json({ publicUrl, path: safeName });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Erro ao gerar URL de upload";
+    const msg = err instanceof Error ? err.message : "Erro ao fazer upload";
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
+
+// Next.js 14 App Router — sem bodyParser config necessário para FormData
