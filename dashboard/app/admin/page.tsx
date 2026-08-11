@@ -2,19 +2,21 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Users, Target, BarChart2, ArrowLeft, ImageIcon } from "lucide-react";
-import { LogoUpload }      from "./components/LogoUpload";
-import { MetasEditor }     from "./components/MetasEditor";
-import { MembrosEditor }   from "./components/MembrosEditor";
-import { HistoricoEditor } from "./components/HistoricoEditor";
+import { Users, Target, BarChart2, ArrowLeft, ImageIcon, Trophy } from "lucide-react";
+import { LogoUpload }        from "./components/LogoUpload";
+import { MetasEditor }       from "./components/MetasEditor";
+import { MembrosEditor }     from "./components/MembrosEditor";
+import { HistoricoEditor }   from "./components/HistoricoEditor";
+import { ConquistasEditor }  from "./components/ConquistasEditor";
 
-type Tab = "config" | "metas" | "membros" | "historico";
+type Tab = "config" | "metas" | "membros" | "historico" | "conquistas";
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode; hint: string }[] = [
-  { id: "config",    label: "Logo",           icon: <ImageIcon size={14} />,  hint: "Faça upload da logo da Sancho" },
-  { id: "metas",     label: "Metas",          icon: <Target    size={14} />,  hint: "Defina as metas por mês" },
-  { id: "membros",   label: "Membros",        icon: <Users     size={14} />,  hint: "Cadastre a equipe comercial" },
-  { id: "historico", label: "Histórico",      icon: <BarChart2 size={14} />,  hint: "Registre resultados reais" },
+  { id: "config",     label: "Logo",       icon: <ImageIcon size={14} />, hint: "Faça upload da logo da Sancho" },
+  { id: "metas",      label: "Metas",      icon: <Target    size={14} />, hint: "Defina as metas por mês" },
+  { id: "membros",    label: "Membros",    icon: <Users     size={14} />, hint: "Cadastre a equipe comercial" },
+  { id: "historico",  label: "Histórico",  icon: <BarChart2 size={14} />, hint: "Registre resultados reais" },
+  { id: "conquistas", label: "Conquistas", icon: <Trophy    size={14} />, hint: "Progresso das metas 2026" },
 ];
 
 export default function AdminPage() {
@@ -187,6 +189,20 @@ export default function AdminPage() {
                     faturamento por área e eventos realizados.
                   </p>
                   <HistoricoEditor />
+                </section>
+              )}
+
+              {tab === "conquistas" && (
+                <section>
+                  <h2 className="text-sm font-bold mb-1" style={{ color: "var(--sancho-black)" }}>
+                    Progresso das Conquistas 2026
+                  </h2>
+                  <p className="text-xs mb-5" style={{ color: "var(--sancho-gray-mid)" }}>
+                    Atualize os contadores de metas estratégicas — novos agenciados,
+                    negócios recorrentes, equipe e faturamento anual realizado.
+                    Os valores aparecem no dashboard em tempo real.
+                  </p>
+                  <ConquistasEditor />
                 </section>
               )}
             </div>
