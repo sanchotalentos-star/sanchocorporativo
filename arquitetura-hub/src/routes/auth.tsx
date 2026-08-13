@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, forwardRef } from 'react'
+import { useState, forwardRef, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -90,18 +90,22 @@ const AuthTextarea = forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttribute
 function AuthPage() {
   const [tab, setTab] = useState<'login' | 'request'>('login')
   const [showPassword, setShowPassword] = useState(false)
-  const { login } = useAuth()
+  const { login, user, loading } = useAuth()
   const navigate = useNavigate()
 
   const loginForm   = useForm<LoginForm>({ resolver: zodResolver(loginSchema) })
   const requestForm = useForm<RequestForm>({ resolver: zodResolver(requestSchema) })
 
+  // Navigate after user state is committed — avoids race condition where
+  // AuthGuard sees user=null before setUser() has been processed by React.
+  useEffect(() => {
+    if (loading || !user) return
+    void navigate({ to: user.role === 'admin' ? '/dashboard/admin' : '/dashboard/membro' })
+  }, [user, loading, navigate])
+
   async function onLogin(data: LoginForm) {
     try {
       await login(data.email, data.password)
-      const stored = localStorage.getItem('mock_user')
-      const role = stored ? (JSON.parse(stored) as { role: string }).role : 'membro'
-      void navigate({ to: role === 'admin' ? '/dashboard/admin' : '/dashboard/membro' })
       toast.success('Bem-vindo(a) de volta!')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Credenciais inválidas')
