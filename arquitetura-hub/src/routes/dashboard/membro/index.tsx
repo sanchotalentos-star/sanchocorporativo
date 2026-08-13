@@ -622,10 +622,10 @@ function ListaView({ okrs, tarefas, expanded, onToggle, onCycleStatus, onCyclePr
                   const krPct     = kr.meta > 0 ? Math.min(100, Math.round((kr.atual / kr.meta) * 100)) : 0
                   return (
                     <div key={kr.id} className={cn(krIdx > 0 ? 'border-t' : '')} style={{ borderColor: D.border }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '8px 20px', background: 'rgba(22,20,18,0.6)', borderBottom: `1px solid ${D.border}` }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '8px 20px', background: D.surface, borderBottom: `1px solid ${D.border}` }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                          <div style={{ width: 5, height: 5, borderRadius: '50%', background: cor, opacity: 0.5, flexShrink: 0 }} />
-                          <p style={{ fontSize: 11, fontWeight: 500, color: D.textSub, margin: 0, lineHeight: 1.4 }}>{kr.descricao}</p>
+                          <div style={{ width: 5, height: 5, borderRadius: '50%', background: cor, flexShrink: 0 }} />
+                          <p style={{ fontSize: 11, fontWeight: 600, color: D.textMid, margin: 0, lineHeight: 1.4 }}>{kr.descricao}</p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                           {kr.meta > 0 && (
