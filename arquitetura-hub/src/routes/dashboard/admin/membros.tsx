@@ -1923,200 +1923,373 @@ function MembrosPage() {
                         })()}
 
                         {/* ════ SESSÃO ════ */}
-                        {ctrl.activeTab === 'sessao' && (
-                          <div className="space-y-4">
+                        {ctrl.activeTab === 'sessao' && (() => {
+                          const today = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+                          const pendentes = ctrl.nextSteps.filter(s => !s.done)
+                          const blocosPendentes = BLOCOS.filter(b => {
+                            const c = getBlocoContent(member, b)
+                            return c !== null && (Array.isArray(c) ? c.length > 0 : c.length > 0) && !ctrl.identidade[b.id].construido
+                          })
+                          const allBlocosConstruidos = BLOCOS.every(b => ctrl.identidade[b.id].construido)
+                          const okrsByTrimestre = okrs.reduce((acc: Record<string, OkrObj[]>, okr) => {
+                            const t = okr.trimestre ?? 'Sem trimestre'
+                            if (!acc[t]) acc[t] = []
+                            acc[t].push(okr)
+                            return acc
+                          }, {})
 
-                            {/* ── Encaminhamentos Pendentes (topo) ── */}
-                            {ctrl.nextSteps.some(s => !s.done) && (
-                              <div className="bg-white border-2 border-[#C5A880]/30">
-                                <div className="flex items-center justify-between px-4 py-3 border-b border-[#C5A880]/20 bg-[#C5A880]/5">
-                                  <div className="flex items-center gap-2">
-                                    <ClipboardList size={12} className="text-[#C5A880]" />
-                                    <SectionLabel>Encaminhamentos Pendentes · Sessão Anterior</SectionLabel>
+                          return (
+                            <div className="divide-y divide-gray-100">
+
+                              {/* ── Header da Sessão ── */}
+                              <div className="px-5 py-4" style={{ background: '#2A2420' }}>
+                                <div className="flex items-start justify-between gap-4">
+                                  <div>
+                                    <p className="text-[9px] font-bold uppercase tracking-widest mb-1" style={{ color: '#C5A880' }}>Sessão em andamento</p>
+                                    <p className="text-white font-bold text-sm capitalize">{today}</p>
+                                    <p className="text-[11px] mt-0.5" style={{ color: 'rgba(197,168,128,0.6)' }}>{member.full_name}</p>
                                   </div>
-                                  <span className="text-[9px] font-bold text-[#C5A880] border border-[#C5A880]/30 px-2 py-0.5">
-                                    {ctrl.nextSteps.filter(s => !s.done).length} pendente{ctrl.nextSteps.filter(s => !s.done).length !== 1 ? 's' : ''}
+                                  <div className="text-right flex-shrink-0">
+                                    <p className="text-[9px] font-bold uppercase tracking-widest mb-1" style={{ color: '#C5A880' }}>Fase atual</p>
+                                    <p className="text-white text-sm font-bold">{ctrl.fase}. {FASES.find(f => f.num === ctrl.fase)?.label}</p>
+                                    <p className="text-[10px] mt-0.5" style={{ color: 'rgba(197,168,128,0.6)' }}>{constructed}/5 blocos construídos</p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* ── MOMENTO 1: ABERTURA ── */}
+                              <div className="bg-white">
+                                <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-gray-50">
+                                  <div className="w-5 h-5 flex items-center justify-center text-white text-[9px] font-black flex-shrink-0" style={{ background: '#C5A880' }}>1</div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[11px] font-black text-gray-900 uppercase tracking-wider">Abertura</p>
+                                    <p className="text-[10px] text-gray-400">Revise junto com o mentorado o que foi combinado na última sessão.</p>
+                                  </div>
+                                  <span className={cn('text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider flex-shrink-0',
+                                    pendentes.length > 0 ? 'text-amber-700 border border-amber-200 bg-amber-50' : 'text-emerald-700 border border-emerald-200 bg-emerald-50')}>
+                                    {pendentes.length > 0 ? `${pendentes.length} pendente${pendentes.length !== 1 ? 's' : ''}` : 'Em dia'}
                                   </span>
                                 </div>
-                                <div className="p-4 space-y-2">
-                                  {ctrl.nextSteps.filter(s => !s.done).map(step => (
-                                    <div key={step.id} className="flex items-center gap-3 py-1 border-l-2 border-[#C5A880]/30 pl-3">
-                                      <button onClick={() => toggleStep(member.id, step.id)}
-                                        className="w-4 h-4 border-2 border-[#C5A880]/50 flex items-center justify-center flex-shrink-0 hover:border-[#C5A880] transition-all">
-                                      </button>
-                                      <p className="text-sm text-gray-800 flex-1 font-medium">{step.texto}</p>
-                                      <button onClick={() => toggleStep(member.id, step.id)}
-                                        className="text-[9px] font-bold text-[#C5A880] uppercase tracking-wider hover:underline flex-shrink-0">
-                                        Concluir
-                                      </button>
+                                <div className="px-5 py-4">
+                                  {pendentes.length === 0 ? (
+                                    <div className="flex items-center gap-2 text-emerald-600">
+                                      <CheckCircle2 size={13} className="flex-shrink-0" />
+                                      <p className="text-xs font-semibold">Nenhum encaminhamento pendente da sessão anterior.</p>
                                     </div>
-                                  ))}
+                                  ) : (
+                                    <div className="space-y-2">
+                                      {pendentes.map(step => (
+                                        <div key={step.id} className="flex items-center gap-3 py-2 pl-3 group border-l-2 border-[#C5A880]/30">
+                                          <button onClick={() => toggleStep(member.id, step.id)}
+                                            className="w-4 h-4 border-2 border-[#C5A880]/40 flex items-center justify-center flex-shrink-0 hover:border-[#C5A880] transition-all">
+                                          </button>
+                                          <p className="text-sm text-gray-800 flex-1 font-medium">{step.texto}</p>
+                                          <button onClick={() => toggleStep(member.id, step.id)}
+                                            className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                            Concluir
+                                          </button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                            )}
 
-                            {/* ── Progresso rápido dos OKRs ── */}
-                            {okrs.length > 0 && (
-                              <div className="bg-white border border-gray-200">
-                                <div className="px-4 py-3 border-b border-gray-100">
-                                  <SectionLabel>Progresso Trimestral · OKRs</SectionLabel>
+                              {/* ── MOMENTO 2: PANORAMA DE OKRs ── */}
+                              <div className="bg-white">
+                                <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-gray-50">
+                                  <div className="w-5 h-5 flex items-center justify-center text-white text-[9px] font-black flex-shrink-0" style={{ background: '#C5A880' }}>2</div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[11px] font-black text-gray-900 uppercase tracking-wider">Panorama · OKRs</p>
+                                    <p className="text-[10px] text-gray-400">Atualize os valores com o mentorado. Clique no número atual para editar.</p>
+                                  </div>
+                                  {okrs.length > 0 && (
+                                    <span className="text-[9px] font-bold text-gray-400 border border-gray-200 px-2 py-0.5 uppercase tracking-wider flex-shrink-0">
+                                      {okrs.length} objetivo{okrs.length !== 1 ? 's' : ''}
+                                    </span>
+                                  )}
                                 </div>
-                                <div className="divide-y divide-gray-100">
-                                  {okrs.map(okr => {
-                                    const krsArr = okr.keyResults ?? []
-                                    const avgPct = krsArr.length > 0
-                                      ? Math.round(krsArr.reduce((sum, kr) => sum + (kr.meta > 0 ? Math.min((kr.atual/kr.meta)*100, 100) : 0), 0) / krsArr.length)
-                                      : 0
-                                    const cor = CATEGORIA_COLORS[okr.categoria] ?? '#C5A880'
-                                    return (
-                                      <div key={okr.id} className="px-4 py-2.5 flex items-center gap-3">
-                                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: cor }} />
-                                        <div className="flex-1 min-w-0">
-                                          <p className="text-[11px] font-bold text-gray-800 truncate">{okr.titulo}</p>
-                                          {okr.trimestre && <p className="text-[9px] text-gray-400">{okr.trimestre}</p>}
+                                {okrs.length === 0 ? (
+                                  <div className="px-5 py-4">
+                                    <p className="text-xs text-gray-400 italic">Nenhum OKR definido ainda. Acesse a aba OKRs para criar.</p>
+                                  </div>
+                                ) : (
+                                  <div className="divide-y divide-gray-50">
+                                    {Object.entries(okrsByTrimestre).map(([trimestre, tOkrs]) => (
+                                      <div key={trimestre}>
+                                        <div className="px-5 py-2 bg-gray-50/60 border-b border-gray-100">
+                                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{trimestre}</p>
                                         </div>
-                                        <div className="flex items-center gap-2 flex-shrink-0">
-                                          <div className="w-20 h-1.5 bg-gray-100">
-                                            <div className="h-full transition-all" style={{ width: `${avgPct}%`, background: avgPct >= 70 ? '#10B981' : avgPct >= 40 ? '#F59E0B' : cor }} />
-                                          </div>
-                                          <span className="text-[10px] font-bold tabular-nums w-8 text-right" style={{ color: avgPct >= 70 ? '#10B981' : avgPct >= 40 ? '#F59E0B' : '#9CA3AF' }}>
-                                            {avgPct}%
-                                          </span>
-                                        </div>
+                                        {tOkrs.map(okr => {
+                                          const krsArr = okr.keyResults ?? []
+                                          const avgPct = krsArr.length > 0
+                                            ? Math.round(krsArr.reduce((sum, kr) => sum + (kr.meta > 0 ? Math.min((kr.atual / kr.meta) * 100, 100) : 0), 0) / krsArr.length)
+                                            : 0
+                                          const catCor = CATEGORIA_COLORS[okr.categoria] ?? '#C5A880'
+                                          const healthCor = avgPct >= 70 ? '#10B981' : avgPct >= 40 ? '#F59E0B' : '#EF4444'
+                                          return (
+                                            <div key={okr.id} className="px-5 py-3 border-b border-gray-50 last:border-0">
+                                              <div className="flex items-center gap-2 mb-2.5">
+                                                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: catCor }} />
+                                                <p className="text-xs font-bold text-gray-800 flex-1">{okr.titulo}</p>
+                                                <span className="text-[11px] font-black tabular-nums flex-shrink-0" style={{ color: healthCor }}>{avgPct}%</span>
+                                              </div>
+                                              {krsArr.length > 0 && (
+                                                <div className="space-y-2.5 pl-4">
+                                                  {krsArr.map((kr, krIdx) => {
+                                                    const pct = kr.meta > 0 ? Math.min(Math.round((kr.atual / kr.meta) * 100), 100) : 0
+                                                    const isEditingThis = editingKr?.memberId === member.id && editingKr?.okrId === okr.id && editingKr?.krIdx === krIdx
+                                                    return (
+                                                      <div key={kr.id} className="space-y-1">
+                                                        <div className="flex items-start gap-2">
+                                                          <p className="text-[11px] text-gray-600 flex-1 leading-snug">{kr.descricao}</p>
+                                                          {isEditingThis ? (
+                                                            <div className="flex items-center gap-1 flex-shrink-0">
+                                                              <input
+                                                                type="number"
+                                                                value={editKrVal}
+                                                                onChange={e => setEditKrVal(e.target.value)}
+                                                                onKeyDown={e => { if (e.key === 'Enter') commitKrEdit(); if (e.key === 'Escape') setEditingKr(null) }}
+                                                                autoFocus
+                                                                className="w-20 border border-[#C5A880] px-2 py-0.5 text-[11px] text-right tabular-nums focus:outline-none"
+                                                              />
+                                                              <button onClick={commitKrEdit} className="text-[9px] font-bold text-[#C5A880] hover:underline">OK</button>
+                                                              <button onClick={() => setEditingKr(null)} className="text-[9px] text-gray-400 hover:underline">X</button>
+                                                            </div>
+                                                          ) : (
+                                                            <button
+                                                              onClick={() => { setEditingKr({ memberId: member.id, okrId: okr.id, krIdx }); setEditKrVal(String(kr.atual)) }}
+                                                              className="flex items-center gap-1 text-[10px] tabular-nums text-gray-500 hover:text-[#C5A880] transition-colors flex-shrink-0 group"
+                                                            >
+                                                              <span className="font-bold group-hover:underline">{kr.atual}</span>
+                                                              <span className="text-gray-300">/</span>
+                                                              <span>{kr.meta} {kr.unit}</span>
+                                                              <Pencil size={9} className="text-gray-300 group-hover:text-[#C5A880] ml-0.5" />
+                                                            </button>
+                                                          )}
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                          <div className="flex-1 h-1 bg-gray-100">
+                                                            <div className="h-full transition-all duration-500"
+                                                              style={{ width: `${pct}%`, background: pct >= 70 ? '#10B981' : pct >= 40 ? '#F59E0B' : '#EF4444' }} />
+                                                          </div>
+                                                          <span className="text-[10px] font-bold w-7 text-right tabular-nums"
+                                                            style={{ color: pct >= 70 ? '#10B981' : pct >= 40 ? '#F59E0B' : '#9CA3AF' }}>
+                                                            {pct}%
+                                                          </span>
+                                                        </div>
+                                                      </div>
+                                                    )
+                                                  })}
+                                                </div>
+                                              )}
+                                            </div>
+                                          )
+                                        })}
                                       </div>
-                                    )
-                                  })}
-                                </div>
-                              </div>
-                            )}
+                                    ))}
+                                  </div>
+                                )}
 
-                            {/* ── Estratégia Q2 (Rodrigo) ── */}
-                            {member.id === 'member-4' && (
-                              <div className="bg-white border border-gray-200">
-                                <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
-                                  <Rocket size={12} className="text-[#C5A880]" />
-                                  <SectionLabel>Estratégia Q2 · Como atingir as metas</SectionLabel>
-                                </div>
-                                <div className="divide-y divide-gray-100">
-                                  {RODRIGO_Q2_ESTRATEGIA.map((e, i) => (
-                                    <div key={i} className="px-4 py-3 border-l-2 ml-4 my-1 mr-4" style={{ borderColor: '#C5A880', marginLeft: '1rem' }}>
-                                      <p className="text-[11px] font-bold text-gray-800 mb-1">{e.titulo}</p>
-                                      <p className="text-[11px] text-gray-500 leading-relaxed">{e.detalhe}</p>
+                                {/* Estratégia Q2 (Rodrigo) — contextual dentro do panorama */}
+                                {member.id === 'member-4' && (
+                                  <div className="border-t border-gray-100 bg-gray-50/40">
+                                    <div className="flex items-center gap-2 px-5 py-2.5 border-b border-gray-100">
+                                      <Rocket size={10} className="text-[#C5A880]" />
+                                      <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Como atingir as metas · Q2</p>
                                     </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Pauta sugerida */}
-                            <div className="bg-white border border-gray-200">
-                              <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
-                                <Sparkles size={12} className="text-[#C5A880]" />
-                                <SectionLabel>Pauta Sugerida para Esta Sessão</SectionLabel>
-                              </div>
-                              <div className="p-4 space-y-2">
-                                {BLOCOS.filter(b => {
-                                  const c = getBlocoContent(member, b)
-                                  return c !== null && (Array.isArray(c) ? c.length > 0 : c.length > 0) && !ctrl.identidade[b.id].construido
-                                }).map(bloco => (
-                                  <div key={bloco.id} className="border-l-2 pl-3 py-2" style={{ borderColor: bloco.cor }}>
-                                    <p className="text-xs font-bold text-gray-800 mb-1">{bloco.num} · {bloco.label}</p>
-                                    <div className="space-y-1">
-                                      {bloco.perguntas.map((q, i) => (
-                                        <p key={i} className="text-[11px] text-gray-500 leading-relaxed">→ {q}</p>
+                                    <div className="px-5 py-3 space-y-3">
+                                      {RODRIGO_Q2_ESTRATEGIA.map((e, i) => (
+                                        <div key={i} className="border-l-2 pl-3" style={{ borderColor: '#C5A880' }}>
+                                          <p className="text-[11px] font-bold text-gray-700 mb-0.5">{e.titulo}</p>
+                                          <p className="text-[10px] text-gray-500 leading-relaxed">{e.detalhe}</p>
+                                        </div>
                                       ))}
                                     </div>
                                   </div>
-                                ))}
-                                {okrs.length > 0 && (
-                                  <div className="flex items-center gap-3 px-3 py-2 border-l-2 border-[#C5A880]">
-                                    <Target size={12} className="text-[#C5A880] flex-shrink-0" />
-                                    <p className="text-xs text-gray-700">Revisar progresso dos <strong>{okrs.length} OKRs</strong> definidos</p>
-                                  </div>
-                                )}
-                                {marketing.length > 0 && (
-                                  <div className="flex items-center gap-3 px-3 py-2 border-l-2 border-[#C5A880]">
-                                    <Calendar size={12} className="text-[#C5A880] flex-shrink-0" />
-                                    <p className="text-xs text-gray-700">Revisar <strong>{marketing.length} ações</strong> do plano de marketing</p>
-                                  </div>
-                                )}
-                                {BLOCOS.every(b => ctrl.identidade[b.id].construido) && (
-                                  <div className="flex items-center gap-2 px-3 py-2 border-l-2 border-emerald-400">
-                                    <CheckCircle2 size={12} className="text-emerald-500" />
-                                    <p className="text-xs text-emerald-700 font-semibold">Todos os blocos de identidade foram construídos.</p>
-                                  </div>
-                                )}
-                                {BLOCOS.filter(b => {
-                                  const c = getBlocoContent(member, b)
-                                  return c !== null && (Array.isArray(c) ? c.length > 0 : c.length > 0) && !ctrl.identidade[b.id].construido
-                                }).length === 0 && okrs.length === 0 && marketing.length === 0 && !BLOCOS.every(b => ctrl.identidade[b.id].construido) && (
-                                  <p className="text-xs text-gray-400 text-center py-3 italic">Nenhum ponto pendente para esta sessão.</p>
                                 )}
                               </div>
-                            </div>
 
-                            {/* Notas da sessão */}
-                            <div className="bg-white border border-gray-200">
-                              <div className="px-4 py-3 border-b border-gray-100">
-                                <SectionLabel>Notas da Sessão</SectionLabel>
-                              </div>
-                              <div className="p-4">
-                                <textarea
-                                  value={ctrl.sessionNotes}
-                                  onChange={e => upd(member.id, { sessionNotes: e.target.value })}
-                                  placeholder="Anote os principais pontos da sessão de hoje..."
-                                  rows={5}
-                                  className="w-full bg-gray-50 border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#C5A880] resize-none"
-                                />
-                                <p className="text-[9px] text-gray-400 mt-1">Salvo automaticamente</p>
-                              </div>
-                            </div>
+                              {/* ── MOMENTO 3: CONSTRUÇÃO CONJUNTA ── */}
+                              <div className="bg-white">
+                                <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-gray-50">
+                                  <div className="w-5 h-5 flex items-center justify-center text-white text-[9px] font-black flex-shrink-0" style={{ background: '#C5A880' }}>3</div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[11px] font-black text-gray-900 uppercase tracking-wider">Construção Conjunta</p>
+                                    <p className="text-[10px] text-gray-400">Trabalhe os blocos de identidade pendentes. Faça as perguntas e construam a síntese juntos.</p>
+                                  </div>
+                                  {!allBlocosConstruidos && blocosPendentes.length > 0 && (
+                                    <span className="text-[9px] font-bold text-amber-700 border border-amber-200 bg-amber-50 px-2 py-0.5 uppercase tracking-wider flex-shrink-0">
+                                      {blocosPendentes.length} pendente{blocosPendentes.length !== 1 ? 's' : ''}
+                                    </span>
+                                  )}
+                                  {allBlocosConstruidos && (
+                                    <span className="text-[9px] font-bold text-emerald-700 border border-emerald-200 bg-emerald-50 px-2 py-0.5 uppercase tracking-wider flex-shrink-0">
+                                      Completo
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="divide-y divide-gray-100">
+                                  {allBlocosConstruidos ? (
+                                    <div className="px-5 py-4 flex items-center gap-2">
+                                      <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0" />
+                                      <p className="text-xs font-semibold text-emerald-700">Todos os blocos de identidade foram construídos.</p>
+                                    </div>
+                                  ) : blocosPendentes.length === 0 ? (
+                                    <div className="px-5 py-4">
+                                      <p className="text-xs text-gray-400 italic">Nenhum bloco com conteúdo pendente. Peça ao mentorado que preencha os blocos de identidade na plataforma.</p>
+                                    </div>
+                                  ) : (
+                                    blocosPendentes.map(bloco => {
+                                      const content = getBlocoContent(member, bloco)
+                                      return (
+                                        <div key={bloco.id} className="px-5 py-4" style={{ borderLeft: `3px solid ${bloco.cor}` }}>
+                                          <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: bloco.cor }}>{bloco.num}</span>
+                                              <p className="text-xs font-black text-gray-900">{bloco.label}</p>
+                                            </div>
+                                            <button onClick={() => toggleConstruido(member.id, bloco.id)}
+                                              className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider border px-2 py-1 transition-colors"
+                                              style={{ color: '#C5A880', borderColor: 'rgba(197,168,128,0.4)' }}>
+                                              <Check size={9} />
+                                              Marcar como construído
+                                            </button>
+                                          </div>
 
-                            {/* Encaminhamentos da Sessão */}
-                            <div className="bg-white border border-gray-200">
-                              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                                <SectionLabel>Encaminhamentos desta Sessão</SectionLabel>
-                                {ctrl.nextSteps.filter(s => s.done).length > 0 && (
-                                  <span className="text-[9px] font-bold text-emerald-600 border border-emerald-200 px-2 py-0.5 mb-3">
-                                    {ctrl.nextSteps.filter(s => s.done).length} concluído{ctrl.nextSteps.filter(s => s.done).length !== 1 ? 's' : ''}
-                                  </span>
-                                )}
+                                          {content && (
+                                            <div className="mb-3 p-3 bg-gray-50 border-l-2 border-gray-200">
+                                              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">O que o mentorado escreveu</p>
+                                              <p className="text-[11px] text-gray-600 leading-relaxed" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>
+                                                {Array.isArray(content) ? content[0] : content}
+                                              </p>
+                                            </div>
+                                          )}
+
+                                          <div className="mb-3">
+                                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Perguntas para aprofundar</p>
+                                            <div className="space-y-1.5">
+                                              {bloco.perguntas.map((q, qi) => (
+                                                <div key={qi} className="flex items-start gap-2">
+                                                  <span className="text-[10px] flex-shrink-0 mt-0.5" style={{ color: bloco.cor }}>→</span>
+                                                  <p className="text-[11px] text-gray-600 leading-snug">{q}</p>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          </div>
+
+                                          <textarea
+                                            value={ctrl.identidade[bloco.id].analise}
+                                            onChange={e => {
+                                              updBloco(member.id, bloco.id, { analise: e.target.value })
+                                              saveSintese(member.id, bloco.id, e.target.value)
+                                            }}
+                                            placeholder={bloco.placeholder}
+                                            rows={3}
+                                            className="w-full bg-white border border-gray-200 px-3 py-2 text-[11px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#C5A880] resize-none transition-colors"
+                                          />
+                                          <p className="text-[9px] text-gray-300 mt-1">Síntese do mentor · salvo automaticamente</p>
+                                        </div>
+                                      )
+                                    })
+                                  )}
+                                </div>
                               </div>
-                              <div className="p-4 space-y-2 mb-2">
-                                {ctrl.nextSteps.length === 0 && (
-                                  <p className="text-xs text-gray-300 italic">Nenhum encaminhamento definido ainda.</p>
-                                )}
-                                {ctrl.nextSteps.map(step => (
-                                  <div key={step.id} className="flex items-center gap-3">
-                                    <button onClick={() => toggleStep(member.id, step.id)}
-                                      className={cn('w-4 h-4 border-2 flex items-center justify-center flex-shrink-0 transition-all',
-                                        step.done ? 'bg-[#C5A880] border-[#C5A880]' : 'border-gray-300'
-                                      )}>
-                                      {step.done && <Check size={9} className="text-white" />}
+
+                              {/* ── MOMENTO 4: ENCAMINHAMENTOS ── */}
+                              <div className="bg-white">
+                                <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-gray-50">
+                                  <div className="w-5 h-5 flex items-center justify-center text-white text-[9px] font-black flex-shrink-0" style={{ background: '#C5A880' }}>4</div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[11px] font-black text-gray-900 uppercase tracking-wider">Encaminhamentos</p>
+                                    <p className="text-[10px] text-gray-400">Defina junto o que o mentorado vai fazer até a próxima sessão. Seja específico.</p>
+                                  </div>
+                                  {ctrl.nextSteps.length > 0 && (
+                                    <span className="text-[9px] font-bold text-gray-400 border border-gray-200 px-2 py-0.5 uppercase tracking-wider flex-shrink-0">
+                                      {ctrl.nextSteps.length} total
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="p-5 space-y-3">
+                                  <div className="flex gap-2">
+                                    <input
+                                      type="text"
+                                      value={ctrl.newStepInput}
+                                      onChange={e => upd(member.id, { newStepInput: e.target.value })}
+                                      onKeyDown={e => e.key === 'Enter' && addNextStep(member.id)}
+                                      placeholder="O que o mentorado vai fazer até a próxima sessão..."
+                                      className="flex-1 bg-gray-50 border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#C5A880] transition-colors"
+                                    />
+                                    <button onClick={() => addNextStep(member.id)}
+                                      className="w-10 h-10 flex items-center justify-center text-white transition-colors flex-shrink-0"
+                                      style={{ background: '#C5A880' }}>
+                                      <Plus size={14} />
                                     </button>
-                                    <p className={cn('text-sm flex-1', step.done ? 'line-through text-gray-300' : 'text-gray-700')}>{step.texto}</p>
                                   </div>
-                                ))}
+                                  {ctrl.nextSteps.length > 0 && (
+                                    <div className="space-y-1.5 pt-1">
+                                      {ctrl.nextSteps.map(step => (
+                                        <div key={step.id} className={cn('flex items-center gap-3 px-3 py-2 border-l-2 transition-all',
+                                          step.done ? 'border-emerald-400 bg-emerald-50/40' : 'border-[#C5A880]/40')}>
+                                          <button onClick={() => toggleStep(member.id, step.id)}
+                                            className={cn('w-4 h-4 border-2 flex items-center justify-center flex-shrink-0 transition-all',
+                                              step.done ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 hover:border-[#C5A880]')}>
+                                            {step.done && <Check size={9} className="text-white" />}
+                                          </button>
+                                          <p className={cn('text-sm flex-1', step.done ? 'line-through text-gray-300' : 'text-gray-700')}>{step.texto}</p>
+                                          {step.done && <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider flex-shrink-0">Feito</span>}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                  <p className="text-[9px] text-gray-300">Encaminhamentos pendentes aparecem no topo da próxima sessão.</p>
+                                </div>
                               </div>
-                              <div className="px-4 pb-4 flex gap-2">
-                                <input
-                                  type="text"
-                                  value={ctrl.newStepInput}
-                                  onChange={e => upd(member.id, { newStepInput: e.target.value })}
-                                  onKeyDown={e => e.key === 'Enter' && addNextStep(member.id)}
-                                  placeholder="Registrar encaminhamento da reunião..."
-                                  className="flex-1 bg-gray-50 border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#C5A880] transition-colors"
-                                />
-                                <button onClick={() => addNextStep(member.id)}
-                                  className="w-9 h-9 bg-[#C5A880] flex items-center justify-center text-white hover:bg-[#A88B62] transition-colors flex-shrink-0">
-                                  <Plus size={14} />
-                                </button>
-                              </div>
-                              <p className="text-[9px] text-gray-400 px-4 pb-3">Encaminhamentos pendentes aparecem no topo da próxima sessão.</p>
-                            </div>
 
-                          </div>
-                        )}
+                              {/* ── MOMENTO 5: FECHAMENTO ── */}
+                              <div className="bg-white">
+                                <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-gray-50">
+                                  <div className="w-5 h-5 flex items-center justify-center text-white text-[9px] font-black flex-shrink-0" style={{ background: '#C5A880' }}>5</div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[11px] font-black text-gray-900 uppercase tracking-wider">Fechamento</p>
+                                    <p className="text-[10px] text-gray-400">Registre os pontos principais e encerre a sessão com clareza.</p>
+                                  </div>
+                                </div>
+                                <div className="p-5 space-y-4">
+                                  <div className="grid grid-cols-3 gap-2">
+                                    <div className="bg-gray-50 px-3 py-3 text-center">
+                                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Encaminhamentos</p>
+                                      <p className="text-xl font-black text-gray-800 tabular-nums">{ctrl.nextSteps.filter(s => !s.done).length}</p>
+                                      <p className="text-[9px] text-gray-400">pendentes</p>
+                                    </div>
+                                    <div className="bg-gray-50 px-3 py-3 text-center">
+                                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Identidade</p>
+                                      <p className="text-xl font-black tabular-nums" style={{ color: constructed > 0 ? '#C5A880' : '#9CA3AF' }}>{constructed}/5</p>
+                                      <p className="text-[9px] text-gray-400">construídos</p>
+                                    </div>
+                                    <div className="bg-gray-50 px-3 py-3 text-center">
+                                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">OKRs</p>
+                                      <p className="text-xl font-black text-gray-800 tabular-nums">{okrs.length}</p>
+                                      <p className="text-[9px] text-gray-400">objetivos</p>
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Notas da Sessão</p>
+                                    <textarea
+                                      value={ctrl.sessionNotes}
+                                      onChange={e => upd(member.id, { sessionNotes: e.target.value })}
+                                      placeholder="O que foi discutido, decisões tomadas, insights do mentorado..."
+                                      rows={5}
+                                      className="w-full bg-gray-50 border border-gray-200 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#C5A880] resize-none transition-colors"
+                                    />
+                                    <p className="text-[9px] text-gray-400 mt-1">Salvo automaticamente</p>
+                                  </div>
+                                </div>
+                              </div>
+
+                            </div>
+                          )
+                        })()}
 
                       </div>
                     </div>
