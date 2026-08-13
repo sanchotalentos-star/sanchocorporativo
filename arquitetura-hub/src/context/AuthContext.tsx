@@ -86,8 +86,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(email: string, password: string) {
     if (useMocks) {
-      const entry = MOCK_USERS[email]
-      if (!entry || entry.password !== password) throw new Error('Credenciais inválidas')
+      const entry = MOCK_USERS[email.trim().toLowerCase()]
+      if (!entry || entry.password !== password.trim()) throw new Error('Credenciais inválidas')
       setUser(entry.user)
       localStorage.setItem('mock_user', JSON.stringify(entry.user))
       return
