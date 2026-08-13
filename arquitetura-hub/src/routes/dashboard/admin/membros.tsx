@@ -800,12 +800,6 @@ function MembrosPage() {
                 </div>
                 <div className="hidden sm:flex items-center divide-x divide-gray-100 flex-shrink-0">
                   <div className="text-right pr-5">
-                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Score</p>
-                    <p className="text-sm font-black tabular-nums" style={{ color: member.score >= 70 ? '#10B981' : member.score >= 40 ? '#F59E0B' : '#EF4444' }}>
-                      {member.score}/100
-                    </p>
-                  </div>
-                  <div className="text-right px-5">
                     <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Fase</p>
                     <p className="text-[11px] font-bold text-gray-700">{ctrl.fase}. {faseInfo.label}</p>
                   </div>
@@ -818,12 +812,6 @@ function MembrosPage() {
                 </div>
                 {isOpen ? <ChevronUp size={15} className="text-gray-300 flex-shrink-0" /> : <ChevronDown size={15} className="text-gray-300 flex-shrink-0" />}
               </button>
-
-              {/* Score bar */}
-              <div className="h-0.5 bg-gray-100">
-                <div className="h-full transition-all duration-500"
-                  style={{ width: `${member.score}%`, background: member.score >= 70 ? '#10B981' : member.score >= 40 ? '#F59E0B' : '#EF4444' }} />
-              </div>
 
               {/* ── Expanded ── */}
               <AnimatePresence>
@@ -869,9 +857,8 @@ function MembrosPage() {
                           <div className="space-y-4">
 
                             {/* Stats row */}
-                            <div className="grid grid-cols-3 gap-px bg-gray-200">
+                            <div className="grid grid-cols-2 gap-px bg-gray-200">
                               {[
-                                { label: 'Score',   value: `${member.score}`, suffix: '/100', color: member.score >= 70 ? '#10B981' : member.score >= 40 ? '#F59E0B' : '#EF4444' },
                                 { label: 'Leads',   value: `${member.leads}`,  color: '#10B981' },
                                 { label: 'Alcance', value: member.alcance >= 1000 ? `${(member.alcance/1000).toFixed(1)}k` : `${member.alcance}`, color: '#3B82F6' },
                               ].map(s => (
