@@ -658,6 +658,166 @@ const OKR_SEEDS: Record<string, Objective[]> = {
   ],
 }
 
+/* ─────────────────────────────────────────────
+   OKR DASHBOARD
+───────────────────────────────────────────── */
+function OkrDashboard({ okrs, totalKrs, doneKrs, overallProgress }: {
+  okrs: Objective[]
+  totalKrs: number
+  doneKrs: number
+  overallProgress: number
+}) {
+  const cats = Object.keys(catColor)
+  const catStats = cats.map(cat => {
+    const objs = okrs.filter(o => o.categoria === cat)
+    const krs  = objs.flatMap(o => o.keyResults)
+    const pct  = krs.length > 0
+      ? Math.round(krs.reduce((s, kr) => s + getProgress(kr.atual, kr.meta), 0) / krs.length)
+      : 0
+    return { cat, cor: catColor[cat], objs: objs.length, krs: krs.length, pct }
+  }).filter(c => c.objs > 0)
+
+  const objStats = okrs.map(o => {
+    const pct = o.keyResults.length > 0
+      ? Math.round(o.keyResults.reduce((s, kr) => s + getProgress(kr.atual, kr.meta), 0) / o.keyResults.length)
+      : 0
+    return {
+      id: o.id,
+      titulo: o.titulo.length > 48 ? o.titulo.slice(0, 48) + '…' : o.titulo,
+      categoria: o.categoria,
+      trimestre: o.trimestre,
+      pct,
+      krs: o.keyResults.length,
+    }
+  })
+
+  const trimMap: Record<string, { total: number; sum: number }> = {}
+  okrs.forEach(o => {
+    const t = o.trimestre || 'Sem período'
+    if (!trimMap[t]) trimMap[t] = { total: 0, sum: 0 }
+    const pct = o.keyResults.length > 0
+      ? o.keyResults.reduce((s, kr) => s + getProgress(kr.atual, kr.meta), 0) / o.keyResults.length
+      : 0
+    trimMap[t].total++
+    trimMap[t].sum += pct
+  })
+  const trimStats = Object.entries(trimMap).map(([t, v]) => ({ t, pct: Math.round(v.sum / v.total) }))
+
+  const circ = 2 * Math.PI * 32
+
+  return (
+    <div className="rounded-xl bg-white border border-gray-100 shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Dashboard de OKRs</p>
+        <p className="text-[10px] text-gray-400">
+          {okrs.length} objetivos · {totalKrs} key results · {overallProgress}% concluído
+        </p>
+      </div>
+
+      <div className="p-5 grid md:grid-cols-3 gap-6">
+
+        {/* Coluna 1 – Por objetivo */}
+        <div>
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Progresso por Objetivo</p>
+          <div className="space-y-3">
+            {objStats.map(o => {
+              const cor = catColor[o.categoria] ?? '#7B2FBE'
+              const barCor = o.pct >= 70 ? '#10B981' : o.pct >= 30 ? '#F59E0B' : cor
+              return (
+                <div key={o.id}>
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cor }} />
+                      <p className="text-[11px] text-gray-600 leading-snug" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.titulo}</p>
+                    </div>
+                    <span className="text-[11px] font-bold tabular-nums flex-shrink-0" style={{ color: barCor }}>{o.pct}%</span>
+                  </div>
+                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full" style={{ width: `${o.pct}%`, background: barCor, transition: 'width 0.5s ease' }} />
+                  </div>
+                  <p className="text-[9px] text-gray-300 mt-0.5">{o.trimestre} · {o.krs} KR{o.krs !== 1 ? 's' : ''}</p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Coluna 2 – Por categoria */}
+        <div>
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Por Categoria</p>
+          {catStats.length === 0 ? (
+            <p className="text-[11px] text-gray-300">Nenhum objetivo categorizado</p>
+          ) : (
+            <div className="space-y-4">
+              {catStats.map(c => (
+                <div key={c.cat}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full" style={{ background: c.cor }} />
+                      <p className="text-[11px] font-medium text-gray-600">{c.cat}</p>
+                    </div>
+                    <span className="text-[11px] font-bold tabular-nums" style={{ color: c.cor }}>{c.pct}%</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full" style={{ width: `${c.pct}%`, background: c.cor, transition: 'width 0.5s ease' }} />
+                  </div>
+                  <p className="text-[9px] text-gray-300 mt-0.5">{c.objs} obj · {c.krs} KR{c.krs !== 1 ? 's' : ''}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Coluna 3 – Por período + anel */}
+        <div className="flex flex-col gap-5">
+          <div>
+            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Por Período</p>
+            <div className="space-y-3">
+              {trimStats.map(ts => {
+                const cor = ts.pct >= 70 ? '#10B981' : ts.pct >= 30 ? '#F59E0B' : '#7B2FBE'
+                return (
+                  <div key={ts.t}>
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-[11px] text-gray-500">{ts.t}</p>
+                      <span className="text-[11px] font-bold tabular-nums" style={{ color: cor }}>{ts.pct}%</span>
+                    </div>
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${ts.pct}%`, background: cor, transition: 'width 0.5s ease' }} />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Anel SVG */}
+          <div className="flex flex-col items-center justify-center py-2">
+            <svg width="88" height="88" viewBox="0 0 88 88">
+              <circle cx="44" cy="44" r="36" fill="none" stroke="#F3F4F6" strokeWidth="8" />
+              <circle
+                cx="44" cy="44" r="36" fill="none"
+                stroke={overallProgress >= 70 ? '#10B981' : overallProgress >= 30 ? '#F59E0B' : '#7B2FBE'}
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={String(circ)}
+                strokeDashoffset={String(circ * (1 - overallProgress / 100))}
+                transform="rotate(-90 44 44)"
+              />
+              <text x="44" y="49" textAnchor="middle" fontSize="15" fontWeight="700" fill="#1A1916" fontFamily="system-ui">
+                {overallProgress}%
+              </text>
+            </svg>
+            <p className="text-[10px] text-gray-400 mt-1">Progresso Geral</p>
+            <p className="text-[9px] text-gray-300">{doneKrs}/{totalKrs} KRs concluídos</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
 function OkrPage() {
   const [okrs, setOkrs] = useState<Objective[]>(() => {
     try {
@@ -932,139 +1092,9 @@ function OkrPage() {
       </motion.div>
 
       {/* ── Dashboard de OKRs ── */}
-      {okrs.length > 0 && (() => {
-        // Por categoria
-        const cats = Object.keys(catColor)
-        const catStats = cats.map(cat => {
-          const objs = okrs.filter(o => o.categoria === cat)
-          const krs  = objs.flatMap(o => o.keyResults)
-          const pct  = krs.length > 0
-            ? Math.round(krs.reduce((s, kr) => s + getProgress(kr.atual, kr.meta), 0) / krs.length)
-            : 0
-          return { cat, cor: catColor[cat], objs: objs.length, krs: krs.length, pct }
-        }).filter(c => c.objs > 0)
-
-        // Por objetivo (para barra individual)
-        const objStats = okrs.map(o => {
-          const pct = o.keyResults.length > 0
-            ? Math.round(o.keyResults.reduce((s, kr) => s + getProgress(kr.atual, kr.meta), 0) / o.keyResults.length)
-            : 0
-          return { id: o.id, titulo: o.titulo.length > 50 ? o.titulo.slice(0, 50) + '…' : o.titulo, categoria: o.categoria, trimestre: o.trimestre, pct, krs: o.keyResults.length }
-        })
-
-        // Por trimestre
-        const trimMap: Record<string, { total: number; sum: number }> = {}
-        okrs.forEach(o => {
-          const t = o.trimestre ?? 'Sem período'
-          if (!trimMap[t]) trimMap[t] = { total: 0, sum: 0 }
-          const pct = o.keyResults.length > 0
-            ? o.keyResults.reduce((s, kr) => s + getProgress(kr.atual, kr.meta), 0) / o.keyResults.length
-            : 0
-          trimMap[t].total++
-          trimMap[t].sum += pct
-        })
-        const trimStats = Object.entries(trimMap).map(([t, v]) => ({ t, pct: Math.round(v.sum / v.total) }))
-
-        return (
-          <motion.div variants={fadeInUp} initial="hidden" animate="visible"
-            className="rounded-xl bg-white border border-gray-100 shadow-sm overflow-hidden"
-          >
-            <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Dashboard de OKRs</p>
-              <p className="text-[10px] text-gray-400">{okrs.length} objetivos · {totalKrs} key results · {overallProgress}% concluído</p>
-            </div>
-
-            <div className="p-5 grid md:grid-cols-3 gap-6">
-
-              {/* Coluna 1 – Progresso por objetivo */}
-              <div className="md:col-span-1">
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Progresso por Objetivo</p>
-                <div className="space-y-3">
-                  {objStats.map(o => (
-                    <div key={o.id}>
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: catColor[o.categoria] ?? '#6B7280' }} />
-                          <p className="text-[11px] text-gray-600 leading-snug truncate">{o.titulo}</p>
-                        </div>
-                        <span className="text-[11px] font-bold tabular-nums flex-shrink-0" style={{ color: o.pct >= 70 ? '#10B981' : o.pct >= 30 ? '#F59E0B' : '#6B7280' }}>{o.pct}%</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all duration-500"
-                          style={{ width: `${o.pct}%`, background: o.pct >= 70 ? '#10B981' : o.pct >= 30 ? '#F59E0B' : catColor[o.categoria] ?? '#7B2FBE' }} />
-                      </div>
-                      <p className="text-[9px] text-gray-300 mt-0.5">{o.trimestre} · {o.krs} KR{o.krs !== 1 ? 's' : ''}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Coluna 2 – Progresso por categoria */}
-              <div className="md:col-span-1">
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Por Categoria</p>
-                <div className="space-y-4">
-                  {catStats.map(c => (
-                    <div key={c.cat}>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-2 h-2 rounded-full" style={{ background: c.cor }} />
-                          <p className="text-[11px] font-medium text-gray-600">{c.cat}</p>
-                        </div>
-                        <span className="text-[11px] font-bold tabular-nums" style={{ color: c.cor }}>{c.pct}%</span>
-                      </div>
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${c.pct}%`, background: c.cor }} />
-                      </div>
-                      <p className="text-[9px] text-gray-300 mt-0.5">{c.objs} obj · {c.krs} KR{c.krs !== 1 ? 's' : ''}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Coluna 3 – Por trimestre + anel geral */}
-              <div className="md:col-span-1 flex flex-col gap-5">
-                <div>
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Por Período</p>
-                  <div className="space-y-3">
-                    {trimStats.map(ts => (
-                      <div key={ts.t}>
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="text-[11px] text-gray-500">{ts.t}</p>
-                          <span className="text-[11px] font-bold tabular-nums" style={{ color: ts.pct >= 70 ? '#10B981' : ts.pct >= 30 ? '#F59E0B' : '#6B7280' }}>{ts.pct}%</span>
-                        </div>
-                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full transition-all duration-500"
-                            style={{ width: `${ts.pct}%`, background: ts.pct >= 70 ? '#10B981' : ts.pct >= 30 ? '#F59E0B' : '#7B2FBE' }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Anel de progresso geral */}
-                <div className="flex flex-col items-center justify-center py-2">
-                  <svg width="80" height="80" viewBox="0 0 80 80">
-                    <circle cx="40" cy="40" r="32" fill="none" stroke="#F3F4F6" strokeWidth="8" />
-                    <circle cx="40" cy="40" r="32" fill="none"
-                      stroke={overallProgress >= 70 ? '#10B981' : overallProgress >= 30 ? '#F59E0B' : '#7B2FBE'}
-                      strokeWidth="8"
-                      strokeLinecap="round"
-                      strokeDasharray={`${2 * Math.PI * 32}`}
-                      strokeDashoffset={`${2 * Math.PI * 32 * (1 - overallProgress / 100)}`}
-                      transform="rotate(-90 40 40)"
-                      style={{ transition: 'stroke-dashoffset 0.6s ease' }}
-                    />
-                    <text x="40" y="44" textAnchor="middle" fontSize="14" fontWeight="700" fill="#1A1916">{overallProgress}%</text>
-                  </svg>
-                  <p className="text-[10px] text-gray-400 mt-1">Progresso Geral</p>
-                  <p className="text-[9px] text-gray-300">{doneKrs} de {totalKrs} KRs concluídos</p>
-                </div>
-              </div>
-
-            </div>
-          </motion.div>
-        )
-      })()}
+      {okrs.length > 0 && (
+        <OkrDashboard okrs={okrs} totalKrs={totalKrs} doneKrs={doneKrs} overallProgress={overallProgress} />
+      )}
 
       {/* Sugestões baseadas na identidade */}
       <SugestoesDeOkr onAddOkr={(obj) => setOkrs(prev => [...prev, obj])} />
