@@ -7,7 +7,7 @@ import {
   Target, Calendar, BarChart2, Sparkles, CheckCircle2,
   Plus, BookOpen, ClipboardList, TrendingUp,
   ChevronRight, Award, Zap, Layers, Pencil, X, Trash2,
-  Megaphone, AlertCircle, XCircle, Circle, Filter,
+  Megaphone, AlertCircle, XCircle, Circle, Filter, Rocket,
 } from 'lucide-react'
 import { fadeInUp } from '@/lib/motion'
 import { mockMembers } from '@/lib/mocks/members'
@@ -88,28 +88,63 @@ const RODRIGO_IDENTIDADE_SEED = {
   ],
 }
 
+// v2 — estrutura trimestral (20/08/26)
+const RODRIGO_OKR_SEED_V = 'v2'
+
 const RODRIGO_OKR_SEED: OkrObj[] = [
+  // ── ANUAL: Faturamento ──────────────────────────────────────────────
   {
-    id: 'seed-r-o1', titulo: 'FATURAMENTO DE 2.380.000 MILHÕES', categoria: 'Receita', trimestre: 'Q3 2026',
+    id: 'seed-r-anual-fat', titulo: 'FATURAMENTO ANUAL: R$ 2.380.000', categoria: 'Receita', trimestre: 'Anual 2026',
     keyResults: [
-      { id: 'seed-r-kr1', descricao: 'ATINGIR 360.000 DE FATURAMENTO EM BILHETERIA NA IMERSÃO EM VENDAS NOVAS', meta: 360000, atual: 0,     unit: 'R$' },
-      { id: 'seed-r-kr2', descricao: 'ATINGIR 1440.000 EM VENDA DE CONSELHOS CONSULTIVOS',                       meta: 1440000, atual: 15000, unit: 'R$' },
-      { id: 'seed-r-kr3', descricao: 'ATINGIR 180 MIL EM TECNOLOGIA PRÓPRIA',                                    meta: 180000, atual: 0,     unit: 'R$' },
-      { id: 'seed-r-kr4', descricao: 'ATINGIR 400 MIL REAIS EM PATROCINIO',                                      meta: 400000, atual: 6000,  unit: 'R$' },
+      { id: 'seed-r-kr1', descricao: 'Consultoria (projetos de mentoria e conselhos consultivos)',  meta: 1440000, atual: 15000, unit: 'R$' },
+      { id: 'seed-r-kr2', descricao: 'Bilheteria de Imersões (Geração Harmônica e novas)',          meta: 360000,  atual: 0,     unit: 'R$' },
+      { id: 'seed-r-kr3', descricao: 'Patrocínio',                                                  meta: 400000,  atual: 6000,  unit: 'R$' },
+      { id: 'seed-r-kr4', descricao: 'Tecnologia Própria',                                          meta: 180000,  atual: 0,     unit: 'R$' },
     ],
   },
+  // ── ANUAL: Alcance & Visibilidade ───────────────────────────────────
   {
-    id: 'seed-r-o2', titulo: 'ESTRUTURA DE FAMILY OFFICE PROFISSIONAL', categoria: 'Produto', trimestre: 'Q3 2026',
-    keyResults: [],
-  },
-  {
-    id: 'seed-r-o3', titulo: 'RELEVÂNCIA ESTADUAL', categoria: 'Alcance', trimestre: 'Q3 2026',
+    id: 'seed-r-anual-alc', titulo: 'RELEVÂNCIA ESTADUAL 2026', categoria: 'Alcance', trimestre: 'Anual 2026',
     keyResults: [
-      { id: 'seed-r-kr5', descricao: '3 EVENTOS TOPO DE FUNIL UTILIZANDO A BASE ROMAZI',                    meta: 3,     atual: 0,   unit: 'eventos'    },
-      { id: 'seed-r-kr6', descricao: '10 MIL SEGUIDORES NAS REDES SOCIAIS',                                meta: 10000, atual: 930, unit: 'seguidores'  },
-      { id: 'seed-r-kr7', descricao: '10 PALESTRAS OU PAINÉS FEITAS EM PUBLICO ACIMA DE 100 PESSOAS',      meta: 10,    atual: 1,   unit: 'palestras'   },
+      { id: 'seed-r-kr6', descricao: '10.000 seguidores nas redes sociais',                              meta: 10000, atual: 930, unit: 'seguidores' },
+      { id: 'seed-r-kr7', descricao: '10 palestras ou painéis (público acima de 100 pessoas)',            meta: 10,    atual: 1,   unit: 'palestras'  },
     ],
   },
+  // ── Q2: 20/08 → 20/11/2026 ─────────────────────────────────────────
+  {
+    id: 'seed-r-q2', titulo: 'Q2 · CONVERSÃO E VOLUME', categoria: 'Produto', trimestre: 'Q2: 20/08 – 20/11/26',
+    keyResults: [
+      { id: 'seed-r-q2-kr1', descricao: '2 palestras realizadas no trimestre',                            meta: 2,  atual: 0, unit: 'palestras' },
+      { id: 'seed-r-q2-kr2', descricao: '3 eventos Topo de Geração realizados',                           meta: 3,  atual: 0, unit: 'eventos'   },
+      { id: 'seed-r-q2-kr3', descricao: '9 projetos de mentoria fechados (via Topo de Geração)',          meta: 9,  atual: 0, unit: 'projetos'  },
+      { id: 'seed-r-q2-kr4', descricao: '20% de conversão dos eventos Topo de Geração em projetos',      meta: 20, atual: 0, unit: '%'         },
+    ],
+  },
+  // ── Q3: 21/11/2026 → 21/02/2027 ────────────────────────────────────
+  {
+    id: 'seed-r-q3', titulo: 'Q3 · IMERSÃO E PALCO', categoria: 'Alcance', trimestre: 'Q3: 21/11/26 – 21/02/27',
+    keyResults: [
+      { id: 'seed-r-q3-kr1', descricao: '4 palestras realizadas no trimestre', meta: 4, atual: 0, unit: 'palestras' },
+      { id: 'seed-r-q3-kr2', descricao: '3 imersões realizadas',               meta: 3, atual: 0, unit: 'imersões'  },
+    ],
+  },
+  // ── Q4: 22/02/2027 → 22/05/2027 ────────────────────────────────────
+  {
+    id: 'seed-r-q4', titulo: 'Q4 · CONSOLIDAÇÃO', categoria: 'Alcance', trimestre: 'Q4: 22/02/27 – 22/05/27',
+    keyResults: [
+      { id: 'seed-r-q4-kr1', descricao: '4 palestras realizadas no trimestre', meta: 4, atual: 0, unit: 'palestras' },
+      { id: 'seed-r-q4-kr2', descricao: '3 imersões realizadas',               meta: 3, atual: 0, unit: 'imersões'  },
+    ],
+  },
+]
+
+// Estratégias de execução por trimestre para o Rodrigo
+const RODRIGO_Q2_ESTRATEGIA = [
+  { titulo: 'Agenda semanal de prospecção',      detalhe: 'Reservar 2h todo terça-feira para contato direto com empresas familiares: ligação, e-mail ou mensagem de LinkedIn para ex-alunos de palestras.' },
+  { titulo: 'Ritual de pré-evento',              detalhe: 'Para cada Topo de Geração: listar 50 contatados 2 semanas antes, fazer follow-up pessoal 72h antes do evento e enviar proposta de projeto até 48h após.' },
+  { titulo: 'Meta diária de conexão',            detalhe: '3 novas conexões qualificadas por dia no LinkedIn ou WhatsApp — sucessores, líderes e gestores de empresas familiares.' },
+  { titulo: 'Pipeline de conversão',             detalhe: 'Dos 3 eventos: cada um deve gerar pelo menos 3 projetos (9 total). Acompanhar pipeline no CRM ou planilha com etapa, data de proposta e próximo passo.' },
+  { titulo: 'Divulgar a imersão Geração Harmônica', detalhe: 'Encaminhamento imediato: publicar conteúdo sobre a imersão nas redes, enviar convite para a base Romazi e acionar parceiros para cocriação de divulgação.' },
 ]
 function mktKeyFor(id: string)  { return id === 'member-3' ? MARKETING_KEY  : `${MARKETING_KEY}_${id}` }
 function kpiKeyFor(id: string)  { return id === 'member-3' ? KPI_KEY        : `${KPI_KEY}_${id}` }
@@ -411,7 +446,17 @@ function MembrosPage() {
   const [controls, setControls] = useState<Record<string, MenteeControls>>(() => {
     try {
       const saved: Record<string, Partial<MenteeControls>> = JSON.parse(localStorage.getItem(MENTOR_CONTROLS_KEY) ?? 'null') ?? {}
-      return Object.fromEntries(mockMembers.map(m => [m.id, { ...makeDefault(), ...saved[m.id] }]))
+      const result = Object.fromEntries(mockMembers.map(m => [m.id, { ...makeDefault(), ...saved[m.id] }]))
+      // Semear encaminhamento inicial do Rodrigo se ainda não existir
+      const r4 = result['member-4']
+      const jaTemGeracaoHarmonica = r4?.nextSteps?.some(s => s.texto.toLowerCase().includes('geração harmônica'))
+      if (r4 && !jaTemGeracaoHarmonica) {
+        r4.nextSteps = [
+          { id: 'enc-rodrigo-001', texto: 'Divulgar a imersão Geração Harmônica (redes, base Romazi, parceiros)', done: false },
+          ...(r4.nextSteps ?? []),
+        ]
+      }
+      return result
     } catch {
       return Object.fromEntries(mockMembers.map(m => [m.id, makeDefault()]))
     }
@@ -421,9 +466,14 @@ function MembrosPage() {
   // Per-member data maps (each member has isolated localStorage)
   const [okrMap, setOkrMap] = useState<Record<string, OkrObj[]>>(() => {
     const map = Object.fromEntries(mockMembers.map(m => [m.id, loadOkrsFor(m.id)]))
-    if (!map['member-4'] || map['member-4'].length === 0) {
+    // Re-seed Rodrigo se não tiver a estrutura trimestral v2
+    const hasNewStructure = (map['member-4'] ?? []).some(o => o.id === 'seed-r-q2')
+    if (!hasNewStructure) {
       map['member-4'] = RODRIGO_OKR_SEED
-      try { localStorage.setItem(okrKeyFor('member-4'), JSON.stringify(RODRIGO_OKR_SEED)) } catch {}
+      try {
+        localStorage.setItem(okrKeyFor('member-4'), JSON.stringify(RODRIGO_OKR_SEED))
+        localStorage.setItem('rodrigo_okr_seed_version', RODRIGO_OKR_SEED_V)
+      } catch {}
     }
     // Seed Rodrigo's identidade if empty
     const idKey = idKeyFor('member-4')
@@ -1012,6 +1062,34 @@ function MembrosPage() {
                                       </span>
                                     ))}
                                   </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Encaminhamentos pendentes na visão geral */}
+                            {ctrl.nextSteps.filter(s => !s.done).length > 0 && (
+                              <div className="bg-white border border-[#C5A880]/30">
+                                <div className="flex items-center justify-between px-4 py-3 border-b border-[#C5A880]/20 bg-[#C5A880]/5">
+                                  <div className="flex items-center gap-2">
+                                    <ClipboardList size={12} className="text-[#C5A880]" />
+                                    <SectionLabel>Encaminhamentos Pendentes</SectionLabel>
+                                  </div>
+                                  <button onClick={() => upd(member.id, { activeTab: 'sessao' })}
+                                    className="text-[9px] font-bold text-[#C5A880] uppercase tracking-wider hover:underline mb-3 flex items-center gap-1">
+                                    Ver Sessão <ChevronRight size={9} />
+                                  </button>
+                                </div>
+                                <div className="divide-y divide-gray-100">
+                                  {ctrl.nextSteps.filter(s => !s.done).map(step => (
+                                    <div key={step.id} className="flex items-center gap-3 px-4 py-2.5">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-[#C5A880] flex-shrink-0" />
+                                      <p className="text-xs text-gray-700 flex-1">{step.texto}</p>
+                                      <button onClick={() => toggleStep(member.id, step.id)}
+                                        className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider hover:underline flex-shrink-0">
+                                        Feito
+                                      </button>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
                             )}
@@ -1848,11 +1926,93 @@ function MembrosPage() {
                         {ctrl.activeTab === 'sessao' && (
                           <div className="space-y-4">
 
+                            {/* ── Encaminhamentos Pendentes (topo) ── */}
+                            {ctrl.nextSteps.some(s => !s.done) && (
+                              <div className="bg-white border-2 border-[#C5A880]/30">
+                                <div className="flex items-center justify-between px-4 py-3 border-b border-[#C5A880]/20 bg-[#C5A880]/5">
+                                  <div className="flex items-center gap-2">
+                                    <ClipboardList size={12} className="text-[#C5A880]" />
+                                    <SectionLabel>Encaminhamentos Pendentes · Sessão Anterior</SectionLabel>
+                                  </div>
+                                  <span className="text-[9px] font-bold text-[#C5A880] border border-[#C5A880]/30 px-2 py-0.5">
+                                    {ctrl.nextSteps.filter(s => !s.done).length} pendente{ctrl.nextSteps.filter(s => !s.done).length !== 1 ? 's' : ''}
+                                  </span>
+                                </div>
+                                <div className="p-4 space-y-2">
+                                  {ctrl.nextSteps.filter(s => !s.done).map(step => (
+                                    <div key={step.id} className="flex items-center gap-3 py-1 border-l-2 border-[#C5A880]/30 pl-3">
+                                      <button onClick={() => toggleStep(member.id, step.id)}
+                                        className="w-4 h-4 border-2 border-[#C5A880]/50 flex items-center justify-center flex-shrink-0 hover:border-[#C5A880] transition-all">
+                                      </button>
+                                      <p className="text-sm text-gray-800 flex-1 font-medium">{step.texto}</p>
+                                      <button onClick={() => toggleStep(member.id, step.id)}
+                                        className="text-[9px] font-bold text-[#C5A880] uppercase tracking-wider hover:underline flex-shrink-0">
+                                        Concluir
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* ── Progresso rápido dos OKRs ── */}
+                            {okrs.length > 0 && (
+                              <div className="bg-white border border-gray-200">
+                                <div className="px-4 py-3 border-b border-gray-100">
+                                  <SectionLabel>Progresso Trimestral · OKRs</SectionLabel>
+                                </div>
+                                <div className="divide-y divide-gray-100">
+                                  {okrs.map(okr => {
+                                    const krsArr = okr.keyResults ?? []
+                                    const avgPct = krsArr.length > 0
+                                      ? Math.round(krsArr.reduce((sum, kr) => sum + (kr.meta > 0 ? Math.min((kr.atual/kr.meta)*100, 100) : 0), 0) / krsArr.length)
+                                      : 0
+                                    const cor = CATEGORIA_COLORS[okr.categoria] ?? '#C5A880'
+                                    return (
+                                      <div key={okr.id} className="px-4 py-2.5 flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: cor }} />
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-[11px] font-bold text-gray-800 truncate">{okr.titulo}</p>
+                                          {okr.trimestre && <p className="text-[9px] text-gray-400">{okr.trimestre}</p>}
+                                        </div>
+                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                          <div className="w-20 h-1.5 bg-gray-100">
+                                            <div className="h-full transition-all" style={{ width: `${avgPct}%`, background: avgPct >= 70 ? '#10B981' : avgPct >= 40 ? '#F59E0B' : cor }} />
+                                          </div>
+                                          <span className="text-[10px] font-bold tabular-nums w-8 text-right" style={{ color: avgPct >= 70 ? '#10B981' : avgPct >= 40 ? '#F59E0B' : '#9CA3AF' }}>
+                                            {avgPct}%
+                                          </span>
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* ── Estratégia Q2 (Rodrigo) ── */}
+                            {member.id === 'member-4' && (
+                              <div className="bg-white border border-gray-200">
+                                <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
+                                  <Rocket size={12} className="text-[#C5A880]" />
+                                  <SectionLabel>Estratégia Q2 · Como atingir as metas</SectionLabel>
+                                </div>
+                                <div className="divide-y divide-gray-100">
+                                  {RODRIGO_Q2_ESTRATEGIA.map((e, i) => (
+                                    <div key={i} className="px-4 py-3 border-l-2 ml-4 my-1 mr-4" style={{ borderColor: '#C5A880', marginLeft: '1rem' }}>
+                                      <p className="text-[11px] font-bold text-gray-800 mb-1">{e.titulo}</p>
+                                      <p className="text-[11px] text-gray-500 leading-relaxed">{e.detalhe}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
                             {/* Pauta sugerida */}
                             <div className="bg-white border border-gray-200">
                               <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
                                 <Sparkles size={12} className="text-[#C5A880]" />
-                                <SectionLabel>Pauta Sugerida para Próxima Sessão</SectionLabel>
+                                <SectionLabel>Pauta Sugerida para Esta Sessão</SectionLabel>
                               </div>
                               <div className="p-4 space-y-2">
                                 {BLOCOS.filter(b => {
@@ -1912,14 +2072,19 @@ function MembrosPage() {
                               </div>
                             </div>
 
-                            {/* Próximos passos */}
+                            {/* Encaminhamentos da Sessão */}
                             <div className="bg-white border border-gray-200">
-                              <div className="px-4 py-3 border-b border-gray-100">
-                                <SectionLabel>Próximos Passos</SectionLabel>
+                              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                                <SectionLabel>Encaminhamentos desta Sessão</SectionLabel>
+                                {ctrl.nextSteps.filter(s => s.done).length > 0 && (
+                                  <span className="text-[9px] font-bold text-emerald-600 border border-emerald-200 px-2 py-0.5 mb-3">
+                                    {ctrl.nextSteps.filter(s => s.done).length} concluído{ctrl.nextSteps.filter(s => s.done).length !== 1 ? 's' : ''}
+                                  </span>
+                                )}
                               </div>
                               <div className="p-4 space-y-2 mb-2">
                                 {ctrl.nextSteps.length === 0 && (
-                                  <p className="text-xs text-gray-300 italic">Nenhum próximo passo definido ainda.</p>
+                                  <p className="text-xs text-gray-300 italic">Nenhum encaminhamento definido ainda.</p>
                                 )}
                                 {ctrl.nextSteps.map(step => (
                                   <div key={step.id} className="flex items-center gap-3">
@@ -1939,14 +2104,15 @@ function MembrosPage() {
                                   value={ctrl.newStepInput}
                                   onChange={e => upd(member.id, { newStepInput: e.target.value })}
                                   onKeyDown={e => e.key === 'Enter' && addNextStep(member.id)}
-                                  placeholder="Adicionar próximo passo..."
+                                  placeholder="Registrar encaminhamento da reunião..."
                                   className="flex-1 bg-gray-50 border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-[#C5A880] transition-colors"
                                 />
                                 <button onClick={() => addNextStep(member.id)}
-                                  className="w-9 h-9 bg-[#C5A880] flex items-center justify-center text-white hover:bg-[#6a27a5] transition-colors flex-shrink-0">
+                                  className="w-9 h-9 bg-[#C5A880] flex items-center justify-center text-white hover:bg-[#A88B62] transition-colors flex-shrink-0">
                                   <Plus size={14} />
                                 </button>
                               </div>
+                              <p className="text-[9px] text-gray-400 px-4 pb-3">Encaminhamentos pendentes aparecem no topo da próxima sessão.</p>
                             </div>
 
                           </div>
