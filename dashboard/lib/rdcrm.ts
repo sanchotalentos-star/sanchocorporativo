@@ -138,37 +138,21 @@ export async function getActiveDeals(): Promise<Deal[]> {
 }
 
 /**
- * Busca todos os negócios GANHOS no ano corrente, paginando até o fim.
- * Busca com win=true sem filtro de data (a API do RD CRM não suporta
- * start_date/end_date combinado com win=true de forma confiável) e
- * filtra o ano corrente client-side via updated_at ou created_at.
+ * Busca todos os negócios GANHOS no ano corrente.
+ * A API do RD CRM v1 não filtra por win=true de forma confiável,
+ * então buscamos todos os deals (sem filtro) e filtramos client-side.
  */
 export async function getWonDealsYTD(): Promise<Deal[]> {
-  const ano      = new Date().getFullYear();
-  const pageSize = 50;
-  const allDeals: Deal[] = [];
+  const ano  = new Date().getFullYear();
+  // Reutiliza getDeals() — busca até 200 negociações (todas, sem filtro win)
+  const all  = await getDeals(200);
 
-  for (let page = 1; page <= 20; page++) {           // max 1000 registros
-    let response: z.infer<typeof DealsResponseSchema>;
-    try {
-      response = await rdFetch("/deals", DealsResponseSchema, {
-        page,
-        limit: pageSize,
-        win:   "true",
-      });
-    } catch {
-      break;
-    }
-
-    allDeals.push(...response.deals);
-    if (!response.has_more || response.deals.length === 0) break;
-  }
-
-  // Filtra: só deals realmente ganhos E com data de referência no ano corrente
-  return allDeals.filter((d) => {
+  return all.filter((d) => {
+    // Só negócios marcados como ganhos
     if (d.win !== true) return false;
+    // Filtra pelo ano corrente via updated_at ou created_at
     const ref = d.updated_at ?? d.created_at;
-    if (!ref) return true; // sem data → inclui (não descarta)
+    if (!ref) return true; // sem data → inclui
     return ref.startsWith(String(ano));
   });
 }
