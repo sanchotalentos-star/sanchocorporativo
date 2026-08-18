@@ -139,13 +139,12 @@ export async function getActiveDeals(): Promise<Deal[]> {
 
 /**
  * Busca todos os negócios GANHOS no ano corrente, paginando até o fim.
- * Usa win=true + start_date/end_date do ano atual.
+ * Busca com win=true sem filtro de data (a API do RD CRM não suporta
+ * start_date/end_date combinado com win=true de forma confiável) e
+ * filtra o ano corrente client-side via updated_at ou created_at.
  */
 export async function getWonDealsYTD(): Promise<Deal[]> {
-  const ano       = new Date().getFullYear();
-  const startDate = `${ano}-01-01`;
-  const endDate   = `${ano}-12-31`;
-
+  const ano      = new Date().getFullYear();
   const pageSize = 50;
   const allDeals: Deal[] = [];
 
@@ -154,10 +153,8 @@ export async function getWonDealsYTD(): Promise<Deal[]> {
     try {
       response = await rdFetch("/deals", DealsResponseSchema, {
         page,
-        limit:      pageSize,
-        win:        "true",
-        start_date: startDate,
-        end_date:   endDate,
+        limit: pageSize,
+        win:   "true",
       });
     } catch {
       break;
@@ -167,8 +164,13 @@ export async function getWonDealsYTD(): Promise<Deal[]> {
     if (!response.has_more || response.deals.length === 0) break;
   }
 
-  // Filtra defensivamente: garante que só vêm negócios realmente ganhos
-  return allDeals.filter((d) => d.win === true);
+  // Filtra: só deals realmente ganhos E com data de referência no ano corrente
+  return allDeals.filter((d) => {
+    if (d.win !== true) return false;
+    const ref = d.updated_at ?? d.created_at;
+    if (!ref) return true; // sem data → inclui (não descarta)
+    return ref.startsWith(String(ano));
+  });
 }
 
 // ─── Endpoint: Stages ─────────────────────────────────────────────────────────
