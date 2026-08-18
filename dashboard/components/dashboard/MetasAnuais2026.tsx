@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { TrendingUp, Star, Repeat2, Users } from "lucide-react";
 import type { ConquistasRow } from "@/app/api/conquistas/route";
+import type { YtdResponse }   from "@/app/api/rd-crm/ytd/route";
 
 // ── Dados estáticos 2026 ─────────────────────────────────────────────────────
 
@@ -99,18 +100,31 @@ const EMPTY: ConquistasRow = {
 
 export function MetasAnuais2026() {
   const [conquistas, setConquistas] = useState<ConquistasRow>(EMPTY);
+  const [ytdCrm,     setYtdCrm]     = useState<number>(0);
   const [loading,    setLoading]    = useState(true);
+  const [loadingCrm, setLoadingCrm] = useState(true);
 
   useEffect(() => {
+    // Conquistas manuais (contadores estratégicos)
     fetch("/api/conquistas")
       .then((r) => r.json())
       .then((d: ConquistasRow) => setConquistas(d))
       .catch(() => null)
       .finally(() => setLoading(false));
+
+    // YTD real do CRM (negócios ganhos)
+    fetch("/api/rd-crm/ytd")
+      .then((r) => r.json())
+      .then((d: YtdResponse) => setYtdCrm(d.ytd))
+      .catch(() => null)
+      .finally(() => setLoadingCrm(false));
   }, []);
 
-  const ytd     = conquistas.faturamento_ytd;
+  // Usa CRM como fonte primária do YTD financeiro;
+  // cai no campo manual (faturamento_ytd) se CRM retornar zero
+  const ytd     = ytdCrm > 0 ? ytdCrm : conquistas.faturamento_ytd;
   const ytdPct  = pct(ytd, META_ANUAL);
+  const anyLoading = loading || loadingCrm;
 
   return (
     <div
@@ -148,10 +162,10 @@ export function MetasAnuais2026() {
               className="text-2xl font-black tabular-nums"
               style={{ color: ytdPct >= 100 ? "#10B981" : "var(--sancho-pink)", lineHeight: 1 }}
             >
-              {loading ? "—" : fmtBRL(ytd)}
+              {anyLoading ? "—" : fmtBRL(ytd)}
             </div>
             <div className="text-[10px] mt-0.5" style={{ color: "var(--sancho-gray-mid)" }}>
-              de {fmtBRL(META_ANUAL)} · {loading ? "…" : `${ytdPct.toFixed(1)}%`}
+              de {fmtBRL(META_ANUAL)} · {anyLoading ? "…" : `${ytdPct.toFixed(1)}%`}
             </div>
           </div>
         </div>

@@ -137,6 +137,40 @@ export async function getActiveDeals(): Promise<Deal[]> {
   return deals.filter((d) => !d.win && !d.hold);
 }
 
+/**
+ * Busca todos os negócios GANHOS no ano corrente, paginando até o fim.
+ * Usa win=true + start_date/end_date do ano atual.
+ */
+export async function getWonDealsYTD(): Promise<Deal[]> {
+  const ano       = new Date().getFullYear();
+  const startDate = `${ano}-01-01`;
+  const endDate   = `${ano}-12-31`;
+
+  const pageSize = 50;
+  const allDeals: Deal[] = [];
+
+  for (let page = 1; page <= 20; page++) {           // max 1000 registros
+    let response: z.infer<typeof DealsResponseSchema>;
+    try {
+      response = await rdFetch("/deals", DealsResponseSchema, {
+        page,
+        limit:      pageSize,
+        win:        "true",
+        start_date: startDate,
+        end_date:   endDate,
+      });
+    } catch {
+      break;
+    }
+
+    allDeals.push(...response.deals);
+    if (!response.has_more || response.deals.length === 0) break;
+  }
+
+  // Filtra defensivamente: garante que só vêm negócios realmente ganhos
+  return allDeals.filter((d) => d.win === true);
+}
+
 // ─── Endpoint: Stages ─────────────────────────────────────────────────────────
 
 const StagesResponseSchema = z.object({

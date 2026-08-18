@@ -1,10 +1,13 @@
 // app/api/visao-anual/route.ts
 // Retorna meta + realizado para cada mês do ano corrente (2026)
-// Cruza metas_mensais (meta definida) com historico_mes (resultado real)
+// Cruza metas_mensais (meta definida) com historico_mes (resultado real manual)
+// e complementa com dados do RD Station CRM (deals ganhos) quando não há registro manual
 
-import { NextResponse } from "next/server";
-import { db }           from "@/lib/supabase-server";
-import { METAS_MENSAIS } from "@/config/metas";
+import { NextResponse }   from "next/server";
+import { db }             from "@/lib/supabase-server";
+import { METAS_MENSAIS }  from "@/config/metas";
+import { getWonDealsYTD } from "@/lib/rdcrm";
+import type { Deal }      from "@/lib/rdcrm";
 
 const META_ANUAL = 2_000_000;
 
@@ -15,6 +18,7 @@ export interface MesRow {
   realizado:  number;
   isFuture:   boolean;
   isCurrent:  boolean;
+  fonte:      "manual" | "crm" | "vazio";   // origem do valor realizado
 }
 
 export interface VisaoAnualData {
@@ -51,16 +55,31 @@ export async function GET() {
       realizado: 0,
       isFuture:  i > mesAtual,
       isCurrent: i === mesAtual,
+      fonte:     "vazio" as const,
     })),
   });
+
+  // Helper: agrega deals ganhos por mês usando updated_at
+  function crmPorMes(deals: Deal[]): Record<string, number> {
+    const map: Record<string, number> = {};
+    for (const d of deals) {
+      const ref = d.updated_at ?? d.created_at;
+      if (!ref) continue;
+      const key = ref.slice(0, 7);
+      if (!key.startsWith(String(ano))) continue;
+      const valor = (d.amount_montly ?? 0) + (d.amount_unique ?? 0) + (d.amount_recurrent ?? 0);
+      map[key] = (map[key] ?? 0) + valor;
+    }
+    return map;
+  }
 
   try {
     const client = db();
     const inicioAno = `${ano}-01-01`;
     const fimAno    = `${ano}-12-31`;
 
-    // Busca metas mensais e histórico em paralelo
-    const [{ data: metas }, { data: historico }] = await Promise.all([
+    // Busca metas mensais, histórico manual e deals ganhos CRM em paralelo
+    const [{ data: metas }, { data: historico }, wonDeals] = await Promise.all([
       client
         .from("metas_mensais")
         .select("mes, palestras_valor, apresentacoes_valor, publicidades_valor")
@@ -71,6 +90,7 @@ export async function GET() {
         .select("mes, faturamento_palestras, faturamento_apresentacoes, faturamento_publicidades")
         .gte("mes", inicioAno)
         .lte("mes", fimAno),
+      getWonDealsYTD().catch(() => []),   // silencia falha do CRM
     ]);
 
     // Indexa por mês (ex: "2026-08")
@@ -82,24 +102,44 @@ export async function GET() {
                    + Number(m.publicidades_valor ?? 0);
     }
 
-    const realizadoMap: Record<string, number> = {};
+    // Histórico manual (verdade do usuário)
+    const manualMap: Record<string, number> = {};
     for (const h of historico ?? []) {
       const key = String(h.mes).slice(0, 7);
-      realizadoMap[key] = Number(h.faturamento_palestras     ?? 0)
-                        + Number(h.faturamento_apresentacoes ?? 0)
-                        + Number(h.faturamento_publicidades  ?? 0);
+      manualMap[key] = Number(h.faturamento_palestras     ?? 0)
+                     + Number(h.faturamento_apresentacoes ?? 0)
+                     + Number(h.faturamento_publicidades  ?? 0);
     }
+
+    // CRM — usado quando não há registro manual para o mês
+    const crmMap = crmPorMes(wonDeals);
 
     const meses: MesRow[] = LABELS.map((label, i) => {
       const key  = `${ano}-${String(i + 1).padStart(2, "0")}`;
       const meta = metaMap[key] ?? defaultMeta;
+
+      let realizado: number;
+      let fonte: MesRow["fonte"];
+
+      if (key in manualMap) {
+        realizado = manualMap[key];
+        fonte     = "manual";
+      } else if (key in crmMap) {
+        realizado = crmMap[key];
+        fonte     = "crm";
+      } else {
+        realizado = 0;
+        fonte     = "vazio";
+      }
+
       return {
-        mes:       key,
+        mes:  key,
         label,
         meta,
-        realizado: realizadoMap[key] ?? 0,
+        realizado,
         isFuture:  i > mesAtual,
         isCurrent: i === mesAtual,
+        fonte,
       };
     });
 

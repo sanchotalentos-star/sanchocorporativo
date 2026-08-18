@@ -75,12 +75,26 @@ function MesLinha({ row, acumulado, metaAnual }: { row: MesRow; acumulado: numbe
 
       {/* Realizado */}
       <td className="py-2 px-3 text-right whitespace-nowrap">
-        <span
-          className="text-xs font-bold tabular-nums"
-          style={{ color: row.isFuture ? "rgba(255,255,255,0.15)" : textColor }}
-        >
-          {row.isFuture ? "—" : fmt(row.realizado)}
-        </span>
+        <div className="flex items-center justify-end gap-1.5">
+          {!row.isFuture && row.fonte === "crm" && (
+            <span
+              className="text-[9px] font-semibold px-1 py-0.5 rounded"
+              style={{
+                backgroundColor: "rgba(233,30,140,0.12)",
+                color:           "var(--sancho-pink)",
+              }}
+              title="Valor vindo do RD Station CRM"
+            >
+              CRM
+            </span>
+          )}
+          <span
+            className="text-xs font-bold tabular-nums"
+            style={{ color: row.isFuture ? "rgba(255,255,255,0.15)" : textColor }}
+          >
+            {row.isFuture ? "—" : fmt(row.realizado)}
+          </span>
+        </div>
       </td>
 
       {/* Barra + % */}
