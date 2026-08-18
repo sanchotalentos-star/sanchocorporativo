@@ -27,6 +27,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" className={`${inter.variable} ${blackHanSans.variable}`}>
+      <head>
+        {/* Aplica o tema salvo antes da hidratação para evitar flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('sancho-theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body className={inter.className}>
         {children}
       </body>

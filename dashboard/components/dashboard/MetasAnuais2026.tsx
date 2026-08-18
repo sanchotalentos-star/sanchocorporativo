@@ -52,7 +52,7 @@ function ProgressBar({
   return (
     <div
       className="w-full rounded-full overflow-hidden"
-      style={{ height: thin ? 3 : 5, backgroundColor: "rgba(255,255,255,0.07)" }}
+      style={{ height: thin ? 3 : 5, backgroundColor: "var(--card-bg-input)" }}
     >
       <div
         className="h-full rounded-full transition-all duration-700"
@@ -130,15 +130,15 @@ export function MetasAnuais2026() {
     <div
       className="rounded-2xl overflow-hidden"
       style={{
-        background: "rgba(255,255,255,0.025)",
-        border:     "1px solid rgba(255,255,255,0.07)",
+        background: "var(--card-bg)",
+        border:     "1px solid var(--card-border)",
       }}
     >
 
       {/* ── Barra de progresso anual — destaque máximo ──────────────── */}
       <div
         className="px-5 py-5 border-b"
-        style={{ borderColor: "rgba(255,255,255,0.07)" }}
+        style={{ borderColor: "var(--card-border)" }}
       >
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
@@ -173,7 +173,7 @@ export function MetasAnuais2026() {
         {/* Barra principal */}
         <div
           className="w-full rounded-full overflow-hidden mb-1.5"
-          style={{ height: 8, backgroundColor: "rgba(255,255,255,0.08)" }}
+          style={{ height: 8, backgroundColor: "var(--card-bg-input)" }}
         >
           <div
             className="h-full rounded-full transition-all duration-700"
@@ -185,7 +185,7 @@ export function MetasAnuais2026() {
             }}
           />
         </div>
-        <div className="flex justify-between text-[10px]" style={{ color: "rgba(255,255,255,0.2)" }}>
+        <div className="flex justify-between text-[10px]" style={{ color: "var(--text-ghost)" }}>
           <span>Jan 2026</span>
           <span>Meta: R$ 2.000.000</span>
           <span>Dez 2026</span>
@@ -195,13 +195,13 @@ export function MetasAnuais2026() {
       {/* ── Grade: Agentes | Conquistas ─────────────────────────────── */}
       <div
         className="grid grid-cols-1 md:grid-cols-2"
-        style={{ borderColor: "rgba(255,255,255,0.07)" }}
+        style={{ borderColor: "var(--card-border)" }}
       >
 
         {/* Coluna esquerda — por agenciado */}
         <div
           className="px-5 py-4 space-y-3 border-b md:border-b-0 md:border-r"
-          style={{ borderColor: "rgba(255,255,255,0.07)" }}
+          style={{ borderColor: "var(--card-border)" }}
         >
           <p
             className="text-[10px] font-semibold uppercase tracking-widest mb-3"
@@ -220,7 +220,7 @@ export function MetasAnuais2026() {
                 </span>
                 <span
                   className="text-xs font-bold tabular-nums flex-shrink-0"
-                  style={{ color: a.destaque ? "var(--sancho-pink)" : "rgba(255,255,255,0.3)" }}
+                  style={{ color: a.destaque ? "var(--sancho-pink)" : "var(--text-dim)" }}
                 >
                   {fmtBRL(a.meta)}
                 </span>
@@ -228,7 +228,7 @@ export function MetasAnuais2026() {
               <ProgressBar
                 value={a.meta}
                 max={META_ANUAL}
-                color={a.destaque ? "var(--sancho-pink)" : "rgba(255,255,255,0.15)"}
+                color={a.destaque ? "var(--sancho-pink)" : "var(--text-faint)"}
                 thin
               />
             </div>
@@ -323,7 +323,7 @@ export function MetasAnuais2026() {
           {/* Aviso de edição */}
           <p
             className="text-[10px] mt-5 pt-4 border-t"
-            style={{ color: "rgba(255,255,255,0.2)", borderColor: "rgba(255,255,255,0.06)" }}
+            style={{ color: "var(--text-ghost)", borderColor: "var(--card-border-subtle)" }}
           >
             Atualize os contadores em{" "}
             <a href="/admin" className="underline hover:opacity-80"

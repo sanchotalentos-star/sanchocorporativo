@@ -139,17 +139,19 @@ export async function getActiveDeals(): Promise<Deal[]> {
 
 /**
  * Busca todos os negócios GANHOS no ano corrente.
- * A API do RD CRM v1 não filtra por win=true de forma confiável,
- * então buscamos todos os deals (sem filtro) e filtramos client-side.
+ * Nesta conta do RD CRM os negócios fechados são identificados pela etapa
+ * "Realizado" no pipeline — o boolean win=true não é utilizado.
+ * Aceita ambas as convenções para compatibilidade futura.
  */
 export async function getWonDealsYTD(): Promise<Deal[]> {
-  const ano  = new Date().getFullYear();
-  // Reutiliza getDeals() — busca até 200 negociações (todas, sem filtro win)
-  const all  = await getDeals(200);
+  const ano = new Date().getFullYear();
+  // Busca até 200 negociações sem filtro server-side (filtramos aqui)
+  const all = await getDeals(200);
 
   return all.filter((d) => {
-    // Só negócios marcados como ganhos
-    if (d.win !== true) return false;
+    // Ganho = boolean win OU etapa "Realizado" (convenção desta conta)
+    const isWon = d.win === true || d.deal_stage?.name === "Realizado";
+    if (!isWon) return false;
     // Filtra pelo ano corrente via updated_at ou created_at
     const ref = d.updated_at ?? d.created_at;
     if (!ref) return true; // sem data → inclui

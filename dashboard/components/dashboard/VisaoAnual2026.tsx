@@ -28,15 +28,15 @@ function MesLinha({ row, acumulado, metaAnual }: { row: MesRow; acumulado: numbe
   const p     = pct(row.realizado, row.meta);
   const done  = row.realizado >= row.meta && !row.isFuture && row.realizado > 0;
   const color = done
-    ? "#10B981"
+    ? "var(--sancho-won)"
     : row.isCurrent
     ? "var(--sancho-pink)"
     : row.isFuture
-    ? "rgba(255,255,255,0.12)"
+    ? "var(--bg-disabled)"
     : "#3B82F6";
 
   const textColor = row.isFuture
-    ? "rgba(255,255,255,0.25)"
+    ? "var(--text-ghost)"
     : "var(--sancho-black)";
 
   const acumPct = pct(acumulado, metaAnual);
@@ -44,8 +44,8 @@ function MesLinha({ row, acumulado, metaAnual }: { row: MesRow; acumulado: numbe
   return (
     <tr
       style={{
-        backgroundColor: row.isCurrent ? "rgba(233,30,140,0.05)" : "transparent",
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        backgroundColor: row.isCurrent ? "rgba(233,30,99,0.05)" : "transparent",
+        borderBottom: "1px solid var(--card-border-subtle)",
       }}
     >
       {/* Mês */}
@@ -68,7 +68,7 @@ function MesLinha({ row, acumulado, metaAnual }: { row: MesRow; acumulado: numbe
 
       {/* Meta mensal */}
       <td className="py-2 px-3 text-right whitespace-nowrap">
-        <span className="text-xs tabular-nums" style={{ color: "rgba(255,255,255,0.4)" }}>
+        <span className="text-xs tabular-nums" style={{ color: "var(--text-dim)" }}>
           {fmt(row.meta)}
         </span>
       </td>
@@ -90,7 +90,7 @@ function MesLinha({ row, acumulado, metaAnual }: { row: MesRow; acumulado: numbe
           )}
           <span
             className="text-xs font-bold tabular-nums"
-            style={{ color: row.isFuture ? "rgba(255,255,255,0.15)" : textColor }}
+            style={{ color: row.isFuture ? "var(--text-faint)" : textColor }}
           >
             {row.isFuture ? "—" : fmt(row.realizado)}
           </span>
@@ -103,7 +103,7 @@ function MesLinha({ row, acumulado, metaAnual }: { row: MesRow; acumulado: numbe
           <div className="flex items-center justify-between gap-1">
             <div
               className="flex-1 rounded-full overflow-hidden"
-              style={{ height: 4, backgroundColor: "rgba(255,255,255,0.07)" }}
+              style={{ height: 4, backgroundColor: "var(--card-bg-input)" }}
             >
               <div
                 className="h-full rounded-full transition-all duration-500"
@@ -112,7 +112,7 @@ function MesLinha({ row, acumulado, metaAnual }: { row: MesRow; acumulado: numbe
             </div>
             <span
               className="text-[10px] tabular-nums w-9 text-right flex-shrink-0"
-              style={{ color: row.isFuture ? "rgba(255,255,255,0.15)" : color }}
+              style={{ color: row.isFuture ? "var(--text-faint)" : color }}
             >
               {row.isFuture ? "" : `${p.toFixed(0)}%`}
             </span>
@@ -127,7 +127,7 @@ function MesLinha({ row, acumulado, metaAnual }: { row: MesRow; acumulado: numbe
             <div className="text-xs tabular-nums" style={{ color: textColor }}>
               {fmt(acumulado)}
             </div>
-            <div className="text-[10px] tabular-nums" style={{ color: "rgba(255,255,255,0.25)" }}>
+            <div className="text-[10px] tabular-nums" style={{ color: "var(--text-ghost)" }}>
               {acumPct.toFixed(1)}% do ano
             </div>
           </div>
@@ -170,14 +170,14 @@ export function VisaoAnual2026() {
     <div
       className="rounded-2xl overflow-hidden"
       style={{
-        background: "rgba(255,255,255,0.025)",
-        border:     "1px solid rgba(255,255,255,0.07)",
+        background: "var(--card-bg)",
+        border:     "1px solid var(--card-border)",
       }}
     >
       {/* ── Header ── */}
       <div
         className="px-5 py-4 border-b flex items-center justify-between gap-4 flex-wrap"
-        style={{ borderColor: "rgba(255,255,255,0.07)" }}
+        style={{ borderColor: "var(--card-border)" }}
       >
         <div>
           <div className="flex items-center gap-2 mb-0.5">
@@ -197,29 +197,29 @@ export function VisaoAnual2026() {
         {/* KPIs de cabeçalho */}
         <div className="flex items-center gap-6 flex-wrap">
           <div className="text-right">
-            <div className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>Meta macro</div>
+            <div className="text-[10px]" style={{ color: "var(--text-dim)" }}>Meta macro</div>
             <div className="text-base font-black" style={{ color: "var(--sancho-pink)" }}>R$ 2M</div>
           </div>
           <div className="text-right">
-            <div className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>Meta mensal</div>
+            <div className="text-[10px]" style={{ color: "var(--text-dim)" }}>Meta mensal</div>
             <div className="text-base font-black" style={{ color: "var(--sancho-black)" }}>
               {loading ? "—" : fmt(metaMensal)}
             </div>
           </div>
           <div className="text-right">
-            <div className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>YTD realizado</div>
+            <div className="text-[10px]" style={{ color: "var(--text-dim)" }}>YTD realizado</div>
             <div
               className="text-base font-black"
-              style={{ color: data.ytd_pct >= 100 ? "#10B981" : "var(--sancho-black)" }}
+              style={{ color: data.ytd_pct >= 100 ? "var(--sancho-won)" : "var(--sancho-black)" }}
             >
               {loading ? "—" : fmt(data.ytd)}
             </div>
           </div>
           <div className="text-right">
-            <div className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>% do ano</div>
+            <div className="text-[10px]" style={{ color: "var(--text-dim)" }}>% do ano</div>
             <div
               className="text-base font-black"
-              style={{ color: data.ytd_pct >= 50 ? "#10B981" : "var(--sancho-pink)" }}
+              style={{ color: data.ytd_pct >= 50 ? "var(--sancho-won)" : "var(--sancho-pink)" }}
             >
               {loading ? "—" : `${data.ytd_pct.toFixed(1)}%`}
             </div>
@@ -231,29 +231,29 @@ export function VisaoAnual2026() {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+            <tr style={{ borderBottom: "1px solid var(--card-border)" }}>
               <th className="py-2 pl-4 pr-3 text-left">
-                <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.25)" }}>
+                <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--text-ghost)" }}>
                   Mês
                 </span>
               </th>
               <th className="py-2 px-3 text-right">
-                <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.25)" }}>
+                <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--text-ghost)" }}>
                   Meta
                 </span>
               </th>
               <th className="py-2 px-3 text-right">
-                <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.25)" }}>
+                <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--text-ghost)" }}>
                   Realizado
                 </span>
               </th>
               <th className="py-2 px-3 text-left">
-                <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.25)" }}>
+                <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--text-ghost)" }}>
                   Progresso
                 </span>
               </th>
               <th className="py-2 pl-3 pr-4 text-right">
-                <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.25)" }}>
+                <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--text-ghost)" }}>
                   Acumulado YTD
                 </span>
               </th>
@@ -263,12 +263,12 @@ export function VisaoAnual2026() {
           <tbody>
             {loading
               ? Array.from({ length: 12 }).map((_, i) => (
-                  <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                  <tr key={i} style={{ borderBottom: "1px solid var(--card-border-subtle)" }}>
                     {[...Array(5)].map((__, j) => (
                       <td key={j} className="py-2.5 px-3">
                         <div
                           className="h-3 rounded animate-pulse"
-                          style={{ backgroundColor: "rgba(255,255,255,0.06)", width: j === 0 ? 24 : 64 }}
+                          style={{ backgroundColor: "var(--card-bg-input)", width: j === 0 ? 24 : 64 }}
                         />
                       </td>
                     ))}
@@ -283,7 +283,7 @@ export function VisaoAnual2026() {
           {/* Totais */}
           {!loading && (
             <tfoot>
-              <tr style={{ borderTop: "1px solid rgba(255,255,255,0.10)" }}>
+              <tr style={{ borderTop: "1px solid var(--card-border-2)" }}>
                 <td className="py-3 pl-4 pr-3">
                   <div className="flex items-center gap-1.5">
                     <TrendingUp size={11} style={{ color: "var(--sancho-pink)" }} />
@@ -293,7 +293,7 @@ export function VisaoAnual2026() {
                   </div>
                 </td>
                 <td className="py-3 px-3 text-right">
-                  <span className="text-xs font-bold tabular-nums" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  <span className="text-xs font-bold tabular-nums" style={{ color: "var(--text-dim)" }}>
                     {fmt(metaTotal)}
                   </span>
                 </td>
@@ -306,7 +306,7 @@ export function VisaoAnual2026() {
                   <div className="flex items-center gap-2">
                     <div
                       className="flex-1 rounded-full overflow-hidden"
-                      style={{ height: 5, backgroundColor: "rgba(255,255,255,0.07)" }}
+                      style={{ height: 5, backgroundColor: "var(--card-bg-input)" }}
                     >
                       <div
                         className="h-full rounded-full"
@@ -335,7 +335,7 @@ export function VisaoAnual2026() {
       {/* Nota de edição */}
       <div
         className="px-5 py-3 border-t text-[10px]"
-        style={{ borderColor: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.2)" }}
+        style={{ borderColor: "var(--card-border-subtle)", color: "var(--text-ghost)" }}
       >
         Registre os valores realizados em{" "}
         <a href="/admin" style={{ color: "var(--sancho-pink)" }} className="underline hover:opacity-80">

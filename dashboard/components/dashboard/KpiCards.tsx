@@ -17,8 +17,8 @@ function KpiCard({ label, value, icon, color, subtitle, isLoading }: KpiCardProp
     <div
       className="rounded-2xl p-5 flex flex-col gap-3"
       style={{
-        background:   "rgba(255,255,255,0.03)",
-        border:       "1px solid rgba(255,255,255,0.07)",
+        background:   "var(--card-bg)",
+        border:       "1px solid var(--card-border)",
         borderLeft:   `3px solid ${color}`,
       }}
       role="region"

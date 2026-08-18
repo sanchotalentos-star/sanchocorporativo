@@ -111,25 +111,25 @@ export default function DashboardPage() {
 
   return (
     <>
-      {/* ── Background — dark + pink glow (21st.dev pattern) ── */}
+      {/* ── Background — cor do tema + pink glow ── */}
       <div
         className="fixed inset-0 -z-10"
-        style={{ backgroundColor: "#080808" }}
+        style={{ backgroundColor: "var(--sancho-bg)" }}
         aria-hidden="true"
       >
         {/* Pink radial glow at the top */}
         <div
           className="absolute inset-0"
           style={{
-            background: "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(233,30,140,0.18), transparent)",
+            background: "radial-gradient(ellipse 80% 60% at 50% -10%, var(--sancho-pink-glow), transparent)",
           }}
         />
-        {/* Subtle grid */}
+        {/* Subtle grid — usa var para adaptar ao tema */}
         <div
           className="absolute inset-0 opacity-[0.025]"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(to right, rgba(255,255,255,1) 1px, transparent 1px)",
+              "linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(to right, var(--grid-line) 1px, transparent 1px)",
             backgroundSize: "48px 48px",
           }}
         />
@@ -234,7 +234,7 @@ export default function DashboardPage() {
         <footer
           className="mt-12 py-5 border-t text-center text-xs"
           style={{
-            borderColor: "rgba(255,255,255,.06)",
+            borderColor: "var(--card-border)",
             color:       "var(--sancho-gray-mid)",
           }}
         >

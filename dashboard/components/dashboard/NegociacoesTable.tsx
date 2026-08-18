@@ -74,8 +74,8 @@ export function NegociacoesTable({ data = [], stages = [], isLoading = false }: 
     <section
       className="rounded-2xl p-5"
       style={{
-        background: "rgba(255,255,255,0.03)",
-        border:     "1px solid rgba(255,255,255,0.07)",
+        background: "var(--card-bg)",
+        border:     "1px solid var(--card-border)",
       }}
       aria-labelledby="negociacoes-heading"
     >
@@ -106,8 +106,8 @@ export function NegociacoesTable({ data = [], stages = [], isLoading = false }: 
               onChange={(e) => setStageFilter(e.target.value)}
               className="rounded-lg px-2 py-1 text-xs focus:outline-none focus-visible:ring-1 focus-visible:ring-pink-500"
               style={{
-                backgroundColor: "rgba(255,255,255,.06)",
-                border:          "1px solid rgba(255,255,255,.10)",
+                backgroundColor: "var(--card-bg-input)",
+                border:          "1px solid var(--card-border)",
                 color:           "var(--sancho-gray-dark)",
               }}
               aria-label="Filtrar por etapa do funil"
@@ -139,7 +139,7 @@ export function NegociacoesTable({ data = [], stages = [], isLoading = false }: 
             aria-label="Tabela de negociações ativas"
           >
             <thead>
-              <tr style={{ borderBottom: "1px solid rgba(255,255,255,.08)" }}>
+              <tr style={{ borderBottom: "1px solid var(--card-border)" }}>
                 {[
                   { key: "name"     as SortKey, label: "Negócio"    },
                   { key: null,                  label: "Contato"      },
@@ -174,7 +174,7 @@ export function NegociacoesTable({ data = [], stages = [], isLoading = false }: 
                   key={row.id}
                   className="border-b transition-colors"
                   style={{
-                    borderColor:     "rgba(255,255,255,.05)",
+                    borderColor:     "var(--card-border-subtle)",
                     backgroundColor: row.isStale
                       ? "rgba(248,113,113,.04)"
                       : undefined,

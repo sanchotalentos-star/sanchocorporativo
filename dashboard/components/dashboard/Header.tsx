@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { RefreshCw, Settings } from "lucide-react";
+import { RefreshCw, Settings, Sun, Moon } from "lucide-react";
 import { formatUpdateTimestamp } from "@/lib/formatters";
+import { useTheme } from "@/lib/useTheme";
 
 // ── Sancho Logo Wordmark ────────────────────────────────────────
 // SVG inline que replica a identidade real da Sancho:
@@ -39,11 +40,11 @@ function SanchoWordmark() {
       {/* ── Pena / folha dentro do O ──
            O está aprox. x=103..158, y=53..104
            Centro aprox: 130, 79  raio H≈27 raio V≈25  */}
-      {/* Elipse da pena rotacionada -38° */}
+      {/* Elipse da pena usa cor do fundo via CSS var para se adaptar ao tema */}
       <ellipse
         cx="130" cy="79"
         rx="8" ry="21"
-        fill="#080808"
+        style={{ fill: "var(--feather-fill)" }}
         transform="rotate(-38 130 79)"
       />
       {/* Nervura central da pena */}
@@ -62,7 +63,7 @@ function SanchoWordmark() {
         fontFamily="system-ui, sans-serif"
         fontSize="7"
         fontWeight="700"
-        fill="rgba(255,255,255,0.38)"
+        style={{ fill: "var(--text-ghost)" }}
         letterSpacing="2.5"
       >GESTÃO DE CARREIRA</text>
     </svg>
@@ -81,12 +82,14 @@ export function Header({ updatedAt, onRefresh, isLoading = false, logoUrl }: Hea
     ? formatUpdateTimestamp(new Date(updatedAt))
     : "Carregando...";
 
+  const { isDark, toggle } = useTheme();
+
   return (
     <header
       className="sticky top-0 z-30 border-b"
       style={{
-        backgroundColor: "rgba(8,8,8,0.85)",
-        borderBottomColor: "var(--sancho-border)",
+        backgroundColor: "var(--header-bg)",
+        borderBottomColor: "var(--card-border)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
       }}
@@ -116,14 +119,31 @@ export function Header({ updatedAt, onRefresh, isLoading = false, logoUrl }: Hea
         {/* Ações */}
         <div className="flex items-center gap-2">
 
+          {/* Alternância de tema */}
+          <button
+            onClick={toggle}
+            className="flex items-center justify-center w-8 h-8 rounded-full transition-all"
+            style={{
+              color:           "var(--sancho-gray-mid)",
+              backgroundColor: "var(--card-bg-input)",
+              border:          "1px solid var(--card-border)",
+            }}
+            aria-label={isDark ? "Mudar para modo claro" : "Mudar para modo noturno"}
+            title={isDark ? "Modo claro" : "Modo noturno"}
+          >
+            {isDark
+              ? <Sun  size={14} aria-hidden="true" />
+              : <Moon size={14} aria-hidden="true" />}
+          </button>
+
           {/* Admin */}
           <Link
             href="/admin"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
             style={{
               color:           "var(--sancho-gray-mid)",
-              backgroundColor: "rgba(255,255,255,.05)",
-              border:          "1px solid rgba(255,255,255,.08)",
+              backgroundColor: "var(--card-bg-input)",
+              border:          "1px solid var(--card-border)",
             }}
             aria-label="Administrar dashboard"
             title="Logo, metas e membros"

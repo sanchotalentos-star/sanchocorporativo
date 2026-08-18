@@ -56,7 +56,7 @@ function ProgressRow({
       {/* Events bar */}
       <div
         className="h-1.5 rounded-full overflow-hidden"
-        style={{ backgroundColor: "rgba(255,255,255,.06)" }}
+        style={{ backgroundColor: "var(--card-bg-input)" }}
         role="progressbar"
         aria-valuenow={current}
         aria-valuemin={0}
@@ -87,7 +87,7 @@ function ProgressRow({
       {/* Revenue bar */}
       <div
         className="h-1 rounded-full overflow-hidden mt-1"
-        style={{ backgroundColor: "rgba(255,255,255,.06)" }}
+        style={{ backgroundColor: "var(--card-bg-input)" }}
         role="progressbar"
         aria-valuenow={currentVal}
         aria-valuemin={0}
@@ -156,8 +156,8 @@ export function MetasMensais({
     <section
       className="rounded-2xl p-5"
       style={{
-        background: "rgba(255,255,255,0.03)",
-        border:     "1px solid rgba(255,255,255,0.07)",
+        background: "var(--card-bg)",
+        border:     "1px solid var(--card-border)",
       }}
       aria-labelledby="metas-heading"
     >
@@ -224,7 +224,7 @@ export function MetasMensais({
           <div className="flex items-center gap-3">
             <div
               className="flex-1 h-2.5 rounded-full overflow-hidden"
-              style={{ backgroundColor: "rgba(255,255,255,.06)" }}
+              style={{ backgroundColor: "var(--card-bg-input)" }}
               role="progressbar"
               aria-valuenow={totalRevenue}
               aria-valuemin={0}

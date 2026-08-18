@@ -3,41 +3,100 @@
 @tailwind utilities;
 
 /* ──────────────────────────────────────────────────────────────
-   Design System Sancho — Dark Theme
+   Design System Sancho — Light (default) + Dark toggle
+   data-theme="dark" no <html> ativa o modo noturno
 ────────────────────────────────────────────────────────────── */
+
+/* ── Light mode — padrão ──────────────────────────────────── */
 :root {
-  /* Brand */
+  /* Brand — imutável entre temas */
   --sancho-pink:        #E91E8C;
   --sancho-pink-light:  #F472B6;
   --sancho-pink-bg:     rgba(233, 30, 140, 0.10);
-  --sancho-pink-glow:   rgba(233, 30, 140, 0.18);
+  --sancho-pink-glow:   rgba(233, 30, 140, 0.16);
 
-  /* Surfaces */
+  /* Página */
+  --sancho-bg:          #f1f5f9;
+  --header-bg:          rgba(241, 245, 249, 0.88);
+  --feather-fill:       #f1f5f9;   /* cor de fundo no SVG do logo */
+  --grid-line:          rgba(0, 0, 0, 1);
+
+  /* Superfícies de cartão */
+  --card-bg:            rgba(255, 255, 255, 0.85);
+  --card-bg-2:          rgba(255, 255, 255, 0.60);
+  --card-bg-input:      rgba(0, 0, 0, 0.04);
+  --card-border:        rgba(0, 0, 0, 0.09);
+  --card-border-2:      rgba(0, 0, 0, 0.15);
+  --card-border-subtle: rgba(0, 0, 0, 0.05);
+  --bg-disabled:        rgba(0, 0, 0, 0.09);
+
+  /* Texto */
+  --sancho-black:       #0f172a;    /* texto principal */
+  --sancho-gray-dark:   #334155;
+  --sancho-gray-mid:    #64748B;
+  --sancho-white:       #f1f5f9;
+  --text-dim:           rgba(0, 0, 0, 0.42);
+  --text-ghost:         rgba(0, 0, 0, 0.28);
+  --text-faint:         rgba(0, 0, 0, 0.18);
+  --text-disabled:      rgba(0, 0, 0, 0.22);
+
+  /* Bordas globais */
+  --sancho-border:      rgba(0, 0, 0, 0.09);
+  --sancho-border-2:    rgba(0, 0, 0, 0.15);
+
+  /* Aliases para retrocompatibilidade */
+  --sancho-surface:     rgba(255, 255, 255, 0.85);
+  --sancho-surface-2:   rgba(255, 255, 255, 0.60);
+
+  /* Semântico */
+  --sancho-won:         #059669;
+  --sancho-lost:        #dc2626;
+  --sancho-pending:     #d97706;
+
+  /* Gráficos */
+  --chart-1: #E91E8C;
+  --chart-2: #059669;
+  --chart-3: #60A5FA;
+  --chart-4: #d97706;
+  --chart-5: #C084FC;
+}
+
+/* ── Dark mode — ativado por data-theme="dark" no <html> ──── */
+[data-theme="dark"] {
   --sancho-bg:          #080808;
-  --sancho-surface:     rgba(255, 255, 255, 0.035);
-  --sancho-surface-2:   rgba(255, 255, 255, 0.06);
+  --header-bg:          rgba(8, 8, 8, 0.85);
+  --feather-fill:       #080808;
+  --grid-line:          rgba(255, 255, 255, 1);
 
-  /* Text  */
-  --sancho-black:       #F1F5F9;    /* primary text on dark */
+  --card-bg:            rgba(255, 255, 255, 0.035);
+  --card-bg-2:          rgba(255, 255, 255, 0.06);
+  --card-bg-input:      rgba(255, 255, 255, 0.06);
+  --card-border:        rgba(255, 255, 255, 0.08);
+  --card-border-2:      rgba(255, 255, 255, 0.14);
+  --card-border-subtle: rgba(255, 255, 255, 0.05);
+  --bg-disabled:        rgba(255, 255, 255, 0.12);
+
+  --sancho-black:       #F1F5F9;
   --sancho-gray-dark:   #CBD5E1;
   --sancho-gray-mid:    #64748B;
-  --sancho-white:       #080808;    /* repurposed as bg ref */
+  --sancho-white:       #080808;
+  --text-dim:           rgba(255, 255, 255, 0.40);
+  --text-ghost:         rgba(255, 255, 255, 0.25);
+  --text-faint:         rgba(255, 255, 255, 0.15);
+  --text-disabled:      rgba(255, 255, 255, 0.22);
 
-  /* Borders */
   --sancho-border:      rgba(255, 255, 255, 0.08);
   --sancho-border-2:    rgba(255, 255, 255, 0.14);
 
-  /* Semantic */
+  --sancho-surface:     rgba(255, 255, 255, 0.035);
+  --sancho-surface-2:   rgba(255, 255, 255, 0.06);
+
   --sancho-won:         #10B981;
   --sancho-lost:        #F87171;
   --sancho-pending:     #FBBF24;
 
-  /* Charts */
-  --chart-1: #E91E8C;
   --chart-2: #10B981;
-  --chart-3: #60A5FA;
   --chart-4: #FBBF24;
-  --chart-5: #C084FC;
 }
 
 /* ── Base ───────────────────────────────────────────────────── */
@@ -48,6 +107,10 @@
 }
 
 html {
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
   color-scheme: dark;
 }
 
@@ -60,10 +123,10 @@ body {
   min-height: 100dvh;
 }
 
-/* ── Card dark glass ────────────────────────────────────────── */
+/* ── Card glass ─────────────────────────────────────────────── */
 .glass-card {
-  background: var(--sancho-surface);
-  border: 1px solid var(--sancho-border);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 1rem;
   backdrop-filter: blur(12px);
 }
@@ -73,13 +136,13 @@ body {
   border-left: 3px solid var(--sancho-pink);
 }
 
-/* ── Shimmer (dark) ─────────────────────────────────────────── */
+/* ── Shimmer ────────────────────────────────────────────────── */
 .shimmer {
   background: linear-gradient(
     90deg,
-    rgba(255,255,255,.04) 25%,
-    rgba(233,30,140,.10)  50%,
-    rgba(255,255,255,.04) 75%
+    var(--card-bg-input) 25%,
+    rgba(233,30,140,.08)  50%,
+    var(--card-bg-input) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -108,11 +171,15 @@ body {
 
 /* ── Scrollbar ──────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: rgba(255,255,255,.03); }
+::-webkit-scrollbar-track { background: var(--card-bg-input); }
 ::-webkit-scrollbar-thumb { background: rgba(233,30,140,.3); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--sancho-pink); }
 
-/* ── Select dark ────────────────────────────────────────────── */
+/* ── Select ─────────────────────────────────────────────────── */
 select {
+  color-scheme: inherit;
+}
+
+[data-theme="dark"] select {
   color-scheme: dark;
 }

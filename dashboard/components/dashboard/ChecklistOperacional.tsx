@@ -75,8 +75,8 @@ export function ChecklistOperacional({ metas }: ChecklistOperacionalProps = {}) 
     <section
       className="rounded-2xl p-5"
       style={{
-        background: "rgba(255,255,255,0.03)",
-        border:     "1px solid rgba(255,255,255,0.07)",
+        background: "var(--card-bg)",
+        border:     "1px solid var(--card-border)",
       }}
       aria-labelledby="checklist-heading"
     >
@@ -98,7 +98,7 @@ export function ChecklistOperacional({ metas }: ChecklistOperacionalProps = {}) 
           <li
             key={item.label}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
-            style={{ borderBottom: "1px solid rgba(255,255,255,.05)" }}
+            style={{ borderBottom: "1px solid var(--card-border-subtle)" }}
           >
             {/* Icon */}
             <span
