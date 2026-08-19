@@ -1,0 +1,178 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════
+   DESIGN TOKENS — HUB DE RELEVÂNCIA (tema escuro quente)
+═══════════════════════════════════════════════════ */
+@theme inline {
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --color-primary:            #C5A880;
+  --color-primary-hover:      #D4B891;
+  --color-accent:             #C5A880;
+  --color-accent-light:       #D4B891;
+  --color-surface:            #161412;
+  --color-card:               #1A1815;
+  --color-border:             rgba(255,255,255,0.08);
+  --color-text-primary:       #EFECE6;
+  --color-text-secondary:     #9E9A94;
+  --color-text-muted:         #75716B;
+  --color-success:            #22C55E;
+  --color-warning:            #F59E0B;
+  --color-danger:             #EF4444;
+  --font-sans:                'Inter', sans-serif;
+}
+
+:root {
+  --background:               #FFFFFF;
+  --foreground:               #0A0907;
+  --color-primary:            #C5A880;
+  --color-primary-hover:      #D4B891;
+  --color-accent:             #C5A880;
+  --color-surface:            #161412;
+  --color-card:               #1A1815;
+  --color-border:             rgba(255,255,255,0.08);
+  --color-text-primary:       #EFECE6;
+  --color-text-secondary:     #9E9A94;
+  --color-text-muted:         #75716B;
+  --color-success:            #22C55E;
+  --color-warning:            #F59E0B;
+  --color-danger:             #EF4444;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #121110;
+  color: #EFECE6;
+  margin: 0;
+  padding: 0;
+}
+
+/* ═══════════════════════════════════════════════════
+   DARK HUB — sobrescreve classes Tailwind dentro do shell
+═══════════════════════════════════════════════════ */
+
+/* Backgrounds */
+.dark-hub .bg-white       { background-color: #1A1815 !important; }
+.dark-hub .bg-gray-50     { background-color: #161412 !important; }
+.dark-hub .bg-gray-100    { background-color: #1D1A17 !important; }
+.dark-hub .bg-gray-200    { background-color: #222019 !important; }
+.dark-hub .bg-\[\#FAFAFA\]  { background-color: #161412 !important; }
+.dark-hub .bg-\[\#F9FAFB\]  { background-color: #161412 !important; }
+
+/* Text */
+.dark-hub .text-gray-900 { color: #EFECE6 !important; }
+.dark-hub .text-gray-800 { color: #E0DDD7 !important; }
+.dark-hub .text-gray-700 { color: #D4D0CA !important; }
+.dark-hub .text-gray-600 { color: #B5B0A8 !important; }
+.dark-hub .text-gray-500 { color: #9E9A94 !important; }
+.dark-hub .text-gray-400 { color: #857E77 !important; }
+.dark-hub .text-gray-300 { color: #75716B !important; }
+.dark-hub .text-gray-200 { color: #4A4540 !important; }
+
+/* Borders */
+.dark-hub .border-gray-100 { border-color: rgba(255,255,255,0.06) !important; }
+.dark-hub .border-gray-200 { border-color: rgba(255,255,255,0.08) !important; }
+.dark-hub .border-gray-300 { border-color: rgba(255,255,255,0.12) !important; }
+
+/* Hover states */
+.dark-hub .hover\:bg-gray-50:hover  { background-color: #1D1A17 !important; }
+.dark-hub .hover\:bg-gray-100:hover { background-color: #222019 !important; }
+.dark-hub .hover\:text-gray-700:hover { color: #EFECE6 !important; }
+
+/* Transition colours */
+.dark-hub .transition-colors { transition: background-color 0.1s, color 0.1s, border-color 0.1s; }
+
+/* Inputs, textareas, selects */
+.dark-hub input:not([type="checkbox"]):not([type="radio"]),
+.dark-hub textarea,
+.dark-hub select {
+  background-color: #1A1815 !important;
+  color: #EFECE6 !important;
+  border-color: rgba(255,255,255,0.12) !important;
+}
+.dark-hub input::placeholder,
+.dark-hub textarea::placeholder {
+  color: #75716B !important;
+}
+.dark-hub input:focus,
+.dark-hub textarea:focus,
+.dark-hub select:focus {
+  border-color: #C5A880 !important;
+  outline-color: #C5A880 !important;
+  box-shadow: 0 0 0 2px rgba(197,168,128,0.15) !important;
+}
+
+/* Rounded cards often used with shadow */
+.dark-hub .rounded-lg,
+.dark-hub .rounded-xl,
+.dark-hub .rounded-2xl {
+  /* don't force bg — let inline styles or specific classes win */
+}
+
+/* Override purple primary to golden */
+.dark-hub .text-\[\#7B2FBE\]  { color: #C5A880 !important; }
+.dark-hub .bg-\[\#7B2FBE\]    { background-color: #C5A880 !important; }
+.dark-hub .border-\[\#7B2FBE\] { border-color: #C5A880 !important; }
+
+/* Purple opacity variants → golden */
+.dark-hub .bg-\[\#7B2FBE\]\/5        { background-color: rgba(197,168,128,0.06) !important; }
+.dark-hub .bg-\[\#7B2FBE\]\/10       { background-color: rgba(197,168,128,0.10) !important; }
+.dark-hub .bg-\[\#7B2FBE\]\/\[0\.03\] { background-color: rgba(197,168,128,0.04) !important; }
+.dark-hub .bg-\[\#7B2FBE\]\/\[0\.04\] { background-color: rgba(197,168,128,0.05) !important; }
+.dark-hub .border-\[\#7B2FBE\]\/10   { border-color: rgba(197,168,128,0.10) !important; }
+.dark-hub .border-\[\#7B2FBE\]\/15   { border-color: rgba(197,168,128,0.15) !important; }
+.dark-hub .border-\[\#7B2FBE\]\/20   { border-color: rgba(197,168,128,0.20) !important; }
+.dark-hub .border-\[\#7B2FBE\]\/25   { border-color: rgba(197,168,128,0.25) !important; }
+.dark-hub .border-\[\#7B2FBE\]\/30   { border-color: rgba(197,168,128,0.30) !important; }
+.dark-hub .hover\:border-\[\#7B2FBE\]\/20:hover { border-color: rgba(197,168,128,0.20) !important; }
+.dark-hub .hover\:bg-\[\#7B2FBE\]\/\[0\.03\]:hover { background-color: rgba(197,168,128,0.04) !important; }
+.dark-hub .hover\:text-\[\#7B2FBE\]:hover { color: #C5A880 !important; }
+.dark-hub .group:hover .group-hover\:text-\[\#7B2FBE\] { color: #C5A880 !important; }
+
+/* Gray opacity variants */
+.dark-hub .bg-gray-50\/50 { background-color: rgba(22,20,18,0.5) !important; }
+.dark-hub .bg-gray-50\/30 { background-color: rgba(22,20,18,0.3) !important; }
+.dark-hub .bg-gray-50\/40 { background-color: rgba(22,20,18,0.4) !important; }
+.dark-hub .bg-gray-50\/60 { background-color: rgba(22,20,18,0.6) !important; }
+.dark-hub .bg-blue-50\/30 { background-color: rgba(22,28,40,0.30) !important; }
+
+/* Divide lines */
+.dark-hub .divide-gray-100 > * + * { border-color: rgba(255,255,255,0.05) !important; }
+.dark-hub .divide-gray-50  > * + * { border-color: rgba(255,255,255,0.03) !important; }
+.dark-hub .divide-gray-200 > * + * { border-color: rgba(255,255,255,0.08) !important; }
+
+/* Hover on solid purple buttons → golden hover */
+.dark-hub .hover\:bg-\[\#6a27a5\]:hover { background-color: #D4B891 !important; }
+.dark-hub .hover\:bg-\[\#7B2FBE\]:hover { background-color: #D4B891 !important; }
+
+/* Emerald / amber / red light bgs → dark equivalents */
+.dark-hub .bg-emerald-50  { background-color: rgba(34,197,94,0.10) !important; }
+.dark-hub .bg-amber-50    { background-color: rgba(245,158,11,0.10) !important; }
+.dark-hub .bg-red-50      { background-color: rgba(239,68,68,0.10) !important; }
+.dark-hub .bg-blue-50     { background-color: rgba(59,130,246,0.10) !important; }
+.dark-hub .bg-purple-50   { background-color: rgba(197,168,128,0.10) !important; }
+.dark-hub .bg-yellow-50   { background-color: rgba(245,158,11,0.10) !important; }
+
+/* Shadow suppression (not needed in dark) */
+.dark-hub .shadow-sm  { box-shadow: none !important; }
+.dark-hub .shadow-md  { box-shadow: none !important; }
+.dark-hub .shadow-xl  { box-shadow: 0 4px 24px rgba(0,0,0,0.5) !important; }
+
+/* Additional gray specifics */
+.dark-hub .border-b.border-gray-100,
+.dark-hub .border-t.border-gray-100 { border-color: rgba(255,255,255,0.05) !important; }
+.dark-hub .hover\:border-gray-300:hover { border-color: rgba(255,255,255,0.15) !important; }
+
+/* Focus ring */
+.dark-hub *:focus-visible {
+  outline: 2px solid #C5A880;
+  outline-offset: 2px;
+}
+
+/* Scrollbar */
+.dark-hub ::-webkit-scrollbar { width: 6px; height: 6px; }
+.dark-hub ::-webkit-scrollbar-track { background: #161412; }
+.dark-hub ::-webkit-scrollbar-thumb { background: #3A3632; border-radius: 3px; }
+.dark-hub ::-webkit-scrollbar-thumb:hover { background: #C5A880; }

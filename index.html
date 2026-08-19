@@ -462,7 +462,7 @@ body {
   font-family: 'Inter', sans-serif;
   font-size: clamp(9px, 0.75vw, 11px);
   font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
-  color: #25D366; text-align: center;
+  color: var(--pink); text-align: center;
 }
 .wpp-right {
   display: flex; flex-direction: column;
@@ -470,9 +470,9 @@ body {
 }
 .wpp-badge {
   display: inline-flex; align-items: center; gap: 7px;
-  background: rgba(37,211,102,0.12);
-  border: 1px solid rgba(37,211,102,0.3);
-  color: #25D366;
+  background: rgba(232,24,109,0.10);
+  border: 1px solid rgba(232,24,109,0.30);
+  color: var(--pink);
   font-size: clamp(10px, 0.85vw, 12px);
   font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
   padding: 5px 14px; border-radius: 999px;
@@ -492,8 +492,8 @@ body {
 }
 .wpp-cta-box {
   display: flex; align-items: center; gap: 16px;
-  background: rgba(37,211,102,0.08);
-  border: 1.5px solid rgba(37,211,102,0.25);
+  background: rgba(232,24,109,0.07);
+  border: 1.5px solid rgba(232,24,109,0.25);
   border-radius: 16px;
   padding: clamp(14px, 2vh, 20px) clamp(18px, 2vw, 26px);
   margin-top: 4px;
@@ -502,7 +502,7 @@ body {
 .wpp-cta-label {
   font-family: 'Space Grotesk', sans-serif;
   font-size: clamp(14px, 1.25vw, 19px); font-weight: 700;
-  color: #25D366;
+  color: var(--pink);
 }
 .wpp-cta-hint {
   font-size: clamp(11px, 0.9vw, 14px);
@@ -1070,16 +1070,15 @@ body {
   </div>
 
   <!-- SLIDE 5 — MITO (light) -->
-  <div class="slide light" id="slide-mito" data-frags="3">
+  <div class="slide light" id="slide-mito" data-frags="0" style="justify-content:center;">
     <div class="kicker"><span class="accent">Divis&atilde;o Simplista da Humanidade</span></div>
     <div class="display" style="font-size:clamp(40px,5.8vw,90px);">&ldquo;S&oacute; existem dois tipos de pessoas<br>na face da terra&rdquo;</div>
-    <ul class="arrow-list">
-      <li class="arrow-item fragment">Pessoas que se amostram</li>
-      <li class="arrow-item fragment">Pessoas que <strong style="color:var(--pink);">N&Atilde;O</strong> se amostram</li>
-    </ul>
-    <div class="impact-line fragment">
-      Quais as caracter&iacute;sticas desses Seres Humanos?
-    </div>
+  </div>
+
+  <!-- SLIDE 5B — DOIS TIPOS (light) -->
+  <div class="slide light" id="slide-dois-tipos" data-frags="0" style="justify-content:center;">
+    <div class="kicker"><span class="accent">Divis&atilde;o Simplista da Humanidade</span></div>
+    <div class="display" style="font-size:clamp(44px,6.5vw,96px);">Pessoas que <span class="hl">se amostram</span><br>Pessoas que <span class="hl">n&atilde;o</span> se amostram</div>
   </div>
 
   <!-- SLIDE 6 — NÃO SE AMOSTRAM (light) -->
@@ -1087,10 +1086,15 @@ body {
     <div class="kicker"><span class="accent">Divis&atilde;o Simplista da Humanidade</span></div>
     <div class="display" style="font-size:clamp(40px,5.8vw,90px);">&ldquo;Pessoas que <span class="hl">N&Atilde;O</span> se amostram&rdquo;</div>
     <div class="fragment">
-      <div style="font-size:clamp(10px,0.85vw,13px);font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:var(--pink);margin-bottom:clamp(8px,1.2vh,14px);">Atributos</div>
-      <ul class="arrow-list">
-        <li class="arrow-item">Escolha, Timidez, se sente melhor, quest&otilde;es de sa&uacute;de, medo, considerar que n&atilde;o precisa, prefer&ecirc;ncia&hellip;</li>
-      </ul>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:clamp(8px,1.5vw,22px);padding:clamp(10px,2vh,24px) 0;max-width:900px;">
+        <span style="font-size:clamp(28px,4vw,58px);font-weight:900;color:var(--text-dark);">Medo</span>
+        <span style="font-size:clamp(16px,2vw,30px);font-weight:700;color:var(--pink);">Timidez</span>
+        <span style="font-size:clamp(20px,2.8vw,42px);font-weight:800;color:var(--text-dark);">Escolha</span>
+        <span style="font-size:clamp(13px,1.3vw,20px);font-weight:500;color:var(--text-muted);">Quest&otilde;es de sa&uacute;de</span>
+        <span style="font-size:clamp(18px,2.2vw,34px);font-weight:700;color:var(--pink);">Prefer&ecirc;ncia</span>
+        <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Se sente melhor</span>
+        <span style="font-size:clamp(15px,1.6vw,24px);font-weight:600;color:var(--text-dark);">N&atilde;o precisa</span>
+      </div>
     </div>
     <div class="impact-line fragment">
       A invisibilidade s&oacute; &eacute; super poder quando voc&ecirc; n&atilde;o precisar de outros.
@@ -1109,19 +1113,17 @@ body {
     <div class="display" style="font-size:clamp(44px,6.5vw,96px);">Arrog&acirc;ncia <span class="hl">&ne;</span> Autoridade</div>
     <div class="compare-grid fragment" style="max-width:100%;">
       <div class="compare-card bad">
-        <div class="compare-card-title">Arrog&acirc;ncia</div>
-        <ul>
-          <li>Precisa parecer melhor que os outros</li>
-          <li>Fala mais do que faz</li>
-          <li>Busca aplauso</li>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+          <li style="font-size:clamp(11px,1vw,14px);font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:#FC8181;display:block;">Precisa parecer melhor que os outros</li>
+          <li style="font-size:clamp(11px,1vw,14px);font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:#FC8181;display:block;">Fala mais do que faz</li>
+          <li style="font-size:clamp(11px,1vw,14px);font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:#FC8181;display:block;">Busca aplauso</li>
         </ul>
       </div>
       <div class="compare-card good">
-        <div class="compare-card-title">Autoridade</div>
-        <ul>
-          <li>Compartilha experi&ecirc;ncias</li>
-          <li>Entrega valor antes de pedir qualquer coisa</li>
-          <li>Faz para servir</li>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+          <li style="font-size:clamp(11px,1vw,14px);font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:var(--pink);display:block;">Compartilha experi&ecirc;ncias</li>
+          <li style="font-size:clamp(11px,1vw,14px);font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:var(--pink);display:block;">Entrega valor antes de pedir qualquer coisa</li>
+          <li style="font-size:clamp(11px,1vw,14px);font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:var(--pink);display:block;">Faz para servir</li>
         </ul>
       </div>
     </div>
@@ -1188,20 +1190,10 @@ body {
   <div class="slide light" id="slide-wordcloud" data-frags="0" style="align-items:center;text-align:center;">
     <div class="kicker"><span class="accent">O que a sala disse sobre si mesma</span></div>
     <div class="display" style="font-size:clamp(26px,3.6vw,52px);">A palavra que <span class="hl">te define</span></div>
-    <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:clamp(6px,1.2vw,18px);padding:clamp(10px,2vh,24px) 0;max-width:900px;">
-      <span style="font-size:clamp(28px,4.2vw,62px);font-weight:900;color:var(--text-dark);">Criativo</span>
-      <span style="font-size:clamp(16px,2vw,30px);font-weight:700;color:var(--pink);">Impressão</span>
-      <span style="font-size:clamp(22px,3.2vw,48px);font-weight:800;color:var(--pink);">Marketing</span>
-      <span style="font-size:clamp(13px,1.3vw,20px);font-weight:500;color:var(--text-muted);">Sucesso</span>
-      <span style="font-size:clamp(18px,2.4vw,36px);font-weight:700;color:var(--text-dark);">Arte</span>
-      <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Desenho</span>
-      <span style="font-size:clamp(20px,2.8vw,42px);font-weight:800;color:var(--text-dark);">Perspectiva</span>
-      <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Promoção</span>
-      <span style="font-size:clamp(18px,2.2vw,34px);font-weight:700;color:var(--pink);">Ideia</span>
-      <span style="font-size:clamp(20px,2.6vw,40px);font-weight:800;color:var(--text-dark);">Estilo</span>
-      <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Comercial</span>
-      <span style="font-size:clamp(16px,1.8vw,28px);font-weight:700;color:var(--pink);">Cor</span>
-      <span style="font-size:clamp(13px,1.2vw,19px);font-weight:500;color:var(--text-muted);">Esboço</span>
+    <div id="wordCloud"></div>
+    <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px;">
+      <span class="word-count-display" id="word-count">0</span>
+      <span style="font-size:clamp(13px,1.1vw,17px);color:var(--text-muted);">palavras registradas</span>
     </div>
   </div>
 
@@ -1478,13 +1470,13 @@ body {
 <script>
 // ===================== CONFIG =====================
 var firebaseConfig = {
-  apiKey:            "COLE_AQUI",
-  authDomain:        "COLE_AQUI",
-  databaseURL:       "COLE_AQUI",
-  projectId:         "COLE_AQUI",
-  storageBucket:     "COLE_AQUI",
-  messagingSenderId: "COLE_AQUI",
-  appId:             "COLE_AQUI"
+  apiKey:            "AIzaSyAGfJn3Mnl59xhe9G4xEX0bWMtzVe9NOEU",
+  authDomain:        "sancho-workshop.firebaseapp.com",
+  databaseURL:       "https://sancho-workshop-default-rtdb.firebaseio.com",
+  projectId:         "sancho-workshop",
+  storageBucket:     "sancho-workshop.firebasestorage.app",
+  messagingSenderId: "134141850640",
+  appId:             "1:134141850640:web:bdb6136b245a1d803d4695"
 };
 
 var FORM_URL = window.location.href.split('#')[0] + '#/form';
@@ -1699,8 +1691,23 @@ function syncAreaSlides() {
     }
   });
 
+  // Limita às top 4 áreas com mais participantes
+  var MAX_AREA_SLIDES = 3;
+  var sortedKeys = Object.keys(areaGroups).sort(function(a, b) {
+    return areaGroups[b].participants.length - areaGroups[a].participants.length;
+  }).slice(0, MAX_AREA_SLIDES);
+
+  // Remove slides de áreas que não estão no top 4
+  Object.keys(areaSlideMap).forEach(function(key) {
+    if (sortedKeys.indexOf(key) === -1) {
+      var el = areaSlideMap[key];
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+      delete areaSlideMap[key];
+    }
+  });
+
   var anchor = document.getElementById('slide-wpp-se-amostramento');
-  Object.keys(areaGroups).forEach(function(key) {
+  sortedKeys.forEach(function(key) {
     var group = areaGroups[key];
     if (!areaSlideMap[key]) {
       var el = buildAreaSlide(key, group);
@@ -1800,7 +1807,9 @@ function showSlide(idx) {
   currentSlideIdx = idx;
   currentFrag = -1;
 
-  s.querySelectorAll('.fragment').forEach(function(f) { f.classList.remove('visible'); });
+  var frags = s.querySelectorAll('.fragment');
+  frags.forEach(function(f) { f.classList.add('visible'); });
+  currentFrag = frags.length - 1;
 
   if (s.id === 'slide-qr') {
     renderQR();
@@ -1890,7 +1899,7 @@ function renderQR() {
 function renderWhatsAppQR() {
   var host = document.getElementById('qrcode-wpp');
   if (!host || host.children.length > 0) return;
-  var msg = 'Oi Wladson! Vi sua apresentação e quero receber o meu Mapa do Se Amostramento Profissional 🗺️';
+  var msg = 'Oi! Vi a apresentação e quero receber o meu Mapa do Se Amostramento Astral 🗺️';
   var url = 'https://wa.me/5585921458820?text=' + encodeURIComponent(msg);
   try {
     new QRCode(host, {
@@ -2020,8 +2029,14 @@ function showSuccess() {
 document.addEventListener('keydown', function(e) {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   var key = e.key;
-  if (key === 'ArrowRight' || key === ' ') { e.preventDefault(); next(); }
-  if (key === 'ArrowLeft')  { e.preventDefault(); prev(); }
+  // Avanço: seta direita, espaço, PageDown, seta baixo, Enter
+  if (key === 'ArrowRight' || key === ' ' || key === 'PageDown' || key === 'ArrowDown' || key === 'Enter') {
+    e.preventDefault(); next();
+  }
+  // Voltar: seta esquerda, PageUp, seta cima
+  if (key === 'ArrowLeft' || key === 'PageUp' || key === 'ArrowUp') {
+    e.preventDefault(); prev();
+  }
   if (key === 'f' || key === 'F') toggleFullscreen();
   if (key === 'd' || key === 'D') injectDemo();
 });
