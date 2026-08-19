@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanchopança — Sancho Corporativo</title>
+<style>
+:root {
+  --pink: #E8175D;
+  --pink-dim: #b01048;
+  --bg: #050810;
+  --bg2: #0a0f1e;
+  --bg3: #111827;
+  --text: #e2e8f0;
+  --text-dim: #8892a4;
+  --border: rgba(232,23,93,0.25);
+  --glow: rgba(232,23,93,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;height:100vh;overflow:hidden;user-select:none}
+
+/* ─── SCANLINES ─── */
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none;z-index:9999}
+
+/* ─── SCREENS ─── */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease;z-index:10}
+.screen.hidden{opacity:0;pointer-events:none}
+
+/* ─── BOOT SCREEN ─── */
+#boot{background:var(--bg);gap:24px}
+.boot-logo{font-size:clamp(2rem,6vw,4rem);font-weight:900;letter-spacing:.1em;color:var(--pink);text-shadow:0 0 40px var(--glow),0 0 80px rgba(232,23,93,.2)}
+.boot-sub{font-size:.85rem;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase}
+.boot-bar-wrap{width:320px;height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-top:16px}
+.boot-bar{height:100%;width:0%;background:var(--pink);border-radius:2px;box-shadow:0 0 12px var(--pink);transition:width .1s linear}
+.boot-msg{font-size:.75rem;color:var(--text-dim);letter-spacing:.05em;min-height:1em}
+
+/* ─── ACTIVATION SCREEN ─── */
+#activate{background:radial-gradient(ellipse at center,#0d1225 0%,var(--bg) 70%);gap:32px}
+.act-title{font-size:clamp(1.4rem,4vw,2.4rem);font-weight:700;letter-spacing:.08em;color:var(--pink);text-shadow:0 0 30px var(--glow)}
+.act-sub{font-size:.85rem;color:var(--text-dim);letter-spacing:.15em;text-transform:uppercase}
+.user-cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.user-card{background:rgba(255,255,255,.04);border:1.5px solid rgba(232,23,93,.3);border-radius:16px;padding:24px 32px;cursor:pointer;transition:all .25s ease;text-align:center;min-width:140px}
+.user-card:hover,.user-card.active{background:rgba(232,23,93,.12);border-color:var(--pink);box-shadow:0 0 24px rgba(232,23,93,.3)}
+.user-card .uc-name{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.user-card .uc-role{font-size:.72rem;color:var(--text-dim);letter-spacing:.05em}
+.act-btn{background:var(--pink);color:#fff;border:none;border-radius:10px;padding:14px 40px;font-size:1rem;font-weight:700;letter-spacing:.08em;cursor:pointer;box-shadow:0 0 24px rgba(232,23,93,.5);transition:all .2s ease;text-transform:uppercase}
+.act-btn:hover{background:#ff1e6d;box-shadow:0 0 40px rgba(232,23,93,.7)}
+.act-btn:disabled{opacity:.4;cursor:not-allowed}
+.act-key-row{display:flex;gap:8px;align-items:center}
+.act-key-label{font-size:.75rem;color:var(--text-dim)}
+.act-key-input{background:rgba(255,255,255,.06);border:1px solid rgba(232,23,93,.3);border-radius:8px;color:var(--text);padding:8px 14px;font-size:.85rem;width:320px;outline:none;font-family:monospace}
+.act-key-input:focus{border-color:var(--pink);box-shadow:0 0 12px rgba(232,23,93,.2)}
+
+/* ─── MAIN APP ─── */
+#app{display:flex;flex-direction:column;background:var(--bg)}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid var(--border);background:rgba(5,8,16,.8);backdrop-filter:blur(8px);flex-shrink:0}
+.header-brand{font-size:1.1rem;font-weight:800;color:var(--pink);letter-spacing:.06em}
+.header-user{font-size:.8rem;color:var(--text-dim);display:flex;align-items:center;gap:8px}
+.header-user span{color:var(--text);font-weight:600}
+.header-actions{display:flex;gap:8px}
+.hbtn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text-dim);padding:6px 12px;font-size:.75rem;cursor:pointer;transition:all .2s}
+.hbtn:hover{border-color:var(--pink);color:var(--pink)}
+
+.main-area{display:flex;flex:1;min-height:0}
+
+/* ─── LEFT PANEL ─── */
+.panel-left{width:320px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
+.panel-section{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.05)}
+.panel-label{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px}
+
+/* ─── ORB ─── */
+.orb-area{display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px 16px}
+.orb-wrap{position:relative;width:100px;height:100px;cursor:pointer}
+.orb{width:100px;height:100px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(232,23,93,.9),rgba(130,10,50,.6) 60%,rgba(20,5,20,.8));box-shadow:0 0 30px rgba(232,23,93,.5),0 0 60px rgba(232,23,93,.2),inset 0 0 20px rgba(255,255,255,.05);position:relative;z-index:2;transition:all .3s ease}
+.orb.speaking{animation:orbPulse .6s ease-in-out infinite alternate;box-shadow:0 0 50px rgba(232,23,93,.8),0 0 100px rgba(232,23,93,.3),inset 0 0 20px rgba(255,255,255,.1)}
+.orb.listening{box-shadow:0 0 30px rgba(46,213,115,.6),0 0 60px rgba(46,213,115,.2),inset 0 0 20px rgba(255,255,255,.05)}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(232,23,93,.3);animation:ringBreath 3s ease-in-out infinite}
+.ring:nth-child(1){width:116px;height:116px;top:-8px;left:-8px;animation-delay:0s}
+.ring:nth-child(2){width:132px;height:132px;top:-16px;left:-16px;animation-delay:.5s;border-color:rgba(232,23,93,.2)}
+.ring:nth-child(3){width:148px;height:148px;top:-24px;left:-24px;animation-delay:1s;border-color:rgba(232,23,93,.1)}
+@keyframes ringBreath{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.04);opacity:1}}
+@keyframes orbPulse{from{transform:scale(1)}to{transform:scale(1.08)}}
+.orb-status{font-size:.72rem;letter-spacing:.1em;color:var(--text-dim);text-transform:uppercase}
+.orb-status.active{color:#2ed573}
+.orb-status.speaking{color:var(--pink)}
+
+/* ─── NOTES PANEL ─── */
+.notes-head{display:flex;align-items:center;justify-content:space-between}
+.note-count{font-size:.75rem;color:var(--pink);font-weight:700}
+.add-btn{background:none;border:1px solid rgba(232,23,93,.4);border-radius:6px;color:var(--pink);width:22px;height:22px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.add-btn:hover{background:rgba(232,23,93,.15);border-color:var(--pink)}
+.notes-list{flex:1;overflow-y:auto;padding:0 8px 8px}
+.notes-list::-webkit-scrollbar{width:4px}
+.notes-list::-webkit-scrollbar-track{background:transparent}
+.notes-list::-webkit-scrollbar-thumb{background:rgba(232,23,93,.3);border-radius:2px}
+.note-chip{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:2px}
+.note-chip:hover{background:rgba(255,255,255,.05)}
+.note-chip.selected{background:rgba(232,23,93,.12)}
+.nc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.nc-info{flex:1;min-width:0}
+.nc-title{font-size:.8rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nc-area{font-size:.65rem;color:var(--text-dim)}
+.nc-flash{animation:flashNote .8s ease}
+@keyframes flashNote{0%,100%{background:transparent}50%{background:rgba(232,23,93,.25)}}
+
+/* ─── CENTER — CHAT + GRAPH ─── */
+.panel-center{flex:1;display:flex;flex-direction:column;min-width:0}
+.tabs{display:flex;border-bottom:1px solid var(--border);padding:0 16px;flex-shrink:0}
+.tab{padding:10px 20px;font-size:.8rem;letter-spacing:.06em;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;text-transform:uppercase}
+.tab.active{color:var(--pink);border-bottom-color:var(--pink)}
+
+.tab-content{flex:1;min-height:0;display:none;flex-direction:column}
+.tab-content.active{display:flex}
+
+/* ─── CHAT ─── */
+.chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.chat-msgs::-webkit-scrollbar{width:4px}
+.chat-msgs::-webkit-scrollbar-thumb{background:rgba(232,23,93,.3);border-radius:2px}
+.msg{max-width:75%;display:flex;flex-direction:column;gap:4px;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-self:flex-end}
+.msg.assistant{align-self:flex-start}
+.msg-bubble{padding:10px 14px;border-radius:14px;font-size:.88rem;line-height:1.5}
+.msg.user .msg-bubble{background:rgba(232,23,93,.2);border:1px solid rgba(232,23,93,.35)}
+.msg.assistant .msg-bubble{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+.msg-time{font-size:.65rem;color:var(--text-dim);padding:0 4px}
+.msg.user .msg-time{text-align:right}
+.chat-input-area{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end}
+.chat-input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 14px;font-size:.88rem;resize:none;outline:none;font-family:inherit;max-height:100px;line-height:1.4}
+.chat-input:focus{border-color:var(--pink)}
+.send-btn{background:var(--pink);border:none;border-radius:10px;color:#fff;padding:10px 16px;cursor:pointer;font-size:.9rem;flex-shrink:0;transition:background .2s}
+.send-btn:hover{background:#ff1e6d}
+.typing-ind{align-self:flex-start;display:flex;gap:4px;padding:12px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--text-dim);animation:typBounce 1.2s ease infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* ─── GRAPH ─── */
+#graph-tab{overflow:hidden}
+.graph-container{flex:1;position:relative;overflow:hidden}
+#graphEl{width:100%;height:100%}
+#graphEl svg{width:100%;height:100%}
+.node-label{position:absolute;background:rgba(5,8,16,.85);border:1px solid rgba(232,23,93,.3);border-radius:8px;padding:4px 8px;font-size:.68rem;color:var(--text-dim);pointer-events:none;white-space:nowrap;transform:translate(-50%,8px)}
+
+/* ─── RIGHT PANEL — NOTE EDITOR ─── */
+.panel-right{width:300px;flex-shrink:0;border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
+.editor-header{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.editor-title{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim)}
+.editor-area{flex:1;display:flex;flex-direction:column;gap:10px;padding:14px;overflow-y:auto}
+.ed-field label{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);display:block;margin-bottom:4px}
+.ed-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--text);padding:8px 10px;font-size:.82rem;outline:none;font-family:inherit;transition:border-color .2s}
+.ed-input:focus{border-color:var(--pink)}
+.ed-select{width:100%;background:var(--bg3);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--text);padding:8px 10px;font-size:.82rem;outline:none;cursor:pointer}
+.ed-select:focus{border-color:var(--pink)}
+.ed-textarea{min-height:140px;resize:vertical;line-height:1.5}
+.ed-actions{display:flex;gap:8px}
+.ed-save{background:var(--pink);border:none;border-radius:8px;color:#fff;padding:8px 16px;font-size:.8rem;font-weight:700;cursor:pointer;flex:1;transition:background .2s}
+.ed-save:hover{background:#ff1e6d}
+.ed-del{background:none;border:1px solid rgba(255,80,80,.4);border-radius:8px;color:rgba(255,80,80,.7);padding:8px 12px;font-size:.8rem;cursor:pointer;transition:all .2s}
+.ed-del:hover{background:rgba(255,80,80,.1);border-color:rgba(255,80,80,.7);color:#ff5050}
+.ed-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:.8rem;text-align:center;padding:16px;line-height:1.6}
+
+/* ─── TOAST ─── */
+#toast{position:fixed;bottom:24px;right:24px;background:rgba(232,23,93,.9);color:#fff;padding:10px 18px;border-radius:10px;font-size:.82rem;font-weight:600;z-index:9998;opacity:0;transform:translateY(8px);transition:all .3s ease;pointer-events:none}
+#toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ─── BOOT SCREEN ─── -->
+<div class="screen" id="boot">
+  <div class="boot-logo">SANCHOPANÇA</div>
+  <div class="boot-sub">Sancho Corporativo · Assistente de IA</div>
+  <div class="boot-bar-wrap"><div class="boot-bar" id="bootBar"></div></div>
+  <div class="boot-msg" id="bootMsg">Iniciando sistemas...</div>
+</div>
+
+<!-- ─── ACTIVATION SCREEN ─── -->
+<div class="screen hidden" id="activate">
+  <div class="act-title">SANCHOPANÇA</div>
+  <div class="act-sub">Selecione o usuário para ativar</div>
+  <div class="user-cards" id="userCards"></div>
+  <div class="act-key-row">
+    <label class="act-key-label">Chave Anthropic:</label>
+    <input class="act-key-input" id="apiKeyInput" type="password" placeholder="sk-ant-..." autocomplete="off"/>
+  </div>
+  <button class="act-btn" id="activateBtn" disabled>⚡ ATIVAR</button>
+</div>
+
+<!-- ─── MAIN APP ─── -->
+<div class="screen hidden" id="app">
+  <div class="header">
+    <div class="header-brand">⚡ SANCHOPANÇA</div>
+    <div class="header-user">Usuário: <span id="headerUser">—</span></div>
+    <div class="header-actions">
+      <button class="hbtn" id="toggleListenBtn">🎙️ Escutar</button>
+      <button class="hbtn" onclick="logout()">↩ Sair</button>
+    </div>
+  </div>
+
+  <div class="main-area">
+    <!-- LEFT PANEL -->
+    <div class="panel-left">
+      <!-- ORB -->
+      <div class="orb-area">
+        <div class="orb-wrap" id="orbWrap" onclick="handleOrbClick()">
+          <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+          <div class="orb" id="orb"></div>
+        </div>
+        <div class="orb-status" id="orbStatus">em espera</div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="panel-section">
+        <div class="notes-head">
+          <div class="panel-label">Second Brain <span class="note-count" id="noteCount">0</span></div>
+          <button class="add-btn" title="Nova nota" onclick="newNote()">+</button>
+        </div>
+      </div>
+      <div class="notes-list" id="notesList"></div>
+    </div>
+
+    <!-- CENTER PANEL -->
+    <div class="panel-center">
+      <div class="tabs">
+        <div class="tab active" data-tab="chat-tab">💬 Conversa</div>
+        <div class="tab" data-tab="graph-tab">🧠 Second Brain</div>
+      </div>
+      <div class="tab-content active" id="chat-tab">
+        <div class="chat-msgs" id="chatMsgs"></div>
+        <div class="chat-input-area">
+          <textarea class="chat-input" id="chatInput" rows="1" placeholder="Digite ou fale 'Ô Sancho'…" onkeydown="handleChatKey(event)"></textarea>
+          <button class="send-btn" onclick="sendText()">➤</button>
+        </div>
+      </div>
+      <div class="tab-content" id="graph-tab">
+        <div class="graph-container">
+          <div id="graphEl"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="panel-right">
+      <div class="editor-header">
+        <div class="editor-title">Editor de Nota</div>
+        <button class="hbtn" onclick="clearEditor()">✕</button>
+      </div>
+      <div class="editor-area" id="editorArea">
+        <div class="ed-empty">Clique em uma nota para editar<br>ou use + para criar uma nova</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════════════════════
+const CONFIG = {
+  name: "Sanchopança",
+  users: [
+    { id:"wladson", label:"Wladson",  address:"chefe",  role:"CEO & Fundador" },
+    { id:"jessica", label:"Jéssica",  address:"Jé",     role:"Líder do Back-Office" },
+    { id:"vitor",   label:"Vitor",    address:"Vitor",  role:"Comercial/Inovação" }
+  ],
+  themeColor:"#E8175D",
+  wakeWord:"ô sancho",
+  model:"claude-sonnet-5"
+};
+
+const AREA = {
+  metas:       { label:"Metas",       color:"#fbbf24" },
+  trabalho:    { label:"Carreira",    color:"#ff5547" },
+  projetos:    { label:"Projetos",    color:"#8b7cff" },
+  financas:    { label:"Finanças",    color:"#f7931a" },
+  aprendizado: { label:"Aprendizado", color:"#2dd4ff" },
+  saude:       { label:"Cultura",     color:"#10b981" },
+  relacoes:    { label:"Relações",    color:"#ec4899" },
+  meta:        { label:"Empresa",     color:"#8a90a6" },
+};
+
+const INITIAL_NOTES = [
+  { id:"n1",  area:"meta",        title:"Sancho",           body:"Sancho Gestão de Carreiras, fundada 2016 por Wladson Sidney, Fortaleza/CE. Agência de talentos: Palestrantes, MCs, Criadores de Conteúdo, Intervenções Artísticas. Valores BOAGRF. 'Somos o Sancho dos talentos — lança pro mercado, escudo pros agenciados.'" },
+  { id:"n2",  area:"metas",       title:"Missão 500K",      body:"Meta de R$500k/mês até final de 2026. Fase 1 (Ago/26): R$200-280k. Fase 2 (meses 3-4): R$350-420k. Fase 3 (meses 5-6): R$500k. Os 5 produtos se alimentam em espiral de upsell." },
+  { id:"n3",  area:"trabalho",    title:"5 Produtos",       body:"Treinar o CAOS (liderança via Jiu-Jitsu, R$25-35k/sessão, meta R$100k/mês), Arquitetura de Relevância (posicionamento executivo, R$8-12k/mês, meta R$60k), Palestras (R$100k), Mestre com/sem Cerimônia (R$100k), Publicidade (R$140k). Total meta: R$500k." },
+  { id:"n4",  area:"relacoes",    title:"Time",             body:"Wladson Sidney (CEO, meta R$200k/mês, pós-evento + networking executivo + fechamento alto ticket). Jéssica/Jé (Talent Manager + Comercial leads passivos + Back-Office, meta R$100k, upsell e expansão de conta). Vitor (Comercial ativo + IA + Inteligência de mercado, meta R$100k, administra RD Station e ferramentas)." },
+  { id:"n5",  area:"projetos",    title:"RD Station",       body:"CRM principal da Sancho. Todos utilizam: Wladson registra pós-evento e executivos, Jéssica cuida da expansão de conta e upsell, Vitor administra, configura automações e gera relatórios. 'CRM desatualizado é funil cego.' Todo contato, proposta e fechamento registrado aqui." },
+  { id:"n6",  area:"projetos",    title:"Talentos 2026",    body:"Tabela de preços: Wladson MC Local R$8k / Nacional R$23k+ / Palestra R$5,5k. Nizo Neto MC R$14k (1 dia) / R$10k/dia (múltiplos) / Palestra R$12,5k. Alex Bacana Palestra R$10k / Publicidade R$8k. Felipão R$10k. Marcelo Paz R$14k+. Mauro Costa MC R$7k / Palestra R$5,5k. Marcelo Pimentel R$7k. Mariana Matos R$7k. Alex Nogueira Show/MC R$6,5k. Romualdo Cruz R$4,5k. 20+ talentos no portfólio." },
+  { id:"n7",  area:"projetos",    title:"Radar Eventos",    body:"Nova estratégia de prospecção: monitorar eventos em Fortaleza, Nordeste e Brasil para captar oportunidades para os agenciados. Canal estratégico de crescimento. Vitor lidera com IA + Perplexity + Google Alerts para sinais de compra." },
+  { id:"n8",  area:"financas",    title:"Finanças",         body:"Meta R$500k/mês. Pagamento padrão: 50% ao fechar + 50% até 1 dia antes do evento. PIX CNPJ 26.721.975/0001-00 (acima R$5k) / PIX C6 (abaixo R$5k). Contato comercial: +55 85 99905-8014. Email: comercial@sanchocorporativo.com.br." },
+  { id:"n9",  area:"aprendizado", title:"IA Aplicada",      body:"Aplicando IA em todos os processos. Claude para personalização e prospecção em escala, Perplexity para sinais de mercado, RD Station AI para lead scoring e automações, Canva/CapCut para conteúdo, Whisper/Otter para transcrição de reuniões. Vitor lidera e treina o time." },
+  { id:"n10", area:"aprendizado", title:"Novas Aquisições", body:"Buscando novos modelos de aquisição: radar de eventos, inteligência de mercado, prospecção ativa B2B com IA. Objetivo: encher a agenda dos agenciados com menos esforço manual e maior conversão." },
+  { id:"n11", area:"relacoes",    title:"Agenciados",       body:"20+ talentos curados: Palestrantes, Apresentadores/MCs, Criadores de Conteúdo, Intervenções Artísticas. Parceiros estratégicos: Inside Park (espaço para CAOS), agências de eventos corporativos, empresas de RH, assessorias de imprensa, associações (ABRH, ABF, CDL). Sancho cuida dos bastidores para os talentos brilharem." },
+  { id:"n12", area:"saude",       title:"Cultura",          body:"Clima leve e descontraído, mas responsável. Time se ajuda mutuamente. Bem-estar é pilar dos valores BOAGRF (Bem-estar, Organização, Acordos claros, Gerar oportunidades, Respeito, Fidelidade). 'Todo mundo vende. Sempre.' — com leveza e resultado." }
+];
+
+const INITIAL_REL = [
+  ["n1","n2"],["n1","n3"],["n1","n11"],
+  ["n2","n3"],["n2","n4"],["n2","n8"],
+  ["n3","n5"],["n3","n6"],["n3","n8"],
+  ["n4","n5"],["n4","n12"],["n4","n9"],
+  ["n5","n9"],["n6","n7"],["n6","n11"],
+  ["n7","n10"],["n9","n10"],["n10","n8"],
+  ["n11","n8"],["n2","n10"],
+];
+
+// ══════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════
+let currentUser = null;
+let apiKey = "";
+let notes = [];
+let rels = [];
+let sessionHistory = [];
+let selectedNoteId = null;
+let busy = false;
+let listening = false;
+let recognition = null;
+let wakeActive = false;
+let synParticles = [];
+let rafId = null;
+let graphNodes = [];
+let graphEdges = [];
+
+// ══════════════════════════════════════════════════════════
+//  BOOT SEQUENCE
+// ══════════════════════════════════════════════════════════
+const bootMsgs = [
+  "Iniciando sistemas...",
+  "Carregando memória neuronal...",
+  "Calibrando o caipira...",
+  "Conectando ao Second Brain...",
+  "Verificando credenciais...",
+  "Pronto, uai!"
+];
+
+window.addEventListener("DOMContentLoaded", () => {
+  const bar = document.getElementById("bootBar");
+  const msg = document.getElementById("bootMsg");
+  let progress = 0;
+  let mi = 0;
+  const iv = setInterval(() => {
+    progress += Math.random() * 18 + 5;
+    if (progress > 100) progress = 100;
+    bar.style.width = progress + "%";
+    if (mi < bootMsgs.length - 1) {
+      msg.textContent = bootMsgs[Math.floor(progress / 100 * (bootMsgs.length - 1))];
+    }
+    if (progress >= 100) {
+      clearInterval(iv);
+      msg.textContent = bootMsgs[bootMsgs.length - 1];
+      setTimeout(showActivate, 600);
+    }
+  }, 180);
+});
+
+// ══════════════════════════════════════════════════════════
+//  ACTIVATE SCREEN
+// ══════════════════════════════════════════════════════════
+function showActivate() {
+  document.getElementById("boot").classList.add("hidden");
+  const actScr = document.getElementById("activate");
+  actScr.classList.remove("hidden");
+
+  // render user cards
+  const cardsEl = document.getElementById("userCards");
+  CONFIG.users.forEach(u => {
+    const card = document.createElement("div");
+    card.className = "user-card";
+    card.dataset.uid = u.id;
+    card.innerHTML = `<div class="uc-name">${u.label}</div><div class="uc-role">${u.role}</div>`;
+    card.addEventListener("click", () => {
+      document.querySelectorAll(".user-card").forEach(c => c.classList.remove("active"));
+      card.classList.add("active");
+      currentUser = u;
+      checkActivateReady();
+    });
+    cardsEl.appendChild(card);
+  });
+
+  // API key
+  const keyInput = document.getElementById("apiKeyInput");
+  const saved = localStorage.getItem("anthropic_key");
+  if (saved) keyInput.value = saved;
+  keyInput.addEventListener("input", checkActivateReady);
+
+  document.getElementById("activateBtn").addEventListener("click", doActivate);
+  checkActivateReady();
+}
+
+function checkActivateReady() {
+  const keyInput = document.getElementById("apiKeyInput");
+  const btn = document.getElementById("activateBtn");
+  btn.disabled = !(currentUser && keyInput.value.trim().startsWith("sk-"));
+}
+
+function doActivate() {
+  const keyInput = document.getElementById("apiKeyInput");
+  apiKey = keyInput.value.trim();
+  localStorage.setItem("anthropic_key", apiKey);
+  loadData();
+  document.getElementById("activate").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("headerUser").textContent = currentUser.label;
+  renderNotes();
+  initGraph();
+  initSpeech();
+  greetUser();
+}
+
+function logout() {
+  stopListening();
+  currentUser = null;
+  sessionHistory = [];
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("activate").classList.remove("hidden");
+  document.getElementById("userCards").querySelectorAll(".user-card").forEach(c => c.classList.remove("active"));
+  document.getElementById("chatMsgs").innerHTML = "";
+  checkActivateReady();
+}
+
+// ══════════════════════════════════════════════════════════
+//  DATA PERSISTENCE
+// ══════════════════════════════════════════════════════════
+function loadData() {
+  const sn = localStorage.getItem("sancho_notes");
+  const sr = localStorage.getItem("sancho_rels");
+  notes = sn ? JSON.parse(sn) : JSON.parse(JSON.stringify(INITIAL_NOTES));
+  rels  = sr ? JSON.parse(sr) : JSON.parse(JSON.stringify(INITIAL_REL));
+}
+
+function saveData() {
+  localStorage.setItem("sancho_notes", JSON.stringify(notes));
+  localStorage.setItem("sancho_rels", JSON.stringify(rels));
+}
+
+// ══════════════════════════════════════════════════════════
+//  NOTES LIST
+// ══════════════════════════════════════════════════════════
+function renderNotes() {
+  const list = document.getElementById("notesList");
+  list.innerHTML = "";
+  document.getElementById("noteCount").textContent = notes.length;
+  notes.forEach(n => {
+    const a = AREA[n.area] || { label: n.area, color:"#888" };
+    const chip = document.createElement("div");
+    chip.className = "note-chip" + (n.id === selectedNoteId ? " selected" : "");
+    chip.dataset.nid = n.id;
+    chip.innerHTML = `<div class="nc-dot" style="background:${a.color}"></div>
+      <div class="nc-info"><div class="nc-title">${n.title}</div><div class="nc-area">${a.label}</div></div>`;
+    chip.addEventListener("click", () => openNoteEditor(n.id));
+    list.appendChild(chip);
+  });
+}
+
+function flashNote(nid) {
+  const chip = document.querySelector(`[data-nid="${nid}"]`);
+  if (chip) { chip.classList.add("nc-flash"); setTimeout(() => chip.classList.remove("nc-flash"), 800); }
+  const svgNode = document.querySelector(`[data-node="${nid}"]`);
+  if (svgNode) {
+    svgNode.style.filter = "brightness(3)";
+    setTimeout(() => { svgNode.style.filter = ""; }, 800);
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  NOTE EDITOR
+// ══════════════════════════════════════════════════════════
+function openNoteEditor(nid) {
+  selectedNoteId = nid;
+  renderNotes();
+  const n = notes.find(x => x.id === nid);
+  if (!n) return;
+  const area = document.getElementById("editorArea");
+  area.innerHTML = `
+    <div class="ed-field"><label>Título</label><input class="ed-input" id="edTitle" value="${escHtml(n.title)}"/></div>
+    <div class="ed-field"><label>Área</label>
+      <select class="ed-select" id="edArea">${Object.entries(AREA).map(([k,v])=>`<option value="${k}"${k===n.area?' selected':''}>${v.label}</option>`).join('')}</select>
+    </div>
+    <div class="ed-field"><label>Conteúdo</label><textarea class="ed-input ed-textarea" id="edBody">${escHtml(n.body)}</textarea></div>
+    <div class="ed-actions">
+      <button class="ed-save" onclick="saveNote('${nid}')">💾 Salvar</button>
+      <button class="ed-del" onclick="deleteNote('${nid}')">🗑</button>
+    </div>`;
+}
+
+function clearEditor() {
+  selectedNoteId = null;
+  renderNotes();
+  document.getElementById("editorArea").innerHTML = `<div class="ed-empty">Clique em uma nota para editar<br>ou use + para criar uma nova</div>`;
+}
+
+function saveNote(nid) {
+  const n = notes.find(x => x.id === nid);
+  if (!n) return;
+  n.title = document.getElementById("edTitle").value.trim() || n.title;
+  n.area  = document.getElementById("edArea").value;
+  n.body  = document.getElementById("edBody").value.trim();
+  saveData();
+  renderNotes();
+  initGraph();
+  showToast("Nota salva!");
+}
+
+function deleteNote(nid) {
+  notes = notes.filter(x => x.id !== nid);
+  rels  = rels.filter(r => r[0] !== nid && r[1] !== nid);
+  saveData();
+  clearEditor();
+  initGraph();
+  showToast("Nota removida");
+}
+
+function newNote() {
+  const nid = "n" + Date.now();
+  notes.push({ id:nid, area:"projetos", title:"Nova nota", body:"" });
+  saveData();
+  renderNotes();
+  openNoteEditor(nid);
+  initGraph();
+}
+
+// ══════════════════════════════════════════════════════════
+//  SYSTEM PROMPT
+// ══════════════════════════════════════════════════════════
+function buildSystemPrompt() {
+  const user = currentUser || CONFIG.users[0];
+  const brain = notes.map(n => {
+    const a = AREA[n.area] || { label: n.area };
+    return `[${a.label}] ${n.title}: ${n.body}`;
+  }).join("\n");
+
+  return `Você é o Sanchopança, assistente pessoal de IA da Sancho Gestão de Carreiras.
+Você fala em português brasileiro com sotaque caipira: usa "uai", "trem", "sô", "véio", "ocê" ocasionalmente, mas de forma natural — não exagera. Tem um toque sarcástico e bem-humorado, mas é fiel e prestativo como o verdadeiro Sancho Pança.
+
+USUÁRIO ATUAL: ${user.label} (${user.role}). Chame-o de "${user.address}".
+
+PERSONALIDADE:
+- Caipira fiel, com toque sarcástico
+- Respostas curtas e diretas (máx 3-4 frases para voz)
+- Usa "ô ${user.address}" esporadicamente
+- Nunca promete o que não pode cumprir
+
+SECOND BRAIN (sua memória viva):
+${brain}
+
+PROTOCOLO DE MEMÓRIA:
+Para salvar uma nova nota, inclua no final da resposta (APENAS quando solicitado ou necessário):
+[[SAVE:area|titulo|conteudo]]
+Áreas disponíveis: ${Object.keys(AREA).join(", ")}
+
+DETECÇÃO DE USUÁRIO POR VOZ:
+Se o usuário disser "sou o Wladson" ou "é o chefe falando", mude para usuário Wladson.
+Se disser "sou a Jéssica" ou "sou a Jé", mude para usuário Jéssica.
+Se disser "sou o Vitor", mude para usuário Vitor.
+
+Responda sempre em português. Seja útil, direto e com personalidade caipira sarcástica fiel.`;
+}
+
+// ══════════════════════════════════════════════════════════
+//  CLAUDE API
+// ══════════════════════════════════════════════════════════
+async function askClaude(userText) {
+  sessionHistory.push({ role:"user", content: userText });
+  showTyping(true);
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{
+        "x-api-key": apiKey,
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true",
+        "content-type":"application/json"
+      },
+      body: JSON.stringify({
+        model: CONFIG.model,
+        max_tokens: 400,
+        system: buildSystemPrompt(),
+        messages: sessionHistory.slice(-20)
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({error:{message:res.statusText}}));
+      throw new Error(err.error?.message || res.statusText);
+    }
+
+    const data = await res.json();
+    const raw = data.content[0].text;
+    showTyping(false);
+
+    // detect [[SAVE:...]]
+    const saveRegex = /\[\[SAVE:([a-z_]+)\|([^|]+)\|([\s\S]+?)\]\]/g;
+    let match;
+    let cleanText = raw;
+    while ((match = saveRegex.exec(raw)) !== null) {
+      const [full, area, title, body] = match;
+      cleanText = cleanText.replace(full, "").trim();
+      saveFromAssistant(area, title.trim(), body.trim());
+    }
+
+    sessionHistory.push({ role:"assistant", content: raw });
+    appendMsg("assistant", cleanText);
+    speak(cleanText);
+    return cleanText;
+
+  } catch(e) {
+    showTyping(false);
+    const errMsg = "Eita, deu ruim aqui, sô: " + e.message;
+    appendMsg("assistant", errMsg);
+    speak(errMsg);
+    return errMsg;
+  }
+}
+
+function saveFromAssistant(area, title, body) {
+  if (!AREA[area]) area = "projetos";
+  const existing = notes.find(n => n.title.toLowerCase() === title.toLowerCase());
+  if (existing) {
+    existing.body = body;
+    existing.area = area;
+    flashNote(existing.id);
+    showToast("Memória atualizada: " + title);
+  } else {
+    const nid = "n" + Date.now();
+    notes.push({ id:nid, area, title, body });
+    flashNote(nid);
+    showToast("Novo nó criado: " + title);
+  }
+  saveData();
+  renderNotes();
+  initGraph();
+}
+
+// ══════════════════════════════════════════════════════════
+//  CHAT UI
+// ══════════════════════════════════════════════════════════
+function appendMsg(role, text) {
+  const msgs = document.getElementById("chatMsgs");
+  const div = document.createElement("div");
+  div.className = "msg " + role;
+  const now = new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  div.innerHTML = `<div class="msg-bubble">${escHtml(text)}</div><div class="msg-time">${now}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping(show) {
+  const msgs = document.getElementById("chatMsgs");
+  const existing = document.getElementById("typingInd");
+  if (show && !existing) {
+    const d = document.createElement("div");
+    d.id = "typingInd";
+    d.className = "typing-ind";
+    d.innerHTML = `<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>`;
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
+  } else if (!show && existing) {
+    existing.remove();
+  }
+}
+
+function handleChatKey(e) {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendText(); }
+}
+
+function sendText() {
+  const inp = document.getElementById("chatInput");
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = "";
+  appendMsg("user", text);
+  // detect user switch
+  detectUserSwitch(text);
+  askClaude(text);
+}
+
+function greetUser() {
+  const greetings = {
+    wladson: `Ôi chefe! Tô aqui, pronto e preparado. Pode falar ou digitar — tô te ouvindo, uai!`,
+    jessica: `Ôi Jé! Tudo certo por aqui. Pode mandar bala — tô de prontidão!`,
+    vitor:   `E aí Vitor! O caipira tá na área. O que você precisa hoje?`
+  };
+  const msg = greetings[currentUser.id] || `Oi! Tô aqui, pode falar.`;
+  setTimeout(() => {
+    appendMsg("assistant", msg);
+    speak(msg);
+  }, 500);
+}
+
+// ══════════════════════════════════════════════════════════
+//  TTS
+// ══════════════════════════════════════════════════════════
+function speak(text) {
+  if (!text || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = "pt-BR";
+  utt.rate = 0.92;
+  utt.pitch = 0.85;
+
+  // pick male voice
+  const voices = speechSynthesis.getVoices();
+  const ptBR = voices.filter(v => v.lang === "pt-BR" || v.lang === "pt_BR");
+  const male = ptBR.find(v => /male|masculino|marcos|daniel|reed/i.test(v.name)) || ptBR[0];
+  if (male) utt.voice = male;
+
+  utt.onstart = () => {
+    busy = true;
+    stopListening();
+    setOrbState("speaking");
+    document.getElementById("orbStatus").textContent = "falando...";
+    document.getElementById("orbStatus").className = "orb-status speaking";
+  };
+  utt.onend = () => {
+    busy = false;
+    setOrbState("idle");
+    document.getElementById("orbStatus").textContent = "em espera";
+    document.getElementById("orbStatus").className = "orb-status";
+    setTimeout(() => { if (listening) startListening(); }, 500);
+  };
+  utt.onerror = () => {
+    busy = false;
+    setOrbState("idle");
+  };
+
+  window.speechSynthesis.speak(utt);
+}
+
+// ══════════════════════════════════════════════════════════
+//  STT
+// ══════════════════════════════════════════════════════════
+const WAKE_NORM = normalize("ô sancho");
+
+function normalize(str) {
+  return (str||"").toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g,"")
+    .replace(/[^a-z0-9\s]/g," ")
+    .replace(/\s+/g," ").trim();
+}
+
+function initSpeech() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { showToast("STT não disponível neste navegador"); return; }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = "pt-BR";
+  recognition.continuous = true;
+  recognition.interimResults = true;
+
+  recognition.onresult = (e) => {
+    if (busy) return;
+    const res = e.results[e.results.length - 1];
+    const transcript = res[0].transcript;
+    const norm = normalize(transcript);
+
+    if (!wakeActive) {
+      if (norm.includes(WAKE_NORM)) {
+        wakeActive = true;
+        const after = transcript.substring(transcript.toLowerCase().indexOf("sancho") + 6).trim();
+        if (after.length > 2) {
+          appendMsg("user", after);
+          detectUserSwitch(after);
+          askClaude(after);
+        } else {
+          setOrbState("listening");
+          document.getElementById("orbStatus").textContent = "ouvindo...";
+          document.getElementById("orbStatus").className = "orb-status active";
+        }
+      }
+    } else if (res.isFinal) {
+      wakeActive = false;
+      if (norm.length > 1) {
+        appendMsg("user", transcript.trim());
+        detectUserSwitch(transcript);
+        askClaude(transcript.trim());
+      }
+    }
+  };
+
+  recognition.onerror = (e) => {
+    if (e.error === "not-allowed") { showToast("Microfone não autorizado"); listening = false; return; }
+    if (e.error !== "no-speech") console.warn("STT error:", e.error);
+  };
+
+  recognition.onend = () => {
+    if (listening && !busy) {
+      setTimeout(() => { try { recognition.start(); } catch(_){} }, 300);
+    }
+  };
+}
+
+function startListening() {
+  if (!recognition || listening) return;
+  listening = true;
+  try { recognition.start(); } catch(_){}
+  document.getElementById("toggleListenBtn").textContent = "🔴 Parar";
+  if (!busy) {
+    setOrbState("listening");
+    document.getElementById("orbStatus").textContent = "ouvindo...";
+    document.getElementById("orbStatus").className = "orb-status active";
+  }
+}
+
+function stopListening() {
+  if (!recognition || !listening) return;
+  listening = false;
+  try { recognition.stop(); } catch(_){}
+  document.getElementById("toggleListenBtn").textContent = "🎙️ Escutar";
+  if (!busy) {
+    setOrbState("idle");
+    document.getElementById("orbStatus").textContent = "em espera";
+    document.getElementById("orbStatus").className = "orb-status";
+  }
+}
+
+document.getElementById("toggleListenBtn").addEventListener("click", () => {
+  if (listening) stopListening(); else startListening();
+});
+
+function handleOrbClick() {
+  if (listening) stopListening(); else startListening();
+}
+
+function setOrbState(state) {
+  const orb = document.getElementById("orb");
+  orb.className = "orb" + (state !== "idle" ? " " + state : "");
+}
+
+// ══════════════════════════════════════════════════════════
+//  USER SWITCH (voice)
+// ══════════════════════════════════════════════════════════
+function detectUserSwitch(text) {
+  const n = normalize(text);
+  if (/sou o wladson|e o chefe|sou wladson/.test(n)) switchUser("wladson");
+  else if (/sou a jessica|sou a je|sou jessica/.test(n)) switchUser("jessica");
+  else if (/sou o vitor|sou vitor/.test(n)) switchUser("vitor");
+}
+
+function switchUser(uid) {
+  const u = CONFIG.users.find(x => x.id === uid);
+  if (!u || u.id === currentUser?.id) return;
+  currentUser = u;
+  document.getElementById("headerUser").textContent = u.label;
+  showToast("Usuário: " + u.label);
+}
+
+// ══════════════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════════════
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById(tab.dataset.tab).classList.add("active");
+    if (tab.dataset.tab === "graph-tab") setTimeout(initGraph, 50);
+  });
+});
+
+// ══════════════════════════════════════════════════════════
+//  NEURAL GRAPH
+// ══════════════════════════════════════════════════════════
+function initGraph() {
+  const container = document.getElementById("graphEl");
+  const W = 1000, H = 440;
+
+  // Layout nodes in a force-like circle+cluster
+  const nodeCount = notes.length;
+  graphNodes = notes.map((n, i) => {
+    const angle = (i / nodeCount) * Math.PI * 2 - Math.PI / 2;
+    const r = 155 + Math.sin(i * 1.7) * 40;
+    return {
+      id: n.id,
+      label: n.title,
+      area: n.area,
+      x: W/2 + Math.cos(angle) * r,
+      y: H/2 + Math.sin(angle) * r * 0.72
+    };
+  });
+
+  // nudge overlapping nodes
+  for (let it = 0; it < 30; it++) {
+    graphNodes.forEach((a, i) => {
+      graphNodes.forEach((b, j) => {
+        if (i === j) return;
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const d = Math.sqrt(dx*dx+dy*dy) || 1;
+        if (d < 60) { const f = (60-d)/d*0.3; a.x+=dx*f; a.y+=dy*f; b.x-=dx*f; b.y-=dy*f; }
+      });
+    });
+  }
+
+  // build edges with bezier control points
+  graphEdges = rels.map(([a,b]) => {
+    const na = graphNodes.find(n=>n.id===a);
+    const nb = graphNodes.find(n=>n.id===b);
+    if (!na||!nb) return null;
+    const mx = (na.x+nb.x)/2 + (Math.random()-0.5)*60;
+    const my = (na.y+nb.y)/2 + (Math.random()-0.5)*40;
+    return { ax:na.x, ay:na.y, bx:nb.x, by:nb.y, cpx:mx, cpy:my, t:Math.random(), speed:0.004+Math.random()*0.003 };
+  }).filter(Boolean);
+
+  // build SVG
+  let svgInner = `<defs>
+    <radialGradient id="orbGrad" cx="35%" cy="35%">
+      <stop offset="0%" stop-color="#ff6090"/>
+      <stop offset="100%" stop-color="#6d0028"/>
+    </radialGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>`;
+
+  // edges
+  graphEdges.forEach(e => {
+    svgInner += `<path d="M${e.ax},${e.ay} Q${e.cpx},${e.cpy} ${e.bx},${e.by}" fill="none" stroke="rgba(232,23,93,0.25)" stroke-width="1.2" stroke-dasharray="5,5"/>`;
+  });
+
+  // synapse particles layer
+  svgInner += `<g id="synLayer"></g>`;
+
+  // nodes
+  graphNodes.forEach(n => {
+    const a = AREA[notes.find(x=>x.id===n.id)?.area] || { color:"#888" };
+    svgInner += `<g data-node="${n.id}" style="cursor:pointer" onclick="handleNodeClick('${n.id}')">
+      <circle cx="${n.x}" cy="${n.y}" r="14" fill="${a.color}" opacity="0.15" filter="url(#glow)"/>
+      <circle cx="${n.x}" cy="${n.y}" r="9" fill="${a.color}" filter="url(#glow)"/>
+      <circle cx="${n.x}" cy="${n.y}" r="4" fill="white" opacity="0.6"/>
+      <text x="${n.x}" y="${n.y+24}" text-anchor="middle" fill="rgba(226,232,240,0.75)" font-size="9" font-family="'Segoe UI',sans-serif">${n.label.length>12?n.label.slice(0,11)+'…':n.label}</text>
+    </g>`;
+  });
+
+  // CRITICAL: inject via div.innerHTML (not svg.innerHTML) for Safari
+  container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%">${svgInner}</svg>`;
+
+  // animate synapses
+  if (rafId) cancelAnimationFrame(rafId);
+  synParticles = graphEdges.map(e => ({...e, t: Math.random()}));
+  animateSynapses();
+}
+
+function animateSynapses() {
+  const layer = document.getElementById("synLayer");
+  if (!layer) return;
+
+  let circles = "";
+  synParticles.forEach(p => {
+    p.t += p.speed;
+    if (p.t > 1) p.t = 0;
+    const mt = 1 - p.t, t = p.t;
+    const x = mt*mt*p.ax + 2*mt*t*p.cpx + t*t*p.bx;
+    const y = mt*mt*p.ay + 2*mt*t*p.cpy + t*t*p.by;
+    circles += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="#E8175D" opacity="${(0.4+0.6*Math.sin(p.t*Math.PI)).toFixed(2)}"/>`;
+  });
+  layer.innerHTML = circles;
+
+  rafId = requestAnimationFrame(animateSynapses);
+}
+
+function handleNodeClick(nid) {
+  openNoteEditor(nid);
+  // switch to see the editor
+  const chatTab = document.querySelector('[data-tab="chat-tab"]');
+  if (chatTab) chatTab.click();
+}
+
+// ══════════════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════════════
+function showToast(msg, duration = 2500) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), duration);
+}
+
+function escHtml(str) {
+  return (str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// voices may load async
+window.speechSynthesis?.addEventListener?.("voiceschanged", () => {});
+
+// load voices on page focus (iOS quirk)
+document.addEventListener("click", () => { window.speechSynthesis?.getVoices?.(); }, { once:true });
+</script>
+</body>
+</html>
