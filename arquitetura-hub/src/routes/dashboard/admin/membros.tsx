@@ -859,8 +859,8 @@ function MembrosPage() {
                             {/* Stats row */}
                             <div className="grid grid-cols-2 gap-px bg-gray-200">
                               {[
-                                { label: 'Leads',   value: `${member.leads}`,  color: '#10B981' },
-                                { label: 'Alcance', value: member.alcance >= 1000 ? `${(member.alcance/1000).toFixed(1)}k` : `${member.alcance}`, color: '#3B82F6' },
+                                { label: 'Leads',   value: `${member.leads}`,  color: '#10B981', suffix: '' as string | undefined },
+                                { label: 'Alcance', value: member.alcance >= 1000 ? `${(member.alcance/1000).toFixed(1)}k` : `${member.alcance}`, color: '#3B82F6', suffix: member.alcance >= 1000 ? '' : undefined },
                               ].map(s => (
                                 <div key={s.label} className="bg-white px-4 py-3 text-center">
                                   <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">{s.label}</p>

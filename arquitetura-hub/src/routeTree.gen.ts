@@ -15,6 +15,7 @@ import { Route as DashboardMembroRouteImport } from './routes/dashboard/membro'
 import { Route as DashboardAdminRouteImport } from './routes/dashboard/admin'
 import { Route as DashboardMembroIndexRouteImport } from './routes/dashboard/membro/index'
 import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard/admin/index'
+import { Route as DashboardMembroVisibilidadeRouteImport } from './routes/dashboard/membro/visibilidade'
 import { Route as DashboardMembroTarefasRouteImport } from './routes/dashboard/membro/tarefas'
 import { Route as DashboardMembroRelatoriosRouteImport } from './routes/dashboard/membro/relatorios'
 import { Route as DashboardMembroPosicionamentoRouteImport } from './routes/dashboard/membro/posicionamento'
@@ -23,6 +24,7 @@ import { Route as DashboardMembroOkrRouteImport } from './routes/dashboard/membr
 import { Route as DashboardMembroMarketingRouteImport } from './routes/dashboard/membro/marketing'
 import { Route as DashboardMembroKpisRouteImport } from './routes/dashboard/membro/kpis'
 import { Route as DashboardMembroAgendaRouteImport } from './routes/dashboard/membro/agenda'
+import { Route as DashboardAdminVisibilidadeRouteImport } from './routes/dashboard/admin/visibilidade'
 import { Route as DashboardAdminRelatoriosRouteImport } from './routes/dashboard/admin/relatorios'
 import { Route as DashboardAdminMembrosRouteImport } from './routes/dashboard/admin/membros'
 
@@ -56,6 +58,12 @@ const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardAdminRoute,
 } as any)
+const DashboardMembroVisibilidadeRoute =
+  DashboardMembroVisibilidadeRouteImport.update({
+    id: '/visibilidade',
+    path: '/visibilidade',
+    getParentRoute: () => DashboardMembroRoute,
+  } as any)
 const DashboardMembroTarefasRoute = DashboardMembroTarefasRouteImport.update({
   id: '/tarefas',
   path: '/tarefas',
@@ -99,6 +107,12 @@ const DashboardMembroAgendaRoute = DashboardMembroAgendaRouteImport.update({
   path: '/agenda',
   getParentRoute: () => DashboardMembroRoute,
 } as any)
+const DashboardAdminVisibilidadeRoute =
+  DashboardAdminVisibilidadeRouteImport.update({
+    id: '/visibilidade',
+    path: '/visibilidade',
+    getParentRoute: () => DashboardAdminRoute,
+  } as any)
 const DashboardAdminRelatoriosRoute =
   DashboardAdminRelatoriosRouteImport.update({
     id: '/relatorios',
@@ -118,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/membro': typeof DashboardMembroRouteWithChildren
   '/dashboard/admin/membros': typeof DashboardAdminMembrosRoute
   '/dashboard/admin/relatorios': typeof DashboardAdminRelatoriosRoute
+  '/dashboard/admin/visibilidade': typeof DashboardAdminVisibilidadeRoute
   '/dashboard/membro/agenda': typeof DashboardMembroAgendaRoute
   '/dashboard/membro/kpis': typeof DashboardMembroKpisRoute
   '/dashboard/membro/marketing': typeof DashboardMembroMarketingRoute
@@ -126,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/membro/posicionamento': typeof DashboardMembroPosicionamentoRoute
   '/dashboard/membro/relatorios': typeof DashboardMembroRelatoriosRoute
   '/dashboard/membro/tarefas': typeof DashboardMembroTarefasRoute
+  '/dashboard/membro/visibilidade': typeof DashboardMembroVisibilidadeRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/membro/': typeof DashboardMembroIndexRoute
 }
@@ -134,6 +150,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard/admin/membros': typeof DashboardAdminMembrosRoute
   '/dashboard/admin/relatorios': typeof DashboardAdminRelatoriosRoute
+  '/dashboard/admin/visibilidade': typeof DashboardAdminVisibilidadeRoute
   '/dashboard/membro/agenda': typeof DashboardMembroAgendaRoute
   '/dashboard/membro/kpis': typeof DashboardMembroKpisRoute
   '/dashboard/membro/marketing': typeof DashboardMembroMarketingRoute
@@ -142,6 +159,7 @@ export interface FileRoutesByTo {
   '/dashboard/membro/posicionamento': typeof DashboardMembroPosicionamentoRoute
   '/dashboard/membro/relatorios': typeof DashboardMembroRelatoriosRoute
   '/dashboard/membro/tarefas': typeof DashboardMembroTarefasRoute
+  '/dashboard/membro/visibilidade': typeof DashboardMembroVisibilidadeRoute
   '/dashboard/admin': typeof DashboardAdminIndexRoute
   '/dashboard/membro': typeof DashboardMembroIndexRoute
 }
@@ -153,6 +171,7 @@ export interface FileRoutesById {
   '/dashboard/membro': typeof DashboardMembroRouteWithChildren
   '/dashboard/admin/membros': typeof DashboardAdminMembrosRoute
   '/dashboard/admin/relatorios': typeof DashboardAdminRelatoriosRoute
+  '/dashboard/admin/visibilidade': typeof DashboardAdminVisibilidadeRoute
   '/dashboard/membro/agenda': typeof DashboardMembroAgendaRoute
   '/dashboard/membro/kpis': typeof DashboardMembroKpisRoute
   '/dashboard/membro/marketing': typeof DashboardMembroMarketingRoute
@@ -161,6 +180,7 @@ export interface FileRoutesById {
   '/dashboard/membro/posicionamento': typeof DashboardMembroPosicionamentoRoute
   '/dashboard/membro/relatorios': typeof DashboardMembroRelatoriosRoute
   '/dashboard/membro/tarefas': typeof DashboardMembroTarefasRoute
+  '/dashboard/membro/visibilidade': typeof DashboardMembroVisibilidadeRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/membro/': typeof DashboardMembroIndexRoute
 }
@@ -173,6 +193,7 @@ export interface FileRouteTypes {
     | '/dashboard/membro'
     | '/dashboard/admin/membros'
     | '/dashboard/admin/relatorios'
+    | '/dashboard/admin/visibilidade'
     | '/dashboard/membro/agenda'
     | '/dashboard/membro/kpis'
     | '/dashboard/membro/marketing'
@@ -181,6 +202,7 @@ export interface FileRouteTypes {
     | '/dashboard/membro/posicionamento'
     | '/dashboard/membro/relatorios'
     | '/dashboard/membro/tarefas'
+    | '/dashboard/membro/visibilidade'
     | '/dashboard/admin/'
     | '/dashboard/membro/'
   fileRoutesByTo: FileRoutesByTo
@@ -189,6 +211,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard/admin/membros'
     | '/dashboard/admin/relatorios'
+    | '/dashboard/admin/visibilidade'
     | '/dashboard/membro/agenda'
     | '/dashboard/membro/kpis'
     | '/dashboard/membro/marketing'
@@ -197,6 +220,7 @@ export interface FileRouteTypes {
     | '/dashboard/membro/posicionamento'
     | '/dashboard/membro/relatorios'
     | '/dashboard/membro/tarefas'
+    | '/dashboard/membro/visibilidade'
     | '/dashboard/admin'
     | '/dashboard/membro'
   id:
@@ -207,6 +231,7 @@ export interface FileRouteTypes {
     | '/dashboard/membro'
     | '/dashboard/admin/membros'
     | '/dashboard/admin/relatorios'
+    | '/dashboard/admin/visibilidade'
     | '/dashboard/membro/agenda'
     | '/dashboard/membro/kpis'
     | '/dashboard/membro/marketing'
@@ -215,6 +240,7 @@ export interface FileRouteTypes {
     | '/dashboard/membro/posicionamento'
     | '/dashboard/membro/relatorios'
     | '/dashboard/membro/tarefas'
+    | '/dashboard/membro/visibilidade'
     | '/dashboard/admin/'
     | '/dashboard/membro/'
   fileRoutesById: FileRoutesById
@@ -269,6 +295,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/admin/'
       preLoaderRoute: typeof DashboardAdminIndexRouteImport
       parentRoute: typeof DashboardAdminRoute
+    }
+    '/dashboard/membro/visibilidade': {
+      id: '/dashboard/membro/visibilidade'
+      path: '/visibilidade'
+      fullPath: '/dashboard/membro/visibilidade'
+      preLoaderRoute: typeof DashboardMembroVisibilidadeRouteImport
+      parentRoute: typeof DashboardMembroRoute
     }
     '/dashboard/membro/tarefas': {
       id: '/dashboard/membro/tarefas'
@@ -326,6 +359,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardMembroAgendaRouteImport
       parentRoute: typeof DashboardMembroRoute
     }
+    '/dashboard/admin/visibilidade': {
+      id: '/dashboard/admin/visibilidade'
+      path: '/visibilidade'
+      fullPath: '/dashboard/admin/visibilidade'
+      preLoaderRoute: typeof DashboardAdminVisibilidadeRouteImport
+      parentRoute: typeof DashboardAdminRoute
+    }
     '/dashboard/admin/relatorios': {
       id: '/dashboard/admin/relatorios'
       path: '/relatorios'
@@ -346,12 +386,14 @@ declare module '@tanstack/react-router' {
 interface DashboardAdminRouteChildren {
   DashboardAdminMembrosRoute: typeof DashboardAdminMembrosRoute
   DashboardAdminRelatoriosRoute: typeof DashboardAdminRelatoriosRoute
+  DashboardAdminVisibilidadeRoute: typeof DashboardAdminVisibilidadeRoute
   DashboardAdminIndexRoute: typeof DashboardAdminIndexRoute
 }
 
 const DashboardAdminRouteChildren: DashboardAdminRouteChildren = {
   DashboardAdminMembrosRoute: DashboardAdminMembrosRoute,
   DashboardAdminRelatoriosRoute: DashboardAdminRelatoriosRoute,
+  DashboardAdminVisibilidadeRoute: DashboardAdminVisibilidadeRoute,
   DashboardAdminIndexRoute: DashboardAdminIndexRoute,
 }
 
@@ -368,6 +410,7 @@ interface DashboardMembroRouteChildren {
   DashboardMembroPosicionamentoRoute: typeof DashboardMembroPosicionamentoRoute
   DashboardMembroRelatoriosRoute: typeof DashboardMembroRelatoriosRoute
   DashboardMembroTarefasRoute: typeof DashboardMembroTarefasRoute
+  DashboardMembroVisibilidadeRoute: typeof DashboardMembroVisibilidadeRoute
   DashboardMembroIndexRoute: typeof DashboardMembroIndexRoute
 }
 
@@ -380,6 +423,7 @@ const DashboardMembroRouteChildren: DashboardMembroRouteChildren = {
   DashboardMembroPosicionamentoRoute: DashboardMembroPosicionamentoRoute,
   DashboardMembroRelatoriosRoute: DashboardMembroRelatoriosRoute,
   DashboardMembroTarefasRoute: DashboardMembroTarefasRoute,
+  DashboardMembroVisibilidadeRoute: DashboardMembroVisibilidadeRoute,
   DashboardMembroIndexRoute: DashboardMembroIndexRoute,
 }
 

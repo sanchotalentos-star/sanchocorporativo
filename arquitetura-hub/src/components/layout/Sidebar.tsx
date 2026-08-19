@@ -16,9 +16,10 @@ interface NavGroup { section: string; items: NavItem[] }
 
 const adminGroups: NavGroup[] = [
   { section: 'Visão Geral', items: [
-    { label: 'Dashboard',  href: '/dashboard/admin'            },
-    { label: 'Membros',    href: '/dashboard/admin/membros'    },
-    { label: 'Relatórios', href: '/dashboard/admin/relatorios' },
+    { label: 'Dashboard',           href: '/dashboard/admin'                  },
+    { label: 'Membros',             href: '/dashboard/admin/membros'          },
+    { label: 'Relatórios',          href: '/dashboard/admin/relatorios'       },
+    { label: 'Visibilidade',        href: '/dashboard/admin/visibilidade'     },
   ]},
   { section: 'Mentoria', items: [
     { label: 'Meu Hub', href: '/dashboard/membro' },
@@ -26,14 +27,15 @@ const adminGroups: NavGroup[] = [
 ]
 
 const membroNav: NavItem[] = [
-  { label: 'Central de Controle', href: '/dashboard/membro'                },
-  { label: 'Minha Identidade',    href: '/dashboard/membro/posicionamento' },
-  { label: 'Pilares da Marca',    href: '/dashboard/membro/pilares'        },
-  { label: 'Metas de Impacto',    href: '/dashboard/membro/okr'            },
-  { label: 'Missões',              href: '/dashboard/membro/tarefas'        },
-  { label: 'Marketing Anual',     href: '/dashboard/membro/marketing'      },
-  { label: 'Indicadores',         href: '/dashboard/membro/kpis'           },
-  { label: 'Agenda',              href: '/dashboard/membro/agenda'         },
+  { label: 'Central de Controle',     href: '/dashboard/membro'                  },
+  { label: 'Minha Identidade',        href: '/dashboard/membro/posicionamento'   },
+  { label: 'Pilares da Marca',        href: '/dashboard/membro/pilares'          },
+  { label: 'Metas de Impacto',        href: '/dashboard/membro/okr'              },
+  { label: 'Missões',                 href: '/dashboard/membro/tarefas'          },
+  { label: 'Marketing Anual',         href: '/dashboard/membro/marketing'        },
+  { label: 'Indicadores',             href: '/dashboard/membro/kpis'             },
+  { label: 'Agenda',                  href: '/dashboard/membro/agenda'           },
+  { label: 'Minha Visibilidade',      href: '/dashboard/membro/visibilidade'     },
 ]
 
 /* ── HELPERS ────────────────────────────────────────────── */
