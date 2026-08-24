@@ -153,8 +153,9 @@ export async function getWonDealsYTD(): Promise<Deal[]> {
   const all = await getDeals(300);
 
   return all.filter((d) => {
-    // Ganho = boolean win OU etapa "Realizado" (convenção desta conta)
-    const isWon = d.win === true || d.deal_stage?.name === "Realizado";
+    // Ganho = boolean win OU etapas de venda fechada desta conta
+    const stage = d.deal_stage?.name ?? "";
+    const isWon = d.win === true || stage === "Realizado" || stage === "Pós Venda";
     if (!isWon) return false;
     // Data da venda: win_time (clicou "Marcar venda") > closed_at > updated_at > created_at
     const ref = d.win_time ?? d.closed_at ?? d.updated_at ?? d.created_at;

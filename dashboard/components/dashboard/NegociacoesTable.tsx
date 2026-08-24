@@ -15,7 +15,7 @@ const STAGE_STYLES: Record<string, { color: string; bg: string }> = {
   "Prospecção Ativa":   { color: "#94A3B8", bg: "rgba(148,163,184,.12)" },
   "Prospect (5 dias)":  { color: "#60A5FA", bg: "rgba(96,165,250,.12)"  },
   "Negociação":         { color: "#FBBF24", bg: "rgba(251,191,36,.10)"  },
-  "Pós Venda":          { color: "#C084FC", bg: "rgba(192,132,252,.12)" },
+  "Pós Venda":          { color: "#10B981", bg: "rgba(16,185,129,.14)"  },
   "Combo de Evento":    { color: "#38BDF8", bg: "rgba(56,189,248,.10)"  },
   // Etapas finais
   "Realizado":          { color: "#10B981", bg: "rgba(16,185,129,.14)"  },

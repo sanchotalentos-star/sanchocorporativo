@@ -5,8 +5,11 @@ import type { Deal, DealStage } from "./rdcrm";
 
 // ─── Helpers: identifica negócios por etapa OU pelo boolean do RD CRM ─────────
 
+// Etapas que representam venda já fechada nesta conta
+const WON_STAGES = new Set(["Realizado", "Pós Venda"]);
+
 export function isWon(d: Deal): boolean {
-  return d.win === true || d.deal_stage?.name === "Realizado";
+  return d.win === true || WON_STAGES.has(d.deal_stage?.name ?? "");
 }
 
 export function isLost(d: Deal): boolean {
@@ -143,7 +146,7 @@ export function groupByStage(
     count: counts[name] ?? 0,
     value: values[name] ?? 0,
     pct:   total > 0 ? (counts[name] ?? 0) / total : 0,
-    isWon:  name === "Realizado",
+    isWon:  WON_STAGES.has(name),
     isLost: name === "Perdido",
   }));
 }
