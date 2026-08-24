@@ -67,7 +67,7 @@ export async function GET() {
       if (!ref) continue;
       const key = ref.slice(0, 7);
       if (!key.startsWith(String(ano))) continue;
-      const valor = (d.amount_montly ?? 0) + (d.amount_unique ?? 0) + (d.amount_recurrent ?? 0);
+      const valor = (d.amount ?? 0) + (d.amount_montly ?? 0) + (d.amount_unique ?? 0) + (d.amount_recurrent ?? 0);
       map[key] = (map[key] ?? 0) + valor;
     }
     return map;

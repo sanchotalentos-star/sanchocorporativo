@@ -19,8 +19,10 @@ function getToken(): string {
 export const DealSchema = z.object({
   _id:         z.string(),
   name:        z.string(),
-  amount_montly: z.number().optional().nullable(),
-  amount_unique: z.number().optional().nullable(),
+  // Campos de valor — o RD CRM pode usar qualquer combinação destes
+  amount:           z.number().optional().nullable(), // campo genérico (alguns pipelines)
+  amount_montly:    z.number().optional().nullable(), // nota: typo da API (monthly)
+  amount_unique:    z.number().optional().nullable(),
   amount_recurrent: z.number().optional().nullable(),
   win:         z.boolean().optional().nullable(),
   hold:        z.boolean().optional().nullable(),

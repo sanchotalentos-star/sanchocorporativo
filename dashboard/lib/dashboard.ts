@@ -77,7 +77,7 @@ export function groupByStatus(deals: Deal[]): KpiData {
   const total    = ganhos.length + abertos;
 
   const valorGanho = ganhos.reduce((sum, d) =>
-    sum + (d.amount_unique ?? 0) + (d.amount_montly ?? 0) + (d.amount_recurrent ?? 0), 0);
+    sum + (d.amount ?? 0) + (d.amount_unique ?? 0) + (d.amount_montly ?? 0) + (d.amount_recurrent ?? 0), 0);
 
   return {
     abertos,
@@ -115,6 +115,7 @@ export function groupByStage(
     const stageName = deal.deal_stage?.name ?? "Sem etapa";
     counts[stageName] = (counts[stageName] ?? 0) + 1;
     values[stageName] = (values[stageName] ?? 0)
+      + (deal.amount ?? 0)
       + (deal.amount_unique ?? 0)
       + (deal.amount_montly ?? 0)
       + (deal.amount_recurrent ?? 0);
@@ -191,6 +192,7 @@ export function buildDealRows(deals: Deal[]): DealRow[] {
     const lost = isLost(d);
 
     const value =
+      (d.amount ?? 0) +
       (d.amount_unique ?? 0) +
       (d.amount_montly ?? 0) +
       (d.amount_recurrent ?? 0);
@@ -242,6 +244,7 @@ export function calcRevenueByArea(deals: Deal[]): RevenueByArea {
   for (const d of won) {
     const name  = d.name.toLowerCase();
     const value =
+      (d.amount ?? 0) +
       (d.amount_unique ?? 0) +
       (d.amount_montly ?? 0) +
       (d.amount_recurrent ?? 0);
