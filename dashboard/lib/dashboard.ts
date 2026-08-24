@@ -3,6 +3,20 @@
 
 import type { Deal, DealStage } from "./rdcrm";
 
+// ─── Helpers: identifica negócios por etapa OU pelo boolean do RD CRM ─────────
+
+export function isWon(d: Deal): boolean {
+  return d.win === true || d.deal_stage?.name === "Realizado";
+}
+
+export function isLost(d: Deal): boolean {
+  return d.hold === true || d.deal_stage?.name === "Perdido";
+}
+
+export function isActive(d: Deal): boolean {
+  return !isWon(d) && !isLost(d);
+}
+
 // ─── Tipos de saída ───────────────────────────────────────────────────────────
 
 export interface KpiData {
@@ -10,12 +24,16 @@ export interface KpiData {
   ganhos:     number;
   perdidos:   number;
   conversao:  number; // 0–1
+  valorGanho: number; // R$ total dos negócios ganhos
 }
 
 export interface StageCount {
-  name:  string;
-  count: number;
-  pct:   number;
+  name:     string;
+  count:    number;
+  pct:      number;
+  value:    number;  // R$ total na etapa
+  isWon?:   boolean; // etapa final positiva (Realizado)
+  isLost?:  boolean; // etapa final negativa (Perdido)
 }
 
 export interface WeeklyPoint {
@@ -33,69 +51,99 @@ export interface DealRow {
   value:       number;
   createdAt:   string | null;
   daysOpen:    number;
-  isStale:     boolean; // > 15 dias sem movimento
+  isStale:     boolean; // > 15 dias sem movimento (só deals ativos)
+  isWon:       boolean;
+  isLost:      boolean;
+}
+
+export interface RevenueByArea {
+  palestras:     number;
+  apresentacoes: number;
+  publicidades:  number;
+}
+
+export interface EventsByArea {
+  palestras:     number;
+  apresentacoes: number;
+  publicidades:  number;
 }
 
 // ─── KPIs ─────────────────────────────────────────────────────────────────────
 
 export function groupByStatus(deals: Deal[]): KpiData {
-  const ganhos  = deals.filter((d) => d.win === true).length;
-  const perdidos = deals.filter((d) => d.hold === true).length;
-  const abertos  = deals.filter((d) => !d.win && !d.hold).length;
-  const total    = ganhos + abertos;
+  const ganhos  = deals.filter(isWon);
+  const perdidos = deals.filter(isLost).length;
+  const abertos  = deals.filter(isActive).length;
+  const total    = ganhos.length + abertos;
+
+  const valorGanho = ganhos.reduce((sum, d) =>
+    sum + (d.amount_unique ?? 0) + (d.amount_montly ?? 0) + (d.amount_recurrent ?? 0), 0);
 
   return {
     abertos,
-    ganhos,
+    ganhos:    ganhos.length,
     perdidos,
-    conversao: total > 0 ? ganhos / total : 0,
+    conversao: total > 0 ? ganhos.length / total : 0,
+    valorGanho,
   };
 }
 
-// ─── Pipeline por etapa ───────────────────────────────────────────────────────
+// ─── Pipeline por etapa — inclui TODAS as etapas, Realizado e Perdido ─────────
+
+// Ordem preferida das etapas neste CRM
+const STAGE_ORDER = [
+  "Arquitetura de Relacionamento",
+  "Prospecção Ativa",
+  "Prospecção",
+  "Prospect (5 dias)",
+  "Prospect",
+  "Negociação",
+  "Pós Venda",
+  "Combo de Evento",
+  "Realizado",
+  "Perdido",
+];
 
 export function groupByStage(
   deals: Deal[],
   stages: DealStage[],
 ): StageCount[] {
-  // stages param used to infer ordering by pipeline position
-  void stages;
-
   const counts: Record<string, number> = {};
+  const values: Record<string, number> = {};
 
   for (const deal of deals) {
-    if (deal.win || deal.hold) continue;
     const stageName = deal.deal_stage?.name ?? "Sem etapa";
     counts[stageName] = (counts[stageName] ?? 0) + 1;
+    values[stageName] = (values[stageName] ?? 0)
+      + (deal.amount_unique ?? 0)
+      + (deal.amount_montly ?? 0)
+      + (deal.amount_recurrent ?? 0);
   }
 
   const total = Object.values(counts).reduce((s, n) => s + n, 0);
 
-  // Ordena pela sequência do funil
-  const playbook = [
-    "Abordado",
-    "Respondeu",
-    "Em conversa",
-    "Proposta enviada",
-    "Fechado",
-    "Pós-evento",
-    "Reativação",
-  ];
-
-  const sorted = playbook
-    .map((name) => ({ name, count: counts[name] ?? 0 }))
-    .filter((s) => s.count > 0);
-
-  // Adiciona etapas que existem no CRM mas não no playbook
-  for (const [name, count] of Object.entries(counts)) {
-    if (!sorted.find((s) => s.name === name)) {
-      sorted.push({ name, count });
+  // Ordem: usa a sequência retornada pelo endpoint /deals_stages se disponível
+  let ordered: string[];
+  if (stages.length > 0) {
+    ordered = stages.map((s) => s.name).filter((n) => counts[n] !== undefined);
+    // Adiciona etapas presentes nos deals mas ausentes no endpoint
+    for (const name of Object.keys(counts)) {
+      if (!ordered.includes(name)) ordered.push(name);
+    }
+  } else {
+    ordered = STAGE_ORDER.filter((n) => counts[n] !== undefined);
+    for (const name of Object.keys(counts)) {
+      if (!ordered.includes(name)) ordered.push(name);
     }
   }
 
-  return sorted.map((s) => ({
-    ...s,
-    pct: total > 0 ? s.count / total : 0,
+  return ordered.map((name) => ({
+    name,
+    count: counts[name] ?? 0,
+    value: values[name] ?? 0,
+    pct:   total > 0 ? (counts[name] ?? 0) / total : 0,
+    isWon:  name === "Realizado",
+    isLost: name === "Perdido",
   }));
 }
 
@@ -124,8 +172,8 @@ export function groupByWeek(deals: Deal[]): WeeklyPoint[] {
       if (!created) continue;
 
       if (created >= start && created <= end) {
-        if (deal.win) ganhos++;
-        else if (!deal.hold) abertos++;
+        if (isWon(deal)) ganhos++;
+        else if (isActive(deal)) abertos++;
       }
     }
 
@@ -135,12 +183,13 @@ export function groupByWeek(deals: Deal[]): WeeklyPoint[] {
   return points;
 }
 
-// ─── Tabela de negociações ativas ────────────────────────────────────────────
+// ─── Tabela de negociações — TODAS as etapas ─────────────────────────────────
 
 export function buildDealRows(deals: Deal[]): DealRow[] {
-  const active = deals.filter((d) => !d.win && !d.hold);
+  return deals.map((d) => {
+    const won  = isWon(d);
+    const lost = isLost(d);
 
-  return active.map((d) => {
     const value =
       (d.amount_unique ?? 0) +
       (d.amount_montly ?? 0) +
@@ -168,26 +217,23 @@ export function buildDealRows(deals: Deal[]): DealRow[] {
       stage:       d.deal_stage?.name ?? "Sem etapa",
       value,
       createdAt,
-      daysOpen,
-      isStale:     daysOpen > 15,
+      daysOpen:    won || lost ? 0 : daysOpen,
+      isStale:     !won && !lost && daysOpen > 15,
+      isWon:       won,
+      isLost:      lost,
     };
   });
 }
 
-// ─── Faturamento realizado (mock por etapa "Fechado") ────────────────────────
-
-export interface RevenueByArea {
-  palestras:     number;
-  apresentacoes: number;
-  publicidades:  number;
-}
+// ─── Faturamento realizado por área ─────────────────────────────────────────
 
 /**
  * Extrai receita por área a partir do nome do negócio.
  * Convenção de nomenclatura: "[Palestra] Nome do cliente"
+ * Inclui todos os negócios na etapa "Realizado" (ou win=true).
  */
 export function calcRevenueByArea(deals: Deal[]): RevenueByArea {
-  const won = deals.filter((d) => d.win);
+  const won = deals.filter(isWon);
 
   let palestras     = 0;
   let apresentacoes = 0;
@@ -228,14 +274,8 @@ export function calcRevenueByArea(deals: Deal[]): RevenueByArea {
 
 // ─── Contagem de eventos fechados por área ───────────────────────────────────
 
-export interface EventsByArea {
-  palestras:     number;
-  apresentacoes: number;
-  publicidades:  number;
-}
-
 export function calcEventsByArea(deals: Deal[]): EventsByArea {
-  const won = deals.filter((d) => d.win);
+  const won = deals.filter(isWon);
   let palestras = 0, apresentacoes = 0, publicidades = 0;
 
   for (const d of won) {

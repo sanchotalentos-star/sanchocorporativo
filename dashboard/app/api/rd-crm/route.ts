@@ -40,7 +40,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    const [deals, stages] = await Promise.all([getDeals(), getStages()]);
+    // Busca até 300 para cobrir todos os deals (CRM tem >200 registros)
+    const [deals, stages] = await Promise.all([getDeals(300), getStages()]);
 
     const kpis     = groupByStatus(deals);
     const pipeline = groupByStage(deals, stages);
@@ -78,23 +79,21 @@ export async function GET(request: Request) {
 
 function getMockData() {
   const stages = [
-    "Abordado",
-    "Respondeu",
-    "Em conversa",
-    "Proposta enviada",
-    "Fechado",
-    "Pós-evento",
-    "Reativação",
+    "Prospecção Ativa",
+    "Prospect (5 dias)",
+    "Negociação",
+    "Pós Venda",
+    "Realizado",
+    "Perdido",
   ];
 
   const pipeline = [
-    { name: "Abordado",         count: 18, pct: 0.32 },
-    { name: "Respondeu",        count: 12, pct: 0.21 },
-    { name: "Em conversa",      count: 9,  pct: 0.16 },
-    { name: "Proposta enviada", count: 7,  pct: 0.12 },
-    { name: "Fechado",          count: 5,  pct: 0.09 },
-    { name: "Pós-evento",       count: 3,  pct: 0.05 },
-    { name: "Reativação",       count: 3,  pct: 0.05 },
+    { name: "Prospecção Ativa",  count: 58, value: 10000,   pct: 0.27, isWon: false, isLost: false },
+    { name: "Prospect (5 dias)", count: 15, value: 55500,   pct: 0.07, isWon: false, isLost: false },
+    { name: "Negociação",        count: 13, value: 222600,  pct: 0.06, isWon: false, isLost: false },
+    { name: "Pós Venda",         count:  7, value: 195500,  pct: 0.03, isWon: false, isLost: false },
+    { name: "Realizado",         count: 57, value: 644520,  pct: 0.27, isWon: true,  isLost: false },
+    { name: "Perdido",           count: 53, value: 1069600, pct: 0.25, isWon: false, isLost: true  },
   ];
 
   const weekly = [
@@ -105,20 +104,20 @@ function getMockData() {
     { label: "04/08", abertos: 9,  ganhos: 0 },
   ];
 
-  // Deals ativos no funil (nenhum fechado ainda em agosto/2026)
   const deals = [
-    { id: "1", name: "[Palestra] Tech Summit 2026",      contact: "Ana Lima",       responsible: "Configure RDCRM_TOKEN", stage: "Proposta enviada", value: 18000, createdAt: "2026-07-10T10:00:00Z", daysOpen: 27, isStale: true  },
-    { id: "2", name: "[Apresentação] Fórum RH Nacional", contact: "Carlos Mendes",  responsible: "Configure RDCRM_TOKEN", stage: "Em conversa",      value: 12000, createdAt: "2026-07-22T14:00:00Z", daysOpen: 15, isStale: false },
-    { id: "3", name: "[Publicidade] Marca Viva Moda",    contact: "Fernanda Costa", responsible: "Configure RDCRM_TOKEN", stage: "Abordado",         value:  8000, createdAt: "2026-07-28T09:00:00Z", daysOpen:  9, isStale: false },
-    { id: "4", name: "[Palestra] Liderança Feminina",    contact: "Julia Torres",   responsible: "Configure RDCRM_TOKEN", stage: "Respondeu",        value: 22000, createdAt: "2026-07-30T11:00:00Z", daysOpen:  7, isStale: false },
-    { id: "5", name: "[Apresentação] Awards Night",      contact: "Pedro Alves",    responsible: "Configure RDCRM_TOKEN", stage: "Em conversa",      value: 15000, createdAt: "2026-08-01T15:00:00Z", daysOpen:  5, isStale: false },
-    { id: "6", name: "[Creator] Campanha Verão 2027",    contact: "Mariana Ramos",  responsible: "Configure RDCRM_TOKEN", stage: "Proposta enviada", value: 11000, createdAt: "2026-07-18T08:00:00Z", daysOpen: 19, isStale: true  },
-    { id: "7", name: "[Palestra] Congresso Educação",    contact: "Ricardo Pinto",  responsible: "Configure RDCRM_TOKEN", stage: "Reativação",       value:  9500, createdAt: "2026-06-20T16:00:00Z", daysOpen: 47, isStale: true  },
+    { id: "1",  name: "Rubens Leite - CMTE. Alex Bacana",   contact: "Alex Bacana",    responsible: "Configure RDCRM_TOKEN", stage: "Negociação",       value: 30000,  createdAt: "2026-07-10T10:00:00Z", daysOpen: 14, isStale: false, isWon: false, isLost: false },
+    { id: "2",  name: "Aeroclube de Erechim",               contact: "Aeroclube",      responsible: "Configure RDCRM_TOKEN", stage: "Prospecção Ativa", value: 10000,  createdAt: "2026-08-01T14:00:00Z", daysOpen:  3, isStale: false, isWon: false, isLost: false },
+    { id: "3",  name: "Antonio Alves",                      contact: "Antonio Alves",  responsible: "Configure RDCRM_TOKEN", stage: "Prospect (5 dias)",value: 10000,  createdAt: "2026-07-28T09:00:00Z", daysOpen:  9, isStale: false, isWon: false, isLost: false },
+    { id: "4",  name: "VICTA Lançamento Jasmim",            contact: "Victa Eng.",     responsible: "Configure RDCRM_TOKEN", stage: "Realizado",        value:  5000,  createdAt: "2026-06-10T11:00:00Z", daysOpen:  0, isStale: false, isWon: true,  isLost: false },
+    { id: "5",  name: "Evento Hangar 1 - CMTE. César Neto", contact: "Hangar 1",       responsible: "Configure RDCRM_TOKEN", stage: "Realizado",        value: 10000,  createdAt: "2026-07-01T15:00:00Z", daysOpen:  0, isStale: false, isWon: true,  isLost: false },
+    { id: "6",  name: "Divulgação SQD Mi...",               contact: "Ecoa Influência",responsible: "Configure RDCRM_TOKEN", stage: "Pós Venda",        value: 85000,  createdAt: "2026-07-18T08:00:00Z", daysOpen:  6, isStale: false, isWon: false, isLost: false },
+    { id: "7",  name: "Coquetel Grupo Marsom",              contact: "Beach Park",     responsible: "Configure RDCRM_TOKEN", stage: "Realizado",        value:  2000,  createdAt: "2026-05-20T16:00:00Z", daysOpen:  0, isStale: false, isWon: true,  isLost: false },
+    { id: "8",  name: "Aeroclube do Rio Grande do Sul",     contact: "Aeroclube RS",   responsible: "Configure RDCRM_TOKEN", stage: "Perdido",          value:     0,  createdAt: "2026-04-15T10:00:00Z", daysOpen:  0, isStale: false, isWon: false, isLost: true  },
+    { id: "9",  name: "Aeroclube do Paraná",                contact: "Aeroclube PR",   responsible: "Configure RDCRM_TOKEN", stage: "Perdido",          value:     0,  createdAt: "2026-04-20T10:00:00Z", daysOpen:  0, isStale: false, isWon: false, isLost: true  },
   ];
 
   return {
-    // Nenhum fechamento realizado — kpis refletem apenas o funil ativo
-    kpis:     { abertos: 57, ganhos: 0, perdidos: 0, conversao: 0 },
+    kpis:     { abertos: 93, ganhos: 57, perdidos: 53, conversao: 0.38, valorGanho: 644520 },
     pipeline,
     weekly,
     deals,

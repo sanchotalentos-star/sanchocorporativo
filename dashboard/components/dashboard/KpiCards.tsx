@@ -92,11 +92,17 @@ export function KpiCards({ data, isLoading = false }: KpiCardsProps) {
           isLoading={isLoading}
         />
         <KpiCard
-          label="Negócios Ganhos"
+          label="Realizados"
           value={isLoading ? "—" : String(data?.ganhos ?? 0)}
           icon={<CheckCircle size={18} style={{ color: "var(--sancho-won)" }} />}
           color="var(--sancho-won)"
-          subtitle="fechados no período"
+          subtitle={
+            isLoading || !data?.valorGanho
+              ? "etapa Realizado no CRM"
+              : `${data.valorGanho >= 1_000_000
+                  ? `R$${(data.valorGanho / 1_000_000).toFixed(2)}M`
+                  : `R$${Math.round(data.valorGanho / 1_000)}k`} realizados`
+          }
           isLoading={isLoading}
         />
         <KpiCard

@@ -102,9 +102,9 @@ type DealsResponse = z.infer<typeof DealsResponseSchema>;
 
 /**
  * Busca todas as negociações, paginando automaticamente até o limite.
- * Máximo de 200 negociações retornadas para evitar timeout.
+ * Default de 300 para cobrir funis com 200+ negócios.
  */
-export async function getDeals(limit = 200): Promise<Deal[]> {
+export async function getDeals(limit = 300): Promise<Deal[]> {
   const pageSize = 50;
   const pages    = Math.ceil(limit / pageSize);
   const allDeals: Deal[] = [];
@@ -145,8 +145,8 @@ export async function getActiveDeals(): Promise<Deal[]> {
  */
 export async function getWonDealsYTD(): Promise<Deal[]> {
   const ano = new Date().getFullYear();
-  // Busca até 200 negociações sem filtro server-side (filtramos aqui)
-  const all = await getDeals(200);
+  // Busca até 300 negociações sem filtro server-side (filtramos aqui)
+  const all = await getDeals(300);
 
   return all.filter((d) => {
     // Ganho = boolean win OU etapa "Realizado" (convenção desta conta)
