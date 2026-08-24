@@ -63,9 +63,10 @@ export async function GET() {
   function crmPorMes(deals: Deal[]): Record<string, number> {
     const map: Record<string, number> = {};
     for (const d of deals) {
-      const ref = d.updated_at ?? d.created_at;
+      // Prioridade: win_time (data exata do "Marcar venda") > closed_at > updated_at > created_at
+      const ref = d.win_time ?? d.closed_at ?? d.updated_at ?? d.created_at;
       if (!ref) continue;
-      const key = ref.slice(0, 7);
+      const key = ref.slice(0, 7); // ex: "2026-08"
       if (!key.startsWith(String(ano))) continue;
       const valor = (d.amount ?? 0) + (d.amount_montly ?? 0) + (d.amount_unique ?? 0) + (d.amount_recurrent ?? 0);
       map[key] = (map[key] ?? 0) + valor;

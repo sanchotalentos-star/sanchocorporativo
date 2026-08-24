@@ -26,6 +26,8 @@ export const DealSchema = z.object({
   amount_recurrent: z.number().optional().nullable(),
   win:         z.boolean().optional().nullable(),
   hold:        z.boolean().optional().nullable(),
+  win_time:    z.string().optional().nullable(), // data exata do "Marcar venda" no RD CRM
+  closed_at:   z.string().optional().nullable(), // alternativa usada por alguns pipelines
   created_at:  z.string().optional().nullable(),
   updated_at:  z.string().optional().nullable(),
   last_activity_at: z.string().optional().nullable(),
@@ -154,8 +156,8 @@ export async function getWonDealsYTD(): Promise<Deal[]> {
     // Ganho = boolean win OU etapa "Realizado" (convenção desta conta)
     const isWon = d.win === true || d.deal_stage?.name === "Realizado";
     if (!isWon) return false;
-    // Filtra pelo ano corrente via updated_at ou created_at
-    const ref = d.updated_at ?? d.created_at;
+    // Data da venda: win_time (clicou "Marcar venda") > closed_at > updated_at > created_at
+    const ref = d.win_time ?? d.closed_at ?? d.updated_at ?? d.created_at;
     if (!ref) return true; // sem data → inclui
     return ref.startsWith(String(ano));
   });
