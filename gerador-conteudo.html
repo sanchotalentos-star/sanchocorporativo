@@ -317,9 +317,9 @@ img { max-width: 100%; }
   padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border);
 }
 .pv-card-body { padding: 12px; display: flex; flex-direction: column; gap: 9px; }
-.pv-hook-label { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
-.pv-hook { font-size: 14px; font-weight: 700; color: var(--ink); line-height: 1.5; letter-spacing: -.01em; }
-.pv-desc-label { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-top: 2px; }
+.pv-hook-label { font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--pink); }
+.pv-hook { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.6; font-style: italic; }
+.pv-desc-label { font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--pink); margin-top: 2px; }
 .pv-desc { font-size: 12px; color: var(--ink-2); line-height: 1.75; }
 .pv-cta-row {
   display: flex; align-items: center; gap: 6px;
@@ -388,12 +388,11 @@ img { max-width: 100%; }
 .idea-plat { font-size: 11px; font-weight: 700; color: var(--ink); flex: 1; }
 .idea-fmt { font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); background: var(--bg); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border); }
 .idea-body { padding: 12px; display: flex; flex-direction: column; gap: 9px; }
-.idea-hook { font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.48; letter-spacing: -.01em; }
-.idea-hook::before { content: '\201C'; color: var(--pink); }
-.idea-hook::after  { content: '\201D'; color: var(--pink); }
+.idea-section-label { font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--pink); }
+.idea-hook { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.55; font-style: italic; }
 .idea-desc { font-size: 11px; color: var(--ink-2); line-height: 1.75; }
 .idea-cta { font-size: 11px; font-weight: 700; color: var(--pink); display: flex; align-items: flex-start; gap: 5px; }
-.idea-cta::before { content: '→'; flex-shrink: 0; }
+.idea-cta-label { font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; background: var(--pink); color: #fff; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; margin-top: 1px; }
 .idea-ref { font-size: 10px; color: var(--ink-3); border-top: 1px solid var(--border); padding-top: 8px; }
 .out-regen-wrap { padding: 4px 20px 20px; }
 .out-regen { width: 100%; padding: 9px; border: 1px solid var(--border-hi); border-radius: var(--r); background: transparent; color: var(--ink-2); font-size: 12px; font-weight: 600; transition: border-color .1s, color .1s; }
@@ -574,64 +573,76 @@ const SOURCES=[
 ];
 const TEMPLATES={
   carreiras:[
+    {platform:'Reels / TikTok',icon:'🎬',format:'Video 60s',
+     abertura:t=>`Esse assunto tomou conta da internet essa semana: "${t.slice(0,50)}". Eu vi isso e pensei: isso explica exatamente por que profissionais competentes continuam parados no mesmo lugar.`,
+     desenvolvimento:()=>`Todo dia eu converso com alguem que domina o que faz. Tem resultado. Tem historia. Mas ninguem sabe que essa pessoa existe. O que acontece? O mercado nao e justo. Mas ele e previsivel. Quem nao entende as regras do jogo fica esperando ser descoberto. E o mercado nao descobre ninguem. O mercado reconhece quem ja e visivel.`,
+     provocacao:()=>`A sua competencia nao e suficiente para fazer a sua carreira crescer. Nunca foi. E continua nao sendo. O que move carreira e quem te ve, nao o que voce sabe fazer.`,
+     cta:'Se voce e um competente que ainda esta invisivel no mercado, me segue. Porque e exatamente isso que eu resolvo.'},
     {platform:'LinkedIn',icon:'💼',format:'Texto Nativo',
-     hook:t=>`O que ${t.split(':')[0].toLowerCase()} revela sobre quem vai crescer na carreira`,
-     desc:()=>`Post com sua analise direta sobre o que esse movimento do mercado significa para profissionais competentes. Diga quem vai se adaptar e quem vai ficar para tras. Inclua uma pergunta no final que gere debate genuino.`,
-     cta:'Comenta o que voce faria diferente se soubesse disso ha 5 anos.'},
-    {platform:'Instagram Reels',icon:'🎬',format:'Video 30s',
-     hook:t=>`3 verdades sobre carreiras que ${t.slice(0,30).toLowerCase()} levantou`,
-     desc:()=>`Video direto: olha pra camera e diz 3 verdades que profissionais serios precisam ouvir. Tom de quem conhece os bastidores do mercado. Sem linguagem de coach.`,
-     cta:'Segue pra voce nao ficar para tras quando o mercado virar.'},
+     abertura:t=>`"${t.slice(0,60)}" foi um dos assuntos mais comentados essa semana. E a maioria das pessoas perdeu o ponto real da discussao.`,
+     desenvolvimento:()=>`Eu fico olhando pra esse tipo de debate e vejo sempre a mesma coisa: profissionais discutem o que esta acontecendo no mercado, mas nao percebem que o mercado nao vai mudar por causa da discussao. Quem muda e quem ocupa espaco. O profissional que fica esperando a hora certa de aparecer esta, na pratica, escolhendo continuar invisivel. Eu vi isso acontecer dezenas de vezes. O mais preparado da sala nao foi o escolhido. Foi o mais lembrado.`,
+     provocacao:()=>`Voce nao vai ser promovido, contratado ou indicado pela sua competencia tecnica. Voce vai ser escolhido por quem te conhece e sabe o que voce entrega. Essa e a regra. Sempre foi.`,
+     cta:'Comenta aqui: voce esta sendo lembrado ou ainda esta esperando ser descoberto?'},
   ],
   visibilidade:[
-    {platform:'Instagram',icon:'📸',format:'Carrossel 5 slides',
-     hook:t=>`Por que o melhor profissional da sala ainda esta invisivel, e ${t.split(':')[0].toLowerCase()} prova isso`,
-     desc:()=>`Slide 1: dado impactante. Slides 2-4: o padrao que voce ve nos profissionais que te procuram. Slide 5: como romper com esse ciclo.`,
-     cta:'Salva esse carrossel. Voce vai querer reler quando sentir que esta invisivel.'},
-    {platform:'LinkedIn',icon:'💼',format:'Artigo Curto',
-     hook:t=>`Competencia nao e suficiente. ${t.split(':')[0]} mostrou isso de novo.`,
-     desc:()=>`A tendencia como pano de fundo, o real assunto e o gap entre competencia e visibilidade. Inclua um caso real (sem nomear) de alguem que so comecou a ser reconhecido quando mudou a forma de se apresentar.`,
-     cta:'Me conta: voce se reconhece nessa situacao?'},
+    {platform:'Reels / TikTok',icon:'🎬',format:'Video 45s',
+     abertura:t=>`Vi esse tema viralizando: "${t.slice(0,50)}". E fiquei pensando nos varios profissionais que me procuram toda semana que sao exatamente esse caso.`,
+     desenvolvimento:()=>`Sao pessoas que dominam o que fazem. Entregam resultado. Tem uma trajetoria que poucos tem. Mas quando eu pergunto: quem fora do seu circulo imediato sabe disso?, o silencio e a resposta. E nao e falta de talento. E falta de presenca. Visibilidade nao e vaidade. E estrategia. E a diferenca entre ser o melhor da sala e ser o escolhido da sala.`,
+     provocacao:()=>`Profissional invisivel e profissional descartavel. Por mais que doa ouvir isso, e a realidade do mercado. Ninguem contrata, promove ou indica quem nao conhece.`,
+     cta:'Salva esse video. E quando voce sentir que esta invisivel no mercado, volta aqui e me chama.'},
+    {platform:'LinkedIn',icon:'💼',format:'Texto Nativo',
+     abertura:t=>`"${t.slice(0,55)}" entrou na conversa essa semana. O que pouca gente percebeu e que esse assunto e um espelho direto do que acontece com talentos que ninguem ve.`,
+     desenvolvimento:()=>`Eu trabalho com isso. Todos os dias eu acesso decisores, empresas e mercados que deveriam estar em contato com profissionais incriveis. Mas nao estao. Porque esses profissionais nao aparecem. Eles entregam, produzem, crescem internamente. E continuam esperando que alguem note. Isso nao e humildade. Isso e estrategia equivocada.`,
+     provocacao:()=>`Reconhecimento nao e consequencia automatica de bom trabalho. Nunca foi. Quem entende isso cedo tem uma carreira diferente. Quem aprende tarde paga um preco alto.`,
+     cta:'Me conta: qual e a sua maior dificuldade em aparecer do jeito certo no mercado?'},
   ],
   decisores:[
+    {platform:'Reels / TikTok',icon:'🎬',format:'Video 60s',
+     abertura:t=>`Esse topico foi longe essa semana: "${t.slice(0,50)}". Eu uso isso pra falar sobre algo que nao se aprende em curso nenhum: como chegar ate quem decide.`,
+     desenvolvimento:()=>`Eu passo o meu dia acessando CEOs, diretores, presidentes de empresas. E vejo o tempo todo profissionais tentando chegar nessas pessoas do jeito errado. Mandando mensagem fria. Pedindo conexao sem contexto. Tentando vender antes de gerar qualquer relacao. O acesso a decisores nao funciona assim. Funciona pela credibilidade que voce constroi antes de aparecer na frente deles. Funciona pelo preparo de quem te apresenta. Funciona por quem voce ja conhece que conhece quem voce quer conhecer.`,
+     provocacao:()=>`Voce nao chega ao decisor pelo LinkedIn. Voce chega ao decisor por quem ja esta no mesmo circulo que ele. E pra isso, voce precisa primeiro construir o circulo certo.`,
+     cta:'Comenta ACESSO aqui que eu te explico como funciona na pratica.'},
     {platform:'LinkedIn',icon:'💼',format:'Texto Nativo',
-     hook:t=>`Chegar ate quem decide ficou mais dificil. ${t.split(':')[0]} explica por que`,
-     desc:()=>`Voce como o Sancho Panca moderno: quem acessa o coracao dos reis sabe que o caminho nunca e direto. Use a tendencia para mostrar como a logica de acesso a decisores mudou.`,
-     cta:'Quer saber como eu abro essas portas? Me manda uma mensagem.'},
-    {platform:'Instagram Reels',icon:'🎬',format:'Video Opiniao 45s',
-     hook:t=>`Todo mundo quer falar com o CEO. Ninguem ensina o caminho certo. ${t.slice(0,25).toLowerCase()}`,
-     desc:()=>`Sua visao sobre o que realmente abre portas com quem decide. A tendencia como gancho, a sacada pratica que so quem opera nesse nivel conhece.`,
-     cta:'Comenta PORTAS que eu te conto o primeiro passo.'},
+     abertura:t=>`"${t.slice(0,55)}" foi pauta essa semana. Eu li e pensei: esse assunto explica muito do que eu vejo nas minhas conversas com quem decide nas empresas.`,
+     desenvolvimento:()=>`Quem decide nas organizacoes nao tem tempo. Nao tem paciencia para abordagens genericas. E nao responde a quem nao gera contexto antes de pedir algo. Eu opero nesse nivel todos os dias. E o que eu vejo e que acesso a decisores e um jogo de posicionamento, nao de quantidade de tentativas. Voce nao chega la mandando mais mensagens. Voce chega la sendo a pessoa certa, com a historia certa, apresentada do jeito certo.`,
+     provocacao:()=>`A maioria dos profissionais esta tentando entrar pela porta errada. Nao porque sao ruins. Mas porque ninguem ensinou como funciona o bastidor de quem decide.`,
+     cta:'Quer entender como eu construo esse tipo de acesso? Me manda uma mensagem direta.'},
   ],
   networking:[
-    {platform:'Instagram',icon:'📸',format:'Post com Legenda Longa',
-     hook:t=>`Networking de verdade nao e o que voce esta fazendo. ${t.split(':')[0].toLowerCase()} prova`,
-     desc:()=>`Visual simples e forte. Legenda com o erro mais comum de networking que voce observa, contextualizado com a tendencia. Tres acoes concretas no final.`,
-     cta:'Marca alguem que ainda confunde networking com distribuir cartao.'},
-    {platform:'TikTok e Reels',icon:'📲',format:'Video Provocacao',
-     hook:t=>`A maioria das pessoas faz networking errado. ${t.slice(0,20).toLowerCase()} confirmou isso`,
-     desc:()=>`Uma verdade desconfortavel sobre relacionamentos profissionais, conectada a tendencia. Encerre mostrando o que diferencia quem constroi rede de verdade.`,
-     cta:'Salva pra nao esquecer disso na hora de abrir o LinkedIn.'},
+    {platform:'Reels / TikTok',icon:'🎬',format:'Video 45s',
+     abertura:t=>`"${t.slice(0,50)}" virou assunto. E isso me faz pensar no quanto as pessoas confundem networking com colecionar contatos.`,
+     desenvolvimento:()=>`Eu construi a minha carreira por relacionamentos. Nao por quantidade. Por qualidade. A diferenca e simples: rede de contatos e uma lista. Networking de verdade e um ecossistema de pessoas que confiam no que voce faz e falam de voce quando voce nao esta na sala. Isso nao se constroi no evento de networking. Se constroi no dia a dia, na consistencia, no que voce entrega antes de pedir qualquer coisa.`,
+     provocacao:()=>`Se a sua rede so lembra de voce quando voce aparece, voce nao tem uma rede. Voce tem conhecidos. E conhecidos nao mudam carreiras.`,
+     cta:'Marca alguem que precisa ouvir isso hoje.'},
+    {platform:'LinkedIn',icon:'💼',format:'Texto Nativo',
+     abertura:t=>`Vi "${t.slice(0,55)}" circulando. E fico pensando: quantas pessoas vao ler isso e continuar fazendo networking do jeito errado?`,
+     desenvolvimento:()=>`Networking nao e evento. Nao e adicionar pessoas no LinkedIn. Nao e mandar mensagem de aniversario uma vez por ano. Networking e presenca continua. E quem te recomenda quando surge uma oportunidade que voce nem sabe que existe. E quem abre porta antes de voce bater. Eu construo isso pro profissional que nao sabe por onde comecar. E o resultado nao e uma lista maior. E um ecossistema que trabalha por voce.`,
+     provocacao:()=>`A pergunta nao e quantas pessoas voce conhece. A pergunta e: quantas pessoas falam de voce quando surge uma oportunidade que seria perfeita pra voce?`,
+     cta:'Me conta: sua rede trabalha por voce quando voce nao esta presente?'},
   ],
   marca:[
-    {platform:'LinkedIn',icon:'💼',format:'Texto e Imagem',
-     hook:t=>`Sua marca profissional fala de voce antes de voce abrir a boca. ${t.split(':')[0]} mudou o jogo`,
-     desc:()=>`Imagem impactante e texto que usa a tendencia como espelho: o que esta acontecendo revela o que decisores realmente buscam numa marca profissional.`,
-     cta:'Como esta a sua marca profissional hoje? Me conta nos comentarios.'},
-    {platform:'Instagram',icon:'📸',format:'Carrossel Antes e Depois',
-     hook:t=>`Antes e depois de uma marca profissional que ninguem via. ${t.slice(0,25).toLowerCase()}`,
-     desc:()=>`Estagios de transformacao de marca pessoal: profissional competente e invisivel, o que muda quando se posiciona bem, como a tendencia acelera ou atrasa esse processo.`,
-     cta:'Quer saber em qual estagio voce esta? Responde nos comentarios.'},
+    {platform:'Reels / TikTok',icon:'🎬',format:'Video 60s',
+     abertura:t=>`"${t.slice(0,50)}" tomou a timeline essa semana. Eu olhei pra isso e lembrei de uma conversa que tive ha pouco tempo com um profissional incrivel que ninguem conhecia.`,
+     desenvolvimento:()=>`Ele tinha resultado. Tinha formacao. Tinha trajetoria. Mas quando eu perguntei como ele era percebido no mercado, ele nao soube responder. Isso e um problema de marca profissional. Nao e arrogante falar da sua marca. E necessario. Porque o mercado nao interpreta silencio como humildade. Interpreta como irrelevancia. Sua marca profissional existe quer voce cuide dela ou nao. A diferenca e quem esta no controle da narrativa.`,
+     provocacao:()=>`Voce esta deixando o mercado decidir quem voce e. Ou voce esta decidindo isso primeiro e entregando essa versao pro mercado?`,
+     cta:'Se voce quer comecar a construir sua marca do jeito certo, me segue. Eu mostro como funciona.'},
+    {platform:'LinkedIn',icon:'💼',format:'Texto Nativo',
+     abertura:t=>`"${t.slice(0,55)}" foi pauta essa semana. Isso tem tudo a ver com algo que eu vejo acontecer o tempo todo: profissionais que entregam mais do que comunicam.`,
+     desenvolvimento:()=>`Marca profissional nao e fake. Nao e performar algo que voce nao e. E traduzir o que voce ja e de um jeito que o mercado entenda e lembre. Eu trabalho com isso. E o maior erro que vejo e o profissional que espera os resultados falarem por si mesmos. Resultados nao falam. Quem fala e voce. Quem amplifica e a sua rede. Quem decide e o mercado. E o mercado so decide sobre o que conhece.`,
+     provocacao:()=>`Voce nao e mal posicionado porque nao tem resultado. Voce e mal posicionado porque nao sabe contar o que faz de um jeito que as pessoas certas entendam e lembrem.`,
+     cta:'Como voce descreveria sua marca profissional hoje em uma frase? Escreve aqui nos comentarios.'},
   ],
   lideranca:[
-    {platform:'LinkedIn',icon:'💼',format:'Artigo para Gestores',
-     hook:t=>`O que ${t.split(':')[0].toLowerCase()} revela sobre os talentos que as empresas perdem por nao enxergar`,
-     desc:()=>`Texto para gestores e RHs: use a tendencia para abrir o debate sobre como organizacoes desperdicam competencia por falta de visibilidade interna.`,
-     cta:'Voce ja perdeu um talento que nem sabia que tinha? Me conta.'},
-    {platform:'Instagram Reels',icon:'🎬',format:'Video Reflexao',
-     hook:t=>`Talentos se perdem porque ${t.slice(0,30).toLowerCase()}. E ninguem fala sobre isso.`,
-     desc:()=>`Video de reflexao, nao de conselho. Compartilhe o que ve acontecer com profissionais brilhantes que ficam no anonimato, conectado a tendencia atual.`,
-     cta:'Compartilha com um lider que precisa ouvir isso hoje.'},
+    {platform:'Reels / TikTok',icon:'🎬',format:'Video 60s',
+     abertura:t=>`Esse topico estava em todo lugar essa semana: "${t.slice(0,50)}". E ele me fez pensar nos talentos que empresas perdem sem nunca saber que perderam.`,
+     desenvolvimento:()=>`Eu converso com gestores e RHs o tempo todo. E existe um padrao que me chama atencao sempre: as empresas investem em atrair talento, mas quase nada em tornar esse talento visivel internamente. O profissional entrega. Cresce. Fica bom no que faz. E continua sendo o fulano la do setor X. Sem exposicao, sem posicionamento, sem acesso a quem decide. E um dia esse talento vai embora. E a empresa fica sem entender por que.`,
+     provocacao:()=>`Retencao de talento nao e sobre salario. E sobre fazer o profissional sentir que o trabalho dele e visto, reconhecido e conectado a algo maior. E isso nao acontece por acidente.`,
+     cta:'Compartilha com um lider que precisa ouvir isso agora.'},
+    {platform:'LinkedIn',icon:'💼',format:'Texto para Gestores',
+     abertura:t=>`"${t.slice(0,55)}" foi um dos temas da semana. Eu li e fui direto ao ponto que ninguem esta discutindo nesse debate: o que acontece com os talentos que as empresas nao enxergam.`,
+     desenvolvimento:()=>`Eu passei anos acessando organizacoes de dentro pra fora. E o que eu vejo consistentemente e organizacoes que perderam talentos incriveis nao porque nao valorizavam. Mas porque nao sabiam que tinham. O talento nao aparecia. Nao chegava nas reunioes certas. Nao era conectado com quem decidia. Era bom no que fazia. E ficava fazendo. Ate ir embora pra um lugar que soube enxergar o que ele tinha.`,
+     provocacao:()=>`Voce sabe quem sao os melhores da sua equipe. Mas sabe quem sao os que ainda nao foram notados e estao pensando em sair? Porque esses dois grupos sao, muitas vezes, os mesmos.`,
+     cta:'Voce ja perdeu um talento que so entendeu o valor depois que foi embora? Me conta.'},
   ],
 };
 
@@ -752,12 +763,13 @@ function renderPreview(){
   const{topic,tmpl}=items[idx];
   badge.hidden=false;badge.textContent=`${idx+1} de ${items.length}`;
   prevBtn.disabled=idx===0;nextBtn.disabled=idx===items.length-1;
-  const hook=tmpl.hook(topic.title);
-  const desc=tmpl.desc(topic.title);
+  const abertura=tmpl.abertura(topic.title);
+  const desenvolvimento=tmpl.desenvolvimento(topic.title);
+  const provocacao=tmpl.provocacao(topic.title);
   const meta=SOURCE_META[topic.source]||SOURCE_META['curado'];
   const otherCount=selectedTopics.size-1;
   empty.hidden=true;content.style.display='flex';
-  content.innerHTML=`<div class="pv-topic-tag"><span class="pv-topic-label">Topico</span><span class="pv-topic-title">${topic.title}</span><span class="tr-badge ${meta.badgeCls}">${meta.badge}</span></div><div class="pv-card"><div class="pv-card-head"><span class="pv-card-ico">${tmpl.icon}</span><span class="pv-card-plat">${tmpl.platform}</span><span class="pv-card-fmt">${tmpl.format}</span></div><div class="pv-card-body"><div class="pv-hook-label">Hook de abertura</div><div class="pv-hook">${hook}</div><div class="pv-desc-label">Roteiro</div><div class="pv-desc">${desc}</div><div class="pv-cta-row"><span class="pv-cta-icon">💬</span><span class="pv-cta">${tmpl.cta}</span></div></div></div>${otherCount>0?`<div class="pv-more-topics">+${otherCount} topico${otherCount>1?'s':''} selecionado${otherCount>1?'s':''}. Use as setas para navegar.</div>`:''}`;
+  content.innerHTML=`<div class="pv-topic-tag"><span class="pv-topic-label">Topico</span><span class="pv-topic-title">${topic.title}</span><span class="tr-badge ${meta.badgeCls}">${meta.badge}</span></div><div class="pv-card"><div class="pv-card-head"><span class="pv-card-ico">${tmpl.icon}</span><span class="pv-card-plat">${tmpl.platform}</span><span class="pv-card-fmt">${tmpl.format}</span></div><div class="pv-card-body"><div class="pv-hook-label">ABERTURA</div><div class="pv-hook">${abertura}</div><div class="pv-desc-label">DESENVOLVIMENTO</div><div class="pv-desc">${desenvolvimento}</div><div class="pv-desc-label">PROVOCACAO</div><div class="pv-desc">${provocacao}</div><div class="pv-cta-row"><span class="pv-cta-icon">🎯</span><span class="pv-cta">${tmpl.cta}</span></div></div></div>${otherCount>0?`<div class="pv-more-topics">+${otherCount} topico${otherCount>1?'s':''} selecionado${otherCount>1?'s':''}. Use as setas para navegar.</div>`:''}`;
 }
 
 function updateUI(){
@@ -787,7 +799,7 @@ function generateContent(){
       const card=document.createElement('div');
       card.className='idea-card';
       const meta=SOURCE_META[topic.source]||SOURCE_META['curado'];
-      card.innerHTML=`<div class="idea-head"><span class="idea-ico">${tmpl.icon}</span><span class="idea-plat">${tmpl.platform}</span><span class="idea-fmt">${tmpl.format}</span></div><div class="idea-body"><div class="idea-hook">${tmpl.hook(topic.title)}</div><div class="idea-desc">${tmpl.desc(topic.title)}</div><div class="idea-cta">${tmpl.cta}</div><div class="idea-ref">${topic.title.slice(0,55)}${topic.title.length>55?'...':''} · <span class="tr-badge ${meta.badgeCls}">${meta.badge}</span></div></div>`;
+      card.innerHTML=`<div class="idea-head"><span class="idea-ico">${tmpl.icon}</span><span class="idea-plat">${tmpl.platform}</span><span class="idea-fmt">${tmpl.format}</span></div><div class="idea-body"><div class="idea-section-label">ABERTURA</div><div class="idea-hook">${tmpl.abertura(topic.title)}</div><div class="idea-section-label">DESENVOLVIMENTO</div><div class="idea-desc">${tmpl.desenvolvimento(topic.title)}</div><div class="idea-section-label">PROVOCACAO</div><div class="idea-desc">${tmpl.provocacao(topic.title)}</div><div class="idea-cta"><span class="idea-cta-label">CTA</span> ${tmpl.cta}</div><div class="idea-ref">${topic.title.slice(0,55)}${topic.title.length>55?'...':''} · <span class="tr-badge ${meta.badgeCls}">${meta.badge}</span></div></div>`;
       grid.appendChild(card);
     });
   });
