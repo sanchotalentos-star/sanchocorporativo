@@ -1,63 +1,29 @@
 <title>Gerador de Conteudo</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ── TOKENS ── */
 :root {
-  --bg:        #F7F6F3;
+  --bg:        #F0F2F5;
   --surface:   #FFFFFF;
-  --card:      #F2F1EE;
-  --border:    #E4E0D8;
-  --border-hi: #C8C3BB;
-  --ink:       #19181C;
-  --ink-2:     #6B6573;
-  --ink-3:     #B0ABB8;
-  --pink:      #E8186D;
-  --pink-bg:   rgba(232,24,109,.07);
-  --pink-bdr:  rgba(232,24,109,.22);
-  --green:     #0A7A42;
-  --amber:     #A05E08;
-  --blue:      #2545B8;
-  --orange:    #C05510;
-  --font:      'Barlow', system-ui, sans-serif;
-  --serif:     'DM Serif Display', Georgia, serif;
-  --r:         3px;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg:        #111016;
-    --surface:   #18171C;
-    --card:      #201F26;
-    --border:    rgba(220,215,235,.07);
-    --border-hi: rgba(220,215,235,.16);
-    --ink:       #E2DFF0;
-    --ink-2:     #7E7A90;
-    --ink-3:     #3E3A4A;
-    --pink:      #F03080;
-    --pink-bg:   rgba(240,48,128,.08);
-    --pink-bdr:  rgba(240,48,128,.24);
-    --green:     #1EC978;
-    --amber:     #C8962A;
-    --blue:      #607AE8;
-    --orange:    #E07840;
-  }
-}
-:root[data-theme="dark"] {
-  --bg:        #111016;
-  --surface:   #18171C;
-  --card:      #201F26;
-  --border:    rgba(220,215,235,.07);
-  --border-hi: rgba(220,215,235,.16);
-  --ink:       #E2DFF0;
-  --ink-2:     #7E7A90;
-  --ink-3:     #3E3A4A;
-  --pink:      #F03080;
-  --pink-bg:   rgba(240,48,128,.08);
-  --pink-bdr:  rgba(240,48,128,.24);
-  --green:     #1EC978;
-  --amber:     #C8962A;
-  --blue:      #607AE8;
-  --orange:    #E07840;
+  --panel:     #FAFBFC;
+  --border:    #E2E5EA;
+  --border-hi: #CBD0D8;
+  --ink:       #111318;
+  --ink-2:     #5A6172;
+  --ink-3:     #9BA3B0;
+  --pink:      #D91460;
+  --pink-lt:   rgba(217,20,96,.08);
+  --pink-bdr:  rgba(217,20,96,.2);
+  --green:     #0F7A3D;
+  --green-lt:  rgba(15,122,61,.1);
+  --amber:     #996008;
+  --amber-lt:  rgba(153,96,8,.1);
+  --blue:      #1E3FAA;
+  --blue-lt:   rgba(30,63,170,.09);
+  --orange:    #B84C10;
+  --orange-lt: rgba(184,76,16,.1);
+  --font:      'Inter', system-ui, sans-serif;
+  --r:         4px;
+  --r2:        6px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -66,129 +32,209 @@ html, body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--ink);
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.5;
   overflow: hidden;
 }
+button { font-family: var(--font); cursor: pointer; }
 
 /* ── APP SHELL ── */
 .app {
   height: 100%;
   display: grid;
-  grid-template-rows: 44px auto 1fr 62px;
+  grid-template-rows: 44px 1fr;
+  overflow: hidden;
 }
 
 /* ── TOPBAR ── */
 .topbar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 24px;
+  gap: 0;
+  padding: 0 16px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
-.t-wordmark {
-  font-family: var(--serif);
-  font-size: 17px;
-  color: var(--pink);
+.t-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 16px;
+  border-right: 1px solid var(--border);
+  margin-right: 14px;
+}
+.t-logo-sq {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: var(--pink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
   letter-spacing: -.01em;
 }
-.t-pipe {
-  width: 1px;
-  height: 14px;
-  background: var(--border-hi);
+.t-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.01em;
 }
-.t-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .04em;
+.t-title {
+  font-size: 12px;
+  font-weight: 500;
   color: var(--ink-2);
   flex: 1;
 }
+.t-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 12px;
+}
 .t-upd {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--ink-3);
   font-variant-numeric: tabular-nums;
 }
 .t-btn {
-  font-family: var(--font);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--ink-2);
   background: transparent;
   border: 1px solid var(--border-hi);
-  padding: 4px 11px;
+  padding: 5px 11px;
   border-radius: var(--r);
-  cursor: pointer;
-  transition: border-color .12s, color .12s;
-  display: flex; align-items: center; gap: 5px;
+  transition: border-color .12s, color .12s, background .12s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
-.t-btn:hover { border-color: var(--pink); color: var(--pink); }
+.t-btn:hover { background: var(--bg); border-color: var(--border-hi); color: var(--ink); }
 .t-btn.loading { opacity: .38; pointer-events: none; }
 .spin { display: inline-block; }
 .t-btn.loading .spin { animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── HERO STRIP ── */
-.hero {
-  padding: 16px 28px 14px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: baseline;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.hero-name {
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: clamp(24px, 3.2vw, 40px);
-  color: var(--ink);
-  line-height: 1;
-  letter-spacing: -.02em;
-  white-space: nowrap;
-}
-.hero-sub {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.hero-role {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--pink);
-}
-.hero-sep { color: var(--border-hi); }
-.hero-line {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink-2);
-  font-style: italic;
-}
-
-/* ── BODY GRID ── */
-.body-grid {
+/* ── MAIN BODY: 3 columns ── */
+.body {
   display: grid;
-  grid-template-columns: 1fr 252px;
+  grid-template-columns: 220px 1fr 340px;
   min-height: 0;
   overflow: hidden;
 }
 
-/* ── TOPICS PANEL ── */
+/* ── ZONE PANEL (left) ── */
+.zone-panel {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-head {
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.panel-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.panel-sub {
+  font-size: 11px;
+  color: var(--ink-2);
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.zones-list {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  flex: 1;
+}
+.zone-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 9px 10px;
+  border-radius: var(--r2);
+  border: 1.5px solid transparent;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  transition: background .1s, border-color .1s;
+}
+.zone-btn:hover { background: var(--bg); }
+.zone-btn.active {
+  background: var(--pink-lt);
+  border-color: var(--pink-bdr);
+}
+.z-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.z-info { display: flex; flex-direction: column; min-width: 0; }
+.z-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  line-height: 1.3;
+}
+.zone-btn.active .z-name { color: var(--pink); }
+.z-ct {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  margin-top: 1px;
+}
+
+.zone-divider { margin: 8px 14px; border: none; border-top: 1px solid var(--border); }
+
+.src-section { padding: 8px 14px 12px; flex-shrink: 0; }
+.src-list { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
+.src-item { display: flex; align-items: center; gap: 7px; }
+.s-led {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--ink-3); flex-shrink: 0;
+}
+.s-led.ok   { background: var(--green); }
+.s-led.err  { background: var(--orange); }
+.s-led.pend { background: var(--amber); animation: blink 1s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.s-name { flex: 1; font-size: 11px; color: var(--ink-2); font-weight: 500; }
+.s-ct { font-size: 11px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* ── TOPICS PANEL (center) ── */
 .topics-panel {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: hidden;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
 }
 .filter-row {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 8px 20px;
+  padding: 8px 14px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   flex-shrink: 0;
@@ -196,39 +242,48 @@ html, body {
   scrollbar-width: none;
 }
 .filter-row::-webkit-scrollbar { display: none; }
-.f-pill {
-  font-family: var(--font);
+.f-btn {
   font-size: 11px;
-  font-weight: 700;
-  padding: 4px 11px;
-  border-radius: 20px;
-  border: 1px solid var(--border-hi);
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
   background: transparent;
   color: var(--ink-2);
-  cursor: pointer;
-  transition: all .12s;
+  transition: all .1s;
   white-space: nowrap;
   flex-shrink: 0;
 }
-.f-pill:hover { background: var(--card); color: var(--ink); }
-.f-pill.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+.f-btn:hover { background: var(--bg); color: var(--ink); }
+.f-btn.active {
+  background: var(--surface);
+  border-color: var(--border-hi);
+  color: var(--ink);
+  font-weight: 700;
+}
 
-.topics-bar {
+.topics-meta {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 20px;
+  padding: 7px 14px;
   border-bottom: 1px solid var(--border);
-  background: var(--bg);
+  background: var(--panel);
   flex-shrink: 0;
 }
-.tb-count {
+.tm-count {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ink-2);
+  flex: 1;
   font-variant-numeric: tabular-nums;
 }
-.tb-hint {
+.tm-sel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pink);
+}
+.tm-hint {
   font-size: 11px;
   color: var(--ink-3);
 }
@@ -243,321 +298,379 @@ html, body {
 /* ── TOPIC ROW ── */
 .topic-row {
   display: grid;
-  grid-template-columns: 42px 20px 1fr 62px;
+  grid-template-columns: 36px 16px 1fr 52px;
   align-items: center;
   gap: 0;
-  padding: 10px 16px 10px 0;
+  padding: 9px 12px 9px 0;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
-  transition: background .1s;
-  user-select: none;
   background: var(--surface);
+  transition: background .08s;
+  user-select: none;
 }
-.topic-row:hover { background: var(--bg); }
-.topic-row.selected { background: var(--pink-bg); }
+.topic-row:hover { background: #F5F7FA; }
+.topic-row.selected { background: #FFF0F5; }
+.topic-row.selected:hover { background: #FFE8F0; }
 
 .tr-score {
-  font-size: 20px;
-  font-weight: 900;
-  font-style: italic;
+  font-size: 16px;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
   text-align: center;
-  line-height: 1;
   color: var(--ink-3);
-  padding: 0 8px 0 16px;
   flex-shrink: 0;
+  line-height: 1;
+  padding-left: 12px;
 }
 .tr-score.hi  { color: var(--pink); }
 .tr-score.mid { color: var(--amber); }
 .tr-score.lo  { color: var(--blue); }
-.topic-row.selected .tr-score { color: var(--pink); }
 
 .tr-ck {
-  width: 16px;
-  height: 16px;
-  border-radius: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
   border: 1.5px solid var(--border-hi);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 9px;
-  color: #fff;
+  font-size: 8px;
+  font-weight: 800;
+  color: transparent;
   flex-shrink: 0;
   transition: all .1s;
 }
 .topic-row.selected .tr-ck {
   background: var(--pink);
   border-color: var(--pink);
+  color: #fff;
 }
 
-.tr-body {
-  padding: 0 12px;
-  min-width: 0;
-}
+.tr-body { padding: 0 10px; min-width: 0; }
 .tr-title {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--ink);
-  line-height: 1.38;
-  margin-bottom: 4px;
+  line-height: 1.42;
+  margin-bottom: 3px;
 }
 .tr-tags {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   flex-wrap: wrap;
 }
 .tr-live {
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
+  width: 5px; height: 5px; border-radius: 50%;
   background: var(--green);
-  animation: blink 2.2s ease-in-out infinite;
+  animation: blink 2s ease-in-out infinite;
   flex-shrink: 0;
+  display: inline-block;
 }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
-.tr-src-badge {
+.tr-badge {
   font-size: 9px;
-  font-weight: 800;
-  letter-spacing: .05em;
+  font-weight: 700;
   padding: 1px 5px;
-  border-radius: 2px;
-}
-.badge-google    { background: rgba(10,122,66,.1);   color: var(--green); }
-.badge-exame     { background: rgba(160,94,8,.1);    color: var(--amber); }
-.badge-meioem    { background: rgba(192,85,16,.1);   color: var(--orange); }
-.badge-infomoney { background: rgba(37,69,184,.1);   color: var(--blue); }
-.badge-curado    { background: rgba(232,24,109,.09); color: var(--pink); }
-.tr-zone-pill {
-  font-size: 9px;
-  font-weight: 800;
-  padding: 1px 6px;
-  border-radius: 20px;
+  border-radius: 3px;
   letter-spacing: .02em;
 }
+.b-google    { background: var(--green-lt);  color: var(--green); }
+.b-exame     { background: var(--amber-lt);  color: var(--amber); }
+.b-meioem    { background: var(--orange-lt); color: var(--orange); }
+.b-infomoney { background: var(--blue-lt);   color: var(--blue); }
+.b-curado    { background: var(--pink-lt);   color: var(--pink); }
 
 .tr-right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
-  padding-right: 0;
   flex-shrink: 0;
 }
-.tr-vlabel {
+.tr-vl {
   font-size: 9px;
-  font-weight: 800;
-  letter-spacing: .06em;
+  font-weight: 700;
+  letter-spacing: .04em;
   text-transform: uppercase;
   color: var(--ink-3);
   white-space: nowrap;
 }
 .tr-vbar {
-  width: 48px;
+  width: 40px;
   height: 2px;
   background: var(--border);
   border-radius: 2px;
   overflow: hidden;
 }
-.tr-vfill {
-  height: 100%;
-  border-radius: 2px;
-  transition: width .3s;
-}
+.tr-vfill { height: 100%; border-radius: 2px; }
 
-/* Skeleton rows */
+/* Skeleton */
 .skel-row {
   display: grid;
-  grid-template-columns: 42px 20px 1fr 62px;
+  grid-template-columns: 36px 16px 1fr 52px;
   align-items: center;
-  padding: 10px 16px 10px 0;
+  padding: 9px 12px 9px 0;
   border-bottom: 1px solid var(--border);
-  gap: 0;
+  background: var(--surface);
 }
 .skel {
-  background: var(--card);
+  background: var(--border);
   border-radius: 2px;
-  animation: sh 1.4s ease infinite;
+  animation: sh 1.3s ease infinite;
 }
-@keyframes sh { 0%,100%{opacity:.35} 50%{opacity:.75} }
+@keyframes sh { 0%,100%{opacity:.35} 50%{opacity:.7} }
 
-/* ── SIDEBAR ── */
-.sidebar {
-  border-left: 1px solid var(--border);
+/* ── PREVIEW PANEL (right) ── */
+.preview-panel {
   background: var(--surface);
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-hi) transparent;
+  overflow: hidden;
 }
-.sb-sec {
-  padding: 16px;
+.pv-head {
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
-.sb-sec + .sb-sec {
-  border-top: 1px solid var(--border);
-}
-.sb-lbl {
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: .18em;
+.pv-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--ink-3);
-  margin-bottom: 10px;
+  flex: 1;
 }
-
-/* Zone buttons */
-.zones-list { display: flex; flex-direction: column; gap: 1px; }
-.zone-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 8px;
-  border-radius: var(--r);
-  cursor: pointer;
-  transition: background .1s;
-  border: none;
-  width: 100%;
-  background: transparent;
-  text-align: left;
-  font-family: var(--font);
-  border-left: 2px solid transparent;
-}
-.zone-btn:hover { background: var(--card); }
-.zone-btn.active { background: var(--card); border-left-color: var(--pink); }
-.z-pip {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.z-name {
-  font-size: 12px;
+.pv-badge {
+  font-size: 10px;
   font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--pink-lt);
+  color: var(--pink);
+  border: 1px solid var(--pink-bdr);
+  font-variant-numeric: tabular-nums;
+}
+.pv-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.pv-nav-btn {
+  width: 22px; height: 22px;
+  border-radius: var(--r);
+  border: 1px solid var(--border-hi);
+  background: transparent;
   color: var(--ink-2);
-  flex: 1;
-  line-height: 1.3;
-}
-.zone-btn.active .z-name { color: var(--ink); }
-.z-ct {
-  font-size: 15px;
-  font-weight: 900;
-  font-style: italic;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-3);
-}
-.zone-btn.active .z-ct { color: var(--ink-2); }
-
-/* Source status */
-.src-list { display: flex; flex-direction: column; gap: 5px; }
-.src-item { display: flex; align-items: center; gap: 7px; }
-.s-led {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--ink-3);
-  flex-shrink: 0;
-}
-.s-led.ok   { background: var(--green); }
-.s-led.err  { background: var(--orange); }
-.s-led.pend { background: var(--amber); animation: blink 1s ease-in-out infinite; }
-.s-name { flex: 1; font-size: 11px; color: var(--ink-2); font-weight: 500; }
-.s-ct {
   font-size: 11px;
-  font-weight: 800;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ── COMMAND BAR ── */
-.cmd-bar {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 0 20px;
-  padding-bottom: env(safe-area-inset-bottom, 0);
-  background: var(--surface);
-  border-top: 2px solid var(--border);
-}
-.cmd-steps {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-}
-.cmd-step {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.step-dot {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border-hi);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
-  font-weight: 900;
+  transition: background .1s, border-color .1s;
+}
+.pv-nav-btn:hover { background: var(--bg); border-color: var(--border-hi); }
+.pv-nav-btn:disabled { opacity: .3; pointer-events: none; }
+
+.pv-scroll {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-hi) transparent;
+}
+
+/* Empty preview state */
+.pv-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 12px;
+  padding: 32px;
   color: var(--ink-3);
-  flex-shrink: 0;
-  transition: all .15s;
+  text-align: center;
 }
-.step-dot.done {
-  background: var(--pink);
-  border-color: var(--pink);
-  color: #fff;
+.pv-empty-ico {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1.5px dashed var(--border-hi);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
 }
-.step-txt {
-  font-size: 11px;
+.pv-empty-h {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.pv-empty-p { font-size: 12px; line-height: 1.6; }
+
+/* Preview content */
+.pv-content { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+
+.pv-topic-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--bg);
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+}
+.pv-topic-label {
+  font-size: 10px;
   font-weight: 600;
   color: var(--ink-3);
-  transition: color .15s;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.pv-topic-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
-.step-txt.done { color: var(--ink); }
-.cmd-div {
-  color: var(--border-hi);
-  font-size: 14px;
+
+.pv-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
+  background: var(--panel);
 }
-.cmd-zone-sel {
-  font-family: var(--font);
-  font-size: 12px;
+.pv-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.pv-card-ico { font-size: 14px; }
+.pv-card-plat {
+  font-size: 11px;
   font-weight: 700;
-  background: var(--card);
-  border: 1px solid var(--border-hi);
-  color: var(--ink-2);
-  padding: 7px 10px;
-  border-radius: var(--r);
-  outline: none;
-  cursor: pointer;
-  max-width: 200px;
+  color: var(--ink);
+  flex: 1;
+  letter-spacing: -.01em;
 }
-.cmd-zone-sel option { background: var(--card); }
-.cmd-cta {
-  font-family: var(--font);
+.pv-card-fmt {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--bg);
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+.pv-card-body { padding: 12px; display: flex; flex-direction: column; gap: 9px; }
+.pv-hook-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.pv-hook {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.5;
+  letter-spacing: -.01em;
+}
+.pv-hook em { font-style: italic; color: var(--pink); }
+.pv-desc-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+.pv-desc {
   font-size: 12px;
-  font-weight: 900;
-  letter-spacing: .05em;
+  color: var(--ink-2);
+  line-height: 1.75;
+}
+.pv-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+.pv-cta-icon { font-size: 12px; }
+.pv-cta {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--pink);
+  flex: 1;
+  line-height: 1.4;
+}
+
+.pv-more-topics {
+  padding: 8px 12px;
+  background: var(--bg);
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--ink-2);
+  font-weight: 500;
+  text-align: center;
+}
+
+/* ── GENERATE BUTTON AREA ── */
+.pv-footer {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.gen-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--r2);
+  border: none;
   background: var(--pink);
   color: #fff;
-  border: none;
-  border-radius: var(--r);
-  padding: 9px 20px;
-  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -.01em;
   transition: opacity .12s, transform .08s;
-  white-space: nowrap;
 }
-.cmd-cta:hover { opacity: .88; transform: translateY(-1px); }
-.cmd-cta:disabled { background: var(--border-hi); cursor: not-allowed; transform: none; opacity: 1; color: var(--ink-3); }
+.gen-btn:hover { opacity: .88; transform: translateY(-1px); }
+.gen-btn:disabled {
+  background: var(--border-hi);
+  color: var(--ink-3);
+  transform: none;
+  opacity: 1;
+}
+.gen-hint {
+  font-size: 11px;
+  color: var(--ink-3);
+  text-align: center;
+  line-height: 1.5;
+}
 
 /* ── OUTPUT OVERLAY ── */
 .out-overlay {
   position: fixed; inset: 0;
-  background: rgba(10,8,16,.75);
-  backdrop-filter: blur(8px);
+  background: rgba(8,10,16,.65);
+  backdrop-filter: blur(6px);
   z-index: 200;
   display: flex;
   align-items: flex-end;
@@ -568,199 +681,138 @@ html, body {
   background: var(--surface);
   border: 1px solid var(--border-hi);
   border-bottom: none;
-  border-radius: 6px 6px 0 0;
-  width: 100%;
-  max-width: 940px;
-  max-height: 88vh;
+  border-radius: 8px 8px 0 0;
+  width: 100%; max-width: 980px;
+  max-height: 90vh;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+  display: flex; flex-direction: column;
 }
 .out-head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 24px;
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px;
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: var(--surface);
-  z-index: 1;
+  position: sticky; top: 0;
+  background: var(--surface); z-index: 1;
 }
 .out-title {
-  font-family: var(--serif);
-  font-size: 18px;
-  color: var(--ink);
-  flex: 1;
+  font-size: 14px; font-weight: 700;
+  color: var(--ink); flex: 1; letter-spacing: -.01em;
 }
 .out-close {
-  width: 28px;
-  height: 28px;
+  width: 26px; height: 26px;
   border-radius: var(--r);
-  background: var(--card);
+  background: var(--bg);
   border: 1px solid var(--border-hi);
   color: var(--ink-2);
-  font-size: 13px;
+  font-size: 12px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font);
+  display: flex; align-items: center; justify-content: center;
   transition: background .1s;
 }
-.out-close:hover { background: var(--border); color: var(--ink); }
+.out-close:hover { background: var(--border); }
 .out-ctx {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  padding: 10px 24px;
+  display: flex; gap: 6px; flex-wrap: wrap;
+  padding: 10px 20px;
   border-bottom: 1px solid var(--border);
 }
-.ctx-tag {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 20px;
-  background: var(--card);
-  color: var(--ink-2);
+.ctx-chip {
+  font-size: 10px; font-weight: 600;
+  padding: 3px 8px; border-radius: 20px;
+  background: var(--bg); color: var(--ink-2);
   border: 1px solid var(--border-hi);
 }
-.ctx-tag-pink {
-  background: var(--pink-bg);
-  color: var(--pink);
+.ctx-chip.pink {
+  background: var(--pink-lt); color: var(--pink);
   border-color: var(--pink-bdr);
 }
 .ideas-grid {
-  padding: 20px 24px;
+  padding: 16px 20px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 12px;
-}
-.idea-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  overflow: hidden;
-}
-.idea-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 14px;
-  border-bottom: 1px solid var(--border);
-  background: var(--card);
-}
-.idea-ico { font-size: 15px; }
-.idea-plat {
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--ink-2);
-  flex: 1;
-}
-.idea-fmt {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  padding: 2px 7px;
-  border-radius: 2px;
-  background: var(--pink-bg);
-  color: var(--pink);
-  border: 1px solid var(--pink-bdr);
-}
-.idea-body {
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 10px;
 }
+.idea-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
+  background: var(--panel);
+}
+.idea-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.idea-ico { font-size: 14px; }
+.idea-plat { font-size: 11px; font-weight: 700; color: var(--ink); flex: 1; }
+.idea-fmt {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-3); background: var(--bg);
+  padding: 2px 6px; border-radius: 3px;
+  border: 1px solid var(--border);
+}
+.idea-body { padding: 12px; display: flex; flex-direction: column; gap: 9px; }
 .idea-hook {
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 15px;
-  color: var(--ink);
-  line-height: 1.45;
+  font-size: 13px; font-weight: 700;
+  color: var(--ink); line-height: 1.48;
+  letter-spacing: -.01em;
 }
 .idea-hook::before { content: '\201C'; color: var(--pink); }
 .idea-hook::after  { content: '\201D'; color: var(--pink); }
-.idea-desc { font-size: 12px; color: var(--ink-2); line-height: 1.75; }
+.idea-desc { font-size: 11px; color: var(--ink-2); line-height: 1.75; }
 .idea-cta {
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--pink);
-  letter-spacing: .01em;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  font-size: 11px; font-weight: 700;
+  color: var(--pink); display: flex;
+  align-items: flex-start; gap: 5px;
 }
-.idea-cta::before { content: '→'; }
+.idea-cta::before { content: '→'; flex-shrink: 0; }
 .idea-ref {
-  font-size: 10px;
-  color: var(--ink-3);
-  font-style: italic;
+  font-size: 10px; color: var(--ink-3);
   border-top: 1px solid var(--border);
-  padding-top: 9px;
+  padding-top: 8px;
 }
-.out-regen-wrap { padding: 4px 24px 24px; }
+.out-regen-wrap { padding: 4px 20px 20px; }
 .out-regen {
-  font-family: var(--font);
-  font-size: 12px;
-  font-weight: 700;
-  background: transparent;
+  width: 100%; padding: 9px;
   border: 1px solid var(--border-hi);
-  color: var(--ink-2);
-  padding: 10px;
   border-radius: var(--r);
-  cursor: pointer;
-  transition: border-color .12s, color .12s;
-  width: 100%;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 12px; font-weight: 600;
+  transition: border-color .1s, color .1s;
 }
 .out-regen:hover { border-color: var(--pink); color: var(--pink); }
 
+/* ── EMPTY ── */
+.empty-state {
+  text-align: center; padding: 48px 24px;
+  color: var(--ink-2);
+}
+.empty-icon { font-size: 24px; margin-bottom: 8px; }
+.empty-h { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.empty-p { font-size: 12px; }
+
 /* ── TOAST ── */
 .toast {
-  position: fixed;
-  bottom: 74px;
-  left: 50%;
+  position: fixed; bottom: 20px; left: 50%;
   transform: translateX(-50%);
-  background: var(--ink);
-  color: var(--bg);
-  font-size: 12px;
-  font-weight: 700;
-  padding: 7px 16px;
-  border-radius: 20px;
-  z-index: 300;
-  opacity: 0;
-  transition: opacity .22s;
-  pointer-events: none;
-  white-space: nowrap;
+  background: var(--ink); color: #fff;
+  font-size: 12px; font-weight: 600;
+  padding: 7px 16px; border-radius: 20px;
+  z-index: 300; opacity: 0; transition: opacity .2s;
+  pointer-events: none; white-space: nowrap;
 }
 .toast.show { opacity: 1; }
 
-/* ── EMPTY ── */
-.empty-state {
-  text-align: center;
-  padding: 48px 24px;
-  color: var(--ink-2);
-}
-.empty-icon { font-size: 28px; margin-bottom: 10px; }
-.empty-h { font-size: 14px; font-weight: 800; color: var(--ink); margin-bottom: 3px; }
-.empty-p { font-size: 12px; }
-
 /* ── RESPONSIVE ── */
-@media (max-width: 740px) {
-  .body-grid { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
-  .hero { padding: 12px 16px 10px; }
-  .filter-row, .topics-bar { padding-inline: 12px; }
-  .cmd-bar { gap: 8px; padding-inline: 12px; }
-  .cmd-zone-sel { max-width: 130px; font-size: 11px; }
-  .ideas-grid { grid-template-columns: 1fr; padding: 14px; }
-  .out-head, .out-ctx, .out-regen-wrap { padding-inline: 14px; }
-  .cmd-steps { gap: 5px; }
-  .step-txt { display: none; }
+@media (max-width: 800px) {
+  .body { grid-template-columns: 180px 1fr; }
+  .preview-panel { display: none; }
+}
+@media (max-width: 560px) {
+  .body { grid-template-columns: 1fr; }
+  .zone-panel { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
@@ -769,81 +821,83 @@ html, body {
 
 <!-- TOPBAR -->
 <header class="topbar">
-  <span class="t-wordmark">Sancho</span>
-  <span class="t-pipe"></span>
-  <span class="t-label">Gerador de Conteudo</span>
-  <span class="t-upd" id="last-updated"></span>
-  <button class="t-btn" id="refresh-btn"><span class="spin">↻</span> Atualizar</button>
+  <div class="t-brand">
+    <div class="t-logo-sq">S</div>
+    <span class="t-name">Sancho</span>
+  </div>
+  <span class="t-title">Gerador de Conteudo · Wladson Sidney</span>
+  <div class="t-status">
+    <span class="t-upd" id="last-updated"></span>
+  </div>
+  <button class="t-btn" id="refresh-btn"><span class="spin">↻</span> Atualizar fontes</button>
 </header>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-name">Wladson Sidney</div>
-  <div class="hero-sub">
-    <span class="hero-role">Estrategista de Personalidades</span>
-    <span class="hero-sep">·</span>
-    <span class="hero-line">Tornar os competentes conhecidos.</span>
+<!-- BODY: 3 paineis -->
+<div class="body">
+
+  <!-- 1. ZONE PANEL -->
+  <div class="zone-panel">
+    <div class="panel-head">
+      <div class="panel-label">Zona de Genialidade</div>
+      <div class="panel-sub">Selecione o angulo</div>
+    </div>
+    <div class="zones-list" id="zones-list"></div>
+    <hr class="zone-divider">
+    <div class="src-section" id="source-status">
+      <div class="panel-label">Fontes</div>
+      <div class="src-list"></div>
+    </div>
   </div>
-</div>
 
-<!-- BODY -->
-<div class="body-grid">
-
-  <!-- Topics panel -->
+  <!-- 2. TOPICS PANEL -->
   <div class="topics-panel">
     <div class="filter-row" id="source-filter">
-      <button class="f-pill active" data-filter="all">Todos</button>
-      <button class="f-pill" data-filter="google">Google Trends</button>
-      <button class="f-pill" data-filter="portais">Portais</button>
-      <button class="f-pill" data-filter="curado">Curado</button>
+      <button class="f-btn active" data-filter="all">Todos</button>
+      <button class="f-btn" data-filter="google">Google Trends</button>
+      <button class="f-btn" data-filter="portais">Portais</button>
+      <button class="f-btn" data-filter="curado">Curado</button>
     </div>
-    <div class="topics-bar">
-      <span class="tb-count" id="topic-count">...</span>
-      <span class="tb-hint">Clique para selecionar</span>
+    <div class="topics-meta">
+      <span class="tm-count" id="topic-count">...</span>
+      <span class="tm-sel" id="sel-count"></span>
+      <span class="tm-hint" id="topics-hint">Clique para selecionar</span>
     </div>
     <div class="topics-scroll">
       <div id="topics-grid"></div>
     </div>
   </div>
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sb-sec">
-      <div class="sb-lbl">Zona de Genialidade</div>
-      <div class="zones-list" id="zones-list"></div>
+  <!-- 3. PREVIEW PANEL -->
+  <div class="preview-panel">
+    <div class="pv-head">
+      <span class="pv-label">Previa gerada</span>
+      <span class="pv-badge" id="pv-badge" hidden>1 de 1</span>
+      <div class="pv-nav">
+        <button class="pv-nav-btn" id="pv-prev" title="Anterior">‹</button>
+        <button class="pv-nav-btn" id="pv-next" title="Proxima">›</button>
+      </div>
     </div>
-    <div class="sb-sec" id="source-status">
-      <div class="sb-lbl">Fontes</div>
-      <div class="src-list"></div>
+    <div class="pv-scroll" id="pv-scroll">
+      <div class="pv-empty" id="pv-empty">
+        <div class="pv-empty-ico">✦</div>
+        <div class="pv-empty-h">Nenhuma selecao</div>
+        <div class="pv-empty-p">Escolha uma zona a esquerda e clique em um topico para ver a previa do conteudo.</div>
+      </div>
+      <div class="pv-content" id="pv-content" style="display:none"></div>
+    </div>
+    <div class="pv-footer">
+      <button class="gen-btn" id="gen-btn" disabled>Gerar todas as ideias</button>
+      <div class="gen-hint" id="gen-hint">Selecione uma zona e ao menos um topico</div>
     </div>
   </div>
 
 </div>
 
-<!-- COMMAND BAR -->
-<div class="cmd-bar">
-  <div class="cmd-steps">
-    <div class="cmd-step">
-      <div class="step-dot" id="step1-dot">1</div>
-      <span class="step-txt" id="step1-txt">Selecione topicos</span>
-    </div>
-    <span class="cmd-div">·</span>
-    <div class="cmd-step">
-      <div class="step-dot" id="step2-dot">2</div>
-      <span class="step-txt" id="step2-txt">Escolha a zona</span>
-    </div>
-  </div>
-  <select class="cmd-zone-sel" id="zone-select">
-    <option value="">Zona de Genialidade</option>
-  </select>
-  <button class="cmd-cta" id="gen-btn" disabled>Gerar ideias →</button>
-</div>
-
-<!-- OUTPUT -->
+<!-- OUTPUT OVERLAY -->
 <div class="out-overlay" id="out-overlay" hidden>
   <div class="out-sheet">
     <div class="out-head">
-      <div class="out-title">Ideias de Conteudo</div>
+      <div class="out-title">Todas as ideias de conteudo</div>
       <button class="out-close" id="out-close">✕</button>
     </div>
     <div class="out-ctx" id="out-ctx"></div>
@@ -857,20 +911,20 @@ html, body {
 <div class="toast" id="toast"></div>
 
 <script>
-/* DATA */
+/* ── DATA ── */
 const ZONES = [
-  { id:'carreiras',    label:'Gestao de Carreiras',        color:'#E8186D', count:0 },
-  { id:'visibilidade', label:'Visibilidade do Competente',  color:'#A05E08', count:0 },
-  { id:'decisores',    label:'Acesso a Decisores',          color:'#0A7A42', count:0 },
-  { id:'networking',   label:'Networking Estrategico',      color:'#2545B8', count:0 },
-  { id:'marca',        label:'Marca Profissional',           color:'#C05510', count:0 },
-  { id:'lideranca',    label:'Lideranca e Talentos',         color:'#6A38C8', count:0 },
+  { id:'carreiras',    label:'Gestao de Carreiras',        icon:'💼', count:0 },
+  { id:'visibilidade', label:'Visibilidade Profissional',   icon:'👁', count:0 },
+  { id:'decisores',    label:'Acesso a Decisores',          icon:'🔑', count:0 },
+  { id:'networking',   label:'Networking Estrategico',      icon:'🤝', count:0 },
+  { id:'marca',        label:'Marca Profissional',           icon:'⭐', count:0 },
+  { id:'lideranca',    label:'Lideranca e Talentos',         icon:'🏆', count:0 },
 ];
 
 const ZONE_KW = {
   carreiras:    ['carreira','emprego','trabalho','mercado de trabalho','recolocacao','vaga','contratar','recrutamento','curriculo','entrevista','profissional','salario','promocao'],
   visibilidade: ['visibilidade','reconhecimento','linkedin','pessoal','influencia','autoridade','reputacao','notoriedade','destaque','aparecer','presenca','competente','talentoso'],
-  decisores:    ['lideranca','executivo','ceo','diretor','gestor','c-level','tomada de decisao','board','estrategia corporativa','corporativo','empresa','negocios','empreendedor'],
+  decisores:    ['lideranca','executivo','ceo','diretor','gestor','c-level','tomada de decisao','board','estrategia','corporativo','empresa','negocios','empreendedor'],
   networking:   ['networking','rede de contatos','conexao','evento','parceria','relacao','relacionamento','comunidade','mentoria','ecossistema'],
   marca:        ['marca pessoal','branding pessoal','personal branding','identidade','portfolio','storytelling','narrativa','comunicacao','imagem','posicionamento','pitch'],
   lideranca:    ['talento','competencia','habilidade','soft skill','hard skill','desenvolvimento','treinamento','capacitacao','gestao de pessoas','equipe','time','colaborador','cultura'],
@@ -890,68 +944,100 @@ const CURATED = [
 ];
 
 const SOURCE_META = {
-  'google-trends-br': { label:'Google Trends BR', badgeCls:'badge-google',    badge:'🔥 Trends', filter:'google'  },
-  'exame-carreira':   { label:'Exame · Carreira', badgeCls:'badge-exame',     badge:'💼 Exame',  filter:'portais' },
-  'meioemensagem':    { label:'Meio e Mensagem',  badgeCls:'badge-meioem',    badge:'📣 M&M',    filter:'portais' },
-  'infomoney':        { label:'InfoMoney',         badgeCls:'badge-infomoney', badge:'📊 Info',   filter:'portais' },
-  'curado':           { label:'Curado Sancho',     badgeCls:'badge-curado',    badge:'✦ Sancho',  filter:'curado'  },
+  'google-trends-br': { label:'Google Trends BR', badgeCls:'b-google',    badge:'Trends',  filter:'google'  },
+  'exame-carreira':   { label:'Exame · Carreira', badgeCls:'b-exame',     badge:'Exame',   filter:'portais' },
+  'meioemensagem':    { label:'Meio e Mensagem',  badgeCls:'b-meioem',    badge:'M&M',     filter:'portais' },
+  'infomoney':        { label:'InfoMoney',         badgeCls:'b-infomoney', badge:'InfoMoney', filter:'portais' },
+  'curado':           { label:'Curado Sancho',     badgeCls:'b-curado',    badge:'Sancho',  filter:'curado'  },
 };
 
 const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
 const SOURCES = [
-  {
-    id:'google-trends-br', label:'Google Trends BR', filter:'google',
+  { id:'google-trends-br', label:'Google Trends BR', filter:'google',
     url: RSS2JSON + encodeURIComponent('https://trends.google.com/trends/trendingsearches/daily/rss?geo=BR'),
-    parse: items => items.map((item, i) => ({
-      title: clean(item.title), tags: tagsFromDesc(item.description||''),
-      viralityBase: Math.max(70, 98 - i*2), source:'google-trends-br', live:true, link:item.link,
-    })),
-  },
-  {
-    id:'exame-carreira', label:'Exame · Carreira', filter:'portais',
+    parse: items => items.map((it,i) => ({ title:clean(it.title), tags:tagsFromDesc(it.description||''), viralityBase:Math.max(70,98-i*2), source:'google-trends-br', live:true, link:it.link })) },
+  { id:'exame-carreira', label:'Exame · Carreira', filter:'portais',
     url: RSS2JSON + encodeURIComponent('https://exame.com/feed/'),
-    parse: items => items
-      .filter(i => has(i.title, ['carreira','mercado','negocio','emprego','trabalho','empreendedor','talento','lideranca','executivo','rede']))
-      .slice(0,8).map(item => ({
-        title: clean(item.title), tags: guessTagsFromTitle(item.title),
-        viralityBase: 75 + rnd(12), source:'exame-carreira', live:true, link:item.link,
-      })),
-  },
-  {
-    id:'meioemensagem', label:'Meio e Mensagem', filter:'portais',
+    parse: items => items.filter(i=>has(i.title,['carreira','mercado','negocio','emprego','trabalho','empreendedor','talento','lideranca','executivo','rede'])).slice(0,8).map(it => ({ title:clean(it.title), tags:guessTagsFromTitle(it.title), viralityBase:75+rnd(12), source:'exame-carreira', live:true, link:it.link })) },
+  { id:'meioemensagem', label:'Meio e Mensagem', filter:'portais',
     url: RSS2JSON + encodeURIComponent('https://www.meioemensagem.com.br/feed/'),
-    parse: items => items
-      .filter(i => has(i.title, ['marca','comunicacao','posicionamento','branding','marketing','carreira','influencia','reputacao']))
-      .slice(0,6).map(item => ({
-        title: clean(item.title), tags: guessTagsFromTitle(item.title),
-        viralityBase: 72 + rnd(10), source:'meioemensagem', live:true, link:item.link,
-      })),
-  },
-  {
-    id:'infomoney', label:'InfoMoney', filter:'portais',
+    parse: items => items.filter(i=>has(i.title,['marca','comunicacao','posicionamento','branding','marketing','carreira','influencia','reputacao'])).slice(0,6).map(it => ({ title:clean(it.title), tags:guessTagsFromTitle(it.title), viralityBase:72+rnd(10), source:'meioemensagem', live:true, link:it.link })) },
+  { id:'infomoney', label:'InfoMoney', filter:'portais',
     url: RSS2JSON + encodeURIComponent('https://www.infomoney.com.br/feed/'),
-    parse: items => items
-      .filter(i => has(i.title, ['carreira','emprego','salario','empresa','trabalho','mercado','gestao']))
-      .slice(0,6).map(item => ({
-        title: clean(item.title), tags: guessTagsFromTitle(item.title),
-        viralityBase: 70 + rnd(12), source:'infomoney', live:true, link:item.link,
-      })),
-  },
+    parse: items => items.filter(i=>has(i.title,['carreira','emprego','salario','empresa','trabalho','mercado','gestao'])).slice(0,6).map(it => ({ title:clean(it.title), tags:guessTagsFromTitle(it.title), viralityBase:70+rnd(12), source:'infomoney', live:true, link:it.link })) },
 ];
 
-/* HELPERS */
+const TEMPLATES = {
+  carreiras:[
+    { platform:'LinkedIn', icon:'💼', format:'Texto Nativo',
+      hook: t=>`O que ${t.split(':')[0].toLowerCase()} revela sobre quem vai crescer na carreira`,
+      desc: ()=>`Post com sua analise direta sobre o que esse movimento do mercado significa para profissionais competentes. Diga quem vai se adaptar e quem vai ficar para tras. Inclua uma pergunta no final que gere debate genuino.`,
+      cta:'Comenta o que voce faria diferente se soubesse disso ha 5 anos.' },
+    { platform:'Instagram Reels', icon:'🎬', format:'Video 30s',
+      hook: t=>`3 verdades sobre carreiras que ${t.slice(0,30).toLowerCase()} levantou`,
+      desc: ()=>`Video direto: olha pra camera e diz 3 verdades que profissionais serios precisam ouvir. Tom de quem conhece os bastidores do mercado. Sem linguagem de coach.`,
+      cta:'Segue pra voce nao ficar para tras quando o mercado virar.' },
+  ],
+  visibilidade:[
+    { platform:'Instagram', icon:'📸', format:'Carrossel 5 slides',
+      hook: t=>`Por que o melhor profissional da sala ainda esta invisivel, e ${t.split(':')[0].toLowerCase()} prova isso`,
+      desc: ()=>`Slide 1: dado impactante sobre a tendencia. Slides 2-4: o padrao que voce ve nos profissionais que te procuram. Slide 5: como romper com esse ciclo. Tom de quem abriu portas para centenas de pessoas.`,
+      cta:'Salva esse carrossel. Voce vai querer reler quando sentir que esta invisivel.' },
+    { platform:'LinkedIn', icon:'💼', format:'Artigo Curto',
+      hook: t=>`Competencia nao e suficiente. ${t.split(':')[0]} mostrou isso de novo.`,
+      desc: ()=>`A tendencia como pano de fundo, o real assunto e o gap entre competencia e visibilidade. Inclua um caso real (sem nomear) de alguem que so comecou a ser reconhecido quando mudou a forma de se apresentar.`,
+      cta:'Me conta: voce se reconhece nessa situacao?' },
+  ],
+  decisores:[
+    { platform:'LinkedIn', icon:'💼', format:'Texto Nativo',
+      hook: t=>`Chegar ate quem decide ficou mais dificil. ${t.split(':')[0]} explica por que`,
+      desc: ()=>`Voce como o Sancho Panca moderno: quem acessa o coracao dos reis sabe que o caminho nunca e direto. Use a tendencia para mostrar como a logica de acesso a decisores mudou e o que profissionais competentes precisam entender.`,
+      cta:'Quer saber como eu abro essas portas? Me manda uma mensagem.' },
+    { platform:'Instagram Reels', icon:'🎬', format:'Video Opiniao 45s',
+      hook: t=>`Todo mundo quer falar com o CEO. Ninguem ensina o caminho certo. ${t.slice(0,25).toLowerCase()}`,
+      desc: ()=>`Sua visao sobre o que realmente abre portas com quem decide. A tendencia como gancho, a sacada pratica que so quem opera nesse nivel conhece como entrega.`,
+      cta:'Comenta PORTAS que eu te conto o primeiro passo.' },
+  ],
+  networking:[
+    { platform:'Instagram', icon:'📸', format:'Post com Legenda Longa',
+      hook: t=>`Networking de verdade nao e o que voce esta fazendo. ${t.split(':')[0].toLowerCase()} prova`,
+      desc: ()=>`Visual simples e forte. Legenda com o erro mais comum de networking que voce observa, contextualizado com a tendencia. Tom de quem ja viu o que funciona e o que queima pontes. Tres acoes concretas no final.`,
+      cta:'Marca alguem que ainda confunde networking com distribuir cartao.' },
+    { platform:'TikTok e Reels', icon:'📲', format:'Video Provocacao',
+      hook: t=>`A maioria das pessoas faz networking errado. ${t.slice(0,20).toLowerCase()} confirmou isso`,
+      desc: ()=>`Uma verdade desconfortavel sobre relacionamentos profissionais, conectada a tendencia. Encerre mostrando o que diferencia quem constroi rede de verdade.`,
+      cta:'Salva pra nao esquecer disso na hora de abrir o LinkedIn.' },
+  ],
+  marca:[
+    { platform:'LinkedIn', icon:'💼', format:'Texto e Imagem',
+      hook: t=>`Sua marca profissional fala de voce antes de voce abrir a boca. ${t.split(':')[0]} mudou o jogo`,
+      desc: ()=>`Imagem impactante e texto que usa a tendencia como espelho: o que esta acontecendo revela o que decisores realmente buscam numa marca profissional. Perspectiva de quem ve os bastidores do processo de acesso.`,
+      cta:'Como esta a sua marca profissional hoje? Me conta aqui nos comentarios.' },
+    { platform:'Instagram', icon:'📸', format:'Carrossel Antes e Depois',
+      hook: t=>`Antes e depois de uma marca profissional que ninguem via. ${t.slice(0,25).toLowerCase()}`,
+      desc: ()=>`Estagios de transformacao de marca pessoal: o que parece o profissional competente e invisivel, o que muda quando se posiciona bem, e como a tendencia em questao acelera ou atrasa esse processo.`,
+      cta:'Quer saber em qual estagio voce esta? Responde essa pergunta nos comentarios.' },
+  ],
+  lideranca:[
+    { platform:'LinkedIn', icon:'💼', format:'Artigo para Gestores',
+      hook: t=>`O que ${t.split(':')[0].toLowerCase()} revela sobre os talentos que as empresas perdem por nao enxergar`,
+      desc: ()=>`Texto para gestores e RHs: use a tendencia para abrir o debate sobre como organizacoes desperdicam competencia por falta de visibilidade interna. Sua missao de tornar competentes conhecidos aparece como solucao, nao como discurso.`,
+      cta:'Voce ja perdeu um talento que nem sabia que tinha? Me conta.' },
+    { platform:'Instagram Reels', icon:'🎬', format:'Video Reflexao',
+      hook: t=>`Talentos se perdem porque ${t.slice(0,30).toLowerCase()}. E ninguem fala sobre isso.`,
+      desc: ()=>`Video de reflexao, nao de conselho. Compartilhe o que ve acontecer com profissionais brilhantes que ficam no anonimato, conectado a tendencia atual. Tom de quem opera nos bastidores.`,
+      cta:'Compartilha com um lider que precisa ouvir isso hoje.' },
+  ],
+};
+
+/* ── HELPERS ── */
 function clean(s) { return (s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim(); }
 function rnd(n)   { return Math.floor(Math.random()*n); }
 function has(text, kws) { const t=(text||'').toLowerCase(); return kws.some(k=>t.includes(k)); }
-function tagsFromDesc(d) {
-  return clean(d).split(/[,;\n]+/).map(s=>s.trim()).filter(s=>s.length>2&&s.length<32).slice(0,3);
-}
+function tagsFromDesc(d) { return clean(d).split(/[,;\n]+/).map(s=>s.trim()).filter(s=>s.length>2&&s.length<32).slice(0,3); }
 function guessTagsFromTitle(title) {
   const t=(title||'').toLowerCase();
-  const map=[['linkedin','linkedin'],['carreira','carreira'],['emprego','emprego'],['marca','branding'],
-    ['lideranca','lideranca'],['networking','networking'],['talento','talentos'],
-    ['executivo','c-level'],['empreendedor','empreend'],['mercado','mercado'],
-    ['comunicacao','comunicacao'],['trabalho','trabalho'],['salario','remuneracao']];
+  const map=[['linkedin','linkedin'],['carreira','carreira'],['emprego','emprego'],['marca','branding'],['lideranca','lideranca'],['networking','networking'],['talento','talentos'],['executivo','c-level'],['empreendedor','empreend'],['mercado','mercado'],['comunicacao','comunicacao'],['trabalho','trabalho'],['salario','remuneracao']];
   return map.filter(([k])=>t.includes(k)).map(([,v])=>v).slice(0,3);
 }
 function classifyZone(title, tags) {
@@ -964,7 +1050,7 @@ function classifyZone(title, tags) {
   return best||'carreiras';
 }
 
-/* STATE */
+/* ── STATE ── */
 let allTopics      = [];
 let selectedTopics = new Set();
 let activeFilter   = 'all';
@@ -972,7 +1058,12 @@ let activeZone     = '';
 let srcStatuses    = {};
 let nextId         = 1;
 
-/* FETCH */
+// Preview state
+let pvTemplates    = [];
+let pvTopicIdx     = 0;
+let pvTemplIdx     = 0;
+
+/* ── FETCH ── */
 async function fetchSource(src) {
   setSrcStatus(src.id, 'pend', 0);
   try {
@@ -997,19 +1088,15 @@ async function loadAllTopics() {
   renderSkeletons();
   allTopics = CURATED.map(t=>({...t, id:nextId++}));
   setSrcStatus('curado','ok',CURATED.length);
-
   const results = await Promise.allSettled(SOURCES.map(s=>fetchSource(s)));
   results.forEach(r=>{ if(r.status==='fulfilled') allTopics=[...allTopics,...r.value]; });
-
   const seen=new Set();
   allTopics=allTopics.filter(t=>{ const k=t.title.toLowerCase().slice(0,40); if(seen.has(k))return false; seen.add(k); return true; });
-
   ZONES.forEach(z=>{ z.count=allTopics.filter(t=>t.zone===z.id).length; });
-  renderZones(); renderTopics(); updateGenBtn();
-
+  renderZones(); renderTopics(); updateUI();
   const now=new Date();
   document.getElementById('last-updated').textContent=
-    `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+    `Atualizado ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
   document.getElementById('refresh-btn').classList.remove('loading');
   toast(`${allTopics.length} tendencias carregadas`);
 }
@@ -1023,75 +1110,71 @@ function renderSrcStatus() {
   const container = document.getElementById('source-status');
   const all = [{id:'curado',label:'Curado Sancho'}, ...SOURCES.map(s=>({id:s.id,label:s.label}))];
   const rows = all.map(s=>{
-    const st = srcStatuses[s.id]||{status:'pend',count:0};
+    const st=srcStatuses[s.id]||{status:'pend',count:0};
     return `<div class="src-item">
       <span class="s-led ${st.status}"></span>
       <span class="s-name">${s.label}</span>
       ${st.status==='ok'?`<span class="s-ct">${st.count}</span>`:''}
     </div>`;
   }).join('');
-  container.innerHTML = `<div class="sb-lbl">Fontes</div><div class="src-list">${rows}</div>`;
+  container.innerHTML=`<div class="panel-label">Fontes</div><div class="src-list">${rows}</div>`;
 }
 
-/* RENDER */
+/* ── RENDER ZONES ── */
 function renderZones() {
   const list   = document.getElementById('zones-list');
-  const select = document.getElementById('zone-select');
-  list.innerHTML   = '';
-  select.innerHTML = '<option value="">Zona de Genialidade</option>';
+  list.innerHTML = '';
   ZONES.forEach(z=>{
-    const btn = document.createElement('button');
-    btn.className = 'zone-btn' + (activeZone===z.id?' active':'');
-    btn.dataset.id = z.id;
-    btn.innerHTML = `
-      <span class="z-pip" style="background:${z.color}"></span>
-      <span class="z-name">${z.label}</span>
-      <span class="z-ct">${z.count}</span>
-    `;
+    const btn=document.createElement('button');
+    btn.className='zone-btn'+(activeZone===z.id?' active':'');
+    btn.dataset.id=z.id;
+    btn.innerHTML=`
+      <div class="z-icon" style="background:${activeZone===z.id?'rgba(217,20,96,.12)':'var(--bg)'}">${z.icon}</div>
+      <div class="z-info">
+        <div class="z-name">${z.label}</div>
+        <div class="z-ct">${z.count} topicos</div>
+      </div>`;
     btn.addEventListener('click',()=>{
-      activeZone = z.id;
-      document.querySelectorAll('.zone-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      select.value = z.id;
-      updateGenBtn();
+      activeZone=z.id;
+      document.querySelectorAll('.zone-btn').forEach(b=>{
+        b.classList.toggle('active', b.dataset.id===z.id);
+        b.querySelector('.z-icon').style.background=b.dataset.id===z.id?'rgba(217,20,96,.12)':'var(--bg)';
+      });
+      updateUI();
+      renderPreview();
     });
     list.appendChild(btn);
-
-    const opt = document.createElement('option');
-    opt.value = z.id; opt.textContent = z.label;
-    if(activeZone===z.id) opt.selected = true;
-    select.appendChild(opt);
   });
 }
 
+/* ── RENDER TOPICS ── */
 function renderSkeletons() {
-  const grid = document.getElementById('topics-grid');
-  grid.innerHTML = Array(12).fill('').map(()=>`
+  const grid=document.getElementById('topics-grid');
+  grid.innerHTML=Array(14).fill('').map(()=>`
     <div class="skel-row">
-      <div class="skel" style="height:20px;width:30px;margin:0 auto"></div>
-      <div class="skel" style="height:14px;width:14px;border-radius:2px"></div>
-      <div style="padding:0 12px;display:flex;flex-direction:column;gap:5px">
-        <div class="skel" style="height:13px;width:85%"></div>
-        <div class="skel" style="height:10px;width:55%"></div>
+      <div class="skel" style="height:16px;width:26px;margin:0 8px 0 12px"></div>
+      <div class="skel" style="height:13px;width:13px;border-radius:3px"></div>
+      <div style="padding:0 10px;display:flex;flex-direction:column;gap:5px">
+        <div class="skel" style="height:11px;width:88%"></div>
+        <div class="skel" style="height:9px;width:50%"></div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;padding-right:0">
-        <div class="skel" style="height:9px;width:40px"></div>
-        <div class="skel" style="height:2px;width:48px"></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+        <div class="skel" style="height:9px;width:36px"></div>
+        <div class="skel" style="height:2px;width:40px"></div>
       </div>
     </div>`).join('');
-  document.getElementById('topic-count').textContent = 'Carregando...';
+  document.getElementById('topic-count').textContent='Carregando...';
 }
 
 function renderTopics() {
-  const grid = document.getElementById('topics-grid');
-  const filtered = allTopics.filter(t=>{
+  const grid=document.getElementById('topics-grid');
+  const filtered=allTopics.filter(t=>{
     if(activeFilter==='all') return true;
-    const m = SOURCE_META[t.source];
+    const m=SOURCE_META[t.source];
     return m && m.filter===activeFilter;
   });
-  document.getElementById('topic-count').textContent = `${filtered.length} topicos`;
-  grid.innerHTML = '';
-
+  document.getElementById('topic-count').textContent=`${filtered.length} topicos`;
+  grid.innerHTML='';
   if(!filtered.length){
     grid.innerHTML=`<div class="empty-state">
       <div class="empty-icon">📡</div>
@@ -1100,139 +1183,168 @@ function renderTopics() {
     </div>`;
     return;
   }
-
   [...filtered].sort((a,b)=>b.virality-a.virality).forEach(t=>{
-    const sel   = selectedTopics.has(t.id);
-    const meta  = SOURCE_META[t.source]||SOURCE_META['curado'];
-    const zone  = ZONES.find(z=>z.id===t.zone);
-    const scoreClass = t.virality>=90?'hi':t.virality>=80?'mid':'lo';
-    const fillColor  = t.virality>=90?'var(--pink)':t.virality>=80?'var(--amber)':'var(--blue)';
-    const vl         = t.virality>=90?'Viral':t.virality>=80?'Em alta':'Crescendo';
-
-    const row = document.createElement('div');
-    row.className = 'topic-row' + (sel?' selected':'');
-    row.dataset.id = t.id;
-    row.innerHTML = `
-      <div class="tr-score ${scoreClass}">${t.virality}</div>
+    const sel  =selectedTopics.has(t.id);
+    const meta =SOURCE_META[t.source]||SOURCE_META['curado'];
+    const sc   =t.virality>=90?'hi':t.virality>=80?'mid':'lo';
+    const fc   =t.virality>=90?'var(--pink)':t.virality>=80?'var(--amber)':'var(--blue)';
+    const vl   =t.virality>=90?'Viral':t.virality>=80?'Em alta':'Crescendo';
+    const row=document.createElement('div');
+    row.className='topic-row'+(sel?' selected':'');
+    row.dataset.id=t.id;
+    row.innerHTML=`
+      <div class="tr-score ${sc}">${t.virality}</div>
       <div class="tr-ck">${sel?'✓':''}</div>
       <div class="tr-body">
         <div class="tr-title">${t.title}</div>
         <div class="tr-tags">
           ${t.live?'<span class="tr-live"></span>':''}
-          <span class="tr-src-badge ${meta.badgeCls}">${meta.badge}</span>
-          ${zone?`<span class="tr-zone-pill" style="background:${zone.color}18;color:${zone.color};border:1px solid ${zone.color}28">✦ ${zone.label}</span>`:''}
+          <span class="tr-badge ${meta.badgeCls}">${meta.badge}</span>
         </div>
       </div>
       <div class="tr-right">
-        <span class="tr-vlabel">${vl}</span>
-        <div class="tr-vbar"><div class="tr-vfill" style="width:${t.virality}%;background:${fillColor}"></div></div>
+        <span class="tr-vl">${vl}</span>
+        <div class="tr-vbar"><div class="tr-vfill" style="width:${t.virality}%;background:${fc}"></div></div>
       </div>`;
-
     row.addEventListener('click',()=>{
       if(selectedTopics.has(t.id)){
         selectedTopics.delete(t.id);
         row.classList.remove('selected');
         row.querySelector('.tr-ck').textContent='';
-        row.querySelector('.tr-score').className='tr-score '+scoreClass;
+        row.querySelector('.tr-score').className='tr-score '+sc;
       } else {
         selectedTopics.add(t.id);
         row.classList.add('selected');
         row.querySelector('.tr-ck').textContent='✓';
       }
-      updateGenBtn();
+      updateUI();
+      pvTopicIdx=0; pvTemplIdx=0;
+      renderPreview();
     });
     grid.appendChild(row);
   });
 }
 
-/* TEMPLATES */
-const TEMPLATES = {
-  carreiras:[
-    { platform:'LinkedIn', icon:'💼', format:'Texto Nativo',
-      hook: t=>`O que ${t.split(':')[0].toLowerCase()} revela sobre quem vai crescer na carreira`,
-      desc: ()=>`Post no LinkedIn com sua analise direta sobre o que esse movimento do mercado significa para profissionais competentes. Sem suavizar: diga quem vai se adaptar e quem vai ficar para tras. Inclua uma pergunta no final que gere debate genuino.`,
-      cta:'Comenta o que você faria diferente se soubesse disso ha 5 anos.' },
-    { platform:'Instagram Reels', icon:'🎬', format:'Video 30s',
-      hook: t=>`3 verdades sobre carreiras que ${t.slice(0,30).toLowerCase()} levantou`,
-      desc: ()=>`Video direto: voce olha pra camera e diz 3 verdades que profissionais serios precisam ouvir sobre esse assunto. Tom de quem conhece os bastidores. Sem coach speak.`,
-      cta:'Segue pra voce nao ficar para tras quando o mercado virar.' },
-  ],
-  visibilidade:[
-    { platform:'Instagram', icon:'📸', format:'Carrossel',
-      hook: t=>`Por que o melhor profissional da sala ainda esta invisivel. E ${t.split(':')[0].toLowerCase()} prova isso`,
-      desc: ()=>`Carrossel com 5 slides: abre com dado ou situacao impactante sobre a tendencia, slides centrais mostram o padrao que voce ve nos profissionais que te procuram, ultimo slide apresenta sua visao de como romper com esse ciclo.`,
-      cta:'Salva esse carrossel. Voce vai querer reler quando sentir que esta invisivel.' },
-    { platform:'LinkedIn', icon:'💼', format:'Artigo Curto',
-      hook: t=>`Competencia nao e suficiente. ${t.split(':')[0]} mostrou isso de novo.`,
-      desc: ()=>`Texto com sua perspectiva genuina: a tendencia como pano de fundo, mas o real assunto e o gap entre competencia e visibilidade. Inclua um exemplo real (sem nomear) de alguem que so comecou a ser reconhecido quando mudou a forma de se apresentar.`,
-      cta:'Me conta: voce se reconhece nessa situacao?' },
-  ],
-  decisores:[
-    { platform:'LinkedIn', icon:'💼', format:'Texto Nativo',
-      hook: t=>`Chegar ate quem decide ficou mais dificil. ${t.split(':')[0]} explica por que.`,
-      desc: ()=>`Voce como o Sancho Panca moderno: quem acessa o coracao dos reis sabe que o caminho nunca e direto. Use essa tendencia como contexto para mostrar como a logica de acesso a decisores mudou. O que profissionais competentes precisam entender sobre isso.`,
-      cta:'Quer saber como eu abro essas portas? Me manda uma mensagem.' },
-    { platform:'Instagram Reels', icon:'🎬', format:'Video Opiniao',
-      hook: t=>`Todo mundo quer falar com o CEO. Ninguem ensina o caminho certo. ${t.slice(0,25).toLowerCase()}`,
-      desc: ()=>`Video de 45s com sua visao sobre o que realmente abre portas com quem decide. Use a tendencia como gancho, mas entregue a sacada pratica que so quem opera nesse nivel conhece.`,
-      cta:'Comenta PORTAS que eu te conto o primeiro passo.' },
-  ],
-  networking:[
-    { platform:'Instagram', icon:'📸', format:'Post Legenda Longa',
-      hook: t=>`Networking de verdade nao e o que voce esta fazendo. ${t.split(':')[0].toLowerCase()} prova`,
-      desc: ()=>`Visual simples e forte. Legenda longa com sua visao sobre o erro mais comum de networking que voce observa, contextualizado com a tendencia. Tres acoes concretas no final.`,
-      cta:'Marca alguem que ainda confunde networking com distribuir cartao.' },
-    { platform:'TikTok e Reels', icon:'📲', format:'Video Provocacao',
-      hook: t=>`A maioria das pessoas faz networking errado. ${t.slice(0,20).toLowerCase()} confirmou isso`,
-      desc: ()=>`Provoque com uma verdade desconfortavel sobre relacionamentos profissionais, conectada a tendencia. Encerre mostrando o que diferencia quem constroi rede de verdade.`,
-      cta:'Salva pra voce nao esquecer disso na hora de abrir o LinkedIn.' },
-  ],
-  marca:[
-    { platform:'LinkedIn', icon:'💼', format:'Texto e Imagem',
-      hook: t=>`Sua marca profissional fala de voce antes de voce abrir a boca. ${t.split(':')[0]} mudou o jogo`,
-      desc: ()=>`Post com imagem impactante e legenda que usa a tendencia como espelho: o que esta acontecendo no mercado revela o que decisores realmente buscam numa marca profissional. Sua perspectiva de quem ve os bastidores do processo de acesso.`,
-      cta:'Como esta a sua marca profissional hoje? Me conta aqui nos comentarios.' },
-    { platform:'Instagram', icon:'📸', format:'Carrossel',
-      hook: t=>`Antes e depois de uma marca profissional que ninguem via. ${t.slice(0,25).toLowerCase()}`,
-      desc: ()=>`Carrossel mostrando os estagios de transformacao de marca pessoal: o que o profissional competente e invisivel parece, o que muda quando se posiciona bem, e como a tendencia em questao acelera ou atrasa esse processo.`,
-      cta:'Quer saber em qual estagio voce esta? Responde essa pergunta nos comentarios.' },
-  ],
-  lideranca:[
-    { platform:'LinkedIn', icon:'💼', format:'Artigo',
-      hook: t=>`O que ${t.split(':')[0].toLowerCase()} revela sobre os talentos que as empresas perdem por nao enxergar`,
-      desc: ()=>`Texto para gestores e RHs: use a tendencia para abrir o debate sobre como organizacoes continuam desperdicando competencia por falta de visibilidade interna. Sua missao de tornar competentes conhecidos aparece aqui como solucao.`,
-      cta:'Voce ja perdeu um talento que nem sabia que tinha? Me conta.' },
-    { platform:'Instagram Reels', icon:'🎬', format:'Video Reflexao',
-      hook: t=>`Talentos se perdem porque ${t.slice(0,30).toLowerCase()}. E ninguem fala sobre isso.`,
-      desc: ()=>`Video de reflexao, nao de conselho. Voce compartilha uma observacao do campo: o que ve acontecer com profissionais brilhantes que ficam no anonimato, conectado a tendencia atual.`,
-      cta:'Compartilha com um lider que precisa ouvir isso hoje.' },
-  ],
-};
+/* ── PREVIEW ── */
+function buildPreviewItems() {
+  const topics=allTopics.filter(t=>selectedTopics.has(t.id));
+  const pool  =TEMPLATES[activeZone]||TEMPLATES.carreiras;
+  const items=[];
+  topics.forEach(topic=>{
+    pool.forEach(tmpl=>{
+      items.push({topic, tmpl});
+    });
+  });
+  return items;
+}
 
-/* GENERATE */
+function renderPreview() {
+  const empty  =document.getElementById('pv-empty');
+  const content=document.getElementById('pv-content');
+  const badge  =document.getElementById('pv-badge');
+  const prevBtn=document.getElementById('pv-prev');
+  const nextBtn=document.getElementById('pv-next');
+
+  if(!activeZone || selectedTopics.size===0){
+    empty.hidden=false; content.style.display='none';
+    badge.hidden=true;
+    prevBtn.disabled=true; nextBtn.disabled=true;
+    return;
+  }
+
+  const items=buildPreviewItems();
+  if(!items.length){ empty.hidden=false; content.style.display='none'; return; }
+
+  const idx=Math.min(pvTopicIdx*2+pvTemplIdx, items.length-1);
+  const {topic, tmpl}=items[idx];
+
+  badge.hidden=false;
+  badge.textContent=`${idx+1} de ${items.length}`;
+  prevBtn.disabled=idx===0;
+  nextBtn.disabled=idx===items.length-1;
+
+  const hook=tmpl.hook(topic.title);
+  const desc=tmpl.desc(topic.title);
+  const meta=SOURCE_META[topic.source]||SOURCE_META['curado'];
+  const zone=ZONES.find(z=>z.id===activeZone);
+
+  const otherCount=selectedTopics.size-1;
+
+  empty.hidden=true;
+  content.style.display='flex';
+  content.innerHTML=`
+    <div class="pv-topic-tag">
+      <span class="pv-topic-label">Topico</span>
+      <span class="pv-topic-title">${topic.title}</span>
+      <span class="tr-badge ${meta.badgeCls}">${meta.badge}</span>
+    </div>
+    <div class="pv-card">
+      <div class="pv-card-head">
+        <span class="pv-card-ico">${tmpl.icon}</span>
+        <span class="pv-card-plat">${tmpl.platform}</span>
+        <span class="pv-card-fmt">${tmpl.format}</span>
+      </div>
+      <div class="pv-card-body">
+        <div class="pv-hook-label">Hook de abertura</div>
+        <div class="pv-hook">${hook}</div>
+        <div class="pv-desc-label">Roteiro / Contexto</div>
+        <div class="pv-desc">${desc}</div>
+        <div class="pv-cta-row">
+          <span class="pv-cta-icon">💬</span>
+          <span class="pv-cta">${tmpl.cta}</span>
+        </div>
+      </div>
+    </div>
+    ${otherCount>0?`<div class="pv-more-topics">+${otherCount} topico${otherCount>1?'s':''} selecionado${otherCount>1?'s':''}. Use as setas para navegar ou gere todas as ideias abaixo.</div>`:''}
+  `;
+}
+
+/* ── UI STATE ── */
+function updateUI() {
+  const n=selectedTopics.size;
+  const zone=ZONES.find(z=>z.id===activeZone);
+  const btn=document.getElementById('gen-btn');
+  const hint=document.getElementById('gen-hint');
+  const selCount=document.getElementById('sel-count');
+
+  selCount.textContent=n>0?`${n} selecionado${n>1?'s':''}` : '';
+  selCount.style.display=n>0?'inline':'none';
+
+  if(!activeZone && n===0){
+    btn.disabled=true;
+    hint.textContent='Selecione uma zona e ao menos um topico';
+  } else if(!activeZone){
+    btn.disabled=true;
+    hint.textContent='Selecione uma zona a esquerda';
+  } else if(n===0){
+    btn.disabled=true;
+    hint.textContent='Clique em topicos para selecionar';
+  } else {
+    btn.disabled=false;
+    hint.textContent=`${n} topico${n>1?'s':''} · ${zone.label}`;
+  }
+}
+
+/* ── GENERATE ALL ── */
 function generateContent() {
-  const topics = allTopics.filter(t=>selectedTopics.has(t.id));
-  const zone   = ZONES.find(z=>z.id===activeZone);
-  const pool   = TEMPLATES[activeZone]||TEMPLATES.carreiras;
+  const topics=allTopics.filter(t=>selectedTopics.has(t.id));
+  const zone  =ZONES.find(z=>z.id===activeZone);
+  const pool  =TEMPLATES[activeZone]||TEMPLATES.carreiras;
 
-  const ctx = document.getElementById('out-ctx');
-  ctx.innerHTML=`
-    <span class="ctx-tag">Wladson Sidney</span>
-    <span class="ctx-tag ctx-tag-pink">✦ ${zone.label}</span>
-    ${topics.map(t=>`<span class="ctx-tag">📌 ${t.title.slice(0,40)}${t.title.length>40?'...':''}</span>`).join('')}
+  document.getElementById('out-ctx').innerHTML=`
+    <span class="ctx-chip">Wladson Sidney</span>
+    <span class="ctx-chip pink">${zone.icon} ${zone.label}</span>
+    ${topics.map(t=>`<span class="ctx-chip">📌 ${t.title.slice(0,45)}${t.title.length>45?'...':''}</span>`).join('')}
   `;
 
-  const grid = document.getElementById('ideas-grid');
-  grid.innerHTML = '';
-
+  const grid=document.getElementById('ideas-grid');
+  grid.innerHTML='';
   topics.forEach(topic=>{
-    const shuffled = [...pool].sort(()=>Math.random()-.5);
-    shuffled.slice(0, Math.min(2, shuffled.length)).forEach(tmpl=>{
-      const card = document.createElement('div');
-      card.className = 'idea-card';
-      const hook = tmpl.hook(topic.title);
-      const desc = tmpl.desc(topic.title, zone.label);
-      const meta = SOURCE_META[topic.source]||SOURCE_META['curado'];
+    const shuffled=[...pool].sort(()=>Math.random()-.5);
+    shuffled.slice(0,2).forEach(tmpl=>{
+      const card=document.createElement('div');
+      card.className='idea-card';
+      const meta=SOURCE_META[topic.source]||SOURCE_META['curado'];
       card.innerHTML=`
         <div class="idea-head">
           <span class="idea-ico">${tmpl.icon}</span>
@@ -1240,68 +1352,62 @@ function generateContent() {
           <span class="idea-fmt">${tmpl.format}</span>
         </div>
         <div class="idea-body">
-          <div class="idea-hook">${hook}</div>
-          <div class="idea-desc">${desc}</div>
+          <div class="idea-hook">${tmpl.hook(topic.title)}</div>
+          <div class="idea-desc">${tmpl.desc(topic.title)}</div>
           <div class="idea-cta">${tmpl.cta}</div>
-          <div class="idea-ref">Topico: ${topic.title.slice(0,55)}${topic.title.length>55?'...':''} · <span class="tr-src-badge ${meta.badgeCls}" style="font-size:9px">${meta.badge}</span></div>
+          <div class="idea-ref">${topic.title.slice(0,55)}${topic.title.length>55?'...':''} · <span class="tr-badge ${meta.badgeCls}">${meta.badge}</span></div>
         </div>`;
       grid.appendChild(card);
     });
   });
 
-  document.getElementById('out-overlay').hidden = false;
-  document.querySelector('.out-sheet').scrollTop = 0;
-}
-
-/* UI */
-function updateGenBtn() {
-  const btn  = document.getElementById('gen-btn');
-  const d1   = document.getElementById('step1-dot');
-  const t1   = document.getElementById('step1-txt');
-  const d2   = document.getElementById('step2-dot');
-  const t2   = document.getElementById('step2-txt');
-  const n    = selectedTopics.size;
-
-  if(n>0){ d1.classList.add('done'); d1.textContent='✓'; t1.classList.add('done'); t1.textContent=`${n} topico${n>1?'s':''}`; }
-  else    { d1.classList.remove('done'); d1.textContent='1'; t1.classList.remove('done'); t1.textContent='Selecione topicos'; }
-
-  const zone = ZONES.find(z=>z.id===activeZone);
-  if(zone){ d2.classList.add('done'); d2.textContent='✓'; t2.classList.add('done'); t2.textContent=zone.label; }
-  else    { d2.classList.remove('done'); d2.textContent='2'; t2.classList.remove('done'); t2.textContent='Escolha a zona'; }
-
-  btn.disabled = !(n>0 && activeZone);
+  document.getElementById('out-overlay').hidden=false;
+  document.querySelector('.out-sheet').scrollTop=0;
 }
 
 function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'), 2800);
 }
 
-document.getElementById('source-filter').addEventListener('click', e=>{
-  const btn = e.target.closest('.f-pill'); if(!btn) return;
-  document.querySelectorAll('.f-pill').forEach(b=>b.classList.remove('active'));
+/* ── WIRING ── */
+document.getElementById('source-filter').addEventListener('click',e=>{
+  const btn=e.target.closest('.f-btn'); if(!btn) return;
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  activeFilter = btn.dataset.filter;
+  activeFilter=btn.dataset.filter;
   renderTopics();
 });
 
-document.getElementById('zone-select').addEventListener('change', e=>{
-  activeZone = e.target.value;
-  document.querySelectorAll('.zone-btn').forEach(b=>b.classList.toggle('active', b.dataset.id===activeZone));
-  updateGenBtn();
+document.getElementById('pv-prev').addEventListener('click',()=>{
+  const items=buildPreviewItems();
+  const cur=pvTopicIdx*2+pvTemplIdx;
+  if(cur>0){
+    const ni=cur-1;
+    pvTopicIdx=Math.floor(ni/2); pvTemplIdx=ni%2;
+    renderPreview();
+  }
+});
+document.getElementById('pv-next').addEventListener('click',()=>{
+  const items=buildPreviewItems();
+  const cur=pvTopicIdx*2+pvTemplIdx;
+  if(cur<items.length-1){
+    const ni=cur+1;
+    pvTopicIdx=Math.floor(ni/2); pvTemplIdx=ni%2;
+    renderPreview();
+  }
 });
 
 document.getElementById('gen-btn').addEventListener('click', generateContent);
 document.getElementById('out-regen').addEventListener('click', generateContent);
 document.getElementById('refresh-btn').addEventListener('click', loadAllTopics);
-document.getElementById('out-close').addEventListener('click', ()=>{ document.getElementById('out-overlay').hidden=true; });
-document.getElementById('out-overlay').addEventListener('click', e=>{ if(e.target.id==='out-overlay') document.getElementById('out-overlay').hidden=true; });
+document.getElementById('out-close').addEventListener('click',()=>{ document.getElementById('out-overlay').hidden=true; });
+document.getElementById('out-overlay').addEventListener('click',e=>{ if(e.target.id==='out-overlay') document.getElementById('out-overlay').hidden=true; });
 
-/* INIT */
+/* ── INIT ── */
 CURATED.forEach(t=>allTopics.push({...t, id:nextId++}));
 ZONES.forEach(z=>{ z.count=allTopics.filter(t=>t.zone===z.id).length; });
-renderZones(); renderTopics(); updateGenBtn(); renderSrcStatus();
+renderZones(); renderTopics(); updateUI(); renderPreview(); renderSrcStatus();
 loadAllTopics();
 </script>
