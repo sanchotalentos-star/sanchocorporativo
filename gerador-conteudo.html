@@ -353,13 +353,13 @@ body { display: flex; flex-direction: column; min-height: 100%; }
     <div class="specialist-hero">
       <div class="specialist-avatar">WS</div>
       <div class="specialist-name">Wladson Sidney</div>
-      <div class="specialist-role">Empresário · Gestor de Carreiras</div>
+      <div class="specialist-role">Empresário · Estrategista de Personalidades</div>
       <div class="specialist-mission">
         "Tornar os competentes conhecidos."
       </div>
       <div class="specialist-bio">
-        O Sancho Pança dos tempos modernos — o fiel escudeiro que acessa os corações dos reis.
-        Conecta profissionais talentosos a quem decide, abre portas onde outros enxergam paredes.
+        O Sancho Pança dos tempos modernos. O fiel escudeiro que acessa os corações dos reis.
+        Especialista em fazer com que saberes valiosos cheguem a quem tem o poder de reconhecê-los.
       </div>
     </div>
 
@@ -399,7 +399,7 @@ body { display: flex; flex-direction: column; min-height: 100%; }
         <div class="gen-selection-hint">Selecione tópicos e uma zona para gerar ideias</div>
       </div>
       <select class="gen-zone-select" id="zone-select">
-        <option value="">— Zona de Genialidade —</option>
+        <option value="">Zona de Genialidade</option>
       </select>
       <button class="gen-btn" id="gen-btn" disabled>✦ Gerar Conteúdo</button>
     </div>
@@ -455,12 +455,12 @@ const ZONE_KEYWORDS = {
    CURATED FALLBACK TOPICS
 ═══════════════════════════════════════════ */
 const CURATED_TOPICS = [
-  { title:'Personal branding sem autopromoção — o paradoxo que vira viral',        source:'curado', tags:['marca pessoal','autoridade'], zone:'marca',       virality:95, live:false },
+  { title:'Personal branding sem autopromoção: o paradoxo que vira viral',          source:'curado', tags:['marca pessoal','autoridade'], zone:'marca',       virality:95, live:false },
   { title:'Empreendedor invisível: competentes que o mercado ainda não descobriu',  source:'curado', tags:['visibilidade','carreira'],    zone:'visibilidade', virality:91, live:false },
   { title:'Como chegar até quem decide sem parecer desesperado',                    source:'curado', tags:['decisores','acesso'],         zone:'decisores',    virality:89, live:false },
   { title:'O erro de networking que profissionais sérios cometem todo dia',         source:'curado', tags:['networking','erro'],           zone:'networking',   virality:87, live:false },
   { title:'Recolocação em 2026: o que mudou e o que ainda ninguém te contou',      source:'curado', tags:['recolocação','carreira'],      zone:'carreiras',    virality:90, live:false },
-  { title:'LinkedIn virou vitrine — mas quem realmente converte?',                 source:'curado', tags:['linkedin','conversão'],        zone:'visibilidade', virality:88, live:false },
+  { title:'LinkedIn virou vitrine. Mas quem realmente converte?',                  source:'curado', tags:['linkedin','conversão'],        zone:'visibilidade', virality:88, live:false },
   { title:'Gestão de talentos que as empresas querem mas raramente encontram',      source:'curado', tags:['talentos','gestão'],           zone:'lideranca',    virality:82, live:false },
   { title:'Por que profissionais competentes perdem para os bem relacionados',      source:'curado', tags:['competência','rede'],          zone:'networking',   virality:93, live:false },
   { title:'O capital social que ninguém te ensina na faculdade',                   source:'curado', tags:['capital social','aprendizado'], zone:'carreiras',   virality:85, live:false },
@@ -698,7 +698,7 @@ function renderZones() {
   const list   = document.getElementById('zones-list');
   const select = document.getElementById('zone-select');
   list.innerHTML   = '';
-  select.innerHTML = '<option value="">— Zona de Genialidade —</option>';
+  select.innerHTML = '<option value="">Zona de Genialidade</option>';
 
   ZONES.forEach(z => {
     const chip = document.createElement('button');
@@ -823,9 +823,9 @@ const TEMPLATES = {
   ],
   visibilidade: [
     { platform:'Instagram', icon:'📸', format:'Carrossel',
-      hook: t => `Por que o melhor profissional da sala ainda está invisível — e ${t.split(':')[0].toLowerCase()} prova isso`,
+      hook: t => `Por que o melhor profissional da sala ainda está invisível. E ${t.split(':')[0].toLowerCase()} prova isso`,
       desc: (t, z) => `Carrossel com 5 slides: abre com dado ou situação impactante sobre a tendência, slides centrais mostram o padrão que você vê nos profissionais que te procuram, último slide apresenta sua visão de como romper com esse ciclo. Tom de quem já abriu portas para centenas de pessoas.`,
-      cta: 'Salva esse carrossel — você vai querer reler quando sentir que está invisível.' },
+      cta: 'Salva esse carrossel. Você vai querer reler quando sentir que está invisível.' },
     { platform:'LinkedIn', icon:'💼', format:'Artigo Curto',
       hook: t => `Competência não é suficiente. ${t.split(':')[0]} mostrou isso de novo.`,
       desc: (t, z) => `Texto com sua perspectiva genuína: a tendência como pano de fundo, mas o real assunto é o gap entre competência e visibilidade. Inclua um exemplo real (sem nomear) de alguém que só começou a ser reconhecido quando mudou a forma de se apresentar.`,
@@ -834,16 +834,16 @@ const TEMPLATES = {
   decisores: [
     { platform:'LinkedIn', icon:'💼', format:'Texto Nativo',
       hook: t => `Chegar até quem decide ficou mais difícil. ${t.split(':')[0]} explica por quê.`,
-      desc: (t, z) => `Você como o Sancho Pança moderno: quem acessa o coração dos reis sabe que o caminho nunca é direto. Use essa tendência como contexto para mostrar como a lógica de acesso a decisores mudou — e o que profissionais competentes precisam entender sobre isso.`,
+      desc: (t, z) => `Você como o Sancho Pança moderno: quem acessa o coração dos reis sabe que o caminho nunca é direto. Use essa tendência como contexto para mostrar como a lógica de acesso a decisores mudou. O que profissionais competentes precisam entender sobre isso.`,
       cta: 'Quer saber como eu abro essas portas? Me manda uma mensagem.' },
     { platform:'Instagram Reels', icon:'🎬', format:'Vídeo Opinião',
-      hook: t => `Todo mundo quer falar com o CEO. Ninguém ensina o caminho certo — ${t.slice(0,25).toLowerCase()}`,
+      hook: t => `Todo mundo quer falar com o CEO. Ninguém ensina o caminho certo. ${t.slice(0,25).toLowerCase()}`,
       desc: (t, z) => `Vídeo de 45s com sua visão sobre o que realmente abre portas com quem decide. Use a tendência como gancho, mas entregue a sacada prática que só quem opera nesse nível conhece.`,
       cta: 'Comenta PORTAS que eu te conto o primeiro passo.' },
   ],
   networking: [
     { platform:'Instagram', icon:'📸', format:'Post + Legenda Longa',
-      hook: t => `Networking de verdade não é o que você está fazendo — ${t.split(':')[0].toLowerCase()} prova`,
+      hook: t => `Networking de verdade não é o que você está fazendo. ${t.split(':')[0].toLowerCase()} prova`,
       desc: (t, z) => `Visual simples e forte. Legenda longa com sua visão sobre o erro mais comum de networking que você observa, contextualizado com a tendência. Fale como quem já viu o que funciona e o que queima pontes. Três ações concretas no final.`,
       cta: 'Marca alguém que ainda confunde networking com distribuir cartão.' },
     { platform:'TikTok / Reels', icon:'📲', format:'Vídeo Provocação',
@@ -857,8 +857,8 @@ const TEMPLATES = {
       desc: (t, z) => `Post com imagem impactante e legenda que usa a tendência como espelho: o que está acontecendo no mercado revela o que decisores realmente buscam numa marca profissional. Sua perspectiva de quem vê os bastidores do processo de acesso.`,
       cta: 'Como está a sua marca profissional hoje? Me conta aqui nos comentários.' },
     { platform:'Instagram', icon:'📸', format:'Carrossel',
-      hook: t => `Antes e depois de uma marca profissional que ninguém via — ${t.slice(0,25).toLowerCase()}`,
-      desc: (t, z) => `Carrossel mostrando os estágios de transformação de marca pessoal: o que o profissional competente-invisível parece, o que muda quando se posiciona bem, e como a tendência em questão acelera ou atrasa esse processo.`,
+      hook: t => `Antes e depois de uma marca profissional que ninguém via. ${t.slice(0,25).toLowerCase()}`,
+      desc: (t, z) => `Carrossel mostrando os estágios de transformação de marca pessoal: o que o profissional competente e invisível parece, o que muda quando se posiciona bem, e como a tendência em questão acelera ou atrasa esse processo.`,
       cta: 'Quer saber em qual estágio você está? Responde essa pergunta nos comentários.' },
   ],
   lideranca: [
@@ -868,7 +868,7 @@ const TEMPLATES = {
       cta: 'Você já perdeu um talento que nem sabia que tinha? Me conta.' },
     { platform:'Instagram Reels', icon:'🎬', format:'Vídeo Reflexão',
       hook: t => `Talentos se perdem porque ${t.slice(0,30).toLowerCase()}. E ninguém fala sobre isso.`,
-      desc: (t, z) => `Vídeo de reflexão — não de conselho. Você compartilha uma observação do campo: o que vê acontecer com profissionais brilhantes que ficam no anonimato, conectado à tendência atual. Tom de alguém que opera nos bastidores e vê o que os outros não veem.`,
+      desc: (t, z) => `Vídeo de reflexão, não de conselho. Você compartilha uma observação do campo: o que vê acontecer com profissionais brilhantes que ficam no anonimato, conectado à tendência atual. Tom de alguém que opera nos bastidores e vê o que os outros não veem.`,
       cta: 'Compartilha com um líder que precisa ouvir isso hoje.' },
   ],
 };
@@ -934,7 +934,7 @@ function updateGenBtn() {
     label.textContent = 'Nenhum tópico selecionado';
     btn.disabled = true;
   } else if (!activeZone) {
-    label.textContent = `${n} tópico${n>1?'s':''} selecionado${n>1?'s':''} — escolha a zona`;
+    label.textContent = `${n} tópico${n>1?'s':''} selecionado${n>1?'s':''}. Escolha a zona.`;
     btn.disabled = true;
   } else {
     const z = ZONES.find(z => z.id === activeZone);
