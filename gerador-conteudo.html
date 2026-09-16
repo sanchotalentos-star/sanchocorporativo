@@ -1,6 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gerador de Conteudo</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #F0F2F5;
+  color: #111318;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+button { font-family: inherit; cursor: pointer; }
+img { max-width: 100%; }
+
 :root {
   --bg:        #F0F2F5;
   --surface:   #FFFFFF;
@@ -21,22 +39,9 @@
   --blue-lt:   rgba(30,63,170,.09);
   --orange:    #B84C10;
   --orange-lt: rgba(184,76,16,.1);
-  --font:      'Inter', system-ui, sans-serif;
   --r:         4px;
   --r2:        6px;
 }
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body {
-  height: 100%;
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--ink);
-  font-size: 13px;
-  line-height: 1.5;
-  overflow: hidden;
-}
-button { font-family: var(--font); cursor: pointer; }
 
 /* ── APP SHELL ── */
 .app {
@@ -65,75 +70,40 @@ button { font-family: var(--font); cursor: pointer; }
   margin-right: 14px;
 }
 .t-logo-sq {
-  width: 22px;
-  height: 22px;
+  width: 22px; height: 22px;
   border-radius: 4px;
   background: var(--pink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: -.01em;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #fff;
 }
-.t-name {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: -.01em;
-}
-.t-title {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--ink-2);
-  flex: 1;
-}
-.t-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-right: 12px;
-}
-.t-upd {
-  font-size: 11px;
-  color: var(--ink-3);
-  font-variant-numeric: tabular-nums;
-}
+.t-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+.t-title { font-size: 12px; font-weight: 500; color: var(--ink-2); flex: 1; }
+.t-upd { font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; margin-right: 12px; }
 .t-btn {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-2);
-  background: transparent;
-  border: 1px solid var(--border-hi);
-  padding: 5px 11px;
-  border-radius: var(--r);
-  transition: border-color .12s, color .12s, background .12s;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  font-size: 12px; font-weight: 600; color: var(--ink-2);
+  background: transparent; border: 1px solid var(--border-hi);
+  padding: 5px 11px; border-radius: var(--r);
+  transition: background .12s, color .12s;
+  display: flex; align-items: center; gap: 5px;
 }
-.t-btn:hover { background: var(--bg); border-color: var(--border-hi); color: var(--ink); }
+.t-btn:hover { background: var(--bg); color: var(--ink); }
 .t-btn.loading { opacity: .38; pointer-events: none; }
 .spin { display: inline-block; }
 .t-btn.loading .spin { animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── MAIN BODY: 3 columns ── */
+/* ── BODY ── */
 .body {
   display: grid;
   grid-template-columns: 220px 1fr 340px;
-  min-height: 0;
-  overflow: hidden;
+  min-height: 0; overflow: hidden;
 }
 
-/* ── ZONE PANEL (left) ── */
+/* ── ZONE PANEL ── */
 .zone-panel {
   background: var(--surface);
   border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  display: flex; flex-direction: column; overflow: hidden;
 }
 .panel-head {
   padding: 12px 14px 10px;
@@ -141,80 +111,42 @@ button { font-family: var(--font); cursor: pointer; }
   flex-shrink: 0;
 }
 .panel-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3);
 }
-.panel-sub {
-  font-size: 11px;
-  color: var(--ink-2);
-  margin-top: 2px;
-  font-weight: 400;
-}
+.panel-sub { font-size: 11px; color: var(--ink-2); margin-top: 2px; }
 
 .zones-list {
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  overflow-y: auto;
-  flex: 1;
+  padding: 8px; display: flex; flex-direction: column; gap: 2px;
+  overflow-y: auto; flex: 1;
 }
 .zone-btn {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  padding: 9px 10px;
-  border-radius: var(--r2);
-  border: 1.5px solid transparent;
-  background: transparent;
-  text-align: left;
-  width: 100%;
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 9px 10px; border-radius: var(--r2);
+  border: 1.5px solid transparent; background: transparent;
+  text-align: left; width: 100%;
   transition: background .1s, border-color .1s;
 }
 .zone-btn:hover { background: var(--bg); }
-.zone-btn.active {
-  background: var(--pink-lt);
-  border-color: var(--pink-bdr);
-}
+.zone-btn.active { background: var(--pink-lt); border-color: var(--pink-bdr); }
 .z-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  flex-shrink: 0;
-  margin-top: 1px;
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0; margin-top: 1px;
+  background: var(--bg); transition: background .1s;
 }
+.zone-btn.active .z-icon { background: rgba(217,20,96,.12); }
 .z-info { display: flex; flex-direction: column; min-width: 0; }
-.z-name {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-2);
-  line-height: 1.3;
-}
+.z-name { font-size: 12px; font-weight: 600; color: var(--ink-2); line-height: 1.3; }
 .zone-btn.active .z-name { color: var(--pink); }
-.z-ct {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--ink-3);
-  font-variant-numeric: tabular-nums;
-  margin-top: 1px;
-}
+.z-ct { font-size: 10px; font-weight: 500; color: var(--ink-3); font-variant-numeric: tabular-nums; margin-top: 1px; }
 
 .zone-divider { margin: 8px 14px; border: none; border-top: 1px solid var(--border); }
 
 .src-section { padding: 8px 14px 12px; flex-shrink: 0; }
 .src-list { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
 .src-item { display: flex; align-items: center; gap: 7px; }
-.s-led {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--ink-3); flex-shrink: 0;
-}
+.s-led { width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); flex-shrink: 0; }
 .s-led.ok   { background: var(--green); }
 .s-led.err  { background: var(--orange); }
 .s-led.pend { background: var(--amber); animation: blink 1s ease-in-out infinite; }
@@ -222,586 +154,262 @@ button { font-family: var(--font); cursor: pointer; }
 .s-name { flex: 1; font-size: 11px; color: var(--ink-2); font-weight: 500; }
 .s-ct { font-size: 11px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 
-/* ── TOPICS PANEL (center) ── */
+/* ── TOPICS PANEL ── */
 .topics-panel {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  background: var(--panel);
+  display: flex; flex-direction: column;
+  min-height: 0; background: var(--panel);
   border-right: 1px solid var(--border);
 }
 .filter-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 14px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  flex-shrink: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
+  display: flex; align-items: center; gap: 4px;
+  padding: 8px 14px; border-bottom: 1px solid var(--border);
+  background: var(--surface); flex-shrink: 0;
+  overflow-x: auto; scrollbar-width: none;
 }
 .filter-row::-webkit-scrollbar { display: none; }
 .f-btn {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: var(--r);
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--ink-2);
-  transition: all .1s;
-  white-space: nowrap;
-  flex-shrink: 0;
+  font-size: 11px; font-weight: 600; padding: 4px 10px;
+  border-radius: var(--r); border: 1px solid transparent;
+  background: transparent; color: var(--ink-2);
+  transition: all .1s; white-space: nowrap; flex-shrink: 0;
 }
 .f-btn:hover { background: var(--bg); color: var(--ink); }
-.f-btn.active {
-  background: var(--surface);
-  border-color: var(--border-hi);
-  color: var(--ink);
-  font-weight: 700;
-}
+.f-btn.active { background: var(--surface); border-color: var(--border-hi); color: var(--ink); font-weight: 700; }
 
 .topics-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 14px;
-  border-bottom: 1px solid var(--border);
-  background: var(--panel);
-  flex-shrink: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 14px; border-bottom: 1px solid var(--border);
+  background: var(--panel); flex-shrink: 0;
 }
-.tm-count {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--ink-2);
-  flex: 1;
-  font-variant-numeric: tabular-nums;
-}
-.tm-sel {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--pink);
-}
-.tm-hint {
-  font-size: 11px;
-  color: var(--ink-3);
-}
+.tm-count { font-size: 11px; font-weight: 600; color: var(--ink-2); flex: 1; font-variant-numeric: tabular-nums; }
+.tm-sel { font-size: 11px; font-weight: 700; color: var(--pink); }
 
 .topics-scroll {
-  flex: 1;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-hi) transparent;
+  flex: 1; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: var(--border-hi) transparent;
 }
 
 /* ── TOPIC ROW ── */
 .topic-row {
   display: grid;
   grid-template-columns: 36px 16px 1fr 52px;
-  align-items: center;
-  gap: 0;
+  align-items: center; gap: 0;
   padding: 9px 12px 9px 0;
   border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  background: var(--surface);
-  transition: background .08s;
-  user-select: none;
+  cursor: pointer; background: var(--surface);
+  transition: background .08s; user-select: none;
 }
 .topic-row:hover { background: #F5F7FA; }
 .topic-row.selected { background: #FFF0F5; }
 .topic-row.selected:hover { background: #FFE8F0; }
 
 .tr-score {
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 16px; font-weight: 800;
   font-variant-numeric: tabular-nums;
-  text-align: center;
-  color: var(--ink-3);
-  flex-shrink: 0;
-  line-height: 1;
-  padding-left: 12px;
+  text-align: center; color: var(--ink-3);
+  flex-shrink: 0; line-height: 1; padding-left: 12px;
 }
 .tr-score.hi  { color: var(--pink); }
 .tr-score.mid { color: var(--amber); }
 .tr-score.lo  { color: var(--blue); }
 
 .tr-ck {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
+  width: 14px; height: 14px; border-radius: 3px;
   border: 1.5px solid var(--border-hi);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
-  font-weight: 800;
-  color: transparent;
-  flex-shrink: 0;
-  transition: all .1s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 800; color: transparent;
+  flex-shrink: 0; transition: all .1s;
 }
-.topic-row.selected .tr-ck {
-  background: var(--pink);
-  border-color: var(--pink);
-  color: #fff;
-}
+.topic-row.selected .tr-ck { background: var(--pink); border-color: var(--pink); color: #fff; }
 
 .tr-body { padding: 0 10px; min-width: 0; }
-.tr-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink);
-  line-height: 1.42;
-  margin-bottom: 3px;
-}
-.tr-tags {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-}
+.tr-title { font-size: 12px; font-weight: 600; color: var(--ink); line-height: 1.42; margin-bottom: 3px; }
+.tr-tags { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .tr-live {
   width: 5px; height: 5px; border-radius: 50%;
-  background: var(--green);
-  animation: blink 2s ease-in-out infinite;
-  flex-shrink: 0;
-  display: inline-block;
+  background: var(--green); animation: blink 2s ease-in-out infinite;
+  flex-shrink: 0; display: inline-block;
 }
-.tr-badge {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 1px 5px;
-  border-radius: 3px;
-  letter-spacing: .02em;
-}
+.tr-badge { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; }
 .b-google    { background: var(--green-lt);  color: var(--green); }
 .b-exame     { background: var(--amber-lt);  color: var(--amber); }
 .b-meioem    { background: var(--orange-lt); color: var(--orange); }
 .b-infomoney { background: var(--blue-lt);   color: var(--blue); }
 .b-curado    { background: var(--pink-lt);   color: var(--pink); }
 
-.tr-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  flex-shrink: 0;
-}
-.tr-vl {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  white-space: nowrap;
-}
-.tr-vbar {
-  width: 40px;
-  height: 2px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-}
+.tr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.tr-vl { font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+.tr-vbar { width: 40px; height: 2px; background: var(--border); border-radius: 2px; overflow: hidden; }
 .tr-vfill { height: 100%; border-radius: 2px; }
 
 /* Skeleton */
 .skel-row {
-  display: grid;
-  grid-template-columns: 36px 16px 1fr 52px;
-  align-items: center;
-  padding: 9px 12px 9px 0;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  display: grid; grid-template-columns: 36px 16px 1fr 52px;
+  align-items: center; padding: 9px 12px 9px 0;
+  border-bottom: 1px solid var(--border); background: var(--surface);
 }
-.skel {
-  background: var(--border);
-  border-radius: 2px;
-  animation: sh 1.3s ease infinite;
-}
+.skel { background: var(--border); border-radius: 2px; animation: sh 1.3s ease infinite; }
 @keyframes sh { 0%,100%{opacity:.35} 50%{opacity:.7} }
 
-/* ── PREVIEW PANEL (right) ── */
+/* ── PREVIEW PANEL ── */
 .preview-panel {
   background: var(--surface);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  display: flex; flex-direction: column; overflow: hidden;
 }
 .pv-head {
-  padding: 12px 16px 10px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+  padding: 12px 16px 10px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
 }
-.pv-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  flex: 1;
-}
+.pv-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); flex: 1; }
 .pv-badge {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 20px;
-  background: var(--pink-lt);
-  color: var(--pink);
-  border: 1px solid var(--pink-bdr);
-  font-variant-numeric: tabular-nums;
+  font-size: 10px; font-weight: 700; padding: 2px 8px;
+  border-radius: 20px; background: var(--pink-lt); color: var(--pink);
+  border: 1px solid var(--pink-bdr); font-variant-numeric: tabular-nums;
 }
-.pv-nav {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
+.pv-nav { display: flex; align-items: center; gap: 2px; }
 .pv-nav-btn {
-  width: 22px; height: 22px;
-  border-radius: var(--r);
-  border: 1px solid var(--border-hi);
-  background: transparent;
-  color: var(--ink-2);
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background .1s, border-color .1s;
+  width: 22px; height: 22px; border-radius: var(--r);
+  border: 1px solid var(--border-hi); background: transparent;
+  color: var(--ink-2); font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .1s;
 }
-.pv-nav-btn:hover { background: var(--bg); border-color: var(--border-hi); }
+.pv-nav-btn:hover { background: var(--bg); }
 .pv-nav-btn:disabled { opacity: .3; pointer-events: none; }
 
 .pv-scroll {
-  flex: 1;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-hi) transparent;
+  flex: 1; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: var(--border-hi) transparent;
 }
-
-/* Empty preview state */
 .pv-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  gap: 12px;
-  padding: 32px;
-  color: var(--ink-3);
-  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; height: 100%; gap: 12px;
+  padding: 32px; color: var(--ink-3); text-align: center;
 }
 .pv-empty-ico {
-  width: 44px; height: 44px;
-  border-radius: 10px;
-  background: var(--bg);
-  border: 1.5px dashed var(--border-hi);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
+  width: 44px; height: 44px; border-radius: 10px;
+  background: var(--bg); border: 1.5px dashed var(--border-hi);
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
 }
-.pv-empty-h {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink-2);
-}
+.pv-empty-h { font-size: 13px; font-weight: 600; color: var(--ink-2); }
 .pv-empty-p { font-size: 12px; line-height: 1.6; }
 
-/* Preview content */
 .pv-content { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
-
 .pv-topic-tag {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  background: var(--bg);
-  border-radius: var(--r);
-  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px; background: var(--bg);
+  border-radius: var(--r); border: 1px solid var(--border);
 }
-.pv-topic-label {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--ink-3);
-  letter-spacing: .05em;
-  text-transform: uppercase;
-}
-.pv-topic-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--ink);
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.pv-topic-label { font-size: 10px; font-weight: 600; color: var(--ink-3); letter-spacing: .05em; text-transform: uppercase; }
+.pv-topic-title { font-size: 11px; font-weight: 600; color: var(--ink); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.pv-card {
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  overflow: hidden;
-  background: var(--panel);
-}
+.pv-card { border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; background: var(--panel); }
 .pv-card-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: var(--surface);
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
 .pv-card-ico { font-size: 14px; }
-.pv-card-plat {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--ink);
-  flex: 1;
-  letter-spacing: -.01em;
-}
+.pv-card-plat { font-size: 11px; font-weight: 700; color: var(--ink); flex: 1; }
 .pv-card-fmt {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  background: var(--bg);
-  padding: 2px 6px;
-  border-radius: 3px;
-  border: 1px solid var(--border);
+  font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-3); background: var(--bg);
+  padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border);
 }
 .pv-card-body { padding: 12px; display: flex; flex-direction: column; gap: 9px; }
-.pv-hook-label {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-.pv-hook {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ink);
-  line-height: 1.5;
-  letter-spacing: -.01em;
-}
-.pv-hook em { font-style: italic; color: var(--pink); }
-.pv-desc-label {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  margin-top: 2px;
-}
-.pv-desc {
-  font-size: 12px;
-  color: var(--ink-2);
-  line-height: 1.75;
-}
+.pv-hook-label { font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--pink); }
+.pv-hook { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.6; font-style: italic; }
+.pv-desc-label { font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--pink); margin-top: 2px; }
+.pv-desc { font-size: 12px; color: var(--ink-2); line-height: 1.75; }
 .pv-cta-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 10px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--r);
 }
 .pv-cta-icon { font-size: 12px; }
-.pv-cta {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--pink);
-  flex: 1;
-  line-height: 1.4;
-}
+.pv-cta { font-size: 11px; font-weight: 600; color: var(--pink); flex: 1; line-height: 1.4; }
 
 .pv-more-topics {
-  padding: 8px 12px;
-  background: var(--bg);
-  border-radius: var(--r);
-  border: 1px solid var(--border);
-  font-size: 11px;
-  color: var(--ink-2);
-  font-weight: 500;
-  text-align: center;
+  padding: 8px 12px; background: var(--bg);
+  border-radius: var(--r); border: 1px solid var(--border);
+  font-size: 11px; color: var(--ink-2); font-weight: 500; text-align: center;
 }
 
-/* ── GENERATE BUTTON AREA ── */
+/* ── FOOTER ── */
 .pv-footer {
-  padding: 12px 14px;
-  border-top: 1px solid var(--border);
-  background: var(--panel);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex-shrink: 0;
+  padding: 12px 14px; border-top: 1px solid var(--border);
+  background: var(--panel); display: flex; flex-direction: column;
+  gap: 8px; flex-shrink: 0;
 }
 .gen-btn {
-  width: 100%;
-  padding: 10px;
-  border-radius: var(--r2);
-  border: none;
-  background: var(--pink);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: -.01em;
+  width: 100%; padding: 10px; border-radius: var(--r2);
+  border: none; background: var(--pink); color: #fff;
+  font-size: 13px; font-weight: 700; letter-spacing: -.01em;
   transition: opacity .12s, transform .08s;
 }
 .gen-btn:hover { opacity: .88; transform: translateY(-1px); }
-.gen-btn:disabled {
-  background: var(--border-hi);
-  color: var(--ink-3);
-  transform: none;
-  opacity: 1;
-}
-.gen-hint {
-  font-size: 11px;
-  color: var(--ink-3);
-  text-align: center;
-  line-height: 1.5;
-}
+.gen-btn:disabled { background: var(--border-hi); color: var(--ink-3); transform: none; opacity: 1; cursor: not-allowed; }
+.gen-hint { font-size: 11px; color: var(--ink-3); text-align: center; line-height: 1.5; }
 
 /* ── OUTPUT OVERLAY ── */
 .out-overlay {
   position: fixed; inset: 0;
-  background: rgba(8,10,16,.65);
-  backdrop-filter: blur(6px);
-  z-index: 200;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  background: rgba(8,10,16,.65); backdrop-filter: blur(6px);
+  z-index: 200; display: flex; align-items: flex-end; justify-content: center;
 }
 .out-overlay[hidden] { display: none !important; }
 .out-sheet {
-  background: var(--surface);
-  border: 1px solid var(--border-hi);
-  border-bottom: none;
-  border-radius: 8px 8px 0 0;
-  width: 100%; max-width: 980px;
-  max-height: 90vh;
-  overflow-y: auto;
-  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--border-hi);
+  border-bottom: none; border-radius: 8px 8px 0 0;
+  width: 100%; max-width: 980px; max-height: 90vh;
+  overflow-y: auto; display: flex; flex-direction: column;
 }
 .out-head {
   display: flex; align-items: center; gap: 12px;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  position: sticky; top: 0;
-  background: var(--surface); z-index: 1;
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
 }
-.out-title {
-  font-size: 14px; font-weight: 700;
-  color: var(--ink); flex: 1; letter-spacing: -.01em;
-}
+.out-title { font-size: 14px; font-weight: 700; color: var(--ink); flex: 1; letter-spacing: -.01em; }
 .out-close {
-  width: 26px; height: 26px;
-  border-radius: var(--r);
-  background: var(--bg);
-  border: 1px solid var(--border-hi);
-  color: var(--ink-2);
-  font-size: 12px;
-  cursor: pointer;
+  width: 26px; height: 26px; border-radius: var(--r);
+  background: var(--bg); border: 1px solid var(--border-hi);
+  color: var(--ink-2); font-size: 12px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background .1s;
 }
 .out-close:hover { background: var(--border); }
-.out-ctx {
-  display: flex; gap: 6px; flex-wrap: wrap;
-  padding: 10px 20px;
-  border-bottom: 1px solid var(--border);
-}
-.ctx-chip {
-  font-size: 10px; font-weight: 600;
-  padding: 3px 8px; border-radius: 20px;
-  background: var(--bg); color: var(--ink-2);
-  border: 1px solid var(--border-hi);
-}
-.ctx-chip.pink {
-  background: var(--pink-lt); color: var(--pink);
-  border-color: var(--pink-bdr);
-}
-.ideas-grid {
-  padding: 16px 20px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 10px;
-}
-.idea-card {
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  overflow: hidden;
-  background: var(--panel);
-}
-.idea-head {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 12px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-}
+.out-ctx { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 20px; border-bottom: 1px solid var(--border); }
+.ctx-chip { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; background: var(--bg); color: var(--ink-2); border: 1px solid var(--border-hi); }
+.ctx-chip.pink { background: var(--pink-lt); color: var(--pink); border-color: var(--pink-bdr); }
+.ideas-grid { padding: 16px 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.idea-card { border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; background: var(--panel); }
+.idea-head { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--surface); border-bottom: 1px solid var(--border); }
 .idea-ico { font-size: 14px; }
 .idea-plat { font-size: 11px; font-weight: 700; color: var(--ink); flex: 1; }
-.idea-fmt {
-  font-size: 9px; font-weight: 700;
-  letter-spacing: .06em; text-transform: uppercase;
-  color: var(--ink-3); background: var(--bg);
-  padding: 2px 6px; border-radius: 3px;
-  border: 1px solid var(--border);
-}
+.idea-fmt { font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); background: var(--bg); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border); }
 .idea-body { padding: 12px; display: flex; flex-direction: column; gap: 9px; }
-.idea-hook {
-  font-size: 13px; font-weight: 700;
-  color: var(--ink); line-height: 1.48;
-  letter-spacing: -.01em;
-}
-.idea-hook::before { content: '\201C'; color: var(--pink); }
-.idea-hook::after  { content: '\201D'; color: var(--pink); }
+.idea-section-label { font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--pink); }
+.idea-hook { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.55; font-style: italic; }
 .idea-desc { font-size: 11px; color: var(--ink-2); line-height: 1.75; }
-.idea-cta {
-  font-size: 11px; font-weight: 700;
-  color: var(--pink); display: flex;
-  align-items: flex-start; gap: 5px;
-}
-.idea-cta::before { content: '→'; flex-shrink: 0; }
-.idea-ref {
-  font-size: 10px; color: var(--ink-3);
-  border-top: 1px solid var(--border);
-  padding-top: 8px;
-}
+.idea-cta { font-size: 11px; font-weight: 700; color: var(--pink); display: flex; align-items: flex-start; gap: 5px; }
+.idea-cta-label { font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; background: var(--pink); color: #fff; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; margin-top: 1px; }
+.idea-ref { font-size: 10px; color: var(--ink-3); border-top: 1px solid var(--border); padding-top: 8px; }
 .out-regen-wrap { padding: 4px 20px 20px; }
-.out-regen {
-  width: 100%; padding: 9px;
-  border: 1px solid var(--border-hi);
-  border-radius: var(--r);
-  background: transparent;
-  color: var(--ink-2);
-  font-size: 12px; font-weight: 600;
-  transition: border-color .1s, color .1s;
-}
+.out-regen { width: 100%; padding: 9px; border: 1px solid var(--border-hi); border-radius: var(--r); background: transparent; color: var(--ink-2); font-size: 12px; font-weight: 600; transition: border-color .1s, color .1s; }
 .out-regen:hover { border-color: var(--pink); color: var(--pink); }
 
 /* ── EMPTY ── */
-.empty-state {
-  text-align: center; padding: 48px 24px;
-  color: var(--ink-2);
-}
+.empty-state { text-align: center; padding: 48px 24px; color: var(--ink-2); }
 .empty-icon { font-size: 24px; margin-bottom: 8px; }
 .empty-h { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
 .empty-p { font-size: 12px; }
 
 /* ── TOAST ── */
 .toast {
-  position: fixed; bottom: 20px; left: 50%;
-  transform: translateX(-50%);
-  background: var(--ink); color: #fff;
-  font-size: 12px; font-weight: 600;
-  padding: 7px 16px; border-radius: 20px;
-  z-index: 300; opacity: 0; transition: opacity .2s;
-  pointer-events: none; white-space: nowrap;
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: #fff; font-size: 12px; font-weight: 600;
+  padding: 7px 16px; border-radius: 20px; z-index: 300;
+  opacity: 0; transition: opacity .2s; pointer-events: none; white-space: nowrap;
 }
 .toast.show { opacity: 1; }
 
@@ -818,6 +426,10 @@ button { font-family: var(--font); cursor: pointer; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
 </style>
+</head>
+<body>
+
+<div class="app">
 
 <!-- TOPBAR -->
 <header class="topbar">
@@ -825,17 +437,15 @@ button { font-family: var(--font); cursor: pointer; }
     <div class="t-logo-sq">S</div>
     <span class="t-name">Sancho</span>
   </div>
-  <span class="t-title">Gerador de Conteudo · Wladson Sidney</span>
-  <div class="t-status">
-    <span class="t-upd" id="last-updated"></span>
-  </div>
-  <button class="t-btn" id="refresh-btn"><span class="spin">↻</span> Atualizar fontes</button>
+  <span class="t-title">Gerador de Conteudo &middot; Wladson Sidney</span>
+  <span class="t-upd" id="last-updated"></span>
+  <button class="t-btn" id="refresh-btn"><span class="spin">&#8635;</span> Atualizar fontes</button>
 </header>
 
-<!-- BODY: 3 paineis -->
+<!-- BODY -->
 <div class="body">
 
-  <!-- 1. ZONE PANEL -->
+  <!-- 1. ZONES -->
   <div class="zone-panel">
     <div class="panel-head">
       <div class="panel-label">Zona de Genialidade</div>
@@ -849,7 +459,7 @@ button { font-family: var(--font); cursor: pointer; }
     </div>
   </div>
 
-  <!-- 2. TOPICS PANEL -->
+  <!-- 2. TOPICS -->
   <div class="topics-panel">
     <div class="filter-row" id="source-filter">
       <button class="f-btn active" data-filter="all">Todos</button>
@@ -859,27 +469,26 @@ button { font-family: var(--font); cursor: pointer; }
     </div>
     <div class="topics-meta">
       <span class="tm-count" id="topic-count">...</span>
-      <span class="tm-sel" id="sel-count"></span>
-      <span class="tm-hint" id="topics-hint">Clique para selecionar</span>
+      <span class="tm-sel" id="sel-count" style="display:none"></span>
     </div>
     <div class="topics-scroll">
       <div id="topics-grid"></div>
     </div>
   </div>
 
-  <!-- 3. PREVIEW PANEL -->
+  <!-- 3. PREVIEW -->
   <div class="preview-panel">
     <div class="pv-head">
       <span class="pv-label">Previa gerada</span>
       <span class="pv-badge" id="pv-badge" hidden>1 de 1</span>
       <div class="pv-nav">
-        <button class="pv-nav-btn" id="pv-prev" title="Anterior">‹</button>
-        <button class="pv-nav-btn" id="pv-next" title="Proxima">›</button>
+        <button class="pv-nav-btn" id="pv-prev">&#8249;</button>
+        <button class="pv-nav-btn" id="pv-next">&#8250;</button>
       </div>
     </div>
     <div class="pv-scroll" id="pv-scroll">
       <div class="pv-empty" id="pv-empty">
-        <div class="pv-empty-ico">✦</div>
+        <div class="pv-empty-ico">&#10022;</div>
         <div class="pv-empty-h">Nenhuma selecao</div>
         <div class="pv-empty-p">Escolha uma zona a esquerda e clique em um topico para ver a previa do conteudo.</div>
       </div>
@@ -891,19 +500,20 @@ button { font-family: var(--font); cursor: pointer; }
     </div>
   </div>
 
-</div>
+</div><!-- .body -->
+</div><!-- .app -->
 
 <!-- OUTPUT OVERLAY -->
 <div class="out-overlay" id="out-overlay" hidden>
   <div class="out-sheet">
     <div class="out-head">
       <div class="out-title">Todas as ideias de conteudo</div>
-      <button class="out-close" id="out-close">✕</button>
+      <button class="out-close" id="out-close">&#10005;</button>
     </div>
     <div class="out-ctx" id="out-ctx"></div>
     <div class="ideas-grid" id="ideas-grid"></div>
     <div class="out-regen-wrap">
-      <button class="out-regen" id="out-regen">↻ Gerar novas variacoes</button>
+      <button class="out-regen" id="out-regen">&#8635; Gerar novas variacoes</button>
     </div>
   </div>
 </div>
@@ -911,16 +521,14 @@ button { font-family: var(--font); cursor: pointer; }
 <div class="toast" id="toast"></div>
 
 <script>
-/* ── DATA ── */
 const ZONES = [
-  { id:'carreiras',    label:'Gestao de Carreiras',        icon:'💼', count:0 },
-  { id:'visibilidade', label:'Visibilidade Profissional',   icon:'👁', count:0 },
-  { id:'decisores',    label:'Acesso a Decisores',          icon:'🔑', count:0 },
-  { id:'networking',   label:'Networking Estrategico',      icon:'🤝', count:0 },
-  { id:'marca',        label:'Marca Profissional',           icon:'⭐', count:0 },
-  { id:'lideranca',    label:'Lideranca e Talentos',         icon:'🏆', count:0 },
+  { id:'carreiras',    label:'Gestao de Carreiras',       icon:'💼', count:0 },
+  { id:'visibilidade', label:'Visibilidade Profissional',  icon:'👁', count:0 },
+  { id:'decisores',    label:'Acesso a Decisores',         icon:'🔑', count:0 },
+  { id:'networking',   label:'Networking Estrategico',     icon:'🤝', count:0 },
+  { id:'marca',        label:'Marca Profissional',          icon:'⭐', count:0 },
+  { id:'lideranca',    label:'Lideranca e Talentos',        icon:'🏆', count:0 },
 ];
-
 const ZONE_KW = {
   carreiras:    ['carreira','emprego','trabalho','mercado de trabalho','recolocacao','vaga','contratar','recrutamento','curriculo','entrevista','profissional','salario','promocao'],
   visibilidade: ['visibilidade','reconhecimento','linkedin','pessoal','influencia','autoridade','reputacao','notoriedade','destaque','aparecer','presenca','competente','talentoso'],
@@ -929,7 +537,6 @@ const ZONE_KW = {
   marca:        ['marca pessoal','branding pessoal','personal branding','identidade','portfolio','storytelling','narrativa','comunicacao','imagem','posicionamento','pitch'],
   lideranca:    ['talento','competencia','habilidade','soft skill','hard skill','desenvolvimento','treinamento','capacitacao','gestao de pessoas','equipe','time','colaborador','cultura'],
 };
-
 const CURATED = [
   { title:'Personal branding sem autopromoção: o paradoxo que vira viral',         source:'curado', tags:['marca pessoal','autoridade'], zone:'marca',        virality:95, live:false },
   { title:'Empreendedor invisivel: competentes que o mercado ainda nao descobriu',  source:'curado', tags:['visibilidade','carreira'],   zone:'visibilidade',  virality:91, live:false },
@@ -942,401 +549,248 @@ const CURATED = [
   { title:'O capital social que ninguem te ensina na faculdade',                    source:'curado', tags:['capital social','aprendizado'], zone:'carreiras', virality:85, live:false },
   { title:'Marca pessoal para quem odeia se vender',                                source:'curado', tags:['marca','introvertido'],      zone:'marca',         virality:92, live:false },
 ];
-
 const SOURCE_META = {
-  'google-trends-br': { label:'Google Trends BR', badgeCls:'b-google',    badge:'Trends',  filter:'google'  },
-  'exame-carreira':   { label:'Exame · Carreira', badgeCls:'b-exame',     badge:'Exame',   filter:'portais' },
-  'meioemensagem':    { label:'Meio e Mensagem',  badgeCls:'b-meioem',    badge:'M&M',     filter:'portais' },
-  'infomoney':        { label:'InfoMoney',         badgeCls:'b-infomoney', badge:'InfoMoney', filter:'portais' },
-  'curado':           { label:'Curado Sancho',     badgeCls:'b-curado',    badge:'Sancho',  filter:'curado'  },
+  'google-trends-br': { label:'Google Trends BR', badgeCls:'b-google',    badge:'Trends',   filter:'google'  },
+  'exame-carreira':   { label:'Exame Carreira',   badgeCls:'b-exame',     badge:'Exame',    filter:'portais' },
+  'meioemensagem':    { label:'Meio e Mensagem',  badgeCls:'b-meioem',    badge:'M&M',      filter:'portais' },
+  'infomoney':        { label:'InfoMoney',         badgeCls:'b-infomoney', badge:'InfoMoney',filter:'portais' },
+  'curado':           { label:'Curado Sancho',     badgeCls:'b-curado',    badge:'Sancho',   filter:'curado'  },
 };
-
-const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
-const SOURCES = [
-  { id:'google-trends-br', label:'Google Trends BR', filter:'google',
-    url: RSS2JSON + encodeURIComponent('https://trends.google.com/trends/trendingsearches/daily/rss?geo=BR'),
-    parse: items => items.map((it,i) => ({ title:clean(it.title), tags:tagsFromDesc(it.description||''), viralityBase:Math.max(70,98-i*2), source:'google-trends-br', live:true, link:it.link })) },
-  { id:'exame-carreira', label:'Exame · Carreira', filter:'portais',
-    url: RSS2JSON + encodeURIComponent('https://exame.com/feed/'),
-    parse: items => items.filter(i=>has(i.title,['carreira','mercado','negocio','emprego','trabalho','empreendedor','talento','lideranca','executivo','rede'])).slice(0,8).map(it => ({ title:clean(it.title), tags:guessTagsFromTitle(it.title), viralityBase:75+rnd(12), source:'exame-carreira', live:true, link:it.link })) },
-  { id:'meioemensagem', label:'Meio e Mensagem', filter:'portais',
-    url: RSS2JSON + encodeURIComponent('https://www.meioemensagem.com.br/feed/'),
-    parse: items => items.filter(i=>has(i.title,['marca','comunicacao','posicionamento','branding','marketing','carreira','influencia','reputacao'])).slice(0,6).map(it => ({ title:clean(it.title), tags:guessTagsFromTitle(it.title), viralityBase:72+rnd(10), source:'meioemensagem', live:true, link:it.link })) },
-  { id:'infomoney', label:'InfoMoney', filter:'portais',
-    url: RSS2JSON + encodeURIComponent('https://www.infomoney.com.br/feed/'),
-    parse: items => items.filter(i=>has(i.title,['carreira','emprego','salario','empresa','trabalho','mercado','gestao'])).slice(0,6).map(it => ({ title:clean(it.title), tags:guessTagsFromTitle(it.title), viralityBase:70+rnd(12), source:'infomoney', live:true, link:it.link })) },
+const RSS2JSON='https://api.rss2json.com/v1/api.json?rss_url=';
+const SOURCES=[
+  { id:'google-trends-br',label:'Google Trends BR',filter:'google',
+    url:RSS2JSON+encodeURIComponent('https://trends.google.com/trends/trendingsearches/daily/rss?geo=BR'),
+    parse:items=>items.map((it,i)=>({title:clean(it.title),tags:tagsFromDesc(it.description||''),viralityBase:Math.max(70,98-i*2),source:'google-trends-br',live:true,link:it.link}))},
+  { id:'exame-carreira',label:'Exame Carreira',filter:'portais',
+    url:RSS2JSON+encodeURIComponent('https://exame.com/feed/'),
+    parse:items=>items.filter(i=>has(i.title,['carreira','mercado','emprego','trabalho','empreendedor','talento','lideranca','executivo'])).slice(0,8).map(it=>({title:clean(it.title),tags:guessTagsFromTitle(it.title),viralityBase:75+rnd(12),source:'exame-carreira',live:true,link:it.link}))},
+  { id:'meioemensagem',label:'Meio e Mensagem',filter:'portais',
+    url:RSS2JSON+encodeURIComponent('https://www.meioemensagem.com.br/feed/'),
+    parse:items=>items.filter(i=>has(i.title,['marca','comunicacao','branding','marketing','carreira','influencia','reputacao'])).slice(0,6).map(it=>({title:clean(it.title),tags:guessTagsFromTitle(it.title),viralityBase:72+rnd(10),source:'meioemensagem',live:true,link:it.link}))},
+  { id:'infomoney',label:'InfoMoney',filter:'portais',
+    url:RSS2JSON+encodeURIComponent('https://www.infomoney.com.br/feed/'),
+    parse:items=>items.filter(i=>has(i.title,['carreira','emprego','salario','empresa','trabalho','mercado','gestao'])).slice(0,6).map(it=>({title:clean(it.title),tags:guessTagsFromTitle(it.title),viralityBase:70+rnd(12),source:'infomoney',live:true,link:it.link}))},
 ];
-
-const TEMPLATES = {
+const TEMPLATES={
   carreiras:[
-    { platform:'LinkedIn', icon:'💼', format:'Texto Nativo',
-      hook: t=>`O que ${t.split(':')[0].toLowerCase()} revela sobre quem vai crescer na carreira`,
-      desc: ()=>`Post com sua analise direta sobre o que esse movimento do mercado significa para profissionais competentes. Diga quem vai se adaptar e quem vai ficar para tras. Inclua uma pergunta no final que gere debate genuino.`,
-      cta:'Comenta o que voce faria diferente se soubesse disso ha 5 anos.' },
-    { platform:'Instagram Reels', icon:'🎬', format:'Video 30s',
-      hook: t=>`3 verdades sobre carreiras que ${t.slice(0,30).toLowerCase()} levantou`,
-      desc: ()=>`Video direto: olha pra camera e diz 3 verdades que profissionais serios precisam ouvir. Tom de quem conhece os bastidores do mercado. Sem linguagem de coach.`,
-      cta:'Segue pra voce nao ficar para tras quando o mercado virar.' },
+    {platform:'Reels / TikTok',icon:'🎬',format:'Video 60s',
+     abertura:t=>`Esse assunto tomou conta da internet essa semana: "${t.slice(0,50)}". Eu vi isso e pensei: isso explica exatamente por que profissionais competentes continuam parados no mesmo lugar.`,
+     desenvolvimento:()=>`Todo dia eu converso com alguem que domina o que faz. Tem resultado. Tem historia. Mas ninguem sabe que essa pessoa existe. O que acontece? O mercado nao e justo. Mas ele e previsivel. Quem nao entende as regras do jogo fica esperando ser descoberto. E o mercado nao descobre ninguem. O mercado reconhece quem ja e visivel.`,
+     provocacao:()=>`A sua competencia nao e suficiente para fazer a sua carreira crescer. Nunca foi. E continua nao sendo. O que move carreira e quem te ve, nao o que voce sabe fazer.`,
+     cta:'Se voce e um competente que ainda esta invisivel no mercado, me segue. Porque e exatamente isso que eu resolvo.'},
+    {platform:'LinkedIn',icon:'💼',format:'Texto Nativo',
+     abertura:t=>`"${t.slice(0,60)}" foi um dos assuntos mais comentados essa semana. E a maioria das pessoas perdeu o ponto real da discussao.`,
+     desenvolvimento:()=>`Eu fico olhando pra esse tipo de debate e vejo sempre a mesma coisa: profissionais discutem o que esta acontecendo no mercado, mas nao percebem que o mercado nao vai mudar por causa da discussao. Quem muda e quem ocupa espaco. O profissional que fica esperando a hora certa de aparecer esta, na pratica, escolhendo continuar invisivel. Eu vi isso acontecer dezenas de vezes. O mais preparado da sala nao foi o escolhido. Foi o mais lembrado.`,
+     provocacao:()=>`Voce nao vai ser promovido, contratado ou indicado pela sua competencia tecnica. Voce vai ser escolhido por quem te conhece e sabe o que voce entrega. Essa e a regra. Sempre foi.`,
+     cta:'Comenta aqui: voce esta sendo lembrado ou ainda esta esperando ser descoberto?'},
   ],
   visibilidade:[
-    { platform:'Instagram', icon:'📸', format:'Carrossel 5 slides',
-      hook: t=>`Por que o melhor profissional da sala ainda esta invisivel, e ${t.split(':')[0].toLowerCase()} prova isso`,
-      desc: ()=>`Slide 1: dado impactante sobre a tendencia. Slides 2-4: o padrao que voce ve nos profissionais que te procuram. Slide 5: como romper com esse ciclo. Tom de quem abriu portas para centenas de pessoas.`,
-      cta:'Salva esse carrossel. Voce vai querer reler quando sentir que esta invisivel.' },
-    { platform:'LinkedIn', icon:'💼', format:'Artigo Curto',
-      hook: t=>`Competencia nao e suficiente. ${t.split(':')[0]} mostrou isso de novo.`,
-      desc: ()=>`A tendencia como pano de fundo, o real assunto e o gap entre competencia e visibilidade. Inclua um caso real (sem nomear) de alguem que so comecou a ser reconhecido quando mudou a forma de se apresentar.`,
-      cta:'Me conta: voce se reconhece nessa situacao?' },
+    {platform:'Reels / TikTok',icon:'🎬',format:'Video 45s',
+     abertura:t=>`Vi esse tema viralizando: "${t.slice(0,50)}". E fiquei pensando nos varios profissionais que me procuram toda semana que sao exatamente esse caso.`,
+     desenvolvimento:()=>`Sao pessoas que dominam o que fazem. Entregam resultado. Tem uma trajetoria que poucos tem. Mas quando eu pergunto: quem fora do seu circulo imediato sabe disso?, o silencio e a resposta. E nao e falta de talento. E falta de presenca. Visibilidade nao e vaidade. E estrategia. E a diferenca entre ser o melhor da sala e ser o escolhido da sala.`,
+     provocacao:()=>`Profissional invisivel e profissional descartavel. Por mais que doa ouvir isso, e a realidade do mercado. Ninguem contrata, promove ou indica quem nao conhece.`,
+     cta:'Salva esse video. E quando voce sentir que esta invisivel no mercado, volta aqui e me chama.'},
+    {platform:'LinkedIn',icon:'💼',format:'Texto Nativo',
+     abertura:t=>`"${t.slice(0,55)}" entrou na conversa essa semana. O que pouca gente percebeu e que esse assunto e um espelho direto do que acontece com talentos que ninguem ve.`,
+     desenvolvimento:()=>`Eu trabalho com isso. Todos os dias eu acesso decisores, empresas e mercados que deveriam estar em contato com profissionais incriveis. Mas nao estao. Porque esses profissionais nao aparecem. Eles entregam, produzem, crescem internamente. E continuam esperando que alguem note. Isso nao e humildade. Isso e estrategia equivocada.`,
+     provocacao:()=>`Reconhecimento nao e consequencia automatica de bom trabalho. Nunca foi. Quem entende isso cedo tem uma carreira diferente. Quem aprende tarde paga um preco alto.`,
+     cta:'Me conta: qual e a sua maior dificuldade em aparecer do jeito certo no mercado?'},
   ],
   decisores:[
-    { platform:'LinkedIn', icon:'💼', format:'Texto Nativo',
-      hook: t=>`Chegar ate quem decide ficou mais dificil. ${t.split(':')[0]} explica por que`,
-      desc: ()=>`Voce como o Sancho Panca moderno: quem acessa o coracao dos reis sabe que o caminho nunca e direto. Use a tendencia para mostrar como a logica de acesso a decisores mudou e o que profissionais competentes precisam entender.`,
-      cta:'Quer saber como eu abro essas portas? Me manda uma mensagem.' },
-    { platform:'Instagram Reels', icon:'🎬', format:'Video Opiniao 45s',
-      hook: t=>`Todo mundo quer falar com o CEO. Ninguem ensina o caminho certo. ${t.slice(0,25).toLowerCase()}`,
-      desc: ()=>`Sua visao sobre o que realmente abre portas com quem decide. A tendencia como gancho, a sacada pratica que so quem opera nesse nivel conhece como entrega.`,
-      cta:'Comenta PORTAS que eu te conto o primeiro passo.' },
+    {platform:'Reels / TikTok',icon:'🎬',format:'Video 60s',
+     abertura:t=>`Esse topico foi longe essa semana: "${t.slice(0,50)}". Eu uso isso pra falar sobre algo que nao se aprende em curso nenhum: como chegar ate quem decide.`,
+     desenvolvimento:()=>`Eu passo o meu dia acessando CEOs, diretores, presidentes de empresas. E vejo o tempo todo profissionais tentando chegar nessas pessoas do jeito errado. Mandando mensagem fria. Pedindo conexao sem contexto. Tentando vender antes de gerar qualquer relacao. O acesso a decisores nao funciona assim. Funciona pela credibilidade que voce constroi antes de aparecer na frente deles. Funciona pelo preparo de quem te apresenta. Funciona por quem voce ja conhece que conhece quem voce quer conhecer.`,
+     provocacao:()=>`Voce nao chega ao decisor pelo LinkedIn. Voce chega ao decisor por quem ja esta no mesmo circulo que ele. E pra isso, voce precisa primeiro construir o circulo certo.`,
+     cta:'Comenta ACESSO aqui que eu te explico como funciona na pratica.'},
+    {platform:'LinkedIn',icon:'💼',format:'Texto Nativo',
+     abertura:t=>`"${t.slice(0,55)}" foi pauta essa semana. Eu li e pensei: esse assunto explica muito do que eu vejo nas minhas conversas com quem decide nas empresas.`,
+     desenvolvimento:()=>`Quem decide nas organizacoes nao tem tempo. Nao tem paciencia para abordagens genericas. E nao responde a quem nao gera contexto antes de pedir algo. Eu opero nesse nivel todos os dias. E o que eu vejo e que acesso a decisores e um jogo de posicionamento, nao de quantidade de tentativas. Voce nao chega la mandando mais mensagens. Voce chega la sendo a pessoa certa, com a historia certa, apresentada do jeito certo.`,
+     provocacao:()=>`A maioria dos profissionais esta tentando entrar pela porta errada. Nao porque sao ruins. Mas porque ninguem ensinou como funciona o bastidor de quem decide.`,
+     cta:'Quer entender como eu construo esse tipo de acesso? Me manda uma mensagem direta.'},
   ],
   networking:[
-    { platform:'Instagram', icon:'📸', format:'Post com Legenda Longa',
-      hook: t=>`Networking de verdade nao e o que voce esta fazendo. ${t.split(':')[0].toLowerCase()} prova`,
-      desc: ()=>`Visual simples e forte. Legenda com o erro mais comum de networking que voce observa, contextualizado com a tendencia. Tom de quem ja viu o que funciona e o que queima pontes. Tres acoes concretas no final.`,
-      cta:'Marca alguem que ainda confunde networking com distribuir cartao.' },
-    { platform:'TikTok e Reels', icon:'📲', format:'Video Provocacao',
-      hook: t=>`A maioria das pessoas faz networking errado. ${t.slice(0,20).toLowerCase()} confirmou isso`,
-      desc: ()=>`Uma verdade desconfortavel sobre relacionamentos profissionais, conectada a tendencia. Encerre mostrando o que diferencia quem constroi rede de verdade.`,
-      cta:'Salva pra nao esquecer disso na hora de abrir o LinkedIn.' },
+    {platform:'Reels / TikTok',icon:'🎬',format:'Video 45s',
+     abertura:t=>`"${t.slice(0,50)}" virou assunto. E isso me faz pensar no quanto as pessoas confundem networking com colecionar contatos.`,
+     desenvolvimento:()=>`Eu construi a minha carreira por relacionamentos. Nao por quantidade. Por qualidade. A diferenca e simples: rede de contatos e uma lista. Networking de verdade e um ecossistema de pessoas que confiam no que voce faz e falam de voce quando voce nao esta na sala. Isso nao se constroi no evento de networking. Se constroi no dia a dia, na consistencia, no que voce entrega antes de pedir qualquer coisa.`,
+     provocacao:()=>`Se a sua rede so lembra de voce quando voce aparece, voce nao tem uma rede. Voce tem conhecidos. E conhecidos nao mudam carreiras.`,
+     cta:'Marca alguem que precisa ouvir isso hoje.'},
+    {platform:'LinkedIn',icon:'💼',format:'Texto Nativo',
+     abertura:t=>`Vi "${t.slice(0,55)}" circulando. E fico pensando: quantas pessoas vao ler isso e continuar fazendo networking do jeito errado?`,
+     desenvolvimento:()=>`Networking nao e evento. Nao e adicionar pessoas no LinkedIn. Nao e mandar mensagem de aniversario uma vez por ano. Networking e presenca continua. E quem te recomenda quando surge uma oportunidade que voce nem sabe que existe. E quem abre porta antes de voce bater. Eu construo isso pro profissional que nao sabe por onde comecar. E o resultado nao e uma lista maior. E um ecossistema que trabalha por voce.`,
+     provocacao:()=>`A pergunta nao e quantas pessoas voce conhece. A pergunta e: quantas pessoas falam de voce quando surge uma oportunidade que seria perfeita pra voce?`,
+     cta:'Me conta: sua rede trabalha por voce quando voce nao esta presente?'},
   ],
   marca:[
-    { platform:'LinkedIn', icon:'💼', format:'Texto e Imagem',
-      hook: t=>`Sua marca profissional fala de voce antes de voce abrir a boca. ${t.split(':')[0]} mudou o jogo`,
-      desc: ()=>`Imagem impactante e texto que usa a tendencia como espelho: o que esta acontecendo revela o que decisores realmente buscam numa marca profissional. Perspectiva de quem ve os bastidores do processo de acesso.`,
-      cta:'Como esta a sua marca profissional hoje? Me conta aqui nos comentarios.' },
-    { platform:'Instagram', icon:'📸', format:'Carrossel Antes e Depois',
-      hook: t=>`Antes e depois de uma marca profissional que ninguem via. ${t.slice(0,25).toLowerCase()}`,
-      desc: ()=>`Estagios de transformacao de marca pessoal: o que parece o profissional competente e invisivel, o que muda quando se posiciona bem, e como a tendencia em questao acelera ou atrasa esse processo.`,
-      cta:'Quer saber em qual estagio voce esta? Responde essa pergunta nos comentarios.' },
+    {platform:'Reels / TikTok',icon:'🎬',format:'Video 60s',
+     abertura:t=>`"${t.slice(0,50)}" tomou a timeline essa semana. Eu olhei pra isso e lembrei de uma conversa que tive ha pouco tempo com um profissional incrivel que ninguem conhecia.`,
+     desenvolvimento:()=>`Ele tinha resultado. Tinha formacao. Tinha trajetoria. Mas quando eu perguntei como ele era percebido no mercado, ele nao soube responder. Isso e um problema de marca profissional. Nao e arrogante falar da sua marca. E necessario. Porque o mercado nao interpreta silencio como humildade. Interpreta como irrelevancia. Sua marca profissional existe quer voce cuide dela ou nao. A diferenca e quem esta no controle da narrativa.`,
+     provocacao:()=>`Voce esta deixando o mercado decidir quem voce e. Ou voce esta decidindo isso primeiro e entregando essa versao pro mercado?`,
+     cta:'Se voce quer comecar a construir sua marca do jeito certo, me segue. Eu mostro como funciona.'},
+    {platform:'LinkedIn',icon:'💼',format:'Texto Nativo',
+     abertura:t=>`"${t.slice(0,55)}" foi pauta essa semana. Isso tem tudo a ver com algo que eu vejo acontecer o tempo todo: profissionais que entregam mais do que comunicam.`,
+     desenvolvimento:()=>`Marca profissional nao e fake. Nao e performar algo que voce nao e. E traduzir o que voce ja e de um jeito que o mercado entenda e lembre. Eu trabalho com isso. E o maior erro que vejo e o profissional que espera os resultados falarem por si mesmos. Resultados nao falam. Quem fala e voce. Quem amplifica e a sua rede. Quem decide e o mercado. E o mercado so decide sobre o que conhece.`,
+     provocacao:()=>`Voce nao e mal posicionado porque nao tem resultado. Voce e mal posicionado porque nao sabe contar o que faz de um jeito que as pessoas certas entendam e lembrem.`,
+     cta:'Como voce descreveria sua marca profissional hoje em uma frase? Escreve aqui nos comentarios.'},
   ],
   lideranca:[
-    { platform:'LinkedIn', icon:'💼', format:'Artigo para Gestores',
-      hook: t=>`O que ${t.split(':')[0].toLowerCase()} revela sobre os talentos que as empresas perdem por nao enxergar`,
-      desc: ()=>`Texto para gestores e RHs: use a tendencia para abrir o debate sobre como organizacoes desperdicam competencia por falta de visibilidade interna. Sua missao de tornar competentes conhecidos aparece como solucao, nao como discurso.`,
-      cta:'Voce ja perdeu um talento que nem sabia que tinha? Me conta.' },
-    { platform:'Instagram Reels', icon:'🎬', format:'Video Reflexao',
-      hook: t=>`Talentos se perdem porque ${t.slice(0,30).toLowerCase()}. E ninguem fala sobre isso.`,
-      desc: ()=>`Video de reflexao, nao de conselho. Compartilhe o que ve acontecer com profissionais brilhantes que ficam no anonimato, conectado a tendencia atual. Tom de quem opera nos bastidores.`,
-      cta:'Compartilha com um lider que precisa ouvir isso hoje.' },
+    {platform:'Reels / TikTok',icon:'🎬',format:'Video 60s',
+     abertura:t=>`Esse topico estava em todo lugar essa semana: "${t.slice(0,50)}". E ele me fez pensar nos talentos que empresas perdem sem nunca saber que perderam.`,
+     desenvolvimento:()=>`Eu converso com gestores e RHs o tempo todo. E existe um padrao que me chama atencao sempre: as empresas investem em atrair talento, mas quase nada em tornar esse talento visivel internamente. O profissional entrega. Cresce. Fica bom no que faz. E continua sendo o fulano la do setor X. Sem exposicao, sem posicionamento, sem acesso a quem decide. E um dia esse talento vai embora. E a empresa fica sem entender por que.`,
+     provocacao:()=>`Retencao de talento nao e sobre salario. E sobre fazer o profissional sentir que o trabalho dele e visto, reconhecido e conectado a algo maior. E isso nao acontece por acidente.`,
+     cta:'Compartilha com um lider que precisa ouvir isso agora.'},
+    {platform:'LinkedIn',icon:'💼',format:'Texto para Gestores',
+     abertura:t=>`"${t.slice(0,55)}" foi um dos temas da semana. Eu li e fui direto ao ponto que ninguem esta discutindo nesse debate: o que acontece com os talentos que as empresas nao enxergam.`,
+     desenvolvimento:()=>`Eu passei anos acessando organizacoes de dentro pra fora. E o que eu vejo consistentemente e organizacoes que perderam talentos incriveis nao porque nao valorizavam. Mas porque nao sabiam que tinham. O talento nao aparecia. Nao chegava nas reunioes certas. Nao era conectado com quem decidia. Era bom no que fazia. E ficava fazendo. Ate ir embora pra um lugar que soube enxergar o que ele tinha.`,
+     provocacao:()=>`Voce sabe quem sao os melhores da sua equipe. Mas sabe quem sao os que ainda nao foram notados e estao pensando em sair? Porque esses dois grupos sao, muitas vezes, os mesmos.`,
+     cta:'Voce ja perdeu um talento que so entendeu o valor depois que foi embora? Me conta.'},
   ],
 };
 
-/* ── HELPERS ── */
-function clean(s) { return (s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim(); }
-function rnd(n)   { return Math.floor(Math.random()*n); }
-function has(text, kws) { const t=(text||'').toLowerCase(); return kws.some(k=>t.includes(k)); }
-function tagsFromDesc(d) { return clean(d).split(/[,;\n]+/).map(s=>s.trim()).filter(s=>s.length>2&&s.length<32).slice(0,3); }
-function guessTagsFromTitle(title) {
-  const t=(title||'').toLowerCase();
-  const map=[['linkedin','linkedin'],['carreira','carreira'],['emprego','emprego'],['marca','branding'],['lideranca','lideranca'],['networking','networking'],['talento','talentos'],['executivo','c-level'],['empreendedor','empreend'],['mercado','mercado'],['comunicacao','comunicacao'],['trabalho','trabalho'],['salario','remuneracao']];
-  return map.filter(([k])=>t.includes(k)).map(([,v])=>v).slice(0,3);
-}
-function classifyZone(title, tags) {
-  const text=((title||'')+' '+(tags||[]).join(' ')).toLowerCase();
-  let best=null, top=0;
-  for(const [zid,kws] of Object.entries(ZONE_KW)){
-    const score=kws.filter(k=>text.includes(k)).length;
-    if(score>top){top=score;best=zid;}
-  }
-  return best||'carreiras';
-}
+function clean(s){return(s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").trim();}
+function rnd(n){return Math.floor(Math.random()*n);}
+function has(text,kws){const t=(text||'').toLowerCase();return kws.some(k=>t.includes(k));}
+function tagsFromDesc(d){return clean(d).split(/[,;\n]+/).map(s=>s.trim()).filter(s=>s.length>2&&s.length<32).slice(0,3);}
+function guessTagsFromTitle(title){const t=(title||'').toLowerCase();const map=[['linkedin','linkedin'],['carreira','carreira'],['emprego','emprego'],['marca','branding'],['lideranca','lideranca'],['networking','networking'],['talento','talentos'],['executivo','c-level'],['empreendedor','empreend'],['mercado','mercado'],['comunicacao','comunicacao'],['trabalho','trabalho'],['salario','remuneracao']];return map.filter(([k])=>t.includes(k)).map(([,v])=>v).slice(0,3);}
+function classifyZone(title,tags){const text=((title||'')+' '+(tags||[]).join(' ')).toLowerCase();let best=null,top=0;for(const[zid,kws]of Object.entries(ZONE_KW)){const score=kws.filter(k=>text.includes(k)).length;if(score>top){top=score;best=zid;}}return best||'carreiras';}
 
-/* ── STATE ── */
-let allTopics      = [];
-let selectedTopics = new Set();
-let activeFilter   = 'all';
-let activeZone     = '';
-let srcStatuses    = {};
-let nextId         = 1;
+let allTopics=[],selectedTopics=new Set(),activeFilter='all',activeZone='',srcStatuses={},nextId=1,pvTopicIdx=0,pvTemplIdx=0;
 
-// Preview state
-let pvTemplates    = [];
-let pvTopicIdx     = 0;
-let pvTemplIdx     = 0;
-
-/* ── FETCH ── */
-async function fetchSource(src) {
-  setSrcStatus(src.id, 'pend', 0);
-  try {
-    const res  = await fetch(src.url, { signal: AbortSignal.timeout(8000) });
-    const json = await res.json();
-    if(json.status!=='ok' || !Array.isArray(json.items)) throw new Error();
-    const topics = src.parse(json.items).map(p => ({
-      id: nextId++, title: p.title, source: p.source,
-      tags: p.tags||[], zone: classifyZone(p.title, p.tags),
-      virality: p.viralityBase + rnd(4), live: p.live, link: p.link||null,
-    }));
-    setSrcStatus(src.id, 'ok', topics.length);
-    return topics;
-  } catch(e) {
-    setSrcStatus(src.id, 'err', 0);
-    return [];
-  }
+async function fetchSource(src){
+  setSrcStatus(src.id,'pend',0);
+  try{
+    const res=await fetch(src.url,{signal:AbortSignal.timeout(8000)});
+    const json=await res.json();
+    if(json.status!=='ok'||!Array.isArray(json.items))throw new Error();
+    const topics=src.parse(json.items).map(p=>({id:nextId++,title:p.title,source:p.source,tags:p.tags||[],zone:classifyZone(p.title,p.tags),virality:p.viralityBase+rnd(4),live:p.live,link:p.link||null}));
+    setSrcStatus(src.id,'ok',topics.length);return topics;
+  }catch(e){setSrcStatus(src.id,'err',0);return[];}
 }
 
-async function loadAllTopics() {
+async function loadAllTopics(){
   document.getElementById('refresh-btn').classList.add('loading');
   renderSkeletons();
-  allTopics = CURATED.map(t=>({...t, id:nextId++}));
+  allTopics=CURATED.map(t=>({...t,id:nextId++}));
   setSrcStatus('curado','ok',CURATED.length);
-  const results = await Promise.allSettled(SOURCES.map(s=>fetchSource(s)));
-  results.forEach(r=>{ if(r.status==='fulfilled') allTopics=[...allTopics,...r.value]; });
+  const results=await Promise.allSettled(SOURCES.map(s=>fetchSource(s)));
+  results.forEach(r=>{if(r.status==='fulfilled')allTopics=[...allTopics,...r.value];});
   const seen=new Set();
-  allTopics=allTopics.filter(t=>{ const k=t.title.toLowerCase().slice(0,40); if(seen.has(k))return false; seen.add(k); return true; });
-  ZONES.forEach(z=>{ z.count=allTopics.filter(t=>t.zone===z.id).length; });
-  renderZones(); renderTopics(); updateUI();
+  allTopics=allTopics.filter(t=>{const k=t.title.toLowerCase().slice(0,40);if(seen.has(k))return false;seen.add(k);return true;});
+  ZONES.forEach(z=>{z.count=allTopics.filter(t=>t.zone===z.id).length;});
+  renderZones();renderTopics();updateUI();
   const now=new Date();
-  document.getElementById('last-updated').textContent=
-    `Atualizado ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  document.getElementById('last-updated').textContent=`Atualizado ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
   document.getElementById('refresh-btn').classList.remove('loading');
   toast(`${allTopics.length} tendencias carregadas`);
 }
 
-function setSrcStatus(id, status, count) {
-  srcStatuses[id]={status,count};
-  renderSrcStatus();
-}
+function setSrcStatus(id,status,count){srcStatuses[id]={status,count};renderSrcStatus();}
 
-function renderSrcStatus() {
-  const container = document.getElementById('source-status');
-  const all = [{id:'curado',label:'Curado Sancho'}, ...SOURCES.map(s=>({id:s.id,label:s.label}))];
-  const rows = all.map(s=>{
-    const st=srcStatuses[s.id]||{status:'pend',count:0};
-    return `<div class="src-item">
-      <span class="s-led ${st.status}"></span>
-      <span class="s-name">${s.label}</span>
-      ${st.status==='ok'?`<span class="s-ct">${st.count}</span>`:''}
-    </div>`;
-  }).join('');
+function renderSrcStatus(){
+  const container=document.getElementById('source-status');
+  const all=[{id:'curado',label:'Curado Sancho'},...SOURCES.map(s=>({id:s.id,label:s.label}))];
+  const rows=all.map(s=>{const st=srcStatuses[s.id]||{status:'pend',count:0};return`<div class="src-item"><span class="s-led ${st.status}"></span><span class="s-name">${s.label}</span>${st.status==='ok'?`<span class="s-ct">${st.count}</span>`:''}</div>`;}).join('');
   container.innerHTML=`<div class="panel-label">Fontes</div><div class="src-list">${rows}</div>`;
 }
 
-/* ── RENDER ZONES ── */
-function renderZones() {
-  const list   = document.getElementById('zones-list');
-  list.innerHTML = '';
+function renderZones(){
+  const list=document.getElementById('zones-list');
+  list.innerHTML='';
   ZONES.forEach(z=>{
     const btn=document.createElement('button');
     btn.className='zone-btn'+(activeZone===z.id?' active':'');
     btn.dataset.id=z.id;
-    btn.innerHTML=`
-      <div class="z-icon" style="background:${activeZone===z.id?'rgba(217,20,96,.12)':'var(--bg)'}">${z.icon}</div>
-      <div class="z-info">
-        <div class="z-name">${z.label}</div>
-        <div class="z-ct">${z.count} topicos</div>
-      </div>`;
+    btn.innerHTML=`<div class="z-icon">${z.icon}</div><div class="z-info"><div class="z-name">${z.label}</div><div class="z-ct">${z.count} topicos</div></div>`;
     btn.addEventListener('click',()=>{
       activeZone=z.id;
-      document.querySelectorAll('.zone-btn').forEach(b=>{
-        b.classList.toggle('active', b.dataset.id===z.id);
-        b.querySelector('.z-icon').style.background=b.dataset.id===z.id?'rgba(217,20,96,.12)':'var(--bg)';
-      });
-      updateUI();
-      renderPreview();
+      document.querySelectorAll('.zone-btn').forEach(b=>{b.classList.toggle('active',b.dataset.id===z.id);});
+      pvTopicIdx=0;pvTemplIdx=0;
+      updateUI();renderPreview();
     });
     list.appendChild(btn);
   });
 }
 
-/* ── RENDER TOPICS ── */
-function renderSkeletons() {
+function renderSkeletons(){
   const grid=document.getElementById('topics-grid');
-  grid.innerHTML=Array(14).fill('').map(()=>`
-    <div class="skel-row">
-      <div class="skel" style="height:16px;width:26px;margin:0 8px 0 12px"></div>
-      <div class="skel" style="height:13px;width:13px;border-radius:3px"></div>
-      <div style="padding:0 10px;display:flex;flex-direction:column;gap:5px">
-        <div class="skel" style="height:11px;width:88%"></div>
-        <div class="skel" style="height:9px;width:50%"></div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
-        <div class="skel" style="height:9px;width:36px"></div>
-        <div class="skel" style="height:2px;width:40px"></div>
-      </div>
-    </div>`).join('');
+  grid.innerHTML=Array(14).fill('').map(()=>`<div class="skel-row"><div class="skel" style="height:16px;width:26px;margin:0 5px 0 12px"></div><div class="skel" style="height:13px;width:13px;border-radius:3px"></div><div style="padding:0 10px;display:flex;flex-direction:column;gap:5px"><div class="skel" style="height:11px;width:88%"></div><div class="skel" style="height:9px;width:50%"></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;padding-right:12px"><div class="skel" style="height:9px;width:36px"></div><div class="skel" style="height:2px;width:40px"></div></div></div>`).join('');
   document.getElementById('topic-count').textContent='Carregando...';
 }
 
-function renderTopics() {
+function renderTopics(){
   const grid=document.getElementById('topics-grid');
-  const filtered=allTopics.filter(t=>{
-    if(activeFilter==='all') return true;
-    const m=SOURCE_META[t.source];
-    return m && m.filter===activeFilter;
-  });
+  const filtered=allTopics.filter(t=>{if(activeFilter==='all')return true;const m=SOURCE_META[t.source];return m&&m.filter===activeFilter;});
   document.getElementById('topic-count').textContent=`${filtered.length} topicos`;
   grid.innerHTML='';
-  if(!filtered.length){
-    grid.innerHTML=`<div class="empty-state">
-      <div class="empty-icon">📡</div>
-      <div class="empty-h">Nenhum topico encontrado</div>
-      <div class="empty-p">Tente outro filtro ou atualize as tendencias.</div>
-    </div>`;
-    return;
-  }
+  if(!filtered.length){grid.innerHTML=`<div class="empty-state"><div class="empty-icon">📡</div><div class="empty-h">Nenhum topico encontrado</div><div class="empty-p">Tente outro filtro ou atualize.</div></div>`;return;}
   [...filtered].sort((a,b)=>b.virality-a.virality).forEach(t=>{
-    const sel  =selectedTopics.has(t.id);
-    const meta =SOURCE_META[t.source]||SOURCE_META['curado'];
-    const sc   =t.virality>=90?'hi':t.virality>=80?'mid':'lo';
-    const fc   =t.virality>=90?'var(--pink)':t.virality>=80?'var(--amber)':'var(--blue)';
-    const vl   =t.virality>=90?'Viral':t.virality>=80?'Em alta':'Crescendo';
+    const sel=selectedTopics.has(t.id);
+    const meta=SOURCE_META[t.source]||SOURCE_META['curado'];
+    const sc=t.virality>=90?'hi':t.virality>=80?'mid':'lo';
+    const fc=t.virality>=90?'var(--pink)':t.virality>=80?'var(--amber)':'var(--blue)';
+    const vl=t.virality>=90?'Viral':t.virality>=80?'Em alta':'Crescendo';
     const row=document.createElement('div');
     row.className='topic-row'+(sel?' selected':'');
     row.dataset.id=t.id;
-    row.innerHTML=`
-      <div class="tr-score ${sc}">${t.virality}</div>
-      <div class="tr-ck">${sel?'✓':''}</div>
-      <div class="tr-body">
-        <div class="tr-title">${t.title}</div>
-        <div class="tr-tags">
-          ${t.live?'<span class="tr-live"></span>':''}
-          <span class="tr-badge ${meta.badgeCls}">${meta.badge}</span>
-        </div>
-      </div>
-      <div class="tr-right">
-        <span class="tr-vl">${vl}</span>
-        <div class="tr-vbar"><div class="tr-vfill" style="width:${t.virality}%;background:${fc}"></div></div>
-      </div>`;
+    row.innerHTML=`<div class="tr-score ${sc}">${t.virality}</div><div class="tr-ck">${sel?'✓':''}</div><div class="tr-body"><div class="tr-title">${t.title}</div><div class="tr-tags">${t.live?'<span class="tr-live"></span>':''}<span class="tr-badge ${meta.badgeCls}">${meta.badge}</span></div></div><div class="tr-right"><span class="tr-vl">${vl}</span><div class="tr-vbar"><div class="tr-vfill" style="width:${t.virality}%;background:${fc}"></div></div></div>`;
     row.addEventListener('click',()=>{
-      if(selectedTopics.has(t.id)){
-        selectedTopics.delete(t.id);
-        row.classList.remove('selected');
-        row.querySelector('.tr-ck').textContent='';
-        row.querySelector('.tr-score').className='tr-score '+sc;
-      } else {
-        selectedTopics.add(t.id);
-        row.classList.add('selected');
-        row.querySelector('.tr-ck').textContent='✓';
-      }
-      updateUI();
-      pvTopicIdx=0; pvTemplIdx=0;
-      renderPreview();
+      if(selectedTopics.has(t.id)){selectedTopics.delete(t.id);row.classList.remove('selected');row.querySelector('.tr-ck').textContent='';row.querySelector('.tr-score').className='tr-score '+sc;}
+      else{selectedTopics.add(t.id);row.classList.add('selected');row.querySelector('.tr-ck').textContent='✓';}
+      pvTopicIdx=0;pvTemplIdx=0;
+      updateUI();renderPreview();
     });
     grid.appendChild(row);
   });
 }
 
-/* ── PREVIEW ── */
-function buildPreviewItems() {
+function buildPreviewItems(){
   const topics=allTopics.filter(t=>selectedTopics.has(t.id));
-  const pool  =TEMPLATES[activeZone]||TEMPLATES.carreiras;
+  const pool=TEMPLATES[activeZone]||TEMPLATES.carreiras;
   const items=[];
-  topics.forEach(topic=>{
-    pool.forEach(tmpl=>{
-      items.push({topic, tmpl});
-    });
-  });
+  topics.forEach(topic=>{pool.forEach(tmpl=>{items.push({topic,tmpl});});});
   return items;
 }
 
-function renderPreview() {
-  const empty  =document.getElementById('pv-empty');
+function renderPreview(){
+  const empty=document.getElementById('pv-empty');
   const content=document.getElementById('pv-content');
-  const badge  =document.getElementById('pv-badge');
+  const badge=document.getElementById('pv-badge');
   const prevBtn=document.getElementById('pv-prev');
   const nextBtn=document.getElementById('pv-next');
-
-  if(!activeZone || selectedTopics.size===0){
-    empty.hidden=false; content.style.display='none';
-    badge.hidden=true;
-    prevBtn.disabled=true; nextBtn.disabled=true;
-    return;
-  }
-
+  if(!activeZone||selectedTopics.size===0){empty.hidden=false;content.style.display='none';badge.hidden=true;prevBtn.disabled=true;nextBtn.disabled=true;return;}
   const items=buildPreviewItems();
-  if(!items.length){ empty.hidden=false; content.style.display='none'; return; }
-
-  const idx=Math.min(pvTopicIdx*2+pvTemplIdx, items.length-1);
-  const {topic, tmpl}=items[idx];
-
-  badge.hidden=false;
-  badge.textContent=`${idx+1} de ${items.length}`;
-  prevBtn.disabled=idx===0;
-  nextBtn.disabled=idx===items.length-1;
-
-  const hook=tmpl.hook(topic.title);
-  const desc=tmpl.desc(topic.title);
+  if(!items.length){empty.hidden=false;content.style.display='none';return;}
+  const idx=Math.min(pvTopicIdx*2+pvTemplIdx,items.length-1);
+  const{topic,tmpl}=items[idx];
+  badge.hidden=false;badge.textContent=`${idx+1} de ${items.length}`;
+  prevBtn.disabled=idx===0;nextBtn.disabled=idx===items.length-1;
+  const abertura=tmpl.abertura(topic.title);
+  const desenvolvimento=tmpl.desenvolvimento(topic.title);
+  const provocacao=tmpl.provocacao(topic.title);
   const meta=SOURCE_META[topic.source]||SOURCE_META['curado'];
-  const zone=ZONES.find(z=>z.id===activeZone);
-
   const otherCount=selectedTopics.size-1;
-
-  empty.hidden=true;
-  content.style.display='flex';
-  content.innerHTML=`
-    <div class="pv-topic-tag">
-      <span class="pv-topic-label">Topico</span>
-      <span class="pv-topic-title">${topic.title}</span>
-      <span class="tr-badge ${meta.badgeCls}">${meta.badge}</span>
-    </div>
-    <div class="pv-card">
-      <div class="pv-card-head">
-        <span class="pv-card-ico">${tmpl.icon}</span>
-        <span class="pv-card-plat">${tmpl.platform}</span>
-        <span class="pv-card-fmt">${tmpl.format}</span>
-      </div>
-      <div class="pv-card-body">
-        <div class="pv-hook-label">Hook de abertura</div>
-        <div class="pv-hook">${hook}</div>
-        <div class="pv-desc-label">Roteiro / Contexto</div>
-        <div class="pv-desc">${desc}</div>
-        <div class="pv-cta-row">
-          <span class="pv-cta-icon">💬</span>
-          <span class="pv-cta">${tmpl.cta}</span>
-        </div>
-      </div>
-    </div>
-    ${otherCount>0?`<div class="pv-more-topics">+${otherCount} topico${otherCount>1?'s':''} selecionado${otherCount>1?'s':''}. Use as setas para navegar ou gere todas as ideias abaixo.</div>`:''}
-  `;
+  empty.hidden=true;content.style.display='flex';
+  content.innerHTML=`<div class="pv-topic-tag"><span class="pv-topic-label">Topico</span><span class="pv-topic-title">${topic.title}</span><span class="tr-badge ${meta.badgeCls}">${meta.badge}</span></div><div class="pv-card"><div class="pv-card-head"><span class="pv-card-ico">${tmpl.icon}</span><span class="pv-card-plat">${tmpl.platform}</span><span class="pv-card-fmt">${tmpl.format}</span></div><div class="pv-card-body"><div class="pv-hook-label">ABERTURA</div><div class="pv-hook">${abertura}</div><div class="pv-desc-label">DESENVOLVIMENTO</div><div class="pv-desc">${desenvolvimento}</div><div class="pv-desc-label">PROVOCACAO</div><div class="pv-desc">${provocacao}</div><div class="pv-cta-row"><span class="pv-cta-icon">🎯</span><span class="pv-cta">${tmpl.cta}</span></div></div></div>${otherCount>0?`<div class="pv-more-topics">+${otherCount} topico${otherCount>1?'s':''} selecionado${otherCount>1?'s':''}. Use as setas para navegar.</div>`:''}`;
 }
 
-/* ── UI STATE ── */
-function updateUI() {
+function updateUI(){
   const n=selectedTopics.size;
   const zone=ZONES.find(z=>z.id===activeZone);
   const btn=document.getElementById('gen-btn');
   const hint=document.getElementById('gen-hint');
   const selCount=document.getElementById('sel-count');
-
-  selCount.textContent=n>0?`${n} selecionado${n>1?'s':''}` : '';
+  selCount.textContent=n>0?`${n} selecionado${n>1?'s':''}` :'';
   selCount.style.display=n>0?'inline':'none';
-
-  if(!activeZone && n===0){
-    btn.disabled=true;
-    hint.textContent='Selecione uma zona e ao menos um topico';
-  } else if(!activeZone){
-    btn.disabled=true;
-    hint.textContent='Selecione uma zona a esquerda';
-  } else if(n===0){
-    btn.disabled=true;
-    hint.textContent='Clique em topicos para selecionar';
-  } else {
-    btn.disabled=false;
-    hint.textContent=`${n} topico${n>1?'s':''} · ${zone.label}`;
-  }
+  if(!activeZone&&n===0){btn.disabled=true;hint.textContent='Selecione uma zona e ao menos um topico';}
+  else if(!activeZone){btn.disabled=true;hint.textContent='Selecione uma zona a esquerda';}
+  else if(n===0){btn.disabled=true;hint.textContent='Clique em topicos para selecionar';}
+  else{btn.disabled=false;hint.textContent=`${n} topico${n>1?'s':''} · ${zone.label}`;}
 }
 
-/* ── GENERATE ALL ── */
-function generateContent() {
+function generateContent(){
   const topics=allTopics.filter(t=>selectedTopics.has(t.id));
-  const zone  =ZONES.find(z=>z.id===activeZone);
-  const pool  =TEMPLATES[activeZone]||TEMPLATES.carreiras;
-
-  document.getElementById('out-ctx').innerHTML=`
-    <span class="ctx-chip">Wladson Sidney</span>
-    <span class="ctx-chip pink">${zone.icon} ${zone.label}</span>
-    ${topics.map(t=>`<span class="ctx-chip">📌 ${t.title.slice(0,45)}${t.title.length>45?'...':''}</span>`).join('')}
-  `;
-
+  const zone=ZONES.find(z=>z.id===activeZone);
+  const pool=TEMPLATES[activeZone]||TEMPLATES.carreiras;
+  document.getElementById('out-ctx').innerHTML=`<span class="ctx-chip">Wladson Sidney</span><span class="ctx-chip pink">${zone.icon} ${zone.label}</span>${topics.map(t=>`<span class="ctx-chip">📌 ${t.title.slice(0,45)}${t.title.length>45?'...':''}</span>`).join('')}`;
   const grid=document.getElementById('ideas-grid');
   grid.innerHTML='';
   topics.forEach(topic=>{
@@ -1345,69 +799,29 @@ function generateContent() {
       const card=document.createElement('div');
       card.className='idea-card';
       const meta=SOURCE_META[topic.source]||SOURCE_META['curado'];
-      card.innerHTML=`
-        <div class="idea-head">
-          <span class="idea-ico">${tmpl.icon}</span>
-          <span class="idea-plat">${tmpl.platform}</span>
-          <span class="idea-fmt">${tmpl.format}</span>
-        </div>
-        <div class="idea-body">
-          <div class="idea-hook">${tmpl.hook(topic.title)}</div>
-          <div class="idea-desc">${tmpl.desc(topic.title)}</div>
-          <div class="idea-cta">${tmpl.cta}</div>
-          <div class="idea-ref">${topic.title.slice(0,55)}${topic.title.length>55?'...':''} · <span class="tr-badge ${meta.badgeCls}">${meta.badge}</span></div>
-        </div>`;
+      card.innerHTML=`<div class="idea-head"><span class="idea-ico">${tmpl.icon}</span><span class="idea-plat">${tmpl.platform}</span><span class="idea-fmt">${tmpl.format}</span></div><div class="idea-body"><div class="idea-section-label">ABERTURA</div><div class="idea-hook">${tmpl.abertura(topic.title)}</div><div class="idea-section-label">DESENVOLVIMENTO</div><div class="idea-desc">${tmpl.desenvolvimento(topic.title)}</div><div class="idea-section-label">PROVOCACAO</div><div class="idea-desc">${tmpl.provocacao(topic.title)}</div><div class="idea-cta"><span class="idea-cta-label">CTA</span> ${tmpl.cta}</div><div class="idea-ref">${topic.title.slice(0,55)}${topic.title.length>55?'...':''} · <span class="tr-badge ${meta.badgeCls}">${meta.badge}</span></div></div>`;
       grid.appendChild(card);
     });
   });
-
   document.getElementById('out-overlay').hidden=false;
   document.querySelector('.out-sheet').scrollTop=0;
 }
 
-function toast(msg) {
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), 2800);
-}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);}
 
-/* ── WIRING ── */
-document.getElementById('source-filter').addEventListener('click',e=>{
-  const btn=e.target.closest('.f-btn'); if(!btn) return;
-  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  activeFilter=btn.dataset.filter;
-  renderTopics();
-});
+document.getElementById('source-filter').addEventListener('click',e=>{const btn=e.target.closest('.f-btn');if(!btn)return;document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeFilter=btn.dataset.filter;renderTopics();});
+document.getElementById('pv-prev').addEventListener('click',()=>{const items=buildPreviewItems();const cur=pvTopicIdx*2+pvTemplIdx;if(cur>0){const ni=cur-1;pvTopicIdx=Math.floor(ni/2);pvTemplIdx=ni%2;renderPreview();}});
+document.getElementById('pv-next').addEventListener('click',()=>{const items=buildPreviewItems();const cur=pvTopicIdx*2+pvTemplIdx;if(cur<items.length-1){const ni=cur+1;pvTopicIdx=Math.floor(ni/2);pvTemplIdx=ni%2;renderPreview();}});
+document.getElementById('gen-btn').addEventListener('click',generateContent);
+document.getElementById('out-regen').addEventListener('click',generateContent);
+document.getElementById('refresh-btn').addEventListener('click',loadAllTopics);
+document.getElementById('out-close').addEventListener('click',()=>{document.getElementById('out-overlay').hidden=true;});
+document.getElementById('out-overlay').addEventListener('click',e=>{if(e.target.id==='out-overlay')document.getElementById('out-overlay').hidden=true;});
 
-document.getElementById('pv-prev').addEventListener('click',()=>{
-  const items=buildPreviewItems();
-  const cur=pvTopicIdx*2+pvTemplIdx;
-  if(cur>0){
-    const ni=cur-1;
-    pvTopicIdx=Math.floor(ni/2); pvTemplIdx=ni%2;
-    renderPreview();
-  }
-});
-document.getElementById('pv-next').addEventListener('click',()=>{
-  const items=buildPreviewItems();
-  const cur=pvTopicIdx*2+pvTemplIdx;
-  if(cur<items.length-1){
-    const ni=cur+1;
-    pvTopicIdx=Math.floor(ni/2); pvTemplIdx=ni%2;
-    renderPreview();
-  }
-});
-
-document.getElementById('gen-btn').addEventListener('click', generateContent);
-document.getElementById('out-regen').addEventListener('click', generateContent);
-document.getElementById('refresh-btn').addEventListener('click', loadAllTopics);
-document.getElementById('out-close').addEventListener('click',()=>{ document.getElementById('out-overlay').hidden=true; });
-document.getElementById('out-overlay').addEventListener('click',e=>{ if(e.target.id==='out-overlay') document.getElementById('out-overlay').hidden=true; });
-
-/* ── INIT ── */
-CURATED.forEach(t=>allTopics.push({...t, id:nextId++}));
-ZONES.forEach(z=>{ z.count=allTopics.filter(t=>t.zone===z.id).length; });
-renderZones(); renderTopics(); updateUI(); renderPreview(); renderSrcStatus();
+CURATED.forEach(t=>allTopics.push({...t,id:nextId++}));
+ZONES.forEach(z=>{z.count=allTopics.filter(t=>t.zone===z.id).length;});
+renderZones();renderTopics();updateUI();renderPreview();renderSrcStatus();
 loadAllTopics();
 </script>
+</body>
+</html>
