@@ -378,6 +378,24 @@ img { max-width: 100%; }
   transition: background .1s;
 }
 .out-close:hover { background: var(--border); }
+.out-dl {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700; color: var(--ink-2);
+  background: var(--bg); border: 1px solid var(--border-hi);
+  padding: 4px 11px; border-radius: var(--r);
+  transition: border-color .12s, color .12s;
+}
+.out-dl:hover { border-color: var(--pink); color: var(--pink); }
+.idea-actions { display: flex; gap: 6px; padding: 8px 12px; border-top: 1px solid var(--border); background: var(--surface); }
+.idea-copy-btn {
+  flex: 1; font-size: 11px; font-weight: 600; color: var(--ink-2);
+  background: transparent; border: 1px solid var(--border-hi);
+  border-radius: var(--r); padding: 5px 0;
+  transition: border-color .1s, color .1s, background .1s;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.idea-copy-btn:hover { border-color: var(--pink); color: var(--pink); background: var(--pink-lt); }
+.idea-copy-btn.copied { border-color: var(--green); color: var(--green); background: var(--green-lt); }
 .out-ctx { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 20px; border-bottom: 1px solid var(--border); }
 .ctx-chip { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; background: var(--bg); color: var(--ink-2); border: 1px solid var(--border-hi); }
 .ctx-chip.pink { background: var(--pink-lt); color: var(--pink); border-color: var(--pink-bdr); }
@@ -507,7 +525,8 @@ img { max-width: 100%; }
 <div class="out-overlay" id="out-overlay" hidden>
   <div class="out-sheet">
     <div class="out-head">
-      <div class="out-title">Todas as ideias de conteudo</div>
+      <div class="out-title">Roteiros gerados</div>
+      <button class="out-dl" id="out-dl">&#8659; Baixar todos</button>
       <button class="out-close" id="out-close">&#10005;</button>
     </div>
     <div class="out-ctx" id="out-ctx"></div>
@@ -786,6 +805,42 @@ function updateUI(){
   else{btn.disabled=false;hint.textContent=`${n} topico${n>1?'s':''} · ${zone.label}`;}
 }
 
+function scriptText(topic, tmpl){
+  return [
+    `${tmpl.platform.toUpperCase()} · ${tmpl.format}`,
+    `Topico: ${topic.title}`,
+    '',
+    'ABERTURA',
+    tmpl.abertura(topic.title),
+    '',
+    'DESENVOLVIMENTO',
+    tmpl.desenvolvimento(topic.title),
+    '',
+    'PROVOCACAO',
+    tmpl.provocacao(topic.title),
+    '',
+    'CTA',
+    tmpl.cta,
+  ].join('\n');
+}
+
+function copyScript(btn, text){
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.classList.add('copied');
+    btn.innerHTML='&#10003; Copiado';
+    setTimeout(()=>{btn.classList.remove('copied');btn.innerHTML='&#10064; Copiar roteiro';},2200);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.classList.add('copied');btn.innerHTML='&#10003; Copiado';
+    setTimeout(()=>{btn.classList.remove('copied');btn.innerHTML='&#10064; Copiar roteiro';},2200);
+  });
+}
+
+let generatedScripts=[];
+
 function generateContent(){
   const topics=allTopics.filter(t=>selectedTopics.has(t.id));
   const zone=ZONES.find(z=>z.id===activeZone);
@@ -793,18 +848,37 @@ function generateContent(){
   document.getElementById('out-ctx').innerHTML=`<span class="ctx-chip">Wladson Sidney</span><span class="ctx-chip pink">${zone.icon} ${zone.label}</span>${topics.map(t=>`<span class="ctx-chip">📌 ${t.title.slice(0,45)}${t.title.length>45?'...':''}</span>`).join('')}`;
   const grid=document.getElementById('ideas-grid');
   grid.innerHTML='';
+  generatedScripts=[];
   topics.forEach(topic=>{
     const shuffled=[...pool].sort(()=>Math.random()-.5);
     shuffled.slice(0,2).forEach(tmpl=>{
+      const text=scriptText(topic,tmpl);
+      generatedScripts.push(text);
       const card=document.createElement('div');
       card.className='idea-card';
       const meta=SOURCE_META[topic.source]||SOURCE_META['curado'];
-      card.innerHTML=`<div class="idea-head"><span class="idea-ico">${tmpl.icon}</span><span class="idea-plat">${tmpl.platform}</span><span class="idea-fmt">${tmpl.format}</span></div><div class="idea-body"><div class="idea-section-label">ABERTURA</div><div class="idea-hook">${tmpl.abertura(topic.title)}</div><div class="idea-section-label">DESENVOLVIMENTO</div><div class="idea-desc">${tmpl.desenvolvimento(topic.title)}</div><div class="idea-section-label">PROVOCACAO</div><div class="idea-desc">${tmpl.provocacao(topic.title)}</div><div class="idea-cta"><span class="idea-cta-label">CTA</span> ${tmpl.cta}</div><div class="idea-ref">${topic.title.slice(0,55)}${topic.title.length>55?'...':''} · <span class="tr-badge ${meta.badgeCls}">${meta.badge}</span></div></div>`;
+      card.innerHTML=`<div class="idea-head"><span class="idea-ico">${tmpl.icon}</span><span class="idea-plat">${tmpl.platform}</span><span class="idea-fmt">${tmpl.format}</span></div><div class="idea-body"><div class="idea-section-label">ABERTURA</div><div class="idea-hook">${tmpl.abertura(topic.title)}</div><div class="idea-section-label">DESENVOLVIMENTO</div><div class="idea-desc">${tmpl.desenvolvimento(topic.title)}</div><div class="idea-section-label">PROVOCACAO</div><div class="idea-desc">${tmpl.provocacao(topic.title)}</div><div class="idea-cta"><span class="idea-cta-label">CTA</span> ${tmpl.cta}</div><div class="idea-ref">${topic.title.slice(0,55)}${topic.title.length>55?'...':''} · <span class="tr-badge ${meta.badgeCls}">${meta.badge}</span></div></div><div class="idea-actions"><button class="idea-copy-btn">&#10064; Copiar roteiro</button></div>`;
+      const copyBtn=card.querySelector('.idea-copy-btn');
+      copyBtn.addEventListener('click',()=>copyScript(copyBtn,text));
       grid.appendChild(card);
     });
   });
   document.getElementById('out-overlay').hidden=false;
   document.querySelector('.out-sheet').scrollTop=0;
+}
+
+function downloadAll(){
+  if(!generatedScripts.length)return;
+  const zone=ZONES.find(z=>z.id===activeZone);
+  const header=`ROTEIROS DE VIDEO · Wladson Sidney · ${zone?zone.label:''}\nGerado em ${new Date().toLocaleDateString('pt-BR')}\n${'='.repeat(60)}\n\n`;
+  const body=generatedScripts.join('\n\n'+'='.repeat(60)+'\n\n');
+  const blob=new Blob([header+body],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`roteiros-${zone?zone.id:'conteudo'}-${Date.now()}.txt`;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},1000);
+  toast('Roteiros baixados!');
 }
 
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);}
@@ -814,6 +888,7 @@ document.getElementById('pv-prev').addEventListener('click',()=>{const items=bui
 document.getElementById('pv-next').addEventListener('click',()=>{const items=buildPreviewItems();const cur=pvTopicIdx*2+pvTemplIdx;if(cur<items.length-1){const ni=cur+1;pvTopicIdx=Math.floor(ni/2);pvTemplIdx=ni%2;renderPreview();}});
 document.getElementById('gen-btn').addEventListener('click',generateContent);
 document.getElementById('out-regen').addEventListener('click',generateContent);
+document.getElementById('out-dl').addEventListener('click',downloadAll);
 document.getElementById('refresh-btn').addEventListener('click',loadAllTopics);
 document.getElementById('out-close').addEventListener('click',()=>{document.getElementById('out-overlay').hidden=true;});
 document.getElementById('out-overlay').addEventListener('click',e=>{if(e.target.id==='out-overlay')document.getElementById('out-overlay').hidden=true;});
