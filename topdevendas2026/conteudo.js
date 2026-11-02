@@ -4,7 +4,7 @@
    Este é o ÚNICO arquivo que precisa ser editado para preencher o site.
    Enquanto uma lista estiver vazia, o site mostra "Em breve" naquela aba.
 
-   • Imagens/vídeos: coloque os arquivos na pasta  top-de-vendas-2026/midia/
+   • Imagens/vídeos: coloque os arquivos na pasta  topdevendas2026/midia/
      e use o caminho "midia/nome-do-arquivo.jpg".
      (Links externos completos, https://..., também funcionam.)
    • Vídeos do YouTube: cole o link normal (https://www.youtube.com/watch?v=...)

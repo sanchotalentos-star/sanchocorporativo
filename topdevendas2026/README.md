@@ -2,13 +2,13 @@
 
 Página única, pensada para abrir pelo celular a partir de uma tag NFC.
 
-**Endereço:** `https://SEU-DOMINIO/top-de-vendas-2026/`
+**Endereço:** `https://advbce.com.br/topdevendas2026/`
 
 ## Personalizar por jurado (opcional)
 Grave na tag NFC de cada jurado o link com o nome dele:
 
 ```
-https://SEU-DOMINIO/top-de-vendas-2026/?nome=Ana
+https://advbce.com.br/topdevendas2026/?nome=Ana
 ```
 
 A abertura passa a dizer "Ana, este prêmio tem a sua assinatura." e o agradecimento final também usa o nome.
@@ -24,3 +24,9 @@ Nomes compostos usam `%20` no lugar do espaço: `?nome=Ana%20Paula`.
 - `index.html`: a página (logo animada em SVG + GSAP).
 - `conteudo.js`: conteúdo dos menus.
 - `midia/`: arquivos de fotos e vídeos.
+
+## Publicar em advbce.com.br/topdevendas2026
+Envie a pasta `topdevendas2026/` inteira (com `index.html`, `conteudo.js` e `midia/`)
+para a raiz pública do site advbce.com.br (geralmente `public_html/` ou `www/`),
+via FTP ou pelo gerenciador de arquivos da hospedagem.
+O endereço final fica: https://advbce.com.br/topdevendas2026
